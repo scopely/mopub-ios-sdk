@@ -176,7 +176,7 @@
                                                                                       repeats:NO
                                                                                       logType:WBLogTypeAdBanner];
         [self.refreshTimer scheduleNow];
-        MPLogDebug(@"Scheduled the autorefresh timer to fire in %.1f seconds (%p).", timeInterval, self.refreshTimer);
+        CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Scheduled the autorefresh timer to fire in %.1f seconds (%p).", timeInterval, self.refreshTimer);
     }
 }
 
