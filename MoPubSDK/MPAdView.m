@@ -73,6 +73,24 @@
     [view release];
 }
 
+- (BOOL)ignoresAutorefresh
+{
+    return _ignoresAutorefresh;
+}
+
+- (void)setIgnoresAutorefresh:(BOOL)ignoresAutorefresh
+{
+    if (_ignoresAutorefresh != ignoresAutorefresh) {
+        _ignoresAutorefresh = ignoresAutorefresh;
+    }
+
+    if (_ignoresAutorefresh) {
+        [self.adManager stopAutomaticallyRefreshingContents];
+    } else {
+        [self.adManager startAutomaticallyRefreshingContents];
+    }
+}
+
 - (CGSize)adContentViewSize
 {
     if (!self.adContentView || [self.adContentView isKindOfClass:[MRAdView class]]) {
@@ -105,6 +123,16 @@
 - (void)forceRefreshAd
 {
     [self.adManager forceRefreshAd];
+}
+
+- (void)stopAutomaticallyRefreshingContents
+{
+    [self.adManager stopAutomaticallyRefreshingContents];
+}
+
+- (void)startAutomaticallyRefreshingContents
+{
+    [self.adManager startAutomaticallyRefreshingContents];
 }
 
 - (void)lockNativeAdsToOrientation:(MPNativeAdOrientation)orientation

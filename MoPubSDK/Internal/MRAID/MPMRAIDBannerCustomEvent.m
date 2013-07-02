@@ -19,11 +19,6 @@
 
 @synthesize banner = _banner;
 
-- (BOOL)enableAutomaticImpressionAndClickTracking
-{
-    return NO;
-}
-
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
     CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Loading MoPub MRAID banner");

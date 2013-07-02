@@ -97,7 +97,6 @@
         return NO;
     }
 
-    CoreLogType(WBLogLevelDebug, self.logType, @"Scheduled MPTimer (%p).", self);
     [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
     return YES;
 }

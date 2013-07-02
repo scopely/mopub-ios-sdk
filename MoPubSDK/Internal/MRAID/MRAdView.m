@@ -124,6 +124,8 @@ static NSString * const kMraidURLScheme = @"mraid";
     [_closeButton release];
     [_data release];
     [_displayController release];
+    _destinationDisplayAgent.delegate = nil;
+    [_destinationDisplayAgent release];
     [super dealloc];
 }
 
@@ -406,12 +408,12 @@ static NSString * const kMraidURLScheme = @"mraid";
 
 - (void)displayAgentWillPresentModal
 {
-    [self.delegate appShouldSuspendForAd:self];
+    [self adWillPresentModalView];
 }
 
 - (void)displayAgentDidDismissModal
 {
-    [self.delegate appShouldResumeFromAd:self];
+    [self adDidDismissModalView];
 }
 
 - (void)displayAgentWillLeaveApplication
@@ -474,7 +476,6 @@ static NSString * const kMraidURLScheme = @"mraid";
     [_displayController additionalModalViewDidDismiss];
 
     _modalViewCount--;
-    NSAssert((_modalViewCount >= 0), @"Modal view count cannot be negative.");
     if (_modalViewCount == 0) [self appShouldResume];
 }
 
