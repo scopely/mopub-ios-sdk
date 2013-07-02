@@ -8,7 +8,6 @@
 #import "MMInterstitial.h"
 #import "MPMillennialInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "MPLogging.h"
 
 @interface MPMillennialInterstitialRouter : NSObject
 
@@ -113,6 +112,11 @@
     return self;
 }
 
+-(NSString *)description
+{
+    return @"Millennial";
+}
+
 - (void)dealloc
 {
     [self invalidate];
@@ -133,7 +137,7 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Requesting Millennial interstitial");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting Millennial interstitial");
     self.apid = [info objectForKey:@"adUnitID"];
 
     if (!self.apid || [self.router eventForApid:self.apid]) {
@@ -151,10 +155,10 @@
             return;
         }
         if (success) {
-            MPLogInfo(@"Millennial interstitial did load");
+            CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Millennial interstitial did load");
             [self.delegate interstitialCustomEvent:self didLoadAd:nil];
         } else {
-            MPLogInfo(@"Millennial interstitial did fail");
+            CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"Millennial interstitial did fail");
             [self invalidate];
             [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
         }
@@ -176,11 +180,11 @@
             }
 
             if (success) {
-                MPLogInfo(@"Millennial interstitial did present succesfully");
+                CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"Millennial interstitial did present succesfully");
                 self.didDisplay = YES;
                 [self.delegate trackImpression];
             } else {
-                MPLogInfo(@"Millennial interstitial failed to present");
+                CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"Millennial interstitial failed to present");
                 [self invalidate];
                 [self.delegate interstitialCustomEventDidExpire:self];
             }
@@ -200,7 +204,7 @@
     // XXX: Tap notifications do not include an APID object in the userInfo dictionary.
     if ([[notification.userInfo objectForKey:MillennialMediaAdTypeKey] isEqual:MillennialMediaAdTypeInterstitial] &&
         self.modalCount == 1) {
-        MPLogInfo(@"Millennial interstitial was tapped");
+        CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"Millennial interstitial was tapped");
         if (!self.didTrackClick) {
             [self.delegate trackClick];
             self.didTrackClick = YES;
@@ -212,7 +216,7 @@
 - (void)adWillAppear:(NSNotification *)notification
 {
     if ([self notificationIsRelevant:notification] && self.modalCount == 0) {
-        MPLogInfo(@"Millennial interstitial will appear");
+        CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"Millennial interstitial will appear");
         [self.delegate interstitialCustomEventWillAppear:self];
     }
 }
@@ -222,7 +226,7 @@
     if ([self notificationIsRelevant:notification]) {
         self.modalCount += 1;
         if (self.modalCount == 1) {
-            MPLogInfo(@"Millennial interstitial did appear");
+            CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"Millennial interstitial did appear");
             [self.delegate interstitialCustomEventDidAppear:self];
         }
     }
@@ -231,7 +235,7 @@
 - (void)adWillDismiss:(NSNotification *)notification
 {
     if ([self notificationIsRelevant:notification] && self.modalCount == 1) {
-        MPLogInfo(@"Millennial interstitial will dismiss");
+        CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"Millennial interstitial will dismiss");
         [self.delegate interstitialCustomEventWillDisappear:self];
     }
 }
@@ -241,7 +245,7 @@
     if ([self notificationIsRelevant:notification]) {
         self.modalCount -= 1;
         if (self.modalCount == 0) {
-            MPLogInfo(@"Millennial interstitial did dismiss");
+            CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"Millennial interstitial did dismiss");
             [self invalidate];
             [self.delegate interstitialCustomEventDidDisappear:self];
             [self.delegate interstitialCustomEventDidExpire:self];

@@ -30,4 +30,10 @@
     // and implement code to display an interstitial here.
 }
 
+
+-(void)loadInterstitialWithCustomEventInfo:(NSDictionary *)info
+{
+    //used for banners to actually load since they dont have precaching.
+}
+
 @end

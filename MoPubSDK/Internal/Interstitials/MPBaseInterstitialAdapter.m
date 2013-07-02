@@ -76,7 +76,8 @@
     self.timeoutTimer = [[MPInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:INTERSTITIAL_TIMEOUT_INTERVAL
                                                                                    target:self
                                                                                  selector:@selector(timeout)
-                                                                                  repeats:NO];
+                                                                                  repeats:NO
+                                                                                  logType:WBLogTypeAdFullPage];
     [self.timeoutTimer scheduleNow];
 }
 

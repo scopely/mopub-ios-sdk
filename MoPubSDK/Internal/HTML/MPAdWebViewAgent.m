@@ -8,7 +8,6 @@
 #import "MPAdWebViewAgent.h"
 #import "MPAdConfiguration.h"
 #import "MPGlobal.h"
-#import "MPLogging.h"
 #import "CJSONDeserializer.h"
 #import "MPAdDestinationDisplayAgent.h"
 #import "NSURL+MPAdditions.h"
@@ -78,6 +77,17 @@ NSString * const kMoPubCustomHost = @"custom";
         frame.size.height = configuration.preferredSize.height;
         self.view.frame = frame;
     }
+//    else
+//    {
+//        CoreWarning(adsf);
+////        if(configuration.adType == MPAdTypeBanner && configuration.adSize.height > 0.0f && configuration.adSize.width > 0.0f)
+////        {
+////            CGRect frame = self.view.frame;
+////            frame.size.width = configuration.adSize.width;
+////            frame.size.height = configuration.adSize.height;
+////            self.view.frame = frame;
+////        }
+//    }
 
     [self.view mp_setScrollable:configuration.scrollable];
     [self.view loadHTMLString:[configuration adResponseHTMLString]
@@ -154,7 +164,7 @@ NSString * const kMoPubCustomHost = @"custom";
 #pragma mark - MoPub-specific URL handlers
 - (void)performActionForMoPubSpecificURL:(NSURL *)URL
 {
-    MPLogDebug(@"MPAdWebView - loading MoPub URL: %@", URL);
+    CoreLogType(WBLogLevelTrace, (self.configuration.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdBanner), @"MPAdWebView - loading MoPub URL: %@", URL);
     NSString *host = [URL host];
     if ([host isEqualToString:kMoPubCloseHost]) {
         [self.delegate adDidClose:self.view];
@@ -165,7 +175,7 @@ NSString * const kMoPubCustomHost = @"custom";
     } else if ([host isEqualToString:kMoPubCustomHost]) {
         [self handleMoPubCustomURL:URL];
     } else {
-        MPLogWarn(@"MPAdWebView - unsupported MoPub URL: %@", [URL absoluteString]);
+        CoreLogType(WBLogLevelWarn, (self.configuration.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdBanner), @"MPAdWebView - unsupported MoPub URL: %@", [URL absoluteString]);
     }
 }
 
@@ -187,7 +197,7 @@ NSString * const kMoPubCustomHost = @"custom";
         [self.customMethodDelegate performSelector:oneArgumentSelector
                                         withObject:dataDictionary];
     } else {
-        MPLogError(@"Custom method delegate does not implement custom selectors %@ or %@.",
+        CoreLogType(WBLogLevelError, (self.configuration.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdBanner), @"Custom method delegate does not implement custom selectors %@ or %@.",
                    selectorName, oneArgumentSelectorName);
     }
 }

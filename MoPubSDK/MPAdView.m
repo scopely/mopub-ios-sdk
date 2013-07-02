@@ -11,7 +11,6 @@
 #import "MPBannerAdManager.h"
 #import "MPInstanceProvider.h"
 #import "MPBannerAdManagerDelegate.h"
-#import "MPLogging.h"
 
 @interface MPAdView () <MPBannerAdManagerDelegate>
 
@@ -96,6 +95,11 @@
 - (void)refreshAd
 {
     [self loadAd];
+}
+
+-(void)cancelAd
+{
+    [self.adManager cancelAd];
 }
 
 - (void)forceRefreshAd

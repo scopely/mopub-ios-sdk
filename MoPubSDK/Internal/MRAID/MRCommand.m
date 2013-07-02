@@ -10,7 +10,6 @@
 #import "MRAdView.h"
 #import "MRAdViewDisplayController.h"
 #import "MPGlobal.h"
-#import "MPLogging.h"
 
 @implementation MRCommand
 
@@ -140,7 +139,7 @@
     NSString *urlString = [self stringFromParametersForKey:@"url"];
     NSURL *url = [NSURL URLWithString:urlString];
 
-    MPLogDebug(@"Expanding to (%.1f, %.1f, %.1f, %.1f); displaying %@.", x, y, w, h, url);
+    CoreLogType(WBLogLevelTrace, WBLogTypeAdBanner, @"Expanding to (%.1f, %.1f, %.1f, %.1f); displaying %@.", x, y, w, h, url);
 
     CGRect newFrame = CGRectMake(x, y, w, h);
 

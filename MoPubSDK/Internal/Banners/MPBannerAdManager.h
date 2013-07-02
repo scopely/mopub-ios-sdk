@@ -20,7 +20,7 @@
 - (void)loadAd;
 - (void)forceRefreshAd;
 - (void)rotateToOrientation:(UIInterfaceOrientation)orientation;
-
+- (void)cancelAd;
 // Deprecated.
 - (void)customEventDidLoadAd;
 - (void)customEventDidFailToLoadAd;

@@ -10,7 +10,6 @@
 #import "MPConstants.h"
 
 #import "MPAdConfiguration.h"
-#import "MPLogging.h"
 #import "MPInstanceProvider.h"
 #import "MPAnalyticsTracker.h"
 #import "MPTimer.h"
@@ -90,7 +89,8 @@
     self.timeoutTimer = [[MPInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:BANNER_TIMEOUT_INTERVAL
                                                                                    target:self
                                                                                  selector:@selector(timeout)
-                                                                                  repeats:NO];
+                                                                                  repeats:NO
+                                                                                  logType:(self.configuration.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdFullPage)];
     [self.timeoutTimer scheduleNow];
 }
 
@@ -104,7 +104,7 @@
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation
 {
     // Do nothing by default. Subclasses can override.
-    MPLogDebug(@"rotateToOrientation %d called for adapter %@ (%p)",
+    CoreLogType(WBLogLevelTrace, WBLogTypeAdBanner, @"rotateToOrientation %d called for adapter %@ (%p)",
           newOrientation, NSStringFromClass([self class]), self);
 }
 

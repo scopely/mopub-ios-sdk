@@ -65,15 +65,14 @@ typedef NSUInteger MRAdViewCloseButtonStyle;
     // Flag indicating whether ads presented in this view are allowed to use the expand() API.
     BOOL _allowsExpansion;
 
-    BOOL _expanded;
-
-    // Enum indicating whether this view is being used as an inline ad or an interstitial ad.
-    MRAdViewPlacementType _placementType;
+    BOOL _expanded;    
 }
 
 @property (nonatomic, assign) id<MRAdViewDelegate> delegate;
 @property (nonatomic, assign) BOOL usesCustomCloseButton;
 @property (nonatomic, assign) BOOL expanded;
+// Enum indicating whether this view is being used as an inline ad or an interstitial ad.
+@property (nonatomic, assign, readonly) MRAdViewPlacementType placementType;
 
 - (id)initWithFrame:(CGRect)frame;
 - (id)initWithFrame:(CGRect)frame allowsExpansion:(BOOL)expansion

@@ -14,7 +14,6 @@
 #import "MPInterstitialCustomEventAdapter.h"
 #import "MPInstanceProvider.h"
 #import "MPInterstitialAdManagerDelegate.h"
-#import "MPLogging.h"
 
 @interface MPInterstitialAdManager ()
 
@@ -76,12 +75,12 @@
 - (void)loadAdWithURL:(NSURL *)URL
 {
     if (self.loading) {
-        MPLogWarn(@"Interstitial controller is already loading an ad. "
+        CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"Interstitial controller is already loading an ad. "
                   @"Wait for previous load to finish.");
         return;
     }
 
-    MPLogInfo(@"Interstitial controller is loading ad with MoPub server URL: %@", URL);
+    CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"Interstitial controller is loading ad with MoPub server URL: %@", URL);
 
     self.loading = YES;
     [self.communicator loadURL:URL];
@@ -128,17 +127,17 @@
 {
     self.configuration = configuration;
 
-    MPLogInfo(@"Ad view is fetching ad network type: %@", self.configuration.networkType);
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Ad view is fetching ad network type: %@", self.configuration.networkType);
 
     if ([self.configuration.networkType isEqualToString:@"clear"]) {
-        MPLogInfo(@"Ad server response indicated no ad available.");
+        CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"Ad server response indicated no ad available.");
         self.loading = NO;
         [self.delegate manager:self didFailToLoadInterstitialWithError:nil];
         return;
     }
 
     if (self.configuration.adType != MPAdTypeInterstitial) {
-        MPLogWarn(@"Could not load ad: interstitial object received a non-interstitial ad unit ID.");
+        CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"Could not load ad: interstitial object received a non-interstitial ad unit ID.");
         self.loading = NO;
         [self.delegate manager:self didFailToLoadInterstitialWithError:nil];
         return;

@@ -8,7 +8,6 @@
 #import "MPAnalyticsTracker.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
-#import "MPLogging.h"
 
 @interface MPAnalyticsTracker ()
 
@@ -25,14 +24,14 @@
 
 - (void)trackImpressionForConfiguration:(MPAdConfiguration *)configuration
 {
-    MPLogDebug(@"Tracking impression: %@", configuration.impressionTrackingURL);
+    CoreLogType(WBLogLevelTrace, (configuration.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdBanner), @"Tracking impression: %@", configuration.impressionTrackingURL);
     [NSURLConnection connectionWithRequest:[self requestForURL:configuration.impressionTrackingURL]
                                   delegate:nil];
 }
 
 - (void)trackClickForConfiguration:(MPAdConfiguration *)configuration
 {
-    MPLogDebug(@"Tracking click: %@", configuration.clickTrackingURL);
+    CoreLogType(WBLogLevelTrace, (configuration.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdBanner), @"Tracking click: %@", configuration.clickTrackingURL);
     [NSURLConnection connectionWithRequest:[self requestForURL:configuration.clickTrackingURL]
                                   delegate:nil];
 }

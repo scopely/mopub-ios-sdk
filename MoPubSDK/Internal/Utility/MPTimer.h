@@ -16,7 +16,8 @@
 + (MPTimer *)timerWithTimeInterval:(NSTimeInterval)seconds
                             target:(id)target
                           selector:(SEL)aSelector
-                           repeats:(BOOL)repeats;
+                           repeats:(BOOL)repeats
+                           logType:(WBLogType)logType;
 
 - (BOOL)isValid;
 - (void)invalidate;

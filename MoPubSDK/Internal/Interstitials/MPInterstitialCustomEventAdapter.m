@@ -8,7 +8,6 @@
 #import "MPInterstitialCustomEventAdapter.h"
 
 #import "MPAdConfiguration.h"
-#import "MPLogging.h"
 #import "MPInstanceProvider.h"
 #import "MPInterstitialCustomEvent.h"
 
@@ -44,7 +43,7 @@
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration
 {
-    MPLogInfo(@"Looking for custom event class named %@.", configuration.customEventClass);
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"Looking for custom event class named %@.", configuration.customEventClass);
     self.configuration = configuration;
 
     self.interstitialCustomEvent = [[MPInstanceProvider sharedProvider] buildInterstitialCustomEventFromCustomClass:configuration.customEventClass delegate:self];

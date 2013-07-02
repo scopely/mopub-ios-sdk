@@ -7,7 +7,6 @@
 //
 
 #import "MPProgressOverlayView.h"
-#import "MPLogging.h"
 #import <QuartzCore/QuartzCore.h>
 
 @interface MPProgressOverlayView ()
@@ -131,7 +130,7 @@ static void exponentialDecayInterpolation(void *info, const float *input, float 
                       delegate:(id<MPProgressOverlayViewDelegate>)delegate
 {
     if ([self windowHasExistingOverlay:window]) {
-        MPLogWarn(@"This window is already displaying a progress overlay view.");
+        CoreLogType(WBLogLevelWarn, WBLogTypeAdBanner, @"This window is already displaying a progress overlay view.");
         return;
     }
     

@@ -10,7 +10,6 @@
 #import "MPAdConfiguration.h"
 #import "MPBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "MPLogging.h"
 
 @interface MPBannerCustomEventAdapter ()
 
@@ -50,7 +49,7 @@
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration containerSize:(CGSize)size
 {
-    MPLogInfo(@"Looking for custom event class named %@.", configuration.customEventClass);
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Looking for custom event class named %@.", configuration.customEventClass);
     self.configuration = configuration;
 
     self.bannerCustomEvent = [[MPInstanceProvider sharedProvider] buildBannerCustomEventFromCustomClass:configuration.customEventClass

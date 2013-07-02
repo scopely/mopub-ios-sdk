@@ -8,7 +8,6 @@
 #import "MPInterstitialViewController.h"
 
 #import "MPGlobal.h"
-#import "MPLogging.h"
 #import "UIViewController+MPAdditions.h"
 
 static const CGFloat kCloseButtonPadding = 6.0;
@@ -79,7 +78,7 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
 - (void)presentInterstitialFromViewController:(UIViewController *)controller
 {
     if (_isOnViewControllerStack) {
-        MPLogWarn(@"Cannot present an interstitial that is already on-screen.");
+        CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"Cannot present an interstitial that is already on-screen.");
         return;
     }
 
@@ -247,7 +246,7 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
     // just return the application's supported orientations.
 
     if (!interstitialSupportedOrientations) {
-        MPLogError(@"Your application does not support this interstitial's desired orientation "
+        CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"Your application does not support this interstitial's desired orientation "
                    @"(%@).", orientationDescription);
         return applicationSupportedOrientations;
     }

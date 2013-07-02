@@ -7,13 +7,12 @@
 
 #import "MPLegacyBannerCustomEventAdapter.h"
 #import "MPAdConfiguration.h"
-#import "MPLogging.h"
 
 @implementation MPLegacyBannerCustomEventAdapter
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration containerSize:(CGSize)size
 {
-    MPLogInfo(@"Looking for custom event selector named %@.", configuration.customSelectorName);
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Looking for custom event selector named %@.", configuration.customSelectorName);
 
     SEL customEventSelector = NSSelectorFromString(configuration.customSelectorName);
     if ([self.delegate.bannerDelegate respondsToSelector:customEventSelector]) {
@@ -24,7 +23,7 @@
     NSString *oneArgumentSelectorName = [configuration.customSelectorName
                                          stringByAppendingString:@":"];
 
-    MPLogInfo(@"Looking for custom event selector named %@.", oneArgumentSelectorName);
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Looking for custom event selector named %@.", oneArgumentSelectorName);
 
     SEL customEventOneArgumentSelector = NSSelectorFromString(oneArgumentSelectorName);
     if ([self.delegate.bannerDelegate respondsToSelector:customEventOneArgumentSelector]) {

@@ -81,6 +81,8 @@
  *
  */
 
+-(void)loadInterstitialWithCustomEventInfo:(NSDictionary *)info;
+
 @property (nonatomic, assign) id<MPInterstitialCustomEventDelegate> delegate;
 
 @end

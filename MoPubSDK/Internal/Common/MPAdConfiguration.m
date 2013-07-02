@@ -9,7 +9,6 @@
 
 #import "MPConstants.h"
 #import "MPGlobal.h"
-#import "MPLogging.h"
 
 #import "CJSONDeserializer.h"
 
@@ -139,7 +138,7 @@ NSString * const kAdTypeClear = @"clear";
     Class customEventClass = NSClassFromString(customEventClassName);
 
     if (customEventClassName && !customEventClass) {
-        MPLogWarn(@"Could not find custom event class named %@", customEventClassName);
+        CoreLogType(WBLogLevelError, (self.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Could not find custom event class named %@", customEventClassName);
     }
 
     return customEventClass;

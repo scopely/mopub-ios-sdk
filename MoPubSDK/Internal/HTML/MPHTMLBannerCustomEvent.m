@@ -7,7 +7,6 @@
 
 #import "MPHTMLBannerCustomEvent.h"
 #import "MPAdWebView.h"
-#import "MPLogging.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
 
@@ -28,8 +27,8 @@
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Loading MoPub HTML banner");
-    MPLogTrace(@"Loading banner with HTML source: %@", [[self.delegate configuration] adResponseHTMLString]);
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Loading MoPub HTML banner");
+    CoreLogType(WBLogLevelTrace, WBLogTypeAdBanner, @"Loading banner with HTML source: %@", [[self.delegate configuration] adResponseHTMLString]);
 
     CGRect adWebViewFrame = CGRectMake(0, 0, size.width, size.height);
     self.bannerAgent = [[MPInstanceProvider sharedProvider] buildMPAdWebViewAgentWithAdWebViewFrame:adWebViewFrame
@@ -60,13 +59,13 @@
 
 - (void)adDidFinishLoadingAd:(MPAdWebView *)ad
 {
-    MPLogInfo(@"MoPub HTML banner did load");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"MoPub HTML banner did load");
     [self.delegate bannerCustomEvent:self didLoadAd:ad];
 }
 
 - (void)adDidFailToLoadAd:(MPAdWebView *)ad
 {
-    MPLogInfo(@"MoPub HTML banner did fail");
+    CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"MoPub HTML banner did fail");
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
@@ -77,19 +76,19 @@
 
 - (void)adActionWillBegin:(MPAdWebView *)ad
 {
-    MPLogInfo(@"MoPub HTML banner will begin action");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"MoPub HTML banner will begin action");
     [self.delegate bannerCustomEventWillBeginAction:self];
 }
 
 - (void)adActionDidFinish:(MPAdWebView *)ad
 {
-    MPLogInfo(@"MoPub HTML banner did finish action");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"MoPub HTML banner did finish action");
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 
 - (void)adActionWillLeaveApplication:(MPAdWebView *)ad
 {
-    MPLogInfo(@"MoPub HTML banner will leave application");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"MoPub HTML banner will leave application");
     [self.delegate bannerCustomEventWillLeaveApplication:self];
 }
 

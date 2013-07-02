@@ -12,7 +12,6 @@
 #import "MPError.h"
 #import "MPTimer.h"
 #import "MPConstants.h"
-#import "MPLogging.h"
 #import "MPLegacyBannerCustomEventAdapter.h"
 
 @interface MPBannerAdManager ()
@@ -88,7 +87,7 @@
 - (void)loadAd
 {
     if (self.loading) {
-        MPLogWarn(@"Banner view (%@) is already loading an ad. Wait for previous load to finish.", [self.delegate adUnitId]);
+        CoreLogType(WBLogLevelWarn, WBLogTypeAdBanner, @"Banner view (%@) is already loading an ad. Wait for previous load to finish.", [self.delegate adUnitId]);
         return;
     }
 
@@ -98,6 +97,11 @@
 - (void)forceRefreshAd
 {
     [self loadAdWithURL:nil];
+}
+
+- (void)cancelAd
+{
+    [self.communicator cancel];
 }
 
 - (void)loadAdWithURL:(NSURL *)URL
@@ -115,8 +119,7 @@
                                                      keywords:[self.delegate keywords]
                                                      location:[self.delegate location]
                                                       testing:[self.delegate isTesting]];
-
-    MPLogInfo(@"Banner view (%@) loading ad with MoPub server URL: %@", [self.delegate adUnitId], URL);
+    CoreLogType(WBLogLevelTrace, WBLogTypeAdBanner, @"Banner view (%@) loading ad with MoPub server URL: %@", [self.delegate adUnitId], URL);
 
     [self.communicator loadURL:URL];
 }
@@ -139,7 +142,8 @@
         self.refreshTimer = [[MPInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
                                                                                        target:self
                                                                                      selector:@selector(refreshTimerDidFire)
-                                                                                      repeats:NO];
+                                                                                      repeats:NO
+                                                                                      logType:WBLogTypeAdBanner];
         [self.refreshTimer scheduleNow];
     }
 }
@@ -156,6 +160,8 @@
 - (void)communicatorDidReceiveAdConfiguration:(MPAdConfiguration *)configuration
 {
     self.requestingConfiguration = configuration;
+    
+//    configuration.adSize = self.adView
 
     if (configuration.adType == MPAdTypeUnknown) {
         [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorServerError]];
@@ -192,7 +198,7 @@
     [self.delegate managerDidFailToLoadAd];
     [self scheduleRefreshTimer];
 
-    MPLogError(@"Banner view (%@) failed. Error: %@", [self.delegate adUnitId], error);
+    CoreLogType(WBLogLevelError, WBLogTypeAdBanner, @"Banner view (%@) failed. Error: %@", [self.delegate adUnitId], error);
 }
 
 #pragma mark - <MPBannerAdapterDelegate>
@@ -309,7 +315,7 @@
 - (void)customEventDidLoadAd
 {
     if (![self.requestingAdapter isKindOfClass:[MPLegacyBannerCustomEventAdapter class]]) {
-        MPLogWarn(@"-customEventDidLoadAd should not be called unless a custom event is in "
+        CoreLogType(WBLogLevelWarn, WBLogTypeAdBanner, @"-customEventDidLoadAd should not be called unless a custom event is in "
                   @"progress.");
         return;
     }
@@ -330,7 +336,7 @@
 - (void)customEventDidFailToLoadAd
 {
     if (![self.requestingAdapter isKindOfClass:[MPLegacyBannerCustomEventAdapter class]]) {
-        MPLogWarn(@"-customEventDidFailToLoadAd should not be called unless a custom event is in "
+        CoreLogType(WBLogLevelWarn, WBLogTypeAdBanner, @"-customEventDidFailToLoadAd should not be called unless a custom event is in "
                   @"progress.");
         return;
     }
@@ -341,7 +347,7 @@
 - (void)customEventActionWillBegin
 {
     if (![self.onscreenAdapter isKindOfClass:[MPLegacyBannerCustomEventAdapter class]]) {
-        MPLogWarn(@"-customEventActionWillBegin should not be called unless a custom event is in "
+        CoreLogType(WBLogLevelWarn, WBLogTypeAdBanner, @"-customEventActionWillBegin should not be called unless a custom event is in "
                   @"progress.");
         return;
     }
@@ -353,7 +359,7 @@
 - (void)customEventActionDidEnd
 {
     if (![self.onscreenAdapter isKindOfClass:[MPLegacyBannerCustomEventAdapter class]]) {
-        MPLogWarn(@"-customEventActionDidEnd should not be called unless a custom event is in "
+        CoreLogType(WBLogLevelWarn, WBLogTypeAdBanner, @"-customEventActionDidEnd should not be called unless a custom event is in "
                   @"progress.");
         return;
     }

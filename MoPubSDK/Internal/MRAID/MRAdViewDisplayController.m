@@ -11,7 +11,6 @@
 #import "MRDimmingView.h"
 #import "MRProperty.h"
 #import "MPGlobal.h"
-#import "MPLogging.h"
 #import "MPTimer.h"
 #import "MPInstanceProvider.h"
 
@@ -83,7 +82,8 @@ static NSString *const kMovieWillExitNotification42 =
         _viewabilityTimer = [[[MPInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:kViewabilityTimerInterval
                                                                                         target:self
                                                                                       selector:@selector(checkViewability)
-                                                                                       repeats:YES] retain];
+                                                                                       repeats:YES
+                                                                                       logType:(adView.placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage)] retain];
         [_viewabilityTimer scheduleNow];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -489,7 +489,7 @@ shouldLockOrientation:(BOOL)shouldLockOrientation {
     BOOL currentViewability = [_view isViewable];
     
     if (_isViewable != currentViewability) {
-        MPLogDebug(@"Viewable changed to: %@", currentViewability ? @"YES" : @"NO");
+        CoreLogType(WBLogLevelDebug, (self.view.placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Viewable changed to: %@", currentViewability ? @"YES" : @"NO");
         _isViewable = currentViewability;
         [_view adViewableDidChange:_isViewable];
     }

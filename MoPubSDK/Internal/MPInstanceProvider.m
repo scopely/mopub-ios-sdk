@@ -26,7 +26,6 @@
 #import "MPLegacyBannerCustomEventAdapter.h"
 #import "MPBannerCustomEvent.h"
 #import "MPBannerAdManager.h"
-#import "MPLogging.h"
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
 
@@ -151,7 +150,7 @@ static MPInstanceProvider *sharedProvider = nil;
 {
     MPInterstitialCustomEvent *customEvent = [[[customClass alloc] init] autorelease];
     if ([customEvent respondsToSelector:@selector(customEventDidUnload)]) {
-        MPLogWarn(@"**** Custom Event Class: %@ implements the deprecated -customEventDidUnload method.  This is no longer called.  Use -dealloc for cleanup instead ****", NSStringFromClass(customClass));
+        CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"**** Custom Event Class: %@ implements the deprecated -customEventDidUnload method.  This is no longer called.  Use -dealloc for cleanup instead ****", NSStringFromClass(customClass));
     }
     customEvent.delegate = delegate;
     return customEvent;
@@ -224,9 +223,9 @@ static MPInstanceProvider *sharedProvider = nil;
     return networkInfo.subscriberCellularProvider;
 }
 
-- (MPTimer *)buildMPTimerWithTimeInterval:(NSTimeInterval)seconds target:(id)target selector:(SEL)selector repeats:(BOOL)repeats
+- (MPTimer *)buildMPTimerWithTimeInterval:(NSTimeInterval)seconds target:(id)target selector:(SEL)selector repeats:(BOOL)repeats logType:(WBLogType)logType
 {
-    return [MPTimer timerWithTimeInterval:seconds target:target selector:selector repeats:repeats];
+    return [MPTimer timerWithTimeInterval:seconds target:target selector:selector repeats:repeats logType:logType];
 }
 
 @end

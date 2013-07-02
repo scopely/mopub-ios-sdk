@@ -6,7 +6,6 @@
 //
 
 #import "MPHTMLInterstitialCustomEvent.h"
-#import "MPLogging.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
 
@@ -22,9 +21,9 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Loading MoPub HTML interstitial");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Loading MoPub HTML interstitial");
     MPAdConfiguration *configuration = [self.delegate configuration];
-    MPLogTrace(@"Loading HTML interstitial with source: %@", [configuration adResponseHTMLString]);
+    CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"Loading HTML interstitial with source: %@", [configuration adResponseHTMLString]);
 
     self.interstitial = [[MPInstanceProvider sharedProvider] buildMPHTMLInterstitialViewControllerWithDelegate:self
                                                                                                orientationType:configuration.orientationType
@@ -49,43 +48,43 @@
 
 - (void)interstitialDidLoadAd:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub HTML interstitial did load");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"MoPub HTML interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:self.interstitial];
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub HTML interstitial did fail");
+    CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"MoPub HTML interstitial did fail");
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
 - (void)interstitialWillAppear:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub HTML interstitial will appear");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"MoPub HTML interstitial will appear");
     [self.delegate interstitialCustomEventWillAppear:self];
 }
 
 - (void)interstitialDidAppear:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub HTML interstitial did appear");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"MoPub HTML interstitial did appear");
     [self.delegate interstitialCustomEventDidAppear:self];
 }
 
 - (void)interstitialWillDisappear:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub HTML interstitial will disappear");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"MoPub HTML interstitial will disappear");
     [self.delegate interstitialCustomEventWillDisappear:self];
 }
 
 - (void)interstitialDidDisappear:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub HTML interstitial did disappear");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"MoPub HTML interstitial did disappear");
     [self.delegate interstitialCustomEventDidDisappear:self];
 }
 
 - (void)interstitialWillLeaveApplication:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub HTML interstitial will leave application");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"MoPub HTML interstitial will leave application");
     [self.delegate interstitialCustomEventWillLeaveApplication:self];
 }
 

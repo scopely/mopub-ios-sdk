@@ -6,7 +6,6 @@
 //
 
 #import "MPGoogleAdMobBannerCustomEvent.h"
-#import "MPLogging.h"
 #import "MPInstanceProvider.h"
 
 @interface MPInstanceProvider (AdMobBanners)
@@ -61,7 +60,7 @@
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Requesting Google AdMob banner");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Requesting Google AdMob banner");
     self.adBannerView.frame = [self frameForCustomEventInfo:info];
     self.adBannerView.adUnitID = [info objectForKey:@"adUnitID"];
     self.adBannerView.rootViewController = [self.delegate viewControllerForPresentingModalView];
@@ -102,32 +101,32 @@
 
 - (void)adViewDidReceiveAd:(GADBannerView *)bannerView
 {
-    MPLogInfo(@"Google AdMob Banner did load");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Google AdMob Banner did load");
     [self.delegate bannerCustomEvent:self didLoadAd:self.adBannerView];
 }
 
 - (void)adView:(GADBannerView *)bannerView
 didFailToReceiveAdWithError:(GADRequestError *)error
 {
-    MPLogInfo(@"Google AdMob Banner failed to load with error: %@", error.localizedDescription);
+    CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Google AdMob Banner failed to load with error: %@", error.localizedDescription);
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)adViewWillPresentScreen:(GADBannerView *)bannerView
 {
-    MPLogInfo(@"Google AdMob Banner will present modal");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Google AdMob Banner will present modal");
     [self.delegate bannerCustomEventWillBeginAction:self];
 }
 
 - (void)adViewDidDismissScreen:(GADBannerView *)bannerView
 {
-    MPLogInfo(@"Google AdMob Banner did dismiss modal");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Google AdMob Banner did dismiss modal");
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 
 - (void)adViewWillLeaveApplication:(GADBannerView *)bannerView
 {
-    MPLogInfo(@"Google AdMob Banner will leave the application");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Google AdMob Banner will leave the application");
     [self.delegate bannerCustomEventWillLeaveApplication:self];
 }
 

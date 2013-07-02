@@ -9,7 +9,6 @@
 #import "MRAdView.h"
 #import "UIWebView+MPAdditions.h"
 #import "MPGlobal.h"
-#import "MPLogging.h"
 #import "MRAdViewDisplayController.h"
 #import "MRCommand.h"
 #import "MRProperty.h"
@@ -23,6 +22,7 @@ static NSString * const kMraidURLScheme = @"mraid";
 @property (nonatomic, retain) NSMutableData *data;
 @property (nonatomic, retain) MRAdViewDisplayController *displayController;
 @property (nonatomic, retain) MPAdDestinationDisplayAgent *destinationDisplayAgent;
+@property (nonatomic, assign) MRAdViewPlacementType placementType;
 
 - (void)loadRequest:(NSURLRequest *)request;
 - (void)loadHTMLString:(NSString *)string baseURL:(NSURL *)baseURL;
@@ -179,13 +179,13 @@ static NSString * const kMraidURLScheme = @"mraid";
     [_displayController rotateToOrientation:newOrientation];
 }
 
-- (NSString *)placementType {
-    switch (_placementType) {
-        case MRAdViewPlacementTypeInline: return @"inline";
-        case MRAdViewPlacementTypeInterstitial: return @"interstitial";
-        default: return @"unknown";
-    }
-}
+//- (NSString *)placementType {
+//    switch (_placementType) {
+//        case MRAdViewPlacementTypeInline: return @"inline";
+//        case MRAdViewPlacementTypeInterstitial: return @"interstitial";
+//        default: return @"unknown";
+//    }
+//}
 
 - (void)handleMRAIDOpenCallForURL:(NSURL *)URL
 {
@@ -197,14 +197,14 @@ static NSString * const kMraidURLScheme = @"mraid";
 - (void)fireChangeEventForProperty:(MRProperty *)property {
     NSString *JSON = [NSString stringWithFormat:@"{%@}", property];
     [self executeJavascript:@"window.mraidbridge.fireChangeEvent(%@);", JSON];
-    MPLogDebug(@"JSON: %@", JSON);
+    CoreLogType(WBLogLevelTrace, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"JSON: %@", JSON);
 }
 
 - (void)fireChangeEventsForProperties:(NSArray *)properties {
     NSString *JSON = [NSString stringWithFormat:@"{%@}",
                       [properties componentsJoinedByString:@", "]];
     [self executeJavascript:@"window.mraidbridge.fireChangeEvent(%@);", JSON];
-    MPLogDebug(@"JSON: %@", JSON);
+    CoreLogType(WBLogLevelTrace, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"JSON: %@", JSON);
 }
 
 - (void)fireErrorEventForAction:(NSString *)action withMessage:(NSString *)message {
@@ -254,7 +254,7 @@ static NSString * const kMraidURLScheme = @"mraid";
 }
 
 - (void)convertFragmentToFullPayload:(NSMutableString *)fragment {
-    MPLogDebug(@"Fragment detected: converting to full payload.");
+    CoreLogType(WBLogLevelDebug, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Fragment detected: converting to full payload.");
     NSString *prepend = @"<html><head>"
     @"<meta name='viewport' content='user-scalable=no; initial-scale=1.0'/>"
     @"</head>"
@@ -283,7 +283,7 @@ static NSString * const kMraidURLScheme = @"mraid";
 }
 
 - (void)initializeJavascriptState {
-    MPLogDebug(@"Injecting initial JavaScript state.");
+    CoreLogType(WBLogLevelDebug, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Injecting initial JavaScript state.");
     [self fireChangeEventForProperty:[MRPlacementTypeProperty propertyWithType:_placementType]];
     [_displayController initializeJavascriptState];
     [self fireReadyEvent];
@@ -312,7 +312,9 @@ static NSString * const kMraidURLScheme = @"mraid";
     cmd.view = self;
 
     BOOL processed = [cmd execute];
-    if (!processed) MPLogDebug(@"Unknown command: %@", command);
+    if (!processed){
+        CoreLogType(WBLogLevelWarn, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Unknown command: %@", command);
+    }
 
     [self fireNativeCommandCompleteEvent:command];
 
@@ -352,7 +354,7 @@ static NSString * const kMraidURLScheme = @"mraid";
     NSString *scheme = url.scheme;
 
     if ([scheme isEqualToString:kMraidURLScheme]) {
-        MPLogDebug(@"Trying to process command: %@", urlString);
+        CoreLogType(WBLogLevelTrace, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Trying to process command: %@", urlString);
         BOOL success = [self tryProcessingURLStringAsCommand:urlString];
         if (success) return NO;
     } else if ([scheme isEqualToString:@"mopub"]) {
@@ -362,7 +364,7 @@ static NSString * const kMraidURLScheme = @"mraid";
                                    withString:@" "
                                       options:NSLiteralSearch
                                         range:NSMakeRange(0, [urlString length])];
-        MPLogDebug(@"Web console: %@", urlString);
+        CoreLogType(WBLogLevelTrace, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Web console: %@", urlString);
         return NO;
     }
 
