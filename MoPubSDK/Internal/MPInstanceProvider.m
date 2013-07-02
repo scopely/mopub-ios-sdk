@@ -121,6 +121,11 @@ static MPInstanceProvider *sharedProvider = nil;
                                                       delegate:(id<MPBannerCustomEventDelegate>)delegate
 {
     MPBannerCustomEvent *customEvent = [[[customClass alloc] init] autorelease];
+    if([customEvent isKindOfClass:[MPBannerCustomEvent class]] == NO)
+    {
+        MPLogError(@"**** Custom Event Class: %@ does not extend MPBannerCustomEvent ****", NSStringFromClass(customClass));
+        return nil;
+    }
     customEvent.delegate = delegate;
     return customEvent;
 }
@@ -149,6 +154,11 @@ static MPInstanceProvider *sharedProvider = nil;
                                                                   delegate:(id<MPInterstitialCustomEventDelegate>)delegate
 {
     MPInterstitialCustomEvent *customEvent = [[[customClass alloc] init] autorelease];
+    if([customEvent isKindOfClass:[MPInterstitialCustomEvent class]] == NO)
+    {
+        MPLogError(@"**** Custom Event Class: %@ does not extend MPInterstitialCustomEvent ****", NSStringFromClass(customClass));
+        return nil;
+    }
     if ([customEvent respondsToSelector:@selector(customEventDidUnload)]) {
         CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"**** Custom Event Class: %@ implements the deprecated -customEventDidUnload method.  This is no longer called.  Use -dealloc for cleanup instead ****", NSStringFromClass(customClass));
     }

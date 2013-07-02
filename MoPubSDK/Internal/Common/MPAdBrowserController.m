@@ -253,7 +253,7 @@
 {
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGContextRef context = CGBitmapContextCreate(nil,27,27,8,0,
-                                                 colorSpace,kCGImageAlphaPremultipliedLast);
+                                                 colorSpace,(CGBitmapInfo)kCGImageAlphaPremultipliedLast);
     CFRelease(colorSpace);
     return context;
 }
