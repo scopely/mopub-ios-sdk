@@ -36,4 +36,10 @@
     // to be notified when the parent MPAdView receives -rotateToOrientation: calls.
 }
 
+-(void)invalidate
+{
+    // API to allow us to detach the custom event from (shared instance) routers synchronously
+    // See the iAd banner custom event for an example use case.
+}
+
 @end

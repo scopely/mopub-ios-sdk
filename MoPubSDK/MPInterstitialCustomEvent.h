@@ -71,6 +71,12 @@
  */
 - (BOOL)enableAutomaticImpressionAndClickTracking;
 
+/** 
+ * API to Allow us to detach the custom event from (shared instance) routers synchronously
+ * See the chartboost interstitial custom event for an example use case.
+ */ 
+-(void)invalidate;
+
 /** @name Communicating with the MoPub SDK */
 
 /**
