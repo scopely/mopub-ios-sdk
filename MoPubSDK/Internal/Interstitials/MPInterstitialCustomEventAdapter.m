@@ -29,11 +29,7 @@
 
 - (void)dealloc
 {
-    if ([self.interstitialCustomEvent respondsToSelector:@selector(invalidate)]) {
-        // Secret API to allow us to detach the custom event from (shared instance) routers synchronously
-        // See the chartboost interstitial custom event for an example use case.
-        [self.interstitialCustomEvent performSelector:@selector(invalidate)];
-    }
+    [self.interstitialCustomEvent invalidate];
     self.interstitialCustomEvent.delegate = nil;
     [[_interstitialCustomEvent retain] autorelease];
     self.interstitialCustomEvent = nil;

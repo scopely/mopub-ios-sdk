@@ -29,11 +29,7 @@
 
 - (void)unregisterDelegate
 {
-    if ([self.bannerCustomEvent respondsToSelector:@selector(invalidate)]) {
-        // Secret API to allow us to detach the custom event from (shared instance) routers synchronously
-        // See the iAd banner custom event for an example use case.
-        [self.bannerCustomEvent performSelector:@selector(invalidate)];
-    }
+    [self.bannerCustomEvent invalidate];
     self.bannerCustomEvent.delegate = nil;
     [[_bannerCustomEvent retain] autorelease]; //make sure the custom event isn't released immediately
     self.bannerCustomEvent = nil;
