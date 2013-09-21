@@ -7,7 +7,6 @@
 
 #import "MPGoogleAdMobInterstitialCustomEvent.h"
 #import "MPInterstitialAdController.h"
-#import "MPLogging.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
 #import <CoreLocation/CoreLocation.h>
@@ -49,7 +48,6 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Requesting Google AdMob interstitial");
     self.interstitial = [[MPInstanceProvider sharedProvider] buildGADInterstitialAd];
 
     self.interstitial.adUnitID = [info objectForKey:@"adUnitID"];
@@ -86,42 +84,41 @@
     [super dealloc];
 }
 
+-(NSString *)description
+{
+    return @"AdMob";
+}
+
 #pragma mark - IMAdInterstitialDelegate
 
 - (void)interstitialDidReceiveAd:(GADInterstitial *)interstitial
 {
-    MPLogInfo(@"Google AdMob Interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:self];
 }
 
 - (void)interstitial:(GADInterstitial *)interstitial didFailToReceiveAdWithError:(GADRequestError *)error
 {
-    MPLogInfo(@"Google AdMob Interstitial failed to load with error: %@", error.localizedDescription);
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)interstitialWillPresentScreen:(GADInterstitial *)interstitial
 {
-    MPLogInfo(@"Google AdMob Interstitial will present");
     [self.delegate interstitialCustomEventWillAppear:self];
     [self.delegate interstitialCustomEventDidAppear:self];
 }
 
 - (void)interstitialWillDismissScreen:(GADInterstitial *)ad
 {
-    MPLogInfo(@"Google AdMob Interstitial will dismiss");
     [self.delegate interstitialCustomEventWillDisappear:self];
 }
 
 - (void)interstitialDidDismissScreen:(GADInterstitial *)ad
 {
-    MPLogInfo(@"Google AdMob Interstitial did dismiss");
     [self.delegate interstitialCustomEventDidDisappear:self];
 }
 
 - (void)interstitialWillLeaveApplication:(GADInterstitial *)ad
 {
-    MPLogInfo(@"Google AdMob Interstitial will leave application");
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
 }
 

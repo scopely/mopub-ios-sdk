@@ -7,8 +7,9 @@
 
 #import "GreystripeInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "MPLogging.h"
 #import "GSSDKInfo.h"
+#import "WBCore_Internal.h"
+#import "MPConstants.h"
 
 @interface MPInstanceProvider (GreystripeInterstitials)
 
@@ -28,7 +29,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // This is a sample Greystripe GUID. You will need to replace it with your Greystripe GUID.
-#define kGreystripeGUID @"YOUR_GREYSTRIPE_GUID"
 
 @interface GreystripeInterstitialCustomEvent ()
 
@@ -44,8 +44,8 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Requesting Greystripe interstitial");
-    self.greystripeFullscreenAd = [[MPInstanceProvider sharedProvider] buildGSFullscreenAdWithDelegate:self GUID:kGreystripeGUID];
+    NSString *greyStripeAppId = [WBCore keyForAdProvider:WBAdProviderGreyStripeAppId];
+    self.greystripeFullscreenAd = [[MPInstanceProvider sharedProvider] buildGSFullscreenAdWithDelegate:self GUID:greyStripeAppId];
 
     if (self.delegate.location) {
         [GSSDKInfo updateLocation:self.delegate.location];
@@ -59,7 +59,7 @@
     if ([self.greystripeFullscreenAd isAdReady]) {
         [self.greystripeFullscreenAd displayFromViewController:rootViewController];
     } else {
-        MPLogInfo(@"Failed to show Greystripe interstitial: a previously loaded Greystripe interstitial now claims not to be ready.");
+        CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"Failed to show Greystripe interstitial: a previously loaded Greystripe interstitial now claims not to be ready.");
         [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
     }
 }
@@ -71,30 +71,33 @@
     [super dealloc];
 }
 
+-(NSString *)description
+{
+    return @"GreyStripe";
+}
+
 #pragma mark - GSAdDelegate
 
 - (void)greystripeAdFetchSucceeded:(id<GSAd>)a_ad
 {
-    MPLogInfo(@"Greystripe interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:a_ad];
 }
 
 - (void)greystripeAdFetchFailed:(id<GSAd>)a_ad withError:(GSAdError)a_error
 {
-    MPLogInfo(@"Greystripe banner failed to load with GSAdError: %d", a_error);
-    [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
+    NSError *error = [NSError errorWithDomain:MP_DOMAIN
+                                         code:a_error
+                                     userInfo:@{ NSLocalizedDescriptionKey : [NSString stringWithFormat:@"GSAdError: %d", a_error] }];
+    [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)greystripeAdClickedThrough:(id<GSAd>)a_ad
 {
-    MPLogInfo(@"Greystripe interstitial was clicked");
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
 }
 
 - (void)greystripeWillPresentModalViewController
 {
-    MPLogInfo(@"Greystripe interstitial will present");
-
     [self.delegate interstitialCustomEventWillAppear:self];
 
     // Greystripe doesn't seem to have a separate callback for the "did appear" event, so we
@@ -104,13 +107,11 @@
 
 - (void)greystripeWillDismissModalViewController
 {
-    MPLogInfo(@"Greystripe interstitial will dismiss");
     [self.delegate interstitialCustomEventWillDisappear:self];
 }
 
 - (void)greystripeDidDismissModalViewController
 {
-    MPLogInfo(@"Greystripe interstitial did dismiss");
     [self.delegate interstitialCustomEventDidDisappear:self];
 }
 

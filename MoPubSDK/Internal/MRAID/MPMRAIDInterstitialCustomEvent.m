@@ -7,7 +7,6 @@
 
 #import "MPMRAIDInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "MPLogging.h"
 
 @interface MPMRAIDInterstitialCustomEvent ()
 
@@ -21,7 +20,7 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Loading MoPub MRAID interstitial");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Loading MoPub MRAID interstitial");
     self.interstitial = [[MPInstanceProvider sharedProvider] buildMPMRAIDInterstitialViewControllerWithDelegate:self
                                                                                                   configuration:[self.delegate configuration]];
     [self.interstitial setCloseButtonStyle:MPInterstitialCloseButtonStyleAdControlled];
@@ -41,47 +40,45 @@
     [self.interstitial presentInterstitialFromViewController:controller];
 }
 
+-(NSString *)description
+{
+    return @"MoPub MRAID";
+}
+
 #pragma mark - MPMRAIDInterstitialViewControllerDelegate
 
 - (void)interstitialDidLoadAd:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub MRAID interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:self.interstitial];
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub MRAID interstitial did fail");
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
 - (void)interstitialWillAppear:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub MRAID interstitial will appear");
     [self.delegate interstitialCustomEventWillAppear:self];
 }
 
 - (void)interstitialDidAppear:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub MRAID interstitial did appear");
     [self.delegate interstitialCustomEventDidAppear:self];
 }
 
 - (void)interstitialWillDisappear:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub MRAID interstitial will disappear");
     [self.delegate interstitialCustomEventWillDisappear:self];
 }
 
 - (void)interstitialDidDisappear:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub MRAID interstitial did disappear");
     [self.delegate interstitialCustomEventDidDisappear:self];
 }
 
 - (void)interstitialWillLeaveApplication:(MPInterstitialViewController *)interstitial
 {
-    MPLogInfo(@"MoPub MRAID interstitial will leave application");
     [self.delegate interstitialCustomEventWillLeaveApplication:self];
 }
 

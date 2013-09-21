@@ -106,6 +106,7 @@ typedef enum
  */
 - (void)refreshAd;
 
+-(void)cancelAd;
 /**
  * Cancels any existing ad requests and requests a new ad from the MoPub ad server.
  */

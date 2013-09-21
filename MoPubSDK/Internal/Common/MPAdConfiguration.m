@@ -9,7 +9,6 @@
 
 #import "MPConstants.h"
 #import "MPGlobal.h"
-#import "MPLogging.h"
 
 #import "CJSONDeserializer.h"
 
@@ -139,7 +138,7 @@ NSString * const kAdTypeClear = @"clear";
     Class customEventClass = NSClassFromString(customEventClassName);
 
     if (customEventClassName && !customEventClass) {
-        MPLogWarn(@"Could not find custom event class named %@", customEventClassName);
+        CoreLogType(WBLogLevelError, (self.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Could not find custom event class named %@", customEventClassName);
     }
 
     return customEventClass;
@@ -192,6 +191,10 @@ NSString * const kAdTypeClear = @"clear";
     return self.interceptURLPrefix.absoluteString ? self.interceptURLPrefix.absoluteString : @"";
 }
 
+-(WBLogType)logType
+{
+    return self.preferredSize.height == MOPUB_MEDIUM_RECT_SIZE.height ? WBLogTypeAdFullPage : WBLogTypeAdBanner;
+}
 #pragma mark - Private
 
 - (MPAdType)adTypeFromHeaders:(NSDictionary *)headers

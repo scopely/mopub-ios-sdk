@@ -8,7 +8,6 @@
 #import "MPInterstitialCustomEventAdapter.h"
 
 #import "MPAdConfiguration.h"
-#import "MPLogging.h"
 #import "MPInstanceProvider.h"
 #import "MPInterstitialCustomEvent.h"
 
@@ -29,24 +28,24 @@
 
 - (void)dealloc
 {
-    [self.interstitialCustomEvent invalidate];
-    self.interstitialCustomEvent.delegate = nil;
-    [[_interstitialCustomEvent retain] autorelease];
-    self.interstitialCustomEvent = nil;
-    self.configuration = nil;
-
+    [_interstitialCustomEvent invalidate];
+    _interstitialCustomEvent.delegate = nil;
+    [_interstitialCustomEvent release];
+    [_configuration release];
+    
     [super dealloc];
 }
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration
 {
-    MPLogInfo(@"Looking for custom event class named %@.", configuration.customEventClass);
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"Looking for custom event class named %@.", configuration.customEventClass);
     self.configuration = configuration;
 
     self.interstitialCustomEvent = [[MPInstanceProvider sharedProvider] buildInterstitialCustomEventFromCustomClass:configuration.customEventClass delegate:self];
 
     if (self.interstitialCustomEvent) {
         [self.interstitialCustomEvent requestInterstitialWithCustomEventInfo:configuration.customEventClassData];
+        CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting %@ interstitial", self.interstitialCustomEvent);
     } else {
         [self.delegate adapter:self didFailToLoadAdWithError:nil];
     }
@@ -72,6 +71,7 @@
 - (void)interstitialCustomEvent:(MPInterstitialCustomEvent *)customEvent
                       didLoadAd:(id)ad
 {
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"%@ interstitial did load", customEvent);
     [self didStopLoading];
     [self.delegate adapterDidFinishLoadingAd:self];
 }
@@ -79,17 +79,20 @@
 - (void)interstitialCustomEvent:(MPInterstitialCustomEvent *)customEvent
        didFailToLoadAdWithError:(NSError *)error
 {
+    CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"%@ interstitial did Fail To Load Ad error: %@", customEvent, error);
     [self didStopLoading];
     [self.delegate adapter:self didFailToLoadAdWithError:error];
 }
 
 - (void)interstitialCustomEventWillAppear:(MPInterstitialCustomEvent *)customEvent
 {
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"%@ interstitial will appear", customEvent);
     [self.delegate interstitialWillAppearForAdapter:self];
 }
 
 - (void)interstitialCustomEventDidAppear:(MPInterstitialCustomEvent *)customEvent
 {
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"%@ interstitial did appear", customEvent);
     if ([self.interstitialCustomEvent enableAutomaticImpressionAndClickTracking] && !self.hasTrackedImpression) {
         self.hasTrackedImpression = YES;
         [self trackImpression];
@@ -99,21 +102,25 @@
 
 - (void)interstitialCustomEventWillDisappear:(MPInterstitialCustomEvent *)customEvent
 {
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"%@ interstitial will disappear", customEvent);
     [self.delegate interstitialWillDisappearForAdapter:self];
 }
 
 - (void)interstitialCustomEventDidDisappear:(MPInterstitialCustomEvent *)customEvent
 {
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"%@ interstitial did disappear", customEvent);
     [self.delegate interstitialDidDisappearForAdapter:self];
 }
 
 - (void)interstitialCustomEventDidExpire:(MPInterstitialCustomEvent *)customEvent
 {
+    CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"%@ interstitial did expire", customEvent);
     [self.delegate interstitialDidExpireForAdapter:self];
 }
 
 - (void)interstitialCustomEventDidReceiveTapEvent:(MPInterstitialCustomEvent *)customEvent
 {
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"%@ interstitial received tap", customEvent);
     if ([self.interstitialCustomEvent enableAutomaticImpressionAndClickTracking] && !self.hasTrackedClick) {
         self.hasTrackedClick = YES;
         [self trackClick];
@@ -122,6 +129,7 @@
 
 - (void)interstitialCustomEventWillLeaveApplication:(MPInterstitialCustomEvent *)customEvent
 {
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"%@ interstitial will leave application", customEvent);
     [self.delegate interstitialWillLeaveApplicationForAdapter:self];
 }
 

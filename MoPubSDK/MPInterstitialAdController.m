@@ -7,7 +7,6 @@
 
 #import "MPInterstitialAdController.h"
 
-#import "MPLogging.h"
 #import "MPInstanceProvider.h"
 #import "MPInterstitialAdManager.h"
 #import "MPInterstitialAdManagerDelegate.h"
@@ -95,7 +94,7 @@
 - (void)showFromViewController:(UIViewController *)controller
 {
     if (!controller) {
-        MPLogWarn(@"The interstitial could not be shown: "
+        CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"The interstitial could not be shown: "
                   @"a nil view controller was passed to -showFromViewController:.");
         return;
     }

@@ -7,13 +7,14 @@
 
 #import "MPHTMLBannerCustomEvent.h"
 #import "MPAdWebView.h"
-#import "MPLogging.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
+#import "MPConstants.h"
 
 @interface MPHTMLBannerCustomEvent ()
 
 @property (nonatomic, retain) MPAdWebViewAgent *bannerAgent;
+@property (nonatomic, assign) WBLogType logType;
 
 @end
 
@@ -28,8 +29,9 @@
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Loading MoPub HTML banner");
-    MPLogTrace(@"Loading banner with HTML source: %@", [[self.delegate configuration] adResponseHTMLString]);
+    self.logType = (size.height == MOPUB_MEDIUM_RECT_SIZE.height ? WBLogTypeAdFullPage : WBLogTypeAdBanner);
+    CoreLogType(WBLogLevelInfo, self.logType, @"Loading MoPub HTML %@", (self.logType == WBLogTypeAdBanner ? @"Banner" : @"MedRect"));
+    CoreLogType(WBLogLevelTrace, self.logType, @"Loading banner with HTML source: %@", [[self.delegate configuration] adResponseHTMLString]);
 
     CGRect adWebViewFrame = CGRectMake(0, 0, size.width, size.height);
     self.bannerAgent = [[MPInstanceProvider sharedProvider] buildMPAdWebViewAgentWithAdWebViewFrame:adWebViewFrame
@@ -60,13 +62,13 @@
 
 - (void)adDidFinishLoadingAd:(MPAdWebView *)ad
 {
-    MPLogInfo(@"MoPub HTML banner did load");
+    CoreLogType(WBLogLevelInfo, self.logType, @"MoPub HTML %@ did load", (self.logType == WBLogTypeAdBanner ? @"Banner" : @"MedRect"));
     [self.delegate bannerCustomEvent:self didLoadAd:ad];
 }
 
 - (void)adDidFailToLoadAd:(MPAdWebView *)ad
 {
-    MPLogInfo(@"MoPub HTML banner did fail");
+    CoreLogType(WBLogLevelFatal, self.logType, @"MoPub HTML %@ did fail", (self.logType == WBLogTypeAdBanner ? @"Banner" : @"MedRect"));
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
@@ -77,19 +79,19 @@
 
 - (void)adActionWillBegin:(MPAdWebView *)ad
 {
-    MPLogInfo(@"MoPub HTML banner will begin action");
+    CoreLogType(WBLogLevelDebug, self.logType, @"MoPub HTML %@ will begin action", (self.logType == WBLogTypeAdBanner ? @"Banner" : @"MedRect"));
     [self.delegate bannerCustomEventWillBeginAction:self];
 }
 
 - (void)adActionDidFinish:(MPAdWebView *)ad
 {
-    MPLogInfo(@"MoPub HTML banner did finish action");
+    CoreLogType(WBLogLevelDebug, self.logType, @"MoPub HTML %@ did finish action", (self.logType == WBLogTypeAdBanner ? @"Banner" : @"MedRect"));
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 
 - (void)adActionWillLeaveApplication:(MPAdWebView *)ad
 {
-    MPLogInfo(@"MoPub HTML banner will leave application");
+    CoreLogType(WBLogLevelDebug, self.logType, @"MoPub HTML %@ will leave application", (self.logType == WBLogTypeAdBanner ? @"Banner" : @"MedRect"));
     [self.delegate bannerCustomEventWillLeaveApplication:self];
 }
 

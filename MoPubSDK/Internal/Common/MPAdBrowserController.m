@@ -7,7 +7,6 @@
 //
 
 #import "MPAdBrowserController.h"
-#import "MPLogging.h"
 #import "MPGlobal.h"
 
 @interface MPAdBrowserController ()
@@ -49,7 +48,7 @@
         self.URL = URL;
         self.HTMLString = HTMLString;
 
-        MPLogDebug(@"Ad browser (%p) initialized with URL: %@", self, self.URL);
+        CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"Ad browser (%p) initialized with URL: %@", self, self.URL);
 
         self.webView = [[[UIWebView alloc] initWithFrame:CGRectZero] autorelease];
         self.webView.autoresizingMask = UIViewAutoresizingFlexibleWidth |
@@ -202,7 +201,7 @@
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request
  navigationType:(UIWebViewNavigationType)navigationType
 {
-    MPLogDebug(@"Ad browser (%p) starting to load URL: %@", self, request.URL);
+    CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"Ad browser (%p) starting to load URL: %@", self, request.URL);
     self.URL = request.URL;
     return YES;
 }
@@ -244,7 +243,7 @@
     // Ignore "Frame Load Interrupted" errors after navigating to iTunes or the App Store.
     if (error.code == 102 && [error.domain isEqual:@"WebKitErrorDomain"]) return;
 
-    MPLogError(@"Ad browser (%p) experienced an error: %@.", self, [error localizedDescription]);
+    CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"Ad browser (%p) experienced an error: %@.", self, [error localizedDescription]);
 }
 
 #pragma mark -
@@ -299,13 +298,6 @@
     UIImage *image = [[UIImage alloc] initWithCGImage:imageRef];
     CGImageRelease(imageRef);
     return [image autorelease];
-}
-
-#pragma mark -
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return YES;
 }
 
 @end

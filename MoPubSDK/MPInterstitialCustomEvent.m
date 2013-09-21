@@ -30,10 +30,21 @@
     // and implement code to display an interstitial here.
 }
 
+
+-(void)loadInterstitialWithCustomEventInfo:(NSDictionary *)info
+{
+    //used for banners to actually load since they dont have precaching.
+}
+
 -(void)invalidate
 {
     // API to allow us to detach the custom event from (shared instance) routers synchronously
     // See the chartboost interstitial custom event for an example use case.
+}
+
+-(void)customEventDidUnload __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_NA,__MAC_NA,__IPHONE_3_0,__IPHONE_5_0);
+{
+    
 }
 
 @end

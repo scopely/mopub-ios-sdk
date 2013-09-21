@@ -11,4 +11,5 @@
 
 @interface ChartboostInterstitialCustomEvent : MPInterstitialCustomEvent <ChartboostDelegate>
 
++(void)trackInstall;
 @end

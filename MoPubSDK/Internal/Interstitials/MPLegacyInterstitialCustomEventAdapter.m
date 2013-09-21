@@ -7,7 +7,6 @@
 
 #import "MPLegacyInterstitialCustomEventAdapter.h"
 #import "MPAdConfiguration.h"
-#import "MPLogging.h"
 
 @interface MPLegacyInterstitialCustomEventAdapter ()
 
@@ -23,7 +22,7 @@
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration
 {
-    MPLogInfo(@"Looking for custom event selector named %@.", configuration.customSelectorName);
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"Looking for custom event selector named %@.", configuration.customSelectorName);
 
     SEL customEventSelector = NSSelectorFromString(configuration.customSelectorName);
     if ([self.delegate.interstitialDelegate respondsToSelector:customEventSelector]) {
@@ -34,7 +33,7 @@
     NSString *oneArgumentSelectorName = [configuration.customSelectorName
                                          stringByAppendingString:@":"];
 
-    MPLogInfo(@"Looking for custom event selector named %@.", oneArgumentSelectorName);
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"Looking for custom event selector named %@.", oneArgumentSelectorName);
 
     SEL customEventOneArgumentSelector = NSSelectorFromString(oneArgumentSelectorName);
     if ([self.delegate.interstitialDelegate respondsToSelector:customEventOneArgumentSelector]) {

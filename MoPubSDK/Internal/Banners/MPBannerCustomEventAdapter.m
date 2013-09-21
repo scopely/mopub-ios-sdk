@@ -10,7 +10,6 @@
 #import "MPAdConfiguration.h"
 #import "MPBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "MPLogging.h"
 
 @interface MPBannerCustomEventAdapter ()
 
@@ -27,18 +26,11 @@
 @synthesize hasTrackedImpression = _hasTrackedImpression;
 @synthesize hasTrackedClick = _hasTrackedClick;
 
-- (void)unregisterDelegate
-{
-    [self.bannerCustomEvent invalidate];
-    self.bannerCustomEvent.delegate = nil;
-    [[_bannerCustomEvent retain] autorelease]; //make sure the custom event isn't released immediately
-    self.bannerCustomEvent = nil;
-
-    [super unregisterDelegate];
-}
-
 - (void)dealloc {
-    self.configuration = nil;
+    [_bannerCustomEvent invalidate];
+    _bannerCustomEvent.delegate = nil;
+    [_bannerCustomEvent release];
+    [_configuration release];
     [super dealloc];
 }
 
@@ -46,7 +38,7 @@
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration containerSize:(CGSize)size
 {
-    MPLogInfo(@"Looking for custom event class named %@.", configuration.customEventClass);
+    CoreLogType(WBLogLevelDebug, configuration.logType, @"Looking for custom event class named %@.", configuration.customEventClass);
     self.configuration = configuration;
 
     self.bannerCustomEvent = [[MPInstanceProvider sharedProvider] buildBannerCustomEventFromCustomClass:configuration.customEventClass

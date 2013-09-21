@@ -8,8 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-#define MP_DEBUG_MODE               1
-
+#define MP_DOMAIN                   @"com.mopub.ads"
 #define HOSTNAME                    @"ads.mopub.com"
 #define HOSTNAME_FOR_TESTING        @"testing.ads.mopub.com"
 #define DEFAULT_PUB_ID              @"agltb3B1Yi1pbmNyDAsSBFNpdGUYkaoMDA"

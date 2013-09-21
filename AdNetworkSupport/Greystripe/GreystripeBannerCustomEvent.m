@@ -10,11 +10,9 @@
 #import "GSMediumRectangleAdView.h"
 #import "GSLeaderboardAdView.h"
 #import "MPConstants.h"
-#import "MPLogging.h"
 #import "MPInstanceProvider.h"
 #import "GSSDKInfo.h"
-
-#define kGreystripeGUID @"YOUR_GREYSTRIPE_GUID"
+#import "WBCore_Internal.h"
 
 @interface MPInstanceProvider (GreystripeBanners)
 
@@ -33,7 +31,7 @@
     } else if (CGSizeEqualToSize(size, MOPUB_LEADERBOARD_SIZE)) {
         return [[GSLeaderboardAdView alloc] initWithDelegate:delegate GUID:GUID autoload:NO];
     } else {
-        MPLogInfo(@"Failed to create a Greystripe Banner with invalid size %@", NSStringFromCGSize(size));
+        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Failed to create a Greystripe Banner with invalid size %@", NSStringFromCGSize(size));
         return nil;
     }
 }
@@ -55,8 +53,9 @@
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Requesting Greystripe banner");
-    self.greystripeBanner = [[MPInstanceProvider sharedProvider] buildGreystripeBannerAdViewWithDelegate:self GUID:kGreystripeGUID size:size];
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Requesting Greystripe banner");
+    NSString *greyStripeAppId = [WBCore keyForAdProvider:WBAdProviderGreyStripeAppId];
+    self.greystripeBanner = [[MPInstanceProvider sharedProvider] buildGreystripeBannerAdViewWithDelegate:self GUID:greyStripeAppId size:size];
     if (!self.greystripeBanner) {
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
@@ -81,6 +80,11 @@
     [super dealloc];
 }
 
+-(NSString *)description
+{
+    return @"GreyStripe";
+}
+
 #pragma mark - GSAdDelegate
 
 - (BOOL)greystripeBannerAutoload {
@@ -89,25 +93,25 @@
 
 - (void)greystripeAdFetchSucceeded:(id<GSAd>)a_ad
 {
-    MPLogInfo(@"Greystripe banner did load");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Greystripe banner did load");
     [self.delegate bannerCustomEvent:self didLoadAd:self.greystripeBanner];
 }
 
 - (void)greystripeAdFetchFailed:(id<GSAd>)a_ad withError:(GSAdError)a_error
 {
-    MPLogInfo(@"Greystripe banner failed to load with GSAdError: %d", a_error);
+    CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Greystripe banner failed to load with GSAdError: %d", a_error);
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
 - (void)greystripeWillPresentModalViewController
 {
-    MPLogInfo(@"Greystripe banner will present modal");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Greystripe banner will present modal");
     [self.delegate bannerCustomEventWillBeginAction:self];
 }
 
 - (void)greystripeDidDismissModalViewController
 {
-    MPLogInfo(@"Greystripe banner did dismiss modal");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Greystripe banner did dismiss modal");
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 

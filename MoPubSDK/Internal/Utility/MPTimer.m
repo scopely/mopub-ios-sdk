@@ -7,7 +7,6 @@
 //
 
 #import "MPTimer.h"
-#import "MPLogging.h"
 
 @interface MPTimer ()
 @property (nonatomic, assign) NSTimeInterval timeInterval;
@@ -15,6 +14,7 @@
 @property (nonatomic, copy) NSDate *pauseDate;
 @property (nonatomic, assign) BOOL isPaused;
 @property (nonatomic, assign) NSTimeInterval secondsLeft;
+@property (nonatomic, assign) WBLogType logType;
 @end
 
 @interface MPTimer ()
@@ -38,6 +38,7 @@
                             target:(id)target
                           selector:(SEL)aSelector
                            repeats:(BOOL)repeats
+                           logType:(WBLogType)logType
 {
     MPTimer *timer = [[MPTimer alloc] init];
     timer.target = target;
@@ -48,6 +49,7 @@
                                     userInfo:nil
                                      repeats:repeats];
     timer.timeInterval = seconds;
+    timer.logType = logType;
     return [timer autorelease];
 }
 
@@ -91,7 +93,7 @@
 {
     if (![self.timer isValid])
     {
-        MPLogDebug(@"Could not schedule invalidated MPTimer (%p).", self);
+        CoreLogType(WBLogLevelWarn, self.logType, @"Could not schedule invalidated MPTimer (%p).", self);
         return NO;
     }
 
@@ -103,19 +105,19 @@
 {
     if (self.isPaused)
     {
-        MPLogDebug(@"No-op: tried to pause an MPTimer (%p) that was already paused.", self);
+        CoreLogType(WBLogLevelWarn, self.logType, @"No-op: tried to pause an MPTimer (%p) that was already paused.", self);
         return NO;
     }
 
     if (![self.timer isValid])
     {
-        MPLogDebug(@"Cannot pause invalidated MPTimer (%p).", self);
+        CoreLogType(WBLogLevelWarn, self.logType, @"Cannot pause invalidated MPTimer (%p).", self);
         return NO;
     }
 
     if (![self isScheduled])
     {
-        MPLogDebug(@"No-op: tried to pause an MPTimer (%p) that was never scheduled.", self);
+        CoreLogType(WBLogLevelWarn, self.logType, @"No-op: tried to pause an MPTimer (%p) that was never scheduled.", self);
         return NO;
     }
 
@@ -124,10 +126,13 @@
     self.secondsLeft = [fireDate timeIntervalSinceDate:self.pauseDate];
     if (self.secondsLeft <= 0)
     {
-        MPLogWarn(@"An MPTimer was somehow paused after it was supposed to fire.");
+        CoreLogType(WBLogLevelWarn, self.logType, @"An MPTimer was somehow paused after it was supposed to fire.");
         self.secondsLeft = 5;
     }
-    else MPLogDebug(@"Paused MPTimer (%p) %.1f seconds left before firing.", self, self.secondsLeft);
+    else
+    {
+        CoreLogType(WBLogLevelDebug, self.logType, @"Paused MPTimer (%p) %.1f seconds left before firing.", self, self.secondsLeft);
+    }
 
     // Pause the timer by setting its fire date far into the future.
     [self.timer setFireDate:[NSDate distantFuture]];
@@ -140,17 +145,17 @@
 {
     if (![self.timer isValid])
     {
-        MPLogDebug(@"Cannot resume invalidated MPTimer (%p).", self);
+        CoreLogType(WBLogLevelWarn, self.logType, @"Cannot resume invalidated MPTimer (%p).", self);
         return NO;
     }
 
     if (!self.isPaused)
     {
-        MPLogDebug(@"No-op: tried to resume an MPTimer (%p) that was never paused.", self);
+        CoreLogType(WBLogLevelWarn, self.logType, @"No-op: tried to resume an MPTimer (%p) that was never paused.", self);
         return NO;
     }
 
-    MPLogDebug(@"Resumed MPTimer (%p), should fire in %.1f seconds.", self, self.secondsLeft);
+    CoreLogType(WBLogLevelDebug, self.logType, @"Resumed MPTimer (%p), should fire in %.1f seconds.", self, self.secondsLeft);
 
     // Resume the timer.
     NSDate *newFireDate = [NSDate dateWithTimeInterval:self.secondsLeft sinceDate:[NSDate date]];

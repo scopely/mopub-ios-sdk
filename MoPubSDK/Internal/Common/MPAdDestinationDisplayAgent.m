@@ -6,7 +6,6 @@
 //
 
 #import "MPAdDestinationDisplayAgent.h"
-#import "UIViewController+MPAdditions.h"
 #import "MPInstanceProvider.h"
 
 @interface MPAdDestinationDisplayAgent ()
@@ -50,7 +49,7 @@
 
 - (void)productViewControllerDidFinish:(SKStoreProductViewController *)viewController
 {
-    [viewController mp_dismissModalViewControllerAnimated:MP_ANIMATED];
+    [viewController dismissViewControllerAnimated:MP_ANIMATED completion:nil];
 }
 
 @end
@@ -122,8 +121,7 @@
                                                               HTMLString:HTMLString
                                                                 delegate:self] autorelease];
     self.browserController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    [[self.delegate viewControllerForPresentingModalView] mp_presentModalViewController:self.browserController
-                                                                               animated:MP_ANIMATED];
+    [[self.delegate viewControllerForPresentingModalView] presentViewController:self.browserController animated:MP_ANIMATED completion:nil];
 }
 
 - (void)showStoreKitProductWithParameter:(NSString *)parameter fallbackURL:(NSURL *)URL
@@ -162,8 +160,7 @@
     [self.storeKitController loadProductWithParameters:parameters completionBlock:nil];
 
     [self hideOverlay];
-    [[self.delegate viewControllerForPresentingModalView] mp_presentModalViewController:self.storeKitController
-                                                                               animated:MP_ANIMATED];
+    [[self.delegate viewControllerForPresentingModalView] presentViewController:self.storeKitController animated:MP_ANIMATED completion:nil];
 #endif
 }
 
@@ -193,7 +190,7 @@
 #pragma mark - Convenience Methods
 - (void)hideModalAndNotifyDelegate
 {
-    [[self.delegate viewControllerForPresentingModalView] mp_dismissModalViewControllerAnimated:MP_ANIMATED];
+    [[self.delegate viewControllerForPresentingModalView] dismissViewControllerAnimated:MP_ANIMATED completion:nil];
     [self.delegate displayAgentDidDismissModal];
 }
 

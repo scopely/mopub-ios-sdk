@@ -9,7 +9,6 @@
 #import "MPAdConversionTracker.h"
 #import "MPConstants.h"
 #import "MPGlobal.h"
-#import "MPLogging.h"
 #import "MPIdentityProvider.h"
 #import "MPInstanceProvider.h"
 
@@ -50,7 +49,7 @@
 - (void)reportApplicationOpenForApplicationID:(NSString *)appID
 {
     if (![[NSUserDefaults standardUserDefaults] boolForKey:MOPUB_CONVERSION_DEFAULTS_KEY]) {
-        MPLogInfo(@"Tracking conversion");
+        CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"Tracking conversion");
         NSMutableURLRequest *request = [[MPInstanceProvider sharedProvider] buildConfiguredURLRequestWithURL:[self URLForAppID:appID]];
         self.responseData = [NSMutableData data];
         [NSURLConnection connectionWithRequest:request delegate:self];

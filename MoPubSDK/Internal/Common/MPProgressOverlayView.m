@@ -8,7 +8,6 @@
 
 #import "MPProgressOverlayView.h"
 #import "MPGlobal.h"
-#import "MPLogging.h"
 #import <QuartzCore/QuartzCore.h>
 
 @interface MPProgressOverlayView ()

@@ -6,7 +6,6 @@
 //
 
 #import "MPMRAIDBannerCustomEvent.h"
-#import "MPLogging.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
 
@@ -22,7 +21,7 @@
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Loading MoPub MRAID banner");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Loading MoPub MRAID banner");
     MPAdConfiguration *configuration = [self.delegate configuration];
 
     CGRect adViewFrame = CGRectZero;
@@ -62,13 +61,13 @@
 
 - (void)adDidLoad:(MRAdView *)adView
 {
-    MPLogInfo(@"MoPub MRAID banner did load");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"MoPub MRAID banner did load");
     [self.delegate bannerCustomEvent:self didLoadAd:adView];
 }
 
 - (void)adDidFailToLoad:(MRAdView *)adView
 {
-    MPLogInfo(@"MoPub MRAID banner did fail");
+    CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"MoPub MRAID banner did fail");
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
@@ -79,13 +78,13 @@
 
 - (void)appShouldSuspendForAd:(MRAdView *)adView
 {
-    MPLogInfo(@"MoPub MRAID banner will begin action");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"MoPub MRAID banner will begin action");
     [self.delegate bannerCustomEventWillBeginAction:self];
 }
 
 - (void)appShouldResumeFromAd:(MRAdView *)adView
 {
-    MPLogInfo(@"MoPub MRAID banner did end action");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"MoPub MRAID banner did end action");
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 

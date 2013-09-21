@@ -22,11 +22,6 @@
  */
 - (id)initWithDelegate:(id<MPInterstitialAdapterDelegate>)delegate;
 
-/*
- * Sets the adapter's delegate to nil.
- */
-- (void)unregisterDelegate;
-
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration;
 - (void)_getAdWithConfiguration:(MPAdConfiguration *)configuration;
 

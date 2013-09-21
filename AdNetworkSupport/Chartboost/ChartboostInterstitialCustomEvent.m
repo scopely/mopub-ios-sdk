@@ -7,10 +7,7 @@
 
 #import "ChartboostInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "MPLogging.h"
-
-#define kChartboostAppID        @"YOUR_CHARTBOOST_APP_ID"
-#define kChartboostAppSignature @"YOUR_CHARTBOOST_APP_SIGNATURE"
+#import "WBCore_Internal.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -69,6 +66,11 @@ forChartboostInterstitialCustomEvent:(ChartboostInterstitialCustomEvent *)event;
 
 @implementation ChartboostInterstitialCustomEvent
 
++(void)trackInstall
+{
+    [[[MPChartboostRouter sharedRouter] chartboost] startSession];
+}
+
 @synthesize location = _location;
 
 - (void)invalidate
@@ -77,22 +79,26 @@ forChartboostInterstitialCustomEvent:(ChartboostInterstitialCustomEvent *)event;
     self.location = nil;
 }
 
+-(NSString *)description
+{
+    return @"Chartboost";
+}
+
 #pragma mark - MPInterstitialCustomEvent Subclass Methods
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
     NSString *appId = [info objectForKey:@"appId"];
     if (!appId) {
-        appId = kChartboostAppID;
+        appId = [WBCore keyForAdProvider:WBAdProviderChartBoostAppId];
     }
     NSString *appSignature = [info objectForKey:@"appSignature"];
     if (!appSignature) {
-        appSignature = kChartboostAppSignature;
+        appSignature = [WBCore keyForAdProvider:WBAdProviderChartBoostAppSignature];
     }
     NSString *location = [info objectForKey:@"location"];
     self.location = location ? location : @"Default";
 
-    MPLogInfo(@"Requesting Chartboost interstitial.");
     [[MPChartboostRouter sharedRouter] cacheInterstitialWithAppId:appId
                                                      appSignature:appSignature
                                                          location:self.location
@@ -102,7 +108,6 @@ forChartboostInterstitialCustomEvent:(ChartboostInterstitialCustomEvent *)event;
 - (void)showInterstitialFromRootViewController:(UIViewController *)rootViewController
 {
     if ([[MPChartboostRouter sharedRouter] hasCachedInterstitialForLocation:self.location]) {
-        MPLogInfo(@"Chartboost interstitial will be shown.");
 
         // Normally, we call the "will appear" and "did appear" methods in response to
         // callbacks from Third Party Integrations. Unfortunately, Chartboost doesn't seem to have
@@ -111,7 +116,6 @@ forChartboostInterstitialCustomEvent:(ChartboostInterstitialCustomEvent *)event;
         [[MPChartboostRouter sharedRouter] showInterstitialForLocation:self.location];
         [self.delegate interstitialCustomEventDidAppear:self];
     } else {
-        MPLogInfo(@"Failed to show Chartboost interstitial.");
         [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
     }
 }
@@ -120,22 +124,16 @@ forChartboostInterstitialCustomEvent:(ChartboostInterstitialCustomEvent *)event;
 
 - (void)didCacheInterstitial:(NSString *)location
 {
-    MPLogInfo(@"Successfully loaded Chartboost interstitial. Location: %@", location);
-
     [self.delegate interstitialCustomEvent:self didLoadAd:nil];
 }
 
 - (void)didFailToLoadInterstitial:(NSString *)location
 {
-    MPLogInfo(@"Failed to load Chartboost interstitial. Location: %@", location);
-
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
 - (void)didDismissInterstitial:(NSString *)location
 {
-    MPLogInfo(@"Chartboost interstitial was dismissed. Location: %@", location);
-
     // Chartboost doesn't seem to have a separate callback for the "will disappear" event, so we
     // signal "will disappear" manually.
 
@@ -145,7 +143,6 @@ forChartboostInterstitialCustomEvent:(ChartboostInterstitialCustomEvent *)event;
 
 - (void)didClickInterstitial:(NSString *)location
 {
-    MPLogInfo(@"Chartboost interstitial was clicked. Location: %@", location);
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
 }
 
@@ -212,7 +209,7 @@ forChartboostInterstitialCustomEvent:(ChartboostInterstitialCustomEvent *)event;
 forChartboostInterstitialCustomEvent:(ChartboostInterstitialCustomEvent *)event
 {
     if ([self.activeLocations containsObject:location]) {
-        MPLogInfo(@"Failed to load Chartboost interstitial: this location is already in use.");
+        CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"Failed to load Chartboost interstitial: this location is already in use.");
         [event didFailToLoadInterstitial:location];
         return;
     }
@@ -226,7 +223,7 @@ forChartboostInterstitialCustomEvent:(ChartboostInterstitialCustomEvent *)event
         [self.chartboost startSession];
         [self.chartboost cacheInterstitial:location];
     } else {
-        MPLogInfo(@"Failed to load Chartboost interstitial: missing either appId or appSignature.");
+        CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"Failed to load Chartboost interstitial: missing either appId or appSignature.");
         [event didFailToLoadInterstitial:location];
     }
 }

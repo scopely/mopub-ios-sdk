@@ -25,11 +25,6 @@
 - (id)initWithDelegate:(id<MPBannerAdapterDelegate>)delegate;
 
 /*
- * Sets the adapter's delegate to nil.
- */
-- (void)unregisterDelegate;
-
-/*
  * -_getAdWithConfiguration wraps -getAdWithConfiguration in retain/release calls to prevent the
  * adapter from being prematurely deallocated.
  */

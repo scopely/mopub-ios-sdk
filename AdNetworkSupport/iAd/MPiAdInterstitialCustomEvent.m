@@ -7,7 +7,6 @@
 
 #import "MPiAdInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "MPLogging.h"
 
 @interface MPInstanceProvider (iAdInterstitials)
 
@@ -40,8 +39,6 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Requesting iAd interstitial");
-
     self.iAdInterstitial = [[MPInstanceProvider sharedProvider] buildADInterstitialAd];
     self.iAdInterstitial.delegate = self;
 }
@@ -60,26 +57,28 @@
         self.isOnScreen = YES;
         [self.delegate interstitialCustomEventDidAppear:self];
     } else {
-        MPLogInfo(@"Failed to show iAd interstitial: a previously loaded iAd interstitial now claims not to be ready.");
+        CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"Failed to show iAd interstitial: a previously loaded iAd interstitial now claims not to be ready.");
     }
+}
+
+-(NSString *)description
+{
+    return @"iAd";
 }
 
 #pragma mark - <ADInterstitialAdDelegate>
 
 - (void)interstitialAdDidLoad:(ADInterstitialAd *)interstitialAd {
-    MPLogInfo(@"iAd interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:self.iAdInterstitial];
 }
 
 - (void)interstitialAd:(ADInterstitialAd *)interstitialAd didFailWithError:(NSError *)error {
-    MPLogInfo(@"iAd interstitial failed with error: %@", error.localizedDescription);
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)interstitialAdDidUnload:(ADInterstitialAd *)interstitialAd {
     // This method may be called whether the ad is on-screen or not. We only want to invoke the
     // "disappear" callbacks if the ad is on-screen.
-    MPLogInfo(@"iAd interstitial did unload");
     if (self.isOnScreen) {
         [self.delegate interstitialCustomEventWillDisappear:self];
         [self.delegate interstitialCustomEventDidDisappear:self];
@@ -92,7 +91,6 @@
 
 - (BOOL)interstitialAdActionShouldBegin:(ADInterstitialAd *)interstitialAd
                    willLeaveApplication:(BOOL)willLeave {
-    MPLogInfo(@"iAd interstitial will begin action");
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
     return YES; // YES allows the banner action to execute (NO would instead cancel the action).
 }

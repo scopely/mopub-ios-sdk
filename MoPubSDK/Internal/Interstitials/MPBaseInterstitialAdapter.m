@@ -19,7 +19,7 @@
 @property (nonatomic, retain) MPAdConfiguration *configuration;
 @property (nonatomic, retain) MPTimer *timeoutTimer;
 
-- (void)startTimeoutTimer;
+- (void)startTimeoutTimerWithConfiguration:(MPAdConfiguration *)configuration;
 
 @end
 
@@ -40,18 +40,11 @@
 
 - (void)dealloc
 {
-    [self unregisterDelegate];
-    self.configuration = nil;
-
-    [self.timeoutTimer invalidate];
-    self.timeoutTimer = nil;
+    _delegate = nil;
+    [_configuration release];
+    [_timeoutTimer invalidate];
 
     [super dealloc];
-}
-
-- (void)unregisterDelegate
-{
-    self.delegate = nil;
 }
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration
@@ -64,20 +57,32 @@
 {
     self.configuration = configuration;
 
-    [self startTimeoutTimer];
+    [self startTimeoutTimerWithConfiguration:configuration];
 
     [self retain];
     [self getAdWithConfiguration:configuration];
     [self release];
 }
 
-- (void)startTimeoutTimer
+- (void)startTimeoutTimerWithConfiguration:(MPAdConfiguration *)configuration
 {
-    self.timeoutTimer = [[MPInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:INTERSTITIAL_TIMEOUT_INTERVAL
-                                                                                   target:self
-                                                                                 selector:@selector(timeout)
-                                                                                  repeats:NO];
-    [self.timeoutTimer scheduleNow];
+    int timeout = INTERSTITIAL_TIMEOUT_INTERVAL;
+    id t = configuration.customEventClassData[@"Timeout"];
+    if([t isKindOfClass:[NSString class]] == YES)
+    {
+        timeout = [t intValue];
+        CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"%@ Override timeout available timeout set to %d", NSStringFromClass(configuration.customEventClass), timeout);
+    }
+    
+    if(timeout > 0)
+    {
+        self.timeoutTimer = [[MPInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeout
+                                                                                       target:self
+                                                                                     selector:@selector(timeout)
+                                                                                      repeats:NO
+                                                                                      logType:WBLogTypeAdFullPage];
+        [self.timeoutTimer scheduleNow];
+    }
 }
 
 - (void)didStopLoading
@@ -87,6 +92,7 @@
 
 - (void)timeout
 {
+    CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"%@ custom event did time out", NSStringFromClass(self.configuration.customEventClass));
     [self.delegate adapter:self didFailToLoadAdWithError:nil];
 }
 

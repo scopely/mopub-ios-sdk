@@ -8,7 +8,6 @@
 #import "MPAdServerCommunicator.h"
 
 #import "MPAdConfiguration.h"
-#import "MPLogging.h"
 #import "MPInstanceProvider.h"
 
 const NSTimeInterval kRequestTimeoutInterval = 10.0;

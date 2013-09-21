@@ -71,12 +71,6 @@
  */
 - (BOOL)enableAutomaticImpressionAndClickTracking;
 
-/** 
- * API to Allow us to detach the custom event from (shared instance) routers synchronously
- * See the chartboost interstitial custom event for an example use case.
- */ 
--(void)invalidate;
-
 /** @name Communicating with the MoPub SDK */
 
 /**
@@ -86,6 +80,16 @@
  * and your `MPInterstitialAdController`'s delegate of the progress of your custom event.
  *
  */
+
+-(void)loadInterstitialWithCustomEventInfo:(NSDictionary *)info;
+
+/**
+ * API to Allow us to detach the custom event from (shared instance) routers synchronously
+ * See the chartboost interstitial custom event for an example use case.
+ */
+-(void)invalidate;
+
+-(void)customEventDidUnload __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_NA,__MAC_NA,__IPHONE_3_0,__IPHONE_5_0);
 
 @property (nonatomic, assign) id<MPInterstitialCustomEventDelegate> delegate;
 
