@@ -7,7 +7,7 @@
 
 #import "ChartboostInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "WBSettingService_Internal.h"
+#import "WBSettingService.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

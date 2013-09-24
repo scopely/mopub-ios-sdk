@@ -9,7 +9,7 @@
 #import "MPInstanceProvider.h"
 #import "GSSDKInfo.h"
 #import "MPConstants.h"
-#import "WBSettingService_Internal.h"
+#import "WBSettingService.h"
 
 @interface MPInstanceProvider (GreystripeInterstitials)
 
