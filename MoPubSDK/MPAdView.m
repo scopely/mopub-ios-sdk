@@ -14,6 +14,7 @@
 
 @interface MPAdView () <MPBannerAdManagerDelegate>
 
+@property (nonatomic) BOOL calledLoadedOnce;
 @property (nonatomic, retain) MPBannerAdManager *adManager;
 @property (nonatomic, assign) UIView *adContentView;
 @property (nonatomic, assign) CGSize originalSize;
@@ -86,8 +87,10 @@
 
     if (_ignoresAutorefresh) {
         [self.adManager stopAutomaticallyRefreshingContents];
+        CoreLogType(WBLogLevelWarn, self.logType, @"pauseBanners");
     } else {
         [self.adManager startAutomaticallyRefreshingContents];
+        CoreLogType(WBLogLevelWarn, self.logType, @"unpauseBanners");
     }
 }
 
@@ -107,7 +110,9 @@
 
 - (void)loadAd
 {
+    self.calledLoadedOnce = YES;
     [self.adManager loadAd];
+    CoreLogType(WBLogLevelWarn, self.logType, @"banner loadAd");
 }
 
 - (void)refreshAd
@@ -123,6 +128,7 @@
 - (void)forceRefreshAd
 {
     [self.adManager forceRefreshAd];
+    CoreLogType(WBLogLevelWarn, self.logType, @"forceRefresh");
 }
 
 - (void)stopAutomaticallyRefreshingContents

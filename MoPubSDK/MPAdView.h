@@ -75,6 +75,8 @@ typedef enum
  */
 @property (nonatomic, copy) CLLocation *location;
 
+@property (nonatomic, readonly) BOOL calledLoadedOnce;
+@property (nonatomic, assign) WBLogType logType;
 /** @name Enabling Test Mode */
 
 /**
