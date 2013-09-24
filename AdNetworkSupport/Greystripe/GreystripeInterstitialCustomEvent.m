@@ -8,8 +8,8 @@
 #import "GreystripeInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "GSSDKInfo.h"
-#import "WBCore_Internal.h"
 #import "MPConstants.h"
+#import "WBSettingService_Internal.h"
 
 @interface MPInstanceProvider (GreystripeInterstitials)
 
@@ -44,7 +44,7 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    NSString *greyStripeAppId = [WBCore keyForAdProvider:WBAdProviderGreyStripeAppId];
+    NSString *greyStripeAppId = [WBSettingService keyForAdProvider:WBAdProviderGreyStripeAppId];
     self.greystripeFullscreenAd = [[MPInstanceProvider sharedProvider] buildGSFullscreenAdWithDelegate:self GUID:greyStripeAppId];
 
     if (self.delegate.location) {

@@ -7,7 +7,7 @@
 
 #import "ChartboostInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "WBCore_Internal.h"
+#import "WBSettingService_Internal.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -90,11 +90,11 @@ forChartboostInterstitialCustomEvent:(ChartboostInterstitialCustomEvent *)event;
 {
     NSString *appId = [info objectForKey:@"appId"];
     if (!appId) {
-        appId = [WBCore keyForAdProvider:WBAdProviderChartBoostAppId];
+        appId = [WBSettingService keyForAdProvider:WBAdProviderChartBoostAppId];
     }
     NSString *appSignature = [info objectForKey:@"appSignature"];
     if (!appSignature) {
-        appSignature = [WBCore keyForAdProvider:WBAdProviderChartBoostAppSignature];
+        appSignature = [WBSettingService keyForAdProvider:WBAdProviderChartBoostAppSignature];
     }
     NSString *location = [info objectForKey:@"location"];
     self.location = location ? location : @"Default";

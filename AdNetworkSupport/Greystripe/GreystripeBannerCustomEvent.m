@@ -12,7 +12,7 @@
 #import "MPConstants.h"
 #import "MPInstanceProvider.h"
 #import "GSSDKInfo.h"
-#import "WBCore_Internal.h"
+#import "WBSettingService_Internal.h"
 
 @interface MPInstanceProvider (GreystripeBanners)
 
@@ -54,7 +54,7 @@
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
     CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Requesting Greystripe banner");
-    NSString *greyStripeAppId = [WBCore keyForAdProvider:WBAdProviderGreyStripeAppId];
+    NSString *greyStripeAppId = [WBSettingService keyForAdProvider:WBAdProviderGreyStripeAppId];
     self.greystripeBanner = [[MPInstanceProvider sharedProvider] buildGreystripeBannerAdViewWithDelegate:self GUID:greyStripeAppId size:size];
     if (!self.greystripeBanner) {
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
