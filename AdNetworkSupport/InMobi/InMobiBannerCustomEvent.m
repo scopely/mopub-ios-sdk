@@ -8,7 +8,6 @@
 #import "InMobiBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "MPConstants.h"
-#import "MPLogging.h"
 
 #define kInMobiAppID            @"YOUR_INMOBI_APP_ID"
 #define INVALID_INMOBI_AD_SIZE  -1
@@ -44,10 +43,10 @@
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Requesting InMobi banner");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Requesting InMobi banner");
     int imAdSizeConstant = [self imAdSizeConstantForCGSize:size];
     if (imAdSizeConstant == INVALID_INMOBI_AD_SIZE) {
-        MPLogInfo(@"Failed to create an inMobi Banner with invalid size %@", NSStringFromCGSize(size));
+        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Failed to create an inMobi Banner with invalid size %@", NSStringFromCGSize(size));
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
@@ -103,37 +102,37 @@
 #pragma mark InMobiAdDelegate methods
 
 - (void)bannerDidReceiveAd:(IMBanner *)banner {
-    MPLogInfo(@"InMobi banner did load");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"InMobi banner did load");
     [self.delegate trackImpression];
     [self.delegate bannerCustomEvent:self didLoadAd:banner];
 }
 
 - (void)banner:(IMBanner *)banner didFailToReceiveAdWithError:(IMError *)error {
-    MPLogInfo(@"InMobi banner did fail with error: %@", error.localizedDescription);
+    CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"InMobi banner did fail with error: %@", error.localizedDescription);
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)bannerDidDismissScreen:(IMBanner *)banner {
-    MPLogInfo(@"adViewDidDismissScreen");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"adViewDidDismissScreen");
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 
 - (void)bannerWillDismissScreen:(IMBanner *)banner {
-    MPLogInfo(@"adViewWillDismissScreen");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"adViewWillDismissScreen");
 }
 
 - (void)bannerWillPresentScreen:(IMBanner *)banner {
-    MPLogInfo(@"InMobi banner will present modal");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"InMobi banner will present modal");
     [self.delegate bannerCustomEventWillBeginAction:self];
 }
 
 - (void)bannerWillLeaveApplication:(IMBanner *)banner {
-    MPLogInfo(@"InMobi banner will leave application");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"InMobi banner will leave application");
     [self.delegate bannerCustomEventWillLeaveApplication:self];
 }
 
 - (void)bannerDidInteract:(IMBanner *)banner withParams:(NSDictionary *)dictionary {
-    MPLogInfo(@"InMobi banner was clicked");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"InMobi banner was clicked");
     [self.delegate trackClick];
 }
 

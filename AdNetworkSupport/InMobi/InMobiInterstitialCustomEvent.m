@@ -7,7 +7,7 @@
 
 #import "InMobiInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "MPLogging.h"
+#import "MPConstants.h"
 
 #define kInMobiAppID    @"YOUR_INMOBI_APP_ID"
 
@@ -44,7 +44,7 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"Requesting InMobi interstitial");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting InMobi interstitial");
     self.inMobiInterstitial = [[MPInstanceProvider sharedProvider] buildIMInterstitialWithDelegate:self appId:kInMobiAppID];
     IMInMobiNetworkExtras *inmobiExtras = [[IMInMobiNetworkExtras alloc] init];
     NSMutableDictionary *paramsDict = [[NSMutableDictionary alloc] init];
@@ -76,18 +76,18 @@
 
 
 - (void)interstitialDidReceiveAd:(IMInterstitial *)ad {
-    MPLogInfo(@"InMobi interstitial did load");
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"InMobi interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:ad];
 }
 
 - (void)interstitial:(IMInterstitial *)ad didFailToReceiveAdWithError:(IMError *)error {
 
-    MPLogInfo(@"InMobi banner did fail with error: %@", error.localizedDescription);
+    CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"InMobi banner did fail with error: %@", error.localizedDescription);
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
 - (void)interstitialWillPresentScreen:(IMInterstitial *)ad {
-    MPLogInfo(@"InMobi interstitial will present");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"InMobi interstitial will present");
     [self.delegate interstitialCustomEventWillAppear:self];
 
     // InMobi doesn't seem to have a separate callback for the "did appear" event, so we
@@ -96,27 +96,27 @@
 }
 
 - (void)interstitial:(IMInterstitial *)ad didFailToPresentScreenWithError:(IMError *)error {
-    MPLogInfo(@"InMobi interstitial failed to present with error: %@", error.localizedDescription);
+    CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"InMobi interstitial failed to present with error: %@", error.localizedDescription);
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
 - (void)interstitialWillDismissScreen:(IMInterstitial *)ad {
-    MPLogInfo(@"InMobi interstitial will dismiss");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"InMobi interstitial will dismiss");
     [self.delegate interstitialCustomEventWillDisappear:self];
 }
 
 - (void)interstitialDidDismissScreen:(IMInterstitial *)ad {
-    MPLogInfo(@"InMobi interstitial did dismiss");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"InMobi interstitial did dismiss");
     [self.delegate interstitialCustomEventDidDisappear:self];
 }
 
 - (void)interstitialWillLeaveApplication:(IMInterstitial *)ad {
-    MPLogInfo(@"InMobi interstitial will leave application");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"InMobi interstitial will leave application");
     [self.delegate interstitialCustomEventWillLeaveApplication:self];
 }
 
 - (void) interstitialDidInteract:(IMInterstitial *)ad withParams:(NSDictionary *)dictionary {
-    MPLogInfo(@"InMobi interstitial was tapped");
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"InMobi interstitial was tapped");
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
 }
 
