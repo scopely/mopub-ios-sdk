@@ -175,15 +175,6 @@
             [self.delegate trackClick];
             self.didTrackClick = YES;
         }
-<<<<<<< HEAD
-    }
-}
-
-- (void)modalWillAppear:(NSNotification *)notification
-{
-    if ([[notification.userInfo objectForKey:MillennialMediaAdObjectKey] isEqual:self.mmAdView]) {
-        CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Millennial banner will present modal");
-=======
         
         // XXX: As of Millennial SDK version 5.1.0, a "tapped" notification for an MMAdView is
         // accompanied by the presentation of a modal loading indicator (spinner). Although this
@@ -198,7 +189,6 @@
         // Thus, we must call [self.delegate bannerCustomEventWillBeginAction:self] as soon as we
         // detect that the spinner has been presented.
         
->>>>>>> upstream/master
         [self.delegate bannerCustomEventWillBeginAction:self];
     }
 }
