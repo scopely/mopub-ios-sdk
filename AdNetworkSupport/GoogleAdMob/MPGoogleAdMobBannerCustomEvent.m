@@ -96,6 +96,11 @@
     return CGRectMake(0, 0, width, height);
 }
 
+-(void)removeFromSuperview
+{
+    [self.adBannerView removeFromSuperview];
+}
+
 #pragma mark -
 #pragma mark GADBannerViewDelegate methods
 

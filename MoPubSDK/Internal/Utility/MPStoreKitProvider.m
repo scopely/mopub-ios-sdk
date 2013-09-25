@@ -16,7 +16,7 @@
 
 + (BOOL)deviceHasStoreKit
 {
-    return !!NSClassFromString(@"SKStoreProductViewController");
+    return NSClassFromString(@"SKStoreProductViewController") != nil;
 }
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_6_0

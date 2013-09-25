@@ -262,7 +262,7 @@
 
 - (BOOL)requestingAdapterIsReadyToBePresented
 {
-    return !!self.requestingAdapterAdContentView;
+    return self.requestingAdapterAdContentView != nil;
 }
 
 - (void)presentRequestingAdapter

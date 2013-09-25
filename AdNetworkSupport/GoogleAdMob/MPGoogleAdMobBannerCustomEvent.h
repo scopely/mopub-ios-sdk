@@ -14,4 +14,6 @@
 
 @interface MPGoogleAdMobBannerCustomEvent : MPBannerCustomEvent <GADBannerViewDelegate>
 
+-(void)removeFromSuperview;
+
 @end

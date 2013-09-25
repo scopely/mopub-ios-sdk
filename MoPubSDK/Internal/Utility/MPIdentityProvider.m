@@ -27,7 +27,7 @@
 
 + (BOOL)deviceHasASIdentifierManager
 {
-    return !!NSClassFromString(@"ASIdentifierManager");
+    return NSClassFromString(@"ASIdentifierManager") != nil;
 }
 
 + (NSString *)identifier
