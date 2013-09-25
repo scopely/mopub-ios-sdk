@@ -15,7 +15,6 @@
 #import "MPInstanceProvider.h"
 #import "MRCalendarManager.h"
 #import "MRJavaScriptEventEmitter.h"
-#import "UIViewController+MPAdditions.h"
 #import "MRBundleManager.h"
 
 static NSString *const kExpandableCloseButtonImageName = @"MPCloseButtonX.png";
@@ -326,7 +325,7 @@ static NSString *const kMraidURLScheme = @"mraid";
     [self.jsEventEmitter fireNativeCommandCompleteEvent:command];
 
     if (!success) {
-        MPLogDebug(@"Unknown command: %@", command);
+        CoreLogType(WBLogLevelError, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Unknown command: %@", command);
         [self.jsEventEmitter fireErrorEventForAction:command withMessage:@"Specified command is not implemented."];
     }
 }

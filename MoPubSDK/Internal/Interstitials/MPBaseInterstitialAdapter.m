@@ -73,7 +73,7 @@
     if([t isKindOfClass:[NSString class]] == YES)
     {
         timeInterval = [t intValue];
-        CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"%@ Override timeout available timeout set to %d", NSStringFromClass(configuration.customEventClass), timeInterval);
+        CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"%@ Override timeout available timeout set to %f", NSStringFromClass(configuration.customEventClass), timeInterval);
     }
     
     if(timeInterval > 0)
