@@ -119,6 +119,13 @@
     [super viewWillDisappear:animated];
 }
 
+#pragma mark - Hidding status bar (iOS 7 and above)
+
+- (BOOL)prefersStatusBarHidden
+{
+    return YES;
+}
+
 #pragma mark -
 #pragma mark Navigation
 

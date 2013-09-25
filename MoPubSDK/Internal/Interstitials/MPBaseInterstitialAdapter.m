@@ -66,21 +66,24 @@
 
 - (void)startTimeoutTimerWithConfiguration:(MPAdConfiguration *)configuration
 {
-    int timeout = INTERSTITIAL_TIMEOUT_INTERVAL;
+    NSTimeInterval timeInterval = (self.configuration && self.configuration.adTimeoutInterval >= 0) ?
+    self.configuration.adTimeoutInterval : INTERSTITIAL_TIMEOUT_INTERVAL;
+
     id t = configuration.customEventClassData[@"Timeout"];
     if([t isKindOfClass:[NSString class]] == YES)
     {
-        timeout = [t intValue];
-        CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"%@ Override timeout available timeout set to %d", NSStringFromClass(configuration.customEventClass), timeout);
+        timeInterval = [t intValue];
+        CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"%@ Override timeout available timeout set to %d", NSStringFromClass(configuration.customEventClass), timeInterval);
     }
     
-    if(timeout > 0)
+    if(timeInterval > 0)
     {
-        self.timeoutTimer = [[MPInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeout
+        self.timeoutTimer = [[MPInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
                                                                                        target:self
                                                                                      selector:@selector(timeout)
                                                                                       repeats:NO
                                                                                       logType:WBLogTypeAdFullPage];
+
         [self.timeoutTimer scheduleNow];
     }
 }

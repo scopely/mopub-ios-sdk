@@ -9,6 +9,9 @@
 #import <UIKit/UIKit.h>
 
 #import "MPAdDestinationDisplayAgent.h"
+#import "MRCalendarManager.h"
+#import "MRPictureManager.h"
+#import "MRVideoPlayerManager.h"
 
 @class MRAdViewDisplayController, MRProperty;
 @protocol MRAdViewDelegate;
@@ -33,7 +36,7 @@ enum {
 };
 typedef NSUInteger MRAdViewCloseButtonStyle;
 
-@interface MRAdView : UIView <UIWebViewDelegate, MPAdDestinationDisplayAgentDelegate> {
+@interface MRAdView : UIView <UIWebViewDelegate, MPAdDestinationDisplayAgentDelegate, MRCalendarManagerDelegate, MRPictureManagerDelegate, MRVideoPlayerManagerDelegate> {
     // This view's delegate object.
     id<MRAdViewDelegate> _delegate;
 
@@ -73,13 +76,14 @@ typedef NSUInteger MRAdViewCloseButtonStyle;
 @property (nonatomic, assign) BOOL expanded;
 // Enum indicating whether this view is being used as an inline ad or an interstitial ad.
 @property (nonatomic, assign, readonly) MRAdViewPlacementType placementType;
+@property (nonatomic, retain) MRAdViewDisplayController *displayController;
 
 - (id)initWithFrame:(CGRect)frame;
 - (id)initWithFrame:(CGRect)frame allowsExpansion:(BOOL)expansion
    closeButtonStyle:(MRAdViewCloseButtonStyle)style placementType:(MRAdViewPlacementType)type;
 - (void)loadCreativeFromURL:(NSURL *)url;
 - (void)loadCreativeWithHTMLString:(NSString *)html baseURL:(NSURL *)url;
-- (NSString *)executeJavascript:(NSString *)javascript, ...;
+
 - (BOOL)isViewable;
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation;
 - (void)handleMRAIDOpenCallForURL:(NSURL *)URL;

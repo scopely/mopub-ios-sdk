@@ -6,8 +6,14 @@
 //
 
 #import "FakeMPInstanceProvider.h"
+#import <EventKit/EventKit.h>
+#import <EventKitUI/EventKitUI.h>
+#import <MediaPlayer/MediaPlayer.h>
 #import "MPAdWebView.h"
 #import "FakeMPTimer.h"
+#import "MRJavaScriptEventEmitter.h"
+#import "MRImageDownloader.h"
+#import "MRBundleManager.h"
 
 @interface MPInstanceProvider (ThirdPartyAdditions)
 
@@ -20,8 +26,9 @@
 - (Chartboost *)buildChartboost;
 
 #pragma mark Google Ad Mob
-- (GADRequest *)buildGADRequest;
+- (GADRequest *)buildGADBannerRequest;
 - (GADBannerView *)buildGADBannerViewWithFrame:(CGRect)frame;
+- (GADRequest *)buildGADInterstitialRequest;
 - (GADInterstitial *)buildGADInterstitialAd;
 
 #pragma mark Greystripe
@@ -29,9 +36,8 @@
 - (GSFullscreenAd *)buildGSFullscreenAdWithDelegate:(id<GSAdDelegate>)delegate GUID:(NSString *)GUID;
 
 #pragma mark InMobi
-- (IMAdRequest *)buildIMAdRequest;
-- (IMAdView *)buildIMAdViewWithFrame:(CGRect)frame appId:(NSString *)appId adSize:(int)adSize;
-- (IMAdInterstitial *)buildIMAdInterstitialWithDelegate:(id<IMAdInterstitialDelegate>)delegate appId:(NSString *)appID;
+- (IMBanner *)buildIMBannerWithFrame:(CGRect)frame appId:(NSString *)appId adSize:(int)adSize;
+- (IMInterstitial *)buildIMInterstitialWithDelegate:(id<IMInterstitialDelegate>)delegate appId:(NSString *)appId;
 
 #pragma mark Millennial
 - (MMAdView *)buildMMAdViewWithFrame:(CGRect)frame apid:(NSString *)apid rootViewController:(UIViewController *)controller;
@@ -194,7 +200,100 @@
                      }];
 }
 
+#pragma mark - MRAID
+- (MRBundleManager *)buildMRBundleManager
+{
+    return [self returnFake:self.fakeMRBundleManager
+                     orCall:^{
+                         return [super buildMRBundleManager];
+                     }];
+}
+
+- (UIWebView *)buildUIWebViewWithFrame:(CGRect)frame
+{
+    return [self returnFake:self.fakeUIWebView orCall:^id{
+        return [super buildUIWebViewWithFrame:frame];
+    }];
+}
+
+- (MRJavaScriptEventEmitter *)buildMRJavaScriptEventEmitterWithWebView:(UIWebView *)webView
+{
+    return [self returnFake:self.fakeMRJavaScriptEventEmitter
+                     orCall:^{
+                        return [super buildMRJavaScriptEventEmitterWithWebView:webView];
+                     }];
+}
+
+- (MRCalendarManager *)buildMRCalendarManagerWithDelegate:(id<MRCalendarManagerDelegate>)delegate
+{
+    return [self returnFake:self.fakeMRCalendarManager
+                     orCall:^{
+                         return [super buildMRCalendarManagerWithDelegate:delegate];
+                     }];
+}
+
+- (EKEventEditViewController *)buildEKEventEditViewControllerWithEditViewDelegate:(id <EKEventEditViewDelegate>)editViewDelegate
+{
+    if (self.fakeEKEventEditViewController) {
+        self.fakeEKEventEditViewController.editViewDelegate = editViewDelegate;
+        return self.fakeEKEventEditViewController;
+    } else {
+        return [super buildEKEventEditViewControllerWithEditViewDelegate:editViewDelegate];
+    }
+}
+
+- (EKEventStore *)buildEKEventStore
+{
+    return [self returnFake:self.fakeEKEventStore
+                     orCall:^{
+                        return [super buildEKEventStore];
+                     }];
+}
+
+- (MRPictureManager *)buildMRPictureManagerWithDelegate:(id<MRPictureManagerDelegate>)delegate
+{
+    return [self returnFake:self.fakeMRPictureManager
+                     orCall:^{
+                         return [super buildMRPictureManagerWithDelegate:delegate];
+                     }];
+}
+
+- (MRImageDownloader *)buildMRImageDownloaderWithDelegate:(id<MRImageDownloaderDelegate>)delegate
+{
+    if (self.fakeImageDownloader) {
+        self.fakeImageDownloader.delegate = delegate;
+        return self.fakeImageDownloader;
+    } else {
+        return [super buildMRImageDownloaderWithDelegate:delegate];
+    }
+
+}
+
+- (MRVideoPlayerManager *)buildMRVideoPlayerManagerWithDelegate:(id<MRVideoPlayerManagerDelegate>)delegate
+{
+    return [self returnFake:self.fakeMRVideoPlayerManager
+                     orCall:^{
+                         return [super buildMRVideoPlayerManagerWithDelegate:delegate];
+                     }];
+}
+
+- (MPMoviePlayerViewController *)buildMPMoviePlayerViewControllerWithURL:(NSURL *)URL
+{
+    return [self returnFake:self.fakeMoviePlayerViewController
+                     orCall:^{
+                         return [super buildMPMoviePlayerViewControllerWithURL:URL];
+                     }];
+}
+
 #pragma mark - Utilities
+
+- (NSOperationQueue *)sharedOperationQueue
+{
+    return [self returnFake:self.fakeOperationQueue
+                     orCall:^{
+                        return [super sharedOperationQueue];
+                     }];
+}
 
 - (MPReachability *)sharedMPReachability
 {
@@ -204,11 +303,11 @@
                      }];
 }
 
-- (CTCarrier *)buildCTCarrier;
+- (NSDictionary *)sharedCarrierInfo
 {
-    return [self returnFake:self.fakeCTCarrier
+    return [self returnFake:self.fakeCarrierInfo
                      orCall:^id{
-                         return [super buildCTCarrier];
+                         return [super sharedCarrierInfo];
                      }];
 }
 
@@ -288,11 +387,11 @@
 
 #pragma mark Google Ad Mob
 
-- (GADRequest *)buildGADRequest
+- (GADRequest *)buildGADBannerRequest
 {
-    return [self returnFake:self.fakeGADRequest
+    return [self returnFake:self.fakeGADBannerRequest
                      orCall:^{
-                         return [super buildGADRequest];
+                         return [super buildGADBannerRequest];
                      }];
 }
 
@@ -301,6 +400,14 @@
     return [self returnFake:self.fakeGADBannerView
                      orCall:^{
                          return [super buildGADBannerViewWithFrame:frame];
+                     }];
+}
+
+- (GADRequest *)buildGADInterstitialRequest
+{
+    return [self returnFake:self.fakeGADInterstitialRequest
+                     orCall:^{
+                         return [super buildGADInterstitialRequest];
                      }];
 }
 
@@ -338,33 +445,25 @@
 
 #pragma mark InMobi
 
-- (IMAdRequest *)buildIMAdRequest
-{
-    return [self returnFake:self.fakeIMAdRequest
-                     orCall:^{
-                         return [super buildIMAdRequest];
-                     }];
-}
-
-- (IMAdView *)buildIMAdViewWithFrame:(CGRect)frame appId:(NSString *)appId adSize:(int)adSize
+- (IMBanner *)buildIMBannerWithFrame:(CGRect)frame appId:(NSString *)appId adSize:(int)adSize
 {
     if (self.fakeIMAdView) {
         self.fakeIMAdView.frame = frame;
-        self.fakeIMAdView.imAppId = appId;
-        self.fakeIMAdView.imAdSize = adSize;
+        self.fakeIMAdView.appId = appId;
+        self.fakeIMAdView.adSize = adSize;
         return self.fakeIMAdView;
     }
-    return [super buildIMAdViewWithFrame:frame appId:appId adSize:adSize];
+    return [super buildIMBannerWithFrame:frame appId:appId adSize:adSize];
 }
 
-- (IMAdInterstitial *)buildIMAdInterstitialWithDelegate:(id<IMAdInterstitialDelegate>)delegate appId:(NSString *)appId;
+- (IMInterstitial *)buildIMInterstitialWithDelegate:(id<IMInterstitialDelegate>)delegate appId:(NSString *)appId
 {
     if (self.fakeIMAdInterstitial) {
-        self.fakeIMAdInterstitial.imAppId = appId;
+        self.fakeIMAdInterstitial.appId = appId;
         self.fakeIMAdInterstitial.delegate = delegate;
         return self.fakeIMAdInterstitial;
     }
-    return [super buildIMAdInterstitialWithDelegate:delegate appId:appId];
+    return [super buildIMInterstitialWithDelegate:delegate appId:appId];
 }
 
 #pragma mark Millennial

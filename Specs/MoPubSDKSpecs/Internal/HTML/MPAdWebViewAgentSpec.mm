@@ -19,7 +19,8 @@ SPEC_BEGIN(MPAdWebViewAgentSpec)
 describe(@"MPAdWebViewAgent", ^{
     __block MPAdWebViewAgent *agent;
     __block id<CedarDouble, MPAdWebViewAgentDelegate> delegate;
-    __block MPAdConfiguration *configuration;
+    __block MPAdConfiguration *bannerConfiguration;
+    __block MPAdConfiguration *interstitialConfiguration;
     __block MPAdWebView *webView;
     __block MPAdDestinationDisplayAgent *destinationDisplayAgent;
 
@@ -33,11 +34,26 @@ describe(@"MPAdWebViewAgent", ^{
                                                          delegate:delegate
                                              customMethodDelegate:nil] autorelease];
         webView = agent.view;
-        configuration = [MPAdConfigurationFactory defaultBannerConfiguration];
+        bannerConfiguration = [MPAdConfigurationFactory defaultBannerConfiguration];
+        interstitialConfiguration = [MPAdConfigurationFactory defaultInterstitialConfiguration];
+    });
+
+    describe(@"when an interstitial configuration is loaded", ^{
+        context(@"setting the frame", ^{
+            beforeEach(^{
+                interstitialConfiguration.preferredSize = CGSizeMake(123, 123);
+                [agent loadConfiguration:interstitialConfiguration];
+            });
+
+            it(@"should ignore the frame size", ^{
+                agent.view.frame.size.width should equal(30);
+                agent.view.frame.size.height should equal(20);
+            });
+        });
     });
 
     describe(@"when the configuration is loaded", ^{
-        subjectAction(^{ [agent loadConfiguration:configuration]; });
+        subjectAction(^{ [agent loadConfiguration:bannerConfiguration]; });
 
         describe(@"setting the frame", ^{
             context(@"when the frame sizes are valid", ^{
@@ -49,7 +65,7 @@ describe(@"MPAdWebViewAgent", ^{
 
             context(@"when the frame sizes are invalid", ^{
                 beforeEach(^{
-                    configuration.preferredSize = CGSizeMake(0, 0);
+                    bannerConfiguration.preferredSize = CGSizeMake(0, 0);
                 });
 
                 it(@"should not set its frame", ^{
@@ -62,7 +78,7 @@ describe(@"MPAdWebViewAgent", ^{
         describe(@"setting scrollability", ^{
             context(@"when the configuration says no", ^{
                 beforeEach(^{
-                    configuration.scrollable = NO;
+                    bannerConfiguration.scrollable = NO;
                 });
 
                 it(@"should disable scrolling", ^{
@@ -72,7 +88,7 @@ describe(@"MPAdWebViewAgent", ^{
 
             context(@"when the configuration says yes", ^{
                 beforeEach(^{
-                    configuration.scrollable = YES;
+                    bannerConfiguration.scrollable = YES;
                 });
 
                 it(@"should enable scrolling", ^{
@@ -122,7 +138,7 @@ describe(@"MPAdWebViewAgent", ^{
     describe(@"handling webview navigation", ^{
         __block NSURL *URL;
 
-        subjectAction(^{ [agent loadConfiguration:configuration]; });
+        subjectAction(^{ [agent loadConfiguration:bannerConfiguration]; });
 
         context(@"when told to stop handling requests", ^{
             beforeEach(^{
@@ -133,6 +149,10 @@ describe(@"MPAdWebViewAgent", ^{
             it(@"should never load anything", ^{
                 [agent webView:agent.view shouldStartLoadWithRequest:[NSURLRequest requestWithURL:URL] navigationType:UIWebViewNavigationTypeOther] should equal(NO);
                 delegate should_not have_received(@selector(adDidClose:)).with(agent.view);
+            });
+
+            it(@"should tell its destination display agent to cancel any open url requests", ^{
+                destinationDisplayAgent should have_received(@selector(cancel));
             });
 
             context(@"when told to continue handling requests", ^{
@@ -221,7 +241,7 @@ describe(@"MPAdWebViewAgent", ^{
 
             context(@"when navigation should not be intercepted", ^{
                 beforeEach(^{
-                    configuration.shouldInterceptLinks = NO;
+                    bannerConfiguration.shouldInterceptLinks = NO;
                 });
 
                 it(@"should tell the webview to load the URL", ^{
@@ -231,7 +251,7 @@ describe(@"MPAdWebViewAgent", ^{
 
             context(@"when navigation should be intercepted", ^{
                 beforeEach(^{
-                    configuration.shouldInterceptLinks = YES;
+                    bannerConfiguration.shouldInterceptLinks = YES;
                 });
 
                 context(@"when the navigation type is a click", ^{
@@ -276,7 +296,7 @@ describe(@"MPAdWebViewAgent", ^{
 
                 context(@"when the click tracker is missing", ^{
                     beforeEach(^{
-                        configuration.clickTrackingURL = nil;
+                        bannerConfiguration.clickTrackingURL = nil;
                     });
 
                     it(@"should ask an ad destination display agent to handle the URL, without prepending the click tracker", ^{
@@ -289,20 +309,20 @@ describe(@"MPAdWebViewAgent", ^{
     });
 
     describe(@"when orientations change", ^{
-        subjectAction(^{ [agent loadConfiguration:configuration]; });
+        subjectAction(^{ [agent loadConfiguration:bannerConfiguration]; });
 
         it(@"should tell the web view via javascript", ^{
             [[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeRight];
             [agent rotateToOrientation:UIInterfaceOrientationLandscapeRight];
             NSString *JS = [agent.view executedJavaScripts][0];
-            JS should contain(@"return 90");
+            JS should contain(@"return -90");
             JS = [agent.view executedJavaScripts][1];
             JS should contain(@"width=320");
         });
     });
 
     describe(@"invoking JS", ^{
-        subjectAction(^{ [agent loadConfiguration:configuration]; });
+        subjectAction(^{ [agent loadConfiguration:bannerConfiguration]; });
 
         it(@"should support MPAdWebViewEventAdDidAppear", ^{
             [agent invokeJavaScriptForEvent:MPAdWebViewEventAdDidAppear];

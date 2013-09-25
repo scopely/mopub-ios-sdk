@@ -16,8 +16,8 @@
 #import "FakeInterstitialCustomEvent.h"
 #import "Chartboost.h"
 #import "FakeGSFullscreenAd.h"
-#import "IMAdInterstitial.h"
-#import "IMAdView.h"
+#import "IMInterstitial.h"
+#import "IMBanner.h"
 #import "MPInterstitialAdManager.h"
 #import "GADRequest.h"
 #import "FakeMMAdView.h"
@@ -26,7 +26,16 @@
 #import "MPBaseBannerAdapter.h"
 #import "FakeBannerCustomEvent.h"
 #import "FakeMPTimer.h"
-#import "FakeCTCarrier.h"
+#import <Foundation/Foundation.h>
+
+@class MRJavaScriptEventEmitter;
+@class MRCalendarManager;
+@class EKEventStore;
+@class EKEventEditViewController;
+@class MRPictureManager;
+@class MRVideoPlayerManager;
+@class MPMoviePlayerViewController;
+@class MRBundleManager;
 
 @interface FakeMPInstanceProvider : MPInstanceProvider
 
@@ -52,9 +61,22 @@
 @property (nonatomic, assign) MPURLResolver *fakeMPURLResolver;
 @property (nonatomic, assign) MPAdDestinationDisplayAgent *fakeMPAdDestinationDisplayAgent;
 
+#pragma mark - MRAID
+@property (nonatomic, assign) MRBundleManager *fakeMRBundleManager;
+@property (nonatomic, assign) UIWebView *fakeUIWebView;
+@property (nonatomic, assign) MRJavaScriptEventEmitter *fakeMRJavaScriptEventEmitter;
+@property (nonatomic, assign) MRCalendarManager *fakeMRCalendarManager;
+@property (nonatomic, assign) EKEventEditViewController *fakeEKEventEditViewController;
+@property (nonatomic, assign) EKEventStore *fakeEKEventStore;
+@property (nonatomic, assign) MRPictureManager *fakeMRPictureManager;
+@property (nonatomic, assign) MRImageDownloader *fakeImageDownloader;
+@property (nonatomic, assign) MRVideoPlayerManager *fakeMRVideoPlayerManager;
+@property (nonatomic, assign) MPMoviePlayerViewController *fakeMoviePlayerViewController;
+
 #pragma mark - Utilities
+@property (nonatomic, assign) FakeOperationQueue *fakeOperationQueue;
 @property (nonatomic, assign) FakeMPReachability *fakeMPReachability;
-@property (nonatomic, assign) FakeCTCarrier *fakeCTCarrier;
+@property (nonatomic, assign) NSDictionary *fakeCarrierInfo;
 
 - (NSString *)userAgent;
 - (FakeMPAnalyticsTracker *)sharedFakeMPAnalyticsTracker;
@@ -72,8 +94,9 @@
 @property (nonatomic, assign) Chartboost *fakeChartboost;
 
 #pragma mark Google Ad Mob
-@property (nonatomic, assign) GADRequest *fakeGADRequest;
+@property (nonatomic, assign) GADRequest *fakeGADBannerRequest;
 @property (nonatomic, assign) GADBannerView *fakeGADBannerView;
+@property (nonatomic, assign) GADRequest *fakeGADInterstitialRequest;
 @property (nonatomic, assign) GADInterstitial *fakeGADInterstitial;
 
 #pragma mark Greystripe
@@ -81,9 +104,8 @@
 @property (nonatomic, assign) FakeGSFullscreenAd *fakeGSFullscreenAd;
 
 #pragma mark InMobi
-@property (nonatomic, assign) IMAdRequest *fakeIMAdRequest;
-@property (nonatomic, assign) IMAdView *fakeIMAdView;
-@property (nonatomic, assign) IMAdInterstitial *fakeIMAdInterstitial;
+@property (nonatomic, assign) IMBanner *fakeIMAdView;
+@property (nonatomic, assign) IMInterstitial *fakeIMAdInterstitial;
 
 #pragma mark Millennial
 @property (nonatomic, assign) FakeMMAdView *fakeMMAdView;

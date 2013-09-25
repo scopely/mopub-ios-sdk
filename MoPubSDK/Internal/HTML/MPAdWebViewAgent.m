@@ -59,6 +59,8 @@ NSString * const kMoPubCustomHost = @"custom";
 - (void)dealloc
 {
     self.configuration = nil;
+    [self.destinationDisplayAgent cancel];
+    [self.destinationDisplayAgent setDelegate:nil];
     self.destinationDisplayAgent = nil;
     self.view.delegate = nil;
     self.view = nil;
@@ -71,11 +73,16 @@ NSString * const kMoPubCustomHost = @"custom";
 {
     self.configuration = configuration;
 
-    if ([configuration hasPreferredSize]) {
-        CGRect frame = self.view.frame;
-        frame.size.width = configuration.preferredSize.width;
-        frame.size.height = configuration.preferredSize.height;
-        self.view.frame = frame;
+    // Ignore server configuration size for interstitials. At this point our web view
+    // is sized correctly for the device's screen. Currently the server sends down values for a 3.5in
+    // screen, and they do not size correctly on a 4in screen.
+    if (configuration.adType != MPAdTypeInterstitial) {
+        if ([configuration hasPreferredSize]) {
+            CGRect frame = self.view.frame;
+            frame.size.width = configuration.preferredSize.width;
+            frame.size.height = configuration.preferredSize.height;
+            self.view.frame = frame;
+        }
     }
 //    else
 //    {
@@ -111,6 +118,7 @@ NSString * const kMoPubCustomHost = @"custom";
 - (void)stopHandlingRequests
 {
     self.shouldHandleRequests = NO;
+    [self.destinationDisplayAgent cancel];
 }
 
 - (void)continueHandlingRequests
@@ -241,10 +249,10 @@ NSString * const kMoPubCustomHost = @"custom";
     int angle = -1;
     switch (orientation)
     {
-        case UIDeviceOrientationPortrait: angle = 0; break;
-        case UIDeviceOrientationLandscapeLeft: angle = 90; break;
-        case UIDeviceOrientationLandscapeRight: angle = -90; break;
-        case UIDeviceOrientationPortraitUpsideDown: angle = 180; break;
+        case UIInterfaceOrientationPortrait: angle = 0; break;
+        case UIInterfaceOrientationLandscapeLeft: angle = 90; break;
+        case UIInterfaceOrientationLandscapeRight: angle = -90; break;
+        case UIInterfaceOrientationPortraitUpsideDown: angle = 180; break;
         default: break;
     }
 

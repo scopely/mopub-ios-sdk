@@ -26,13 +26,25 @@
 #import "MPLegacyBannerCustomEventAdapter.h"
 #import "MPBannerCustomEvent.h"
 #import "MPBannerAdManager.h"
+#import "MRJavaScriptEventEmitter.h"
+#import "MRImageDownloader.h"
+#import "MRBundleManager.h"
+#import "MRCalendarManager.h"
+#import "MRPictureManager.h"
+#import "MRVideoPlayerManager.h"
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
+#import <EventKit/EventKit.h>
+#import <EventKitUI/EventKitUI.h>
+#import <MediaPlayer/MediaPlayer.h>
+
+#define MOPUB_CARRIER_INFO_DEFAULTS_KEY @"com.mopub.carrierinfo"
 
 @interface MPInstanceProvider ()
 
 @property (nonatomic, copy) NSString *userAgent;
 @property (nonatomic, retain) NSMutableDictionary *singletons;
+@property (nonatomic, retain) NSMutableDictionary *carrierInfo;
 
 @end
 
@@ -40,14 +52,17 @@
 
 @synthesize userAgent = _userAgent;
 @synthesize singletons = _singletons;
+@synthesize carrierInfo = _carrierInfo;
 
 static MPInstanceProvider *sharedProvider = nil;
 
 + (MPInstanceProvider *)sharedProvider
 {
-    if (!sharedProvider) {
-        sharedProvider = [[MPInstanceProvider alloc] init];
-    }
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        sharedProvider = [[self alloc] init];
+    });
+
     return sharedProvider;
 }
 
@@ -56,6 +71,8 @@ static MPInstanceProvider *sharedProvider = nil;
     self = [super init];
     if (self) {
         self.singletons = [NSMutableDictionary dictionary];
+
+        [self initializeCarrierInfo];
     }
     return self;
 }
@@ -63,6 +80,7 @@ static MPInstanceProvider *sharedProvider = nil;
 - (void)dealloc
 {
     self.singletons = nil;
+    self.carrierInfo = nil;
     [super dealloc];
 }
 
@@ -76,10 +94,42 @@ static MPInstanceProvider *sharedProvider = nil;
     return singleton;
 }
 
+#pragma mark - Initializing Carrier Info
+
+- (void)initializeCarrierInfo
+{
+    self.carrierInfo = [NSMutableDictionary dictionary];
+
+    // check if we have a saved copy
+    NSDictionary *saved = [[NSUserDefaults standardUserDefaults] dictionaryForKey:MOPUB_CARRIER_INFO_DEFAULTS_KEY];
+    if(saved != nil) {
+        [self.carrierInfo addEntriesFromDictionary:saved];
+    }
+
+    // now asynchronously load a fresh copy
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        CTTelephonyNetworkInfo *networkInfo = [[[CTTelephonyNetworkInfo alloc] init] autorelease];
+        [self performSelectorOnMainThread:@selector(updateCarrierInfoForCTCarrier:) withObject:networkInfo.subscriberCellularProvider waitUntilDone:NO];
+    });
+}
+
+- (void)updateCarrierInfoForCTCarrier:(CTCarrier *)ctCarrier
+{
+    // use setValue instead of setObject here because ctCarrier could be nil, and any of its properties could be nil
+    [self.carrierInfo setValue:ctCarrier.carrierName forKey:@"carrierName"];
+    [self.carrierInfo setValue:ctCarrier.isoCountryCode forKey:@"isoCountryCode"];
+    [self.carrierInfo setValue:ctCarrier.mobileCountryCode forKey:@"mobileCountryCode"];
+    [self.carrierInfo setValue:ctCarrier.mobileNetworkCode forKey:@"mobileNetworkCode"];
+
+    [[NSUserDefaults standardUserDefaults] setObject:self.carrierInfo forKey:MOPUB_CARRIER_INFO_DEFAULTS_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 #pragma mark - Fetching Ads
 - (NSMutableURLRequest *)buildConfiguredURLRequestWithURL:(NSURL *)URL
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+    [request setHTTPShouldHandleCookies:YES];
     [request setValue:self.userAgent forHTTPHeaderField:@"User-Agent"];
     return request;
 }
@@ -211,7 +261,80 @@ static MPInstanceProvider *sharedProvider = nil;
     return [MPAdDestinationDisplayAgent agentWithDelegate:delegate];
 }
 
+#pragma mark - MRAID
+
+- (MRBundleManager *)buildMRBundleManager
+{
+    return [MRBundleManager sharedManager];
+}
+
+- (UIWebView *)buildUIWebViewWithFrame:(CGRect)frame
+{
+    return [[[UIWebView alloc] initWithFrame:frame] autorelease];
+}
+
+- (MRJavaScriptEventEmitter *)buildMRJavaScriptEventEmitterWithWebView:(UIWebView *)webView
+{
+    return [[[MRJavaScriptEventEmitter alloc] initWithWebView:webView] autorelease];
+}
+
+- (MRCalendarManager *)buildMRCalendarManagerWithDelegate:(id<MRCalendarManagerDelegate>)delegate
+{
+    return [[[MRCalendarManager alloc] initWithDelegate:delegate] autorelease];
+}
+
+- (EKEventEditViewController *)buildEKEventEditViewControllerWithEditViewDelegate:(id<EKEventEditViewDelegate>)editViewDelegate
+{
+    EKEventEditViewController *controller = [[[EKEventEditViewController alloc] init] autorelease];
+    controller.editViewDelegate = editViewDelegate;
+    controller.eventStore = [self buildEKEventStore];
+    return controller;
+}
+
+- (EKEventStore *)buildEKEventStore
+{
+    return [[[EKEventStore alloc] init] autorelease];
+}
+
+- (MRPictureManager *)buildMRPictureManagerWithDelegate:(id<MRPictureManagerDelegate>)delegate
+{
+    return [[[MRPictureManager alloc] initWithDelegate:delegate] autorelease];
+}
+
+- (MRImageDownloader *)buildMRImageDownloaderWithDelegate:(id<MRImageDownloaderDelegate>)delegate
+{
+    return [[[MRImageDownloader alloc] initWithDelegate:delegate] autorelease];
+}
+
+- (MRVideoPlayerManager *)buildMRVideoPlayerManagerWithDelegate:(id<MRVideoPlayerManagerDelegate>)delegate
+{
+    return [[[MRVideoPlayerManager alloc] initWithDelegate:delegate] autorelease];
+}
+
+- (MPMoviePlayerViewController *)buildMPMoviePlayerViewControllerWithURL:(NSURL *)URL
+{
+    // ImageContext used to avoid CGErrors
+    // http://stackoverflow.com/questions/13203336/iphone-mpmovieplayerviewcontroller-cgcontext-errors/14669166#14669166
+    UIGraphicsBeginImageContext(CGSizeMake(1,1));
+    MPMoviePlayerViewController *playerViewController = [[[MPMoviePlayerViewController alloc] initWithContentURL:URL] autorelease];
+    UIGraphicsEndImageContext();
+
+    return playerViewController;
+}
+
 #pragma mark - Utilities
+
+- (NSOperationQueue *)sharedOperationQueue
+{
+    static NSOperationQueue *sharedOperationQueue = nil;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedOperationQueue = [[NSOperationQueue alloc] init];
+    });
+
+    return sharedOperationQueue;
+}
 
 - (MPAnalyticsTracker *)sharedMPAnalyticsTracker
 {
@@ -227,10 +350,9 @@ static MPInstanceProvider *sharedProvider = nil;
     }];
 }
 
-- (CTCarrier *)buildCTCarrier;
+- (NSDictionary *)sharedCarrierInfo
 {
-    CTTelephonyNetworkInfo *networkInfo = [[[CTTelephonyNetworkInfo alloc] init] autorelease];
-    return networkInfo.subscriberCellularProvider;
+    return self.carrierInfo;
 }
 
 - (MPTimer *)buildMPTimerWithTimeInterval:(NSTimeInterval)seconds target:(id)target selector:(SEL)selector repeats:(BOOL)repeats logType:(WBLogType)logType

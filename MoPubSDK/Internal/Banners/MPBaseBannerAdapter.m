@@ -80,12 +80,18 @@
 
 - (void)startTimeoutTimer
 {
-    self.timeoutTimer = [[MPInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:BANNER_TIMEOUT_INTERVAL
-                                                                                   target:self
-                                                                                 selector:@selector(timeout)
-                                                                                  repeats:NO
-                                                                                  logType:(self.configuration.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdFullPage)];
-    [self.timeoutTimer scheduleNow];
+    NSTimeInterval timeInterval = (self.configuration && self.configuration.adTimeoutInterval >= 0) ?
+    self.configuration.adTimeoutInterval : BANNER_TIMEOUT_INTERVAL;
+
+    if (timeInterval > 0) {
+        self.timeoutTimer = [[MPInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
+                                                                                       target:self
+                                                                                     selector:@selector(timeout)
+                                                                                      repeats:NO
+                                                                                      logType:(self.configuration.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdFullPage)];
+
+        [self.timeoutTimer scheduleNow];
+    }
 }
 
 - (void)timeout

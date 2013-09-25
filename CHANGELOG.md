@@ -1,3 +1,23 @@
+## Version 1.14 (September 12, 2013)
+
+  - iOS 7 Gold Master support
+  - Verified compatibility with latest Millennial iOS SDK (5.1.1)
+  - Updated support for InMobi SDK version 4.0
+  - Bug fixes
+
+#### Updates to InMobi Integrations
+  - **Important**: As of version 1.14.0.0, the InMobi custom events packaged with the MoPub SDK only support InMobi version 4.00 and up. Follow the instructions [here](http://www.inmobi.com/support/art/25856216/22465648/integrating-mopub-with-inmobi-ios-sdk-4-0/) to integrate InMobi version 4.00 and up. If you would like to continue to use a prior version of the InMobi SDK, do not update the custom event files and follow the instructions [here](http://developer.inmobi.com/wiki/index.php?title=MoPub_InMobi_iOS) to integrate.
+
+### Version 1.14.1.0 (September 18, 2013)
+  - Fixed an issue causing certain interstitials to be incorrectly centered or sized
+  - Updated the SDK bundle to include the Millennial Media 5.1.1 SDK
+
+## Version 1.13 (August 22, 2013)
+
+  - Added support for creating calendar events, storing pictures, and video playback via MRAID APIs
+  - Fixed a rendering issue with HTML interstitials on iOS 5
+  - Fixed crashes resulting from delegate callbacks being executed on deallocated objects
+
 ## Version 1.12 (April 25, 2013)
 
 #### Updates to Third Party Integrations
@@ -23,6 +43,11 @@
   - Added .zip archive distribution options with bundled third party network SDKs.  Learn more at the updated [wiki](https://github.com/mopub/mopub-ios-sdk/wiki/Getting-Started).
   - Added appledoc style [Class Documentation](https://github.com/mopub/mopub-ios-sdk/tree/master/ClassDocumentation)
   - Updated the MoPub Sample Application
+
+### Version 1.12.5.0 (August 1, 2013)
+  - Updated to support Millennial SDK 5.1.0
+  - Fixed warnings resulting from duplicate category methods
+  - Fixed a crash occurring when an interstitial was tapped and dismissed immediately afterwards
   
 ### Version 1.12.4.0 (June 26, 2013)  
   - Fixed a memory leak when displaying MRAID ads
@@ -34,7 +59,7 @@
 ### Version 1.12.2.0 (June 7, 2013)
   - Fixed issue causing expanded MRAID banner ads to obscure modal content
   - Fixed issue in which impressions were not tracked properly for MRAID banner ads
-  - Added new API methods on `MPAdView` for managing ad refresh behavior (`-startAutomaticallyRefreshingContent` and `-stopAutomaticallyRefreshingContent`)
+  - Added new API methods on `MPAdView` for managing ad refresh behavior (`-startAutomaticallyRefreshingContents` and `-stopAutomaticallyRefreshingContents`)
   - Deprecated `ignoresAutorefresh` property on `MPAdView`
 
 ### Version 1.12.1.0 (May 13, 2013)

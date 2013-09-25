@@ -55,6 +55,7 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
 
     if (!self.isOnViewControllerStack) {
         self.isOnViewControllerStack = YES;
+        [self didPresentInterstitial];
     }
 }
 
@@ -88,8 +89,6 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
 
     [self layoutCloseButton];
     [controller presentViewController:self animated:MP_ANIMATED completion:nil];
-
-    [self didPresentInterstitial];
 }
 
 - (void)willPresentInterstitial
@@ -198,6 +197,8 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
     [self didDismissInterstitial];
 }
 
+#pragma mark - Hidding status bar (pre-iOS 7)
+
 - (void)setApplicationStatusBarHidden:(BOOL)hidden
 {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_3_2
@@ -212,6 +213,13 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
 #endif
 
     [[UIApplication sharedApplication] setStatusBarHidden:hidden];
+}
+
+#pragma mark - Hidding status bar (iOS 7 and above)
+
+- (BOOL)prefersStatusBarHidden
+{
+    return YES;
 }
 
 #pragma mark - Autorotation (iOS 6.0 and above)
