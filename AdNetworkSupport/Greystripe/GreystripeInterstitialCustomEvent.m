@@ -44,8 +44,7 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    NSString *greyStripeAppId = [WBSettingService keyForAdProvider:WBAdProviderGreyStripeAppId];
-    self.greystripeFullscreenAd = [[MPInstanceProvider sharedProvider] buildGSFullscreenAdWithDelegate:self GUID:greyStripeAppId];
+    self.greystripeFullscreenAd = [[MPInstanceProvider sharedProvider] buildGSFullscreenAdWithDelegate:self GUID:info[WBAdUnitID]];
 
     if (self.delegate.location) {
         [GSSDKInfo updateLocation:self.delegate.location];

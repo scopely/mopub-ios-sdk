@@ -50,7 +50,7 @@
 {
     self.interstitial = [[MPInstanceProvider sharedProvider] buildGADInterstitialAd];
 
-    self.interstitial.adUnitID = [info objectForKey:@"adUnitID"];
+    self.interstitial.adUnitID = [info objectForKey:WBAdUnitID];
     self.interstitial.delegate = self;
 
     GADRequest *request = [[MPInstanceProvider sharedProvider] buildGADInterstitialRequest];

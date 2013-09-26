@@ -137,7 +137,7 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    self.apid = [info objectForKey:@"adUnitID"];
+    self.apid = [info objectForKey:WBAdUnitID];
 
     if (!self.apid || [self.router eventForApid:self.apid]) {
         [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];

@@ -62,7 +62,7 @@
 {
     CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Requesting Google AdMob banner");
     self.adBannerView.frame = [self frameForCustomEventInfo:info];
-    self.adBannerView.adUnitID = [info objectForKey:@"adUnitID"];
+    self.adBannerView.adUnitID = [info objectForKey:WBAdUnitID];
     self.adBannerView.rootViewController = [self.delegate viewControllerForPresentingModalView];
 
     GADRequest *request = [[MPInstanceProvider sharedProvider] buildGADBannerRequest];

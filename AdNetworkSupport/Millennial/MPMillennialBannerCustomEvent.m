@@ -110,7 +110,7 @@
     CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Requesting Millennial banner");
 
     CGRect frame = [self frameFromCustomEventInfo:info];
-    NSString *apid = [info objectForKey:@"adUnitID"];
+    NSString *apid = [info objectForKey:WBAdUnitID];
     self.mmAdView = [[MPInstanceProvider sharedProvider] buildMMAdViewWithFrame:frame
                                                                            apid:apid
                                                              rootViewController:self.delegate.viewControllerForPresentingModalView];

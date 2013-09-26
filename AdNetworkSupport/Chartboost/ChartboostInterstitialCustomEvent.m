@@ -88,19 +88,11 @@ forChartboostInterstitialCustomEvent:(ChartboostInterstitialCustomEvent *)event;
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    NSString *appId = [info objectForKey:@"appId"];
-    if (!appId) {
-        appId = [WBSettingService keyForAdProvider:WBAdProviderChartBoostAppId];
-    }
-    NSString *appSignature = [info objectForKey:@"appSignature"];
-    if (!appSignature) {
-        appSignature = [WBSettingService keyForAdProvider:WBAdProviderChartBoostAppSignature];
-    }
     NSString *location = [info objectForKey:@"location"];
     self.location = location ? location : @"Default";
 
-    [[MPChartboostRouter sharedRouter] cacheInterstitialWithAppId:appId
-                                                     appSignature:appSignature
+    [[MPChartboostRouter sharedRouter] cacheInterstitialWithAppId:info[WBAdUnitID]
+                                                     appSignature:info[WBAdUnitKey]
                                                          location:self.location
                              forChartboostInterstitialCustomEvent:self];
 }
