@@ -6,12 +6,12 @@
 //
 
 #import "MRProperty.h"
-#import "MPLogging.h"
 #import "MRAdView.h"
 #import "MRJavaScriptEventEmitter.h"
 
 @interface MRJavaScriptEventEmitter ()
 
+@property (nonatomic, assign) WBLogType logType;
 @property (nonatomic, retain) UIWebView *webView;
 
 @end
@@ -24,11 +24,12 @@
 
 @synthesize webView = _webView;
 
-- (id)initWithWebView:(UIWebView *)webView
+- (id)initWithWebView:(UIWebView *)webView logType:(WBLogType)logType
 {
     self = [super init];
     if (self) {
-        self.webView = webView;
+        _logType = logType;
+        _webView = [webView retain];
     }
     return self;
 }
@@ -50,14 +51,14 @@
 - (void)fireChangeEventForProperty:(MRProperty *)property {
     NSString *JSON = [NSString stringWithFormat:@"{%@}", property];
     [self executeJavascript:@"window.mraidbridge.fireChangeEvent(%@);", JSON];
-    MPLogDebug(@"JSON: %@", JSON);
+    CoreLogType(WBLogLevelTrace, self.logType, @"JSON: %@", JSON);
 }
 
 - (void)fireChangeEventsForProperties:(NSArray *)properties {
     NSString *JSON = [NSString stringWithFormat:@"{%@}",
                       [properties componentsJoinedByString:@", "]];
     [self executeJavascript:@"window.mraidbridge.fireChangeEvent(%@);", JSON];
-    MPLogDebug(@"JSON: %@", JSON);
+    CoreLogType(WBLogLevelTrace, self.logType, @"JSON: %@", JSON);
 }
 
 - (void)fireErrorEventForAction:(NSString *)action withMessage:(NSString *)message {

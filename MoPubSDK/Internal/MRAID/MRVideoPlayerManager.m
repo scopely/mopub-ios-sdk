@@ -5,7 +5,6 @@
 #import "MRVideoPlayerManager.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import "MPInstanceProvider.h"
-#import "UIViewController+MPAdditions.h"
 
 @implementation MRVideoPlayerManager
 
@@ -42,9 +41,7 @@
     MPMoviePlayerViewController *controller = [[MPInstanceProvider sharedProvider] buildMPMoviePlayerViewControllerWithURL:URL];
 
     [self.delegate videoPlayerManagerWillPresentVideo:self];
-    [[self.delegate viewControllerForPresentingVideoPlayer] mp_presentModalViewController:controller
-                                                                                 animated:MP_ANIMATED];
-
+    [[self.delegate viewControllerForPresentingVideoPlayer] presentViewController:controller animated:MP_ANIMATED completion:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(moviePlayerPlaybackDidFinish:)
                                                  name:MPMoviePlayerPlaybackDidFinishNotification

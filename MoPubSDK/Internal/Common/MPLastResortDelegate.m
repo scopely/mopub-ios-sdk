@@ -7,7 +7,6 @@
 
 #import "MPLastResortDelegate.h"
 #import "MPGlobal.h"
-#import "UIViewController+MPAdditions.h"
 
 @implementation MPLastResortDelegate
 
@@ -23,13 +22,13 @@
 
 - (void)eventEditViewController:(EKEventEditViewController *)controller didCompleteWithAction:(EKEventEditViewAction)action
 {
-    [controller mp_dismissModalViewControllerAnimated:MP_ANIMATED];
+    [controller dismissViewControllerAnimated:MP_ANIMATED completion:nil];
 }
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 60000
 - (void)productViewControllerDidFinish:(SKStoreProductViewController *)viewController
 {
-    [viewController mp_dismissModalViewControllerAnimated:MP_ANIMATED];
+    [viewController dismissViewControllerAnimated:MP_ANIMATED completion:nil];
 }
 #endif
 

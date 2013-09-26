@@ -113,11 +113,13 @@ static NSString *const kMraidURLScheme = @"mraid";
         _allowsExpansion = expansion;
         _closeButtonStyle = style;
         _placementType = type;
+        
+        WBLogType logType = (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage);
 
         _displayController = [[MRAdViewDisplayController alloc] initWithAdView:self
                                                                allowsExpansion:expansion
                                                               closeButtonStyle:style
-                                                               jsEventEmitter:[[MPInstanceProvider sharedProvider] buildMRJavaScriptEventEmitterWithWebView:_webView]];
+                                                               jsEventEmitter:[[MPInstanceProvider sharedProvider] buildMRJavaScriptEventEmitterWithWebView:_webView logType:logType]];
 
         [_closeButton addTarget:_displayController action:@selector(closeButtonPressed) forControlEvents:UIControlEventTouchUpInside];
 
@@ -130,7 +132,7 @@ static NSString *const kMraidURLScheme = @"mraid";
         _videoPlayerManager = [[[MPInstanceProvider sharedProvider]
                                 buildMRVideoPlayerManagerWithDelegate:self] retain];
         _jsEventEmitter = [[[MPInstanceProvider sharedProvider]
-                             buildMRJavaScriptEventEmitterWithWebView:_webView] retain];
+                             buildMRJavaScriptEventEmitterWithWebView:_webView logType:logType] retain];
     }
     return self;
 }

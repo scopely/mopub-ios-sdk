@@ -273,9 +273,9 @@ static MPInstanceProvider *sharedProvider = nil;
     return [[[UIWebView alloc] initWithFrame:frame] autorelease];
 }
 
-- (MRJavaScriptEventEmitter *)buildMRJavaScriptEventEmitterWithWebView:(UIWebView *)webView
+- (MRJavaScriptEventEmitter *)buildMRJavaScriptEventEmitterWithWebView:(UIWebView *)webView logType:(WBLogType)logType
 {
-    return [[[MRJavaScriptEventEmitter alloc] initWithWebView:webView] autorelease];
+    return [[[MRJavaScriptEventEmitter alloc] initWithWebView:webView logType:logType] autorelease];
 }
 
 - (MRCalendarManager *)buildMRCalendarManagerWithDelegate:(id<MRCalendarManagerDelegate>)delegate

@@ -109,7 +109,7 @@ typedef id(^MPSingletonProviderBlock)();
 #pragma mark - MRAID
 - (MRBundleManager *)buildMRBundleManager;
 - (UIWebView *)buildUIWebViewWithFrame:(CGRect)frame;
-- (MRJavaScriptEventEmitter *)buildMRJavaScriptEventEmitterWithWebView:(UIWebView *)webView;
+- (MRJavaScriptEventEmitter *)buildMRJavaScriptEventEmitterWithWebView:(UIWebView *)webView logType:(WBLogType)logType;
 - (MRCalendarManager *)buildMRCalendarManagerWithDelegate:(id<MRCalendarManagerDelegate>)delegate;
 - (EKEventEditViewController *)buildEKEventEditViewControllerWithEditViewDelegate:(id<EKEventEditViewDelegate>)editViewDelegate;
 - (EKEventStore *)buildEKEventStore;

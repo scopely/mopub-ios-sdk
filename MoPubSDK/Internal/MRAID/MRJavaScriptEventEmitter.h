@@ -11,7 +11,7 @@
 
 @interface MRJavaScriptEventEmitter : NSObject
 
-- (id)initWithWebView:(UIWebView *)webView;
+- (id)initWithWebView:(UIWebView *)webView logType:(WBLogType)logType;
 - (NSString *)executeJavascript:(NSString *)javascript, ...;
 - (void)fireChangeEventForProperty:(MRProperty *)property;
 - (void)fireChangeEventsForProperties:(NSArray *)properties;
