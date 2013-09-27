@@ -37,6 +37,7 @@
 #import <EventKit/EventKit.h>
 #import <EventKitUI/EventKitUI.h>
 #import <MediaPlayer/MediaPlayer.h>
+#import "WBAdService.h"
 
 #define MOPUB_CARRIER_INFO_DEFAULTS_KEY @"com.mopub.carrierinfo"
 
@@ -170,6 +171,15 @@ static MPInstanceProvider *sharedProvider = nil;
 - (MPBannerCustomEvent *)buildBannerCustomEventFromCustomClass:(Class)customClass
                                                       delegate:(id<MPBannerCustomEventDelegate>)delegate
 {
+#if (DEBUG || ADHOC)
+    Class classOverride = [WBAdService forcedAdNetworkBannerClass];
+    if(classOverride)
+    {
+        CoreLogType(WBLogLevelWarn, WBLogTypeAdBanner, @"Override is on showing %@ instead of %@", classOverride, customClass);
+        customClass = classOverride;
+    }
+#endif
+    
     MPBannerCustomEvent *customEvent = [[[customClass alloc] init] autorelease];
     if([customEvent isKindOfClass:[MPBannerCustomEvent class]] == NO)
     {
@@ -203,14 +213,20 @@ static MPInstanceProvider *sharedProvider = nil;
 - (MPInterstitialCustomEvent *)buildInterstitialCustomEventFromCustomClass:(Class)customClass
                                                                   delegate:(id<MPInterstitialCustomEventDelegate>)delegate
 {
+#if (DEBUG || ADHOC)
+    Class classOverride = [WBAdService forcedAdNetworkFullpageClass];
+    if(classOverride)
+    {
+        CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"Override is on showing %@ instead of %@", classOverride, customClass);
+        customClass = classOverride;
+    }
+#endif
+    
     MPInterstitialCustomEvent *customEvent = [[[customClass alloc] init] autorelease];
     if([customEvent isKindOfClass:[MPInterstitialCustomEvent class]] == NO)
     {
         CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"**** Custom Event Class: %@ does not extend MPInterstitialCustomEvent ****", NSStringFromClass(customClass));
         return nil;
-    }
-    if ([customEvent respondsToSelector:@selector(customEventDidUnload)]) {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"**** Custom Event Class: %@ implements the deprecated -customEventDidUnload method.  This is no longer called.  Use -dealloc for cleanup instead ****", NSStringFromClass(customClass));
     }
     customEvent.delegate = delegate;
     return customEvent;

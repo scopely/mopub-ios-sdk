@@ -89,8 +89,6 @@
  */
 -(void)invalidate;
 
--(void)customEventDidUnload __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_NA,__MAC_NA,__IPHONE_3_0,__IPHONE_5_0);
-
 @property (nonatomic, assign) id<MPInterstitialCustomEventDelegate> delegate;
 
 @end

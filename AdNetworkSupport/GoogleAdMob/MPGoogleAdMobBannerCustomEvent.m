@@ -7,6 +7,7 @@
 
 #import "MPGoogleAdMobBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
+#import "WBAdService.h"
 
 @interface MPInstanceProvider (AdMobBanners)
 
@@ -61,8 +62,27 @@
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
     CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Requesting Google AdMob banner");
+    NSString *adUnitID = info[WBAdUnitID];
+#if (DEBUG || ADHOC)
+    
+    switch ([WBAdService forcedAdNetwork]) {
+        case WBAdNetworkAM:
+            adUnitID = [WBAdService bannerIdForAdId:WBAdIdAM];
+            break;
+        case WBAdNetworkBackfill:
+            adUnitID = [WBAdService bannerIdForAdId:WBAdIdBackfill];
+            break;
+        case WBAdNetworkEva:
+            adUnitID = [WBAdService bannerIdForAdId:WBAdIdEva];
+            break;
+        default:
+            break;
+    }
+#endif
+    
+    self.adBannerView.adUnitID = adUnitID;
+    
     self.adBannerView.frame = [self frameForCustomEventInfo:info];
-    self.adBannerView.adUnitID = [info objectForKey:WBAdUnitID];
     self.adBannerView.rootViewController = [self.delegate viewControllerForPresentingModalView];
 
     GADRequest *request = [[MPInstanceProvider sharedProvider] buildGADBannerRequest];

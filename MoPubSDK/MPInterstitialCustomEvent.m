@@ -42,9 +42,4 @@
     // See the chartboost interstitial custom event for an example use case.
 }
 
--(void)customEventDidUnload __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_NA,__MAC_NA,__IPHONE_3_0,__IPHONE_5_0);
-{
-    
-}
-
 @end

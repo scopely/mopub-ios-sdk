@@ -9,6 +9,7 @@
 #import "MPInterstitialAdController.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
+#import "WBAdService.h"
 #import <CoreLocation/CoreLocation.h>
 
 @interface MPInstanceProvider (AdMobInterstitials)
@@ -50,7 +51,25 @@
 {
     self.interstitial = [[MPInstanceProvider sharedProvider] buildGADInterstitialAd];
 
-    self.interstitial.adUnitID = [info objectForKey:WBAdUnitID];
+    NSString *adUnitID = info[WBAdUnitID];
+#if (DEBUG || ADHOC)
+    
+    switch ([WBAdService forcedAdNetwork]) {
+        case WBAdNetworkAM:
+            adUnitID = [WBAdService fullpageIdForAdId:WBAdIdAM];
+            break;
+        case WBAdNetworkBackfill:
+            adUnitID = [WBAdService fullpageIdForAdId:WBAdIdBackfill];
+            break;
+        case WBAdNetworkEva:
+            adUnitID = [WBAdService fullpageIdForAdId:WBAdIdEva];
+            break;
+        default:
+            break;
+    }
+#endif
+
+    self.interstitial.adUnitID = adUnitID;
     self.interstitial.delegate = self;
 
     GADRequest *request = [[MPInstanceProvider sharedProvider] buildGADInterstitialRequest];
