@@ -9,7 +9,7 @@
 #import "MPInstanceProvider.h"
 #import "GSSDKInfo.h"
 #import "MPConstants.h"
-#import "WBSettingService.h"
+#import "WBAdService.h"
 
 @interface MPInstanceProvider (GreystripeInterstitials)
 
@@ -44,7 +44,7 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    self.greystripeFullscreenAd = [[MPInstanceProvider sharedProvider] buildGSFullscreenAdWithDelegate:self GUID:info[WBAdUnitID]];
+    self.greystripeFullscreenAd = [[MPInstanceProvider sharedProvider] buildGSFullscreenAdWithDelegate:self GUID:[WBAdService fullpageIdForAdId:WBAdIdGS]];
 
     if (self.delegate.location) {
         [GSSDKInfo updateLocation:self.delegate.location];

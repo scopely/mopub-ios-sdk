@@ -7,7 +7,7 @@
 
 #import "ChartboostInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "WBSettingService.h"
+#import "WBAdService.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -91,8 +91,8 @@ forChartboostInterstitialCustomEvent:(ChartboostInterstitialCustomEvent *)event;
     NSString *location = [info objectForKey:@"location"];
     self.location = location ? location : @"Default";
 
-    [[MPChartboostRouter sharedRouter] cacheInterstitialWithAppId:info[WBAdUnitID]
-                                                     appSignature:info[WBAdUnitKey]
+    [[MPChartboostRouter sharedRouter] cacheInterstitialWithAppId:[WBAdService fullpageIdForAdId:WBAdIdCB]
+                                                     appSignature:[WBAdService fullpageIdForAdId:WBAdIdCBSignature]
                                                          location:self.location
                              forChartboostInterstitialCustomEvent:self];
 }

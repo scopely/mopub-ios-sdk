@@ -10,6 +10,7 @@
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
 #import "MMRequest.h"
+#import "WBAdService.h"
 
 #define MM_SIZE_320x50    CGSizeMake(320, 50)
 #define MM_SIZE_300x250 CGSizeMake(300, 250)
@@ -110,7 +111,7 @@
     CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Requesting Millennial banner");
 
     CGRect frame = [self frameFromCustomEventInfo:info];
-    NSString *apid = [info objectForKey:WBAdUnitID];
+    NSString *apid = [WBAdService bannerIdForAdId:WBAdIdM];
     self.mmAdView = [[MPInstanceProvider sharedProvider] buildMMAdViewWithFrame:frame
                                                                            apid:apid
                                                              rootViewController:self.delegate.viewControllerForPresentingModalView];

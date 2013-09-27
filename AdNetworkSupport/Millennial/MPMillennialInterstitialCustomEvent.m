@@ -8,6 +8,7 @@
 #import "MMInterstitial.h"
 #import "MPMillennialInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
+#import "WBAdService.h"
 
 @interface MPMillennialInterstitialRouter : NSObject
 
@@ -137,7 +138,7 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    self.apid = [info objectForKey:WBAdUnitID];
+    self.apid = [WBAdService fullpageIdForAdId:WBAdIdM];
 
     if (!self.apid || [self.router eventForApid:self.apid]) {
         [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];

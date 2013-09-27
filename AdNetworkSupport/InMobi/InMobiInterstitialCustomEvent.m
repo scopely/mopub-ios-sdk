@@ -8,6 +8,7 @@
 #import "InMobiInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "MPConstants.h"
+#import "WBAdService.h"
 
 @interface MPInstanceProvider (InMobiInterstitials)
 
@@ -43,7 +44,7 @@
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
     CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting InMobi interstitial");
-    self.inMobiInterstitial = [[MPInstanceProvider sharedProvider] buildIMInterstitialWithDelegate:self appId:info[WBAdUnitID]];
+    self.inMobiInterstitial = [[MPInstanceProvider sharedProvider] buildIMInterstitialWithDelegate:self appId:[WBAdService fullpageIdForAdId:WBAdIdIM]];
     IMInMobiNetworkExtras *inmobiExtras = [[IMInMobiNetworkExtras alloc] init];
     NSMutableDictionary *paramsDict = [[NSMutableDictionary alloc] init];
     [paramsDict setObject:@"c_mopub" forKey:@"tp"];
