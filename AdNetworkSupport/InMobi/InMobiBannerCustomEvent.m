@@ -8,7 +8,7 @@
 #import "InMobiBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "MPConstants.h"
-#import "WBAdService.h"
+#import "WBAdService+Internal.h"
 
 #define INVALID_INMOBI_AD_SIZE  -1
 
@@ -51,7 +51,7 @@
         return;
     }
 
-    self.inMobiBanner = [[MPInstanceProvider sharedProvider] buildIMBannerWithFrame:CGRectMake(0, 0, size.width, size.height) appId:[WBAdService bannerIdForAdId:WBAdIdIM] adSize:imAdSizeConstant];
+    self.inMobiBanner = [[MPInstanceProvider sharedProvider] buildIMBannerWithFrame:CGRectMake(0, 0, size.width, size.height) appId:[[WBAdService sharedAdService] bannerIdForAdId:WBAdIdIM] adSize:imAdSizeConstant];
     self.inMobiBanner.delegate = self;
     self.inMobiBanner.refreshInterval = REFRESH_INTERVAL_OFF;
     IMInMobiNetworkExtras *inmobiExtras = [[IMInMobiNetworkExtras alloc] init];

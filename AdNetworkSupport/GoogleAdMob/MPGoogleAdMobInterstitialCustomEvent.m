@@ -9,8 +9,12 @@
 #import "MPInterstitialAdController.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
-#import "WBAdService.h"
+#import "WBAdService+Internal.h"
 #import <CoreLocation/CoreLocation.h>
+
+#if (DEBUG || ADHOC)
+#import "WBAdService+Debugging.h"
+#endif
 
 @interface MPInstanceProvider (AdMobInterstitials)
 
@@ -54,15 +58,15 @@
     NSString *adUnitID = info[WBAdUnitID];
 #if (DEBUG || ADHOC)
     
-    switch ([WBAdService forcedAdNetwork]) {
+    switch ([[WBAdService sharedAdService] forcedAdNetwork]) {
         case WBAdNetworkAM:
-            adUnitID = [WBAdService fullpageIdForAdId:WBAdIdAM];
+            adUnitID = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdAM];
             break;
         case WBAdNetworkBackfill:
-            adUnitID = [WBAdService fullpageIdForAdId:WBAdIdBackfill];
+            adUnitID = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdBackfill];
             break;
         case WBAdNetworkEva:
-            adUnitID = [WBAdService fullpageIdForAdId:WBAdIdEva];
+            adUnitID = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdEva];
             break;
         default:
             break;

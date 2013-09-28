@@ -37,7 +37,10 @@
 #import <EventKit/EventKit.h>
 #import <EventKitUI/EventKitUI.h>
 #import <MediaPlayer/MediaPlayer.h>
-#import "WBAdService.h"
+
+#if (DEBUG || ADHOC)
+#import "WBAdService+Debugging.h"
+#endif
 
 #define MOPUB_CARRIER_INFO_DEFAULTS_KEY @"com.mopub.carrierinfo"
 
@@ -172,7 +175,7 @@ static MPInstanceProvider *sharedProvider = nil;
                                                       delegate:(id<MPBannerCustomEventDelegate>)delegate
 {
 #if (DEBUG || ADHOC)
-    Class classOverride = [WBAdService forcedAdNetworkBannerClass];
+    Class classOverride = [[WBAdService sharedAdService] forcedAdNetworkBannerClass];
     if(classOverride)
     {
         CoreLogType(WBLogLevelWarn, WBLogTypeAdBanner, @"Override is on showing %@ instead of %@", classOverride, customClass);
@@ -214,7 +217,7 @@ static MPInstanceProvider *sharedProvider = nil;
                                                                   delegate:(id<MPInterstitialCustomEventDelegate>)delegate
 {
 #if (DEBUG || ADHOC)
-    Class classOverride = [WBAdService forcedAdNetworkFullpageClass];
+    Class classOverride = [[WBAdService sharedAdService] forcedAdNetworkFullpageClass];
     if(classOverride)
     {
         CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"Override is on showing %@ instead of %@", classOverride, customClass);
