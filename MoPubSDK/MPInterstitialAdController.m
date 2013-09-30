@@ -10,6 +10,7 @@
 #import "MPInstanceProvider.h"
 #import "MPInterstitialAdManager.h"
 #import "MPInterstitialAdManagerDelegate.h"
+#import "MPInterstitialCustomEventAdapter.h"
 
 @interface MPInterstitialAdController () <MPInterstitialAdManagerDelegate>
 
@@ -81,6 +82,11 @@
 - (BOOL)ready
 {
     return self.manager.ready;
+}
+
+-(NSString *)description
+{
+    return [NSString stringWithFormat:@"%@", ((MPInterstitialCustomEventAdapter *)self.manager.adapter).interstitialCustomEvent];
 }
 
 - (void)loadAd

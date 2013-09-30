@@ -11,4 +11,6 @@
 
 @interface MPInterstitialCustomEventAdapter : MPBaseInterstitialAdapter <MPPrivateInterstitialCustomEventDelegate>
 
+@property (nonatomic, retain, readonly) MPInterstitialCustomEvent *interstitialCustomEvent;
+
 @end

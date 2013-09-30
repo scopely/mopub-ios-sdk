@@ -14,6 +14,7 @@
 @interface MPInterstitialAdManager : NSObject <MPAdServerCommunicatorDelegate,
     MPInterstitialAdapterDelegate>
 
+@property (nonatomic, retain, readonly) MPBaseInterstitialAdapter *adapter;
 @property (nonatomic, assign) id<MPInterstitialAdManagerDelegate> delegate;
 @property (nonatomic, assign, readonly) BOOL ready;
 
