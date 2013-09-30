@@ -42,6 +42,7 @@
 @interface MPGoogleAdMobInterstitialCustomEvent ()
 
 @property (nonatomic, retain) GADInterstitial *interstitial;
+@property (nonatomic) BOOL ready;
 
 @end
 
@@ -116,6 +117,7 @@
 
 - (void)interstitialDidReceiveAd:(GADInterstitial *)interstitial
 {
+    self.ready = YES;
     [self.delegate interstitialCustomEvent:self didLoadAd:self];
 }
 
