@@ -9,6 +9,7 @@
 #import "MPInstanceProvider.h"
 #import "MPConstants.h"
 #import "WBAdService+Internal.h"
+#import "InMobi+InitializeSdk.h"
 
 @interface MPInstanceProvider (InMobiInterstitials)
 
@@ -38,6 +39,16 @@
 @implementation InMobiInterstitialCustomEvent
 
 @synthesize inMobiInterstitial = _inMobiInterstitial;
+
+-(id)init
+{
+    self = [super init];
+    if(self)
+    {
+        [InMobi inititializeSdk];
+    }
+    return self;
+}
 
 #pragma mark - MPInterstitialCustomEvent Subclass Methods
 

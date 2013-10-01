@@ -9,6 +9,7 @@
 #import "MPInstanceProvider.h"
 #import "MPConstants.h"
 #import "WBAdService+Internal.h"
+#import "InMobi+InitializeSdk.h"
 
 #define INVALID_INMOBI_AD_SIZE  -1
 
@@ -38,6 +39,16 @@
 @end
 
 @implementation InMobiBannerCustomEvent
+
+-(id)init
+{
+    self = [super init];
+    if(self)
+    {
+        [InMobi inititializeSdk];
+    }
+    return self;
+}
 
 #pragma mark - MPBannerCustomEvent Subclass Methods
 
