@@ -85,6 +85,12 @@
 */
 -(void)invalidate;
 
+/*!
+ *  @abstract
+ *  Removes the banner from the superview
+ */
+-(void)removeFromSuperview;
+
 /** @name Communicating with the MoPub SDK */
 
 /**
