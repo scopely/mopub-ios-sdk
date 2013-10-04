@@ -73,9 +73,6 @@
         case WBAdNetworkAM:
             adUnitID = [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdAM];
             break;
-        case WBAdNetworkBackfill:
-            adUnitID = [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdBackfill];
-            break;
         case WBAdNetworkEva:
             adUnitID = [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdEva];
             break;

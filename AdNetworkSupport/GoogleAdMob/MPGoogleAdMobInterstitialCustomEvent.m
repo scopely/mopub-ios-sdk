@@ -63,9 +63,6 @@
         case WBAdNetworkAM:
             adUnitID = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdAM];
             break;
-        case WBAdNetworkBackfill:
-            adUnitID = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdBackfill];
-            break;
         case WBAdNetworkEva:
             adUnitID = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdEva];
             break;
