@@ -89,6 +89,13 @@
  */
 -(void)invalidate;
 
+/*!
+ *  check to see if the custom event has an ad ready to go
+ *
+ *  @return YES if there is an ad ready to go
+ */
+-(BOOL)ready;
+
 @property (nonatomic, assign) id<MPInterstitialCustomEventDelegate> delegate;
 
 @end

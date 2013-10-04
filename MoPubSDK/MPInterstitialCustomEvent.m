@@ -42,4 +42,9 @@
     // See the chartboost interstitial custom event for an example use case.
 }
 
+-(BOOL)ready
+{
+    return NO;
+}
+
 @end

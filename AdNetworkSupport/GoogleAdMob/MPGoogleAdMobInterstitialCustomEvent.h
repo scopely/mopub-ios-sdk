@@ -10,6 +10,4 @@
 
 @interface MPGoogleAdMobInterstitialCustomEvent : MPInterstitialCustomEvent <GADInterstitialDelegate>
 
-@property (nonatomic, readonly) BOOL ready;
-
 @end
