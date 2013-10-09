@@ -18,7 +18,6 @@
 #import "MPAnalyticsTracker.h"
 #import "MPGlobal.h"
 #import "MPMRAIDInterstitialViewController.h"
-#import "MPReachability.h"
 #import "MPTimer.h"
 #import "MPInterstitialCustomEvent.h"
 #import "MPBaseBannerAdapter.h"
@@ -359,13 +358,6 @@ static MPInstanceProvider *sharedProvider = nil;
 {
     return [self singletonForClass:[MPAnalyticsTracker class] provider:^id{
         return [MPAnalyticsTracker tracker];
-    }];
-}
-
-- (MPReachability *)sharedMPReachability
-{
-    return [self singletonForClass:[MPReachability class] provider:^id{
-        return [MPReachability reachabilityForLocalWiFi];
     }];
 }
 

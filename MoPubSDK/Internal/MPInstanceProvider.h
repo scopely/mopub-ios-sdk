@@ -121,7 +121,6 @@ typedef id(^MPSingletonProviderBlock)();
 #pragma mark - Utilities
 - (NSOperationQueue *)sharedOperationQueue;
 - (MPAnalyticsTracker *)sharedMPAnalyticsTracker;
-- (MPReachability *)sharedMPReachability;
 
 // This call may return nil and may not update if the user hot-swaps the device's sim card.
 - (NSDictionary *)sharedCarrierInfo;

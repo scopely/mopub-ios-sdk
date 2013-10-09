@@ -12,7 +12,7 @@
 #import "MPKeywordProvider.h"
 #import "MPIdentityProvider.h"
 #import "MPInstanceProvider.h"
-#import "MPReachability.h"
+#import "WBNetworkService.h"
 
 NSString * const kMoPubInterfaceOrientationPortrait = @"p";
 NSString * const kMoPubInterfaceOrientationLandscape = @"l";
@@ -160,7 +160,7 @@ NSString * const kMoPubInterfaceOrientationLandscape = @"l";
 
 + (NSString *)queryParameterForConnectionType
 {
-    return [[[MPInstanceProvider sharedProvider] sharedMPReachability] hasWifi] ? @"&ct=2" : @"&ct=3";
+    return [WBNetworkService networkStatus] == ReachableViaWiFi ? @"&ct=2" : @"&ct=3";
 }
 
 + (NSString *)queryParameterForApplicationVersion
