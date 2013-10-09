@@ -68,6 +68,9 @@
     }
     [self.inMobiInterstitial addAdNetworkExtras:inmobiExtras];
     [self.inMobiInterstitial loadInterstitial];
+    
+    [inmobiExtras release];
+    [paramsDict release];
 }
 
 - (void)showInterstitialFromRootViewController:(UIViewController *)rootViewController
