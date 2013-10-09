@@ -12,7 +12,6 @@
 #import "MPKeywordProvider.h"
 #import "MPIdentityProvider.h"
 #import "MPInstanceProvider.h"
-#import "WBNetworkService.h"
 
 NSString * const kMoPubInterfaceOrientationPortrait = @"p";
 NSString * const kMoPubInterfaceOrientationLandscape = @"l";
