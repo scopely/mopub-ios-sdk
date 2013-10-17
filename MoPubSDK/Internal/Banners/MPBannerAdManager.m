@@ -195,7 +195,7 @@
     
 //    configuration.adSize = self.adView
 
-    MPLogInfo(@"Banner ad view is fetching ad network type: %@", self.requestingConfiguration.networkType);
+    CoreLogType(WBLogLevelDebug, self.logType, @"Banner ad view is fetching ad network type: %@", self.requestingConfiguration.networkType);
 
     if (configuration.adType == MPAdTypeUnknown) {
         [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorServerError]];
@@ -203,14 +203,14 @@
     }
 
     if (configuration.adType == MPAdTypeInterstitial) {
-        MPLogWarn(@"Could not load ad: banner object received an interstitial ad unit ID.");
+        CoreLogType(WBLogLevelWarn, self.logType, @"Could not load ad: banner object received an interstitial ad unit ID.");
 
         [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorAdapterInvalid]];
         return;
     }
 
     if ([configuration.networkType isEqualToString:kAdTypeClear]) {
-        MPLogInfo(@"Ad server response indicated no ad available.");
+        CoreLogType(WBLogLevelError, self.logType, @"Ad server response indicated no ad available.");
 
         [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorNoInventory]];
         return;

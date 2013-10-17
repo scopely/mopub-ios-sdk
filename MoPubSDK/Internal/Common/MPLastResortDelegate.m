@@ -29,7 +29,7 @@
 
 - (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(NSInteger)result error:(NSError*)error
 {
-    [controller mp_dismissModalViewControllerAnimated:MP_ANIMATED];
+    [controller dismissViewControllerAnimated:MP_ANIMATED completion:nil];
 }
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 60000

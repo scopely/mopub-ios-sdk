@@ -8,12 +8,10 @@
 #import "MPAdAlertManager.h"
 #import "MPAdConfiguration.h"
 #import "MPAdAlertGestureRecognizer.h"
-#import "MPLogging.h"
 #import "MPIdentityProvider.h"
 #import "MPInstanceProvider.h"
 #import "MPLastResortDelegate.h"
-
-#import "UIViewController+MPAdditions.h"
+#import "MPConstants.h"
 
 #import <QuartzCore/QuartzCore.h>
 #import <CoreLocation/CoreLocation.h>
@@ -72,7 +70,7 @@
 {
     static NSDateFormatter *dateFormatter = nil;
     
-    MPLogInfo(@"MPAdAlertManager processing ad alert");
+    CoreLogType(WBLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager processing ad alert");
     
     // don't even try if this device can't send emails
     if(![MFMailComposeViewController canSendMail])
@@ -127,14 +125,14 @@
             
             [self processAdParams:params andScreenshot:image];
             
-            MPLogInfo(@"MPAdAlertManager finished processing ad alert");
+            CoreLogType(WBLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager finished processing ad alert");
         });
     });
 }
 
 - (void)handleAdAlertGesture
 {
-    MPLogInfo(@"MPAdAlertManager alert gesture recognized");
+    CoreLogType(WBLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager alert gesture recognized");
     
     [self.delegate adAlertManagerDidTriggerAlert:self];
 }
@@ -167,7 +165,7 @@
         [self.currentOpenMailVC addAttachmentData:markupData mimeType:@"text/html" fileName:@"mp_adalert_markup.html"];
     }
     
-    [[self.delegate viewControllerForPresentingMailVC] mp_presentModalViewController:self.currentOpenMailVC animated:MP_ANIMATED];
+    [[self.delegate viewControllerForPresentingMailVC] presentViewController:self.currentOpenMailVC animated:MP_ANIMATED completion:nil];
     
     if([self.delegate respondsToSelector:@selector(adAlertManagerDidProcessAlert:)])
     {
@@ -200,7 +198,7 @@
         self.processedAlert = NO;
     }
     
-    [[self.delegate viewControllerForPresentingMailVC] mp_dismissModalViewControllerAnimated:MP_ANIMATED];
+    [[self.delegate viewControllerForPresentingMailVC] dismissViewControllerAnimated:MP_ANIMATED completion:nil];
 }
 
 #pragma mark - Public
