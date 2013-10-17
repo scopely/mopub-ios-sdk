@@ -19,6 +19,8 @@
 
 static NSString *const kExpandableCloseButtonImageName = @"MPCloseButtonX.png";
 static NSString *const kMraidURLScheme = @"mraid";
+static NSString *const kMoPubURLScheme = @"mopub";
+static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 
 @interface MRAdView ()
 
@@ -29,6 +31,7 @@ static NSString *const kMraidURLScheme = @"mraid";
 @property (nonatomic, retain) MRPictureManager *pictureManager;
 @property (nonatomic, retain) MRVideoPlayerManager *videoPlayerManager;
 @property (nonatomic, retain) MRJavaScriptEventEmitter *jsEventEmitter;
+@property (nonatomic, retain) id<MPAdAlertManagerProtocol> adAlertManager;
 
 - (void)loadRequest:(NSURLRequest *)request;
 - (void)loadHTMLString:(NSString *)string baseURL:(NSURL *)baseURL;
@@ -69,6 +72,8 @@ static NSString *const kMraidURLScheme = @"mraid";
 @synthesize pictureManager = _pictureManager;
 @synthesize videoPlayerManager = _videoPlayerManager;
 @synthesize jsEventEmitter = _jsEventEmitter;
+@synthesize adAlertManager = _adAlertManager;
+@synthesize adType = _adType;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -133,6 +138,10 @@ static NSString *const kMraidURLScheme = @"mraid";
                                 buildMRVideoPlayerManagerWithDelegate:self] retain];
         _jsEventEmitter = [[[MPInstanceProvider sharedProvider]
                              buildMRJavaScriptEventEmitterWithWebView:_webView logType:logType] retain];
+
+        self.adAlertManager = [[MPInstanceProvider sharedProvider] buildMPAdAlertManagerWithDelegate:self];
+
+        self.adType = MRAdViewAdTypeDefault;
     }
     return self;
 }
@@ -153,7 +162,22 @@ static NSString *const kMraidURLScheme = @"mraid";
     [_videoPlayerManager setDelegate:nil];
     [_videoPlayerManager release];
     [_jsEventEmitter release];
+    self.adAlertManager.targetAdView = nil;
+    self.adAlertManager.delegate = nil;
+    self.adAlertManager = nil;
     [super dealloc];
+}
+
+#pragma mark - <MPAdAlertManagerDelegate>
+
+- (UIViewController *)viewControllerForPresentingMailVC
+{
+    return [self.delegate viewControllerForPresentingModalView];
+}
+
+- (void)adAlertManagerDidTriggerAlert:(MPAdAlertManager *)manager
+{
+    [self.adAlertManager processAdAlertOnce];
 }
 
 #pragma mark - Public
@@ -214,8 +238,19 @@ static NSString *const kMraidURLScheme = @"mraid";
 
 #pragma mark - Private
 
+- (void)initAdAlertManager
+{
+    self.adAlertManager.adConfiguration = [self.delegate adConfiguration];
+    self.adAlertManager.adUnitId = [self.delegate adUnitId];
+    self.adAlertManager.targetAdView = self;
+    self.adAlertManager.location = [self.delegate location];
+    [self.adAlertManager beginMonitoringAlerts];
+}
+
 - (void)loadRequest:(NSURLRequest *)request
 {
+    [self initAdAlertManager];
+
     NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate:self];
     if (connection) {
         self.data = [NSMutableData data];
@@ -224,6 +259,8 @@ static NSString *const kMraidURLScheme = @"mraid";
 
 - (void)loadHTMLString:(NSString *)string baseURL:(NSURL *)baseURL
 {
+    [self initAdAlertManager];
+
     // Bail out if we can't locate mraid.js.
     if (![self MRAIDScriptPath]) {
         [self adDidFailToLoad];
@@ -232,6 +269,7 @@ static NSString *const kMraidURLScheme = @"mraid";
 
     NSString *HTML = [self HTMLWithJavaScriptBridge:string];
     if (HTML) {
+        [_webView disableJavaScriptDialogs];
         [_webView loadHTMLString:HTML baseURL:baseURL];
     }
 }
@@ -332,6 +370,17 @@ static NSString *const kMraidURLScheme = @"mraid";
     }
 }
 
+- (void)performActionForMoPubSpecificURL:(NSURL *)url
+{
+    CoreLogType(WBLogLevelDebug, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"MRAdView - loading MoPub URL: %@", url);
+    NSString *host = [url host];
+    if ([host isEqualToString:kMoPubPrecacheCompleteHost] && self.adType == MRAdViewAdTypePreCached) {
+        [self adDidLoad];
+    } else {
+        CoreLogType(WBLogLevelWarn, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"MRAdView - unsupported MoPub URL: %@", [url absoluteString]);
+    }
+}
+
 #pragma mark - NSURLConnectionDelegate
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
@@ -369,7 +418,8 @@ static NSString *const kMraidURLScheme = @"mraid";
         CoreLogType(WBLogLevelTrace, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Trying to process command: %@", urlString);
         [self handleCommandWithURL:url];
         return NO;
-    } else if ([scheme isEqualToString:@"mopub"]) {
+    } else if ([scheme isEqualToString:kMoPubURLScheme]) {
+        [self performActionForMoPubSpecificURL:url];
         return NO;
     } else if ([scheme isEqualToString:@"ios-log"]) {
         [urlString replaceOccurrencesOfString:@"%20"
@@ -394,14 +444,25 @@ static NSString *const kMraidURLScheme = @"mraid";
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
+    [_webView disableJavaScriptDialogs];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
     if (_isLoading) {
         _isLoading = NO;
-        [self adDidLoad];
         [self initializeJavascriptState];
+
+        switch (self.adType) {
+            case MRAdViewAdTypeDefault:
+                [self adDidLoad];
+                break;
+            case MRAdViewAdTypePreCached:
+                // wait for the ad to tell us it's done precaching before we notify the publisher
+                break;
+            default:
+                break;
+        }
     }
 }
 

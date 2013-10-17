@@ -69,6 +69,11 @@
 
 #pragma mark - MPPrivateBannerCustomEventDelegate
 
+- (NSString *)adUnitId
+{
+    return [self.delegate banner].adUnitId;
+}
+
 - (UIViewController *)viewControllerForPresentingModalView
 {
     return [self.delegate viewControllerForPresentingModalView];

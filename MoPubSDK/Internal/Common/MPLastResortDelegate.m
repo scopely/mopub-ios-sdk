@@ -8,6 +8,8 @@
 #import "MPLastResortDelegate.h"
 #import "MPGlobal.h"
 
+@class MFMailComposeViewController;
+
 @implementation MPLastResortDelegate
 
 + (id)sharedDelegate
@@ -23,6 +25,11 @@
 - (void)eventEditViewController:(EKEventEditViewController *)controller didCompleteWithAction:(EKEventEditViewAction)action
 {
     [controller dismissViewControllerAnimated:MP_ANIMATED completion:nil];
+}
+
+- (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(NSInteger)result error:(NSError*)error
+{
+    [controller mp_dismissModalViewControllerAnimated:MP_ANIMATED];
 }
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 60000

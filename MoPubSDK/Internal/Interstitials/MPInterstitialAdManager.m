@@ -126,7 +126,7 @@
 {
     self.configuration = configuration;
 
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Ad view is fetching ad network type: %@", self.configuration.networkType);
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Interstatial Ad view is fetching ad network type: %@", self.configuration.networkType);
 
     if ([self.configuration.networkType isEqualToString:@"clear"]) {
         CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"Ad server response indicated no ad available.");

@@ -51,6 +51,16 @@
 
 #pragma mark - MPInterstitialViewControllerDelegate
 
+- (CLLocation *)location
+{
+    return [self.delegate location];
+}
+
+- (NSString *)adUnitId
+{
+    return [self.delegate adUnitId];
+}
+
 - (void)interstitialDidLoadAd:(MPInterstitialViewController *)interstitial
 {
     [self.delegate interstitialCustomEvent:self didLoadAd:self.interstitial];

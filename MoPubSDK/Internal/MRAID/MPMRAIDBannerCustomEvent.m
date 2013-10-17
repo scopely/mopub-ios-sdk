@@ -52,7 +52,22 @@
     [self.banner rotateToOrientation:newOrientation];
 }
 
-#pragma mark - MPAdWebViewAgentDelegate
+#pragma mark - MRAdViewDelegate
+
+- (CLLocation *)location
+{
+    return [self.delegate location];
+}
+
+- (NSString *)adUnitId
+{
+    return [self.delegate adUnitId];
+}
+
+- (MPAdConfiguration *)adConfiguration
+{
+    return [self.delegate configuration];
+}
 
 - (UIViewController *)viewControllerForPresentingModalView
 {
