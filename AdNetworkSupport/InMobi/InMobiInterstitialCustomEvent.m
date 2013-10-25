@@ -95,7 +95,7 @@
 
 - (void)interstitial:(IMInterstitial *)ad didFailToReceiveAdWithError:(IMError *)error {
 
-    CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"InMobi banner did fail with error: %@", error.localizedDescription);
+    CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"InMobi interstitial did fail with error: %@", error.localizedDescription);
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
