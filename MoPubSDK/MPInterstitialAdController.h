@@ -105,7 +105,12 @@
  * been presented, or has expired. The expiration condition only applies for ads from certain
  * third-party ad networks. See `MPInterstitialAdControllerDelegate` for more details.
  */
-@property (nonatomic, assign, readonly) BOOL ready;
+-(BOOL)ready;
+
+/**
+ *  A Boolean value that represents whether the interstitial ad has loaded an advertisement
+ */
+-(BOOL)hasAd;
 
 /** @name Presenting an Interstitial Ad */
 

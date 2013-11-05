@@ -84,6 +84,11 @@
     return self.manager.ready;
 }
 
+-(BOOL)hasAd
+{
+    return ((MPInterstitialCustomEventAdapter *)self.manager.adapter).interstitialCustomEvent != nil;
+}
+
 -(NSString *)description
 {
     return [NSString stringWithFormat:@"%@", ((MPInterstitialCustomEventAdapter *)self.manager.adapter).interstitialCustomEvent];
