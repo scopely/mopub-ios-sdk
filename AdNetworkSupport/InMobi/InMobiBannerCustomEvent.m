@@ -65,20 +65,15 @@
     self.inMobiBanner = [[MPInstanceProvider sharedProvider] buildIMBannerWithFrame:CGRectMake(0, 0, size.width, size.height) appId:[[WBAdService sharedAdService] bannerIdForAdId:WBAdIdIM] adSize:imAdSizeConstant];
     self.inMobiBanner.delegate = self;
     self.inMobiBanner.refreshInterval = REFRESH_INTERVAL_OFF;
-    IMInMobiNetworkExtras *inmobiExtras = [[IMInMobiNetworkExtras alloc] init];
-    NSMutableDictionary *paramsDict = [[NSMutableDictionary alloc] init];
-    [paramsDict setObject:@"c_mopub" forKey:@"tp"];
-    [paramsDict setObject:MP_SDK_VERSION forKey:@"tp-ver"];
-    inmobiExtras.additionaParameters = paramsDict; // For supply source identification
-
+    self.inMobiBanner.additionaParameters = @{ @"tp" : @"c_mopub",
+                                               @"tp-ver"   : MP_SDK_VERSION };
     if (self.delegate.location) {
         [InMobi setLocationWithLatitude:self.delegate.location.coordinate.latitude
                                longitude:self.delegate.location.coordinate.longitude
                                 accuracy:self.delegate.location.horizontalAccuracy];
     }
-    [self.inMobiBanner addAdNetworkExtras:inmobiExtras];
-    [self.inMobiBanner loadBanner];
 
+    [self.inMobiBanner loadBanner];
 }
 
 - (int)imAdSizeConstantForCGSize:(CGSize)size

@@ -56,21 +56,14 @@
 {
     CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting InMobi interstitial");
     self.inMobiInterstitial = [[MPInstanceProvider sharedProvider] buildIMInterstitialWithDelegate:self appId:[[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdIM]];
-    IMInMobiNetworkExtras *inmobiExtras = [[IMInMobiNetworkExtras alloc] init];
-    NSMutableDictionary *paramsDict = [[NSMutableDictionary alloc] init];
-    [paramsDict setObject:@"c_mopub" forKey:@"tp"];
-    [paramsDict setObject:MP_SDK_VERSION forKey:@"tp-ver"];
-    inmobiExtras.additionaParameters = paramsDict; // For supply source identification
+    self.inMobiInterstitial.additionaParameters = @{ @"tp" : @"c_mopub",
+                                                     @"tp-ver"   : MP_SDK_VERSION };
     if (self.delegate.location) {
         [InMobi setLocationWithLatitude:self.delegate.location.coordinate.latitude
                                longitude:self.delegate.location.coordinate.longitude
                                 accuracy:self.delegate.location.horizontalAccuracy];
     }
-    [self.inMobiInterstitial addAdNetworkExtras:inmobiExtras];
     [self.inMobiInterstitial loadInterstitial];
-    
-    [inmobiExtras release];
-    [paramsDict release];
 }
 
 - (void)showInterstitialFromRootViewController:(UIViewController *)rootViewController

@@ -9,7 +9,6 @@
 
 #import "IMInterstitial.h"
 #import "IMInterstitialDelegate.h"
-#import "IMInMobiNetworkExtras.h"
 
 /*
  * Compatible with version 4.0.0 of the InMobi SDK.
