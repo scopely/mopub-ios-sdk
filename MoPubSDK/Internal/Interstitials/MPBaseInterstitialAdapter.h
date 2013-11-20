@@ -20,7 +20,7 @@
 /*
  * Creates an adapter with a reference to an MPInterstitialAdManager.
  */
-- (id)initWithDelegate:(id<MPInterstitialAdapterDelegate>)delegate;
+- (instancetype)initWithDelegate:(id<MPInterstitialAdapterDelegate>)delegate;
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration;
 - (void)_getAdWithConfiguration:(MPAdConfiguration *)configuration;
@@ -31,6 +31,11 @@
  * Presents the interstitial from the specified view controller.
  */
 - (void)showInterstitialFromViewController:(UIViewController *)controller;
+
+/**
+ *  A Boolean value that represents whether the interstitial ad has loaded an advertisement
+ */
+-(BOOL)hasAd;
 
 @end
 

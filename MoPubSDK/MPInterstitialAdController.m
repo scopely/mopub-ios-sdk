@@ -86,7 +86,7 @@
 
 -(BOOL)hasAd
 {
-    return ((MPInterstitialCustomEventAdapter *)self.manager.adapter).interstitialCustomEvent != nil;
+    return self.manager.adapter.hasAd;
 }
 
 -(NSString *)description
