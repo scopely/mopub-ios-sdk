@@ -204,9 +204,9 @@ static MPInstanceProvider *sharedProvider = nil;
                                                                delegate:(id<MPInterstitialAdapterDelegate>)delegate
 {
     if (configuration.customEventClass) {
-        return [[(MPInterstitialCustomEventAdapter *)[MPInterstitialCustomEventAdapter alloc] initWithDelegate:delegate] autorelease];
+        return [[[MPInterstitialCustomEventAdapter alloc] initWithDelegate:delegate] autorelease];
     } else if (configuration.customSelectorName) {
-        return [[(MPLegacyInterstitialCustomEventAdapter *)[MPLegacyInterstitialCustomEventAdapter alloc] initWithDelegate:delegate] autorelease];
+        return [[[MPLegacyInterstitialCustomEventAdapter alloc] initWithDelegate:delegate] autorelease];
     }
 
     return nil;

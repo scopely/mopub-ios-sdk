@@ -12,6 +12,7 @@
 
 @property (nonatomic, assign) BOOL hasTrackedImpression;
 @property (nonatomic, assign) BOOL hasTrackedClick;
+@property (nonatomic) BOOL adDidLoad;
 
 @end
 
@@ -45,6 +46,11 @@
     [self.delegate adapter:self didFailToLoadAdWithError:nil];
 }
 
+-(BOOL)hasAd
+{
+    return self.adDidLoad;
+}
+
 - (void)startTimeoutTimer
 {
     // Override to do nothing as we don't want to time out these legacy custom events.
@@ -55,6 +61,7 @@
     if (!self.hasTrackedImpression) {
         self.hasTrackedImpression = YES;
         [self trackImpression];
+        self.adDidLoad = YES;
     }
 }
 

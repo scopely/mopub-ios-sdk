@@ -29,7 +29,7 @@
 @synthesize configuration = _configuration;
 @synthesize timeoutTimer = _timeoutTimer;
 
-- (id)initWithDelegate:(id<MPInterstitialAdapterDelegate>)delegate
+- (instancetype)initWithDelegate:(id<MPInterstitialAdapterDelegate>)delegate
 {
     self = [super init];
     if (self) {
@@ -97,6 +97,11 @@
 {
     CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"%@ custom event did time out", NSStringFromClass(self.configuration.customEventClass));
     [self.delegate adapter:self didFailToLoadAdWithError:nil];
+}
+
+-(BOOL)hasAd
+{
+    return NO;
 }
 
 #pragma mark - Presentation
