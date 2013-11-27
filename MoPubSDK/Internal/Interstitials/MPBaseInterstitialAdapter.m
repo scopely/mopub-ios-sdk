@@ -99,11 +99,6 @@
     [self.delegate adapter:self didFailToLoadAdWithError:nil];
 }
 
--(BOOL)hasAd
-{
-    return NO;
-}
-
 #pragma mark - Presentation
 
 - (void)showInterstitialFromViewController:(UIViewController *)controller

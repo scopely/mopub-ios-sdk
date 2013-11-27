@@ -57,11 +57,6 @@
     [self.interstitialCustomEvent showInterstitialFromRootViewController:controller];
 }
 
--(BOOL)hasAd
-{
-    return self.interstitialCustomEvent != nil;
-}
-
 #pragma mark - MPInterstitialCustomEventDelegate
 
 - (NSString *)adUnitId

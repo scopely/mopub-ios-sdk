@@ -32,11 +32,6 @@
  */
 - (void)showInterstitialFromViewController:(UIViewController *)controller;
 
-/**
- *  A Boolean value that represents whether the interstitial ad has loaded an advertisement
- */
--(BOOL)hasAd;
-
 @end
 
 @interface MPBaseInterstitialAdapter (ProtectedMethods)

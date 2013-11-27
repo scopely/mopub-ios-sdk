@@ -108,9 +108,9 @@
 -(BOOL)ready;
 
 /**
- *  A Boolean value that represents whether the interstitial ad has loaded an advertisement
+ *  A Boolean value that represents whether the interstitial is loading an advertisement
  */
--(BOOL)hasAd;
+-(BOOL)loading;
 
 /** @name Presenting an Interstitial Ad */
 

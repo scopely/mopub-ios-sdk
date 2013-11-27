@@ -16,7 +16,10 @@
 
 @property (nonatomic, retain, readonly) MPBaseInterstitialAdapter *adapter;
 @property (nonatomic, assign) id<MPInterstitialAdManagerDelegate> delegate;
-@property (nonatomic, assign, readonly) BOOL ready;
+@property (nonatomic, readonly) BOOL ready;
+@property (nonatomic, readonly) BOOL loading;
+
+
 
 - (id)initWithDelegate:(id<MPInterstitialAdManagerDelegate>)delegate;
 

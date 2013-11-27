@@ -46,11 +46,6 @@
     [self.delegate adapter:self didFailToLoadAdWithError:nil];
 }
 
--(BOOL)hasAd
-{
-    return self.adDidLoad;
-}
-
 - (void)startTimeoutTimer
 {
     // Override to do nothing as we don't want to time out these legacy custom events.

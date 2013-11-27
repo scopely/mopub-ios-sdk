@@ -17,8 +17,8 @@
 
 @interface MPInterstitialAdManager ()
 
-@property (nonatomic, assign) BOOL loading;
-@property (nonatomic, assign, readwrite) BOOL ready;
+@property (nonatomic) BOOL loading;
+@property (nonatomic) BOOL ready;
 @property (nonatomic, retain) MPBaseInterstitialAdapter *adapter;
 @property (nonatomic, retain) MPAdServerCommunicator *communicator;
 @property (nonatomic, retain) MPAdConfiguration *configuration;

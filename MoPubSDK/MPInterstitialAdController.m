@@ -84,9 +84,9 @@
     return self.manager.ready;
 }
 
--(BOOL)hasAd
+-(BOOL)loading
 {
-    return self.manager.adapter.hasAd;
+    return self.manager.loading;
 }
 
 -(NSString *)description
