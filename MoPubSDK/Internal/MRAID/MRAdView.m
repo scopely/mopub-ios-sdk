@@ -111,9 +111,9 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
         [self addSubview:_webView];
 
         _closeButton = [[UIButton buttonWithType:UIButtonTypeCustom] retain];
-        _closeButton.frame = CGRectMake(0, 0, 50, 50);
         UIImage *image = [UIImage imageNamed:kExpandableCloseButtonImageName];
         [_closeButton setImage:image forState:UIControlStateNormal];
+        [_closeButton sizeToFit];
 
         _allowsExpansion = expansion;
         _closeButtonStyle = style;
