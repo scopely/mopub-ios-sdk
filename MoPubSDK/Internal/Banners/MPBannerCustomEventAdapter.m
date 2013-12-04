@@ -91,6 +91,7 @@
 
 - (void)bannerCustomEvent:(MPBannerCustomEvent *)event didLoadAd:(UIView *)ad
 {
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"%@ banner loaded", event);
     [self didStopLoading];
     if (ad) {
         [self.delegate adapter:self didFinishLoadingAd:ad];
@@ -101,23 +102,27 @@
 
 - (void)bannerCustomEvent:(MPBannerCustomEvent *)event didFailToLoadAdWithError:(NSError *)error
 {
+    CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"%@ banner didFailToLoadAdWithError %@", event, error.localizedDescription);
     [self didStopLoading];
     [self.delegate adapter:self didFailToLoadAdWithError:error];
 }
 
 - (void)bannerCustomEventWillBeginAction:(MPBannerCustomEvent *)event
 {
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"%@ banner bannerCustomEventWillBeginAction", event);
     [self trackClickOnce];
     [self.delegate userActionWillBeginForAdapter:self];
 }
 
 - (void)bannerCustomEventDidFinishAction:(MPBannerCustomEvent *)event
 {
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"%@ banner bannerCustomEventDidFinishAction", event);
     [self.delegate userActionDidFinishForAdapter:self];
 }
 
 - (void)bannerCustomEventWillLeaveApplication:(MPBannerCustomEvent *)event
 {
+    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"%@ banner bannerCustomEventWillLeaveApplication", event);
     [self trackClickOnce];
     [self.delegate userWillLeaveApplicationFromAdapter:self];
 }
