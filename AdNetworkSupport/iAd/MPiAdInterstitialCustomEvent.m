@@ -39,6 +39,8 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
+    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting iAd interstitial");
+
     self.iAdInterstitial = [[MPInstanceProvider sharedProvider] buildADInterstitialAd];
     self.iAdInterstitial.delegate = self;
 }
@@ -66,6 +68,15 @@
     return @"iAd";
 }
 
+- (void)interstitialAdDismissed
+{
+    if (self.isOnScreen) {
+        [self.delegate interstitialCustomEventWillDisappear:self];
+        [self.delegate interstitialCustomEventDidDisappear:self];
+        self.isOnScreen = NO; //technically not necessary as iAd interstitials are single use
+    }
+}
+
 #pragma mark - <ADInterstitialAdDelegate>
 
 - (void)interstitialAdDidLoad:(ADInterstitialAd *)interstitialAd {
@@ -79,11 +90,7 @@
 - (void)interstitialAdDidUnload:(ADInterstitialAd *)interstitialAd {
     // This method may be called whether the ad is on-screen or not. We only want to invoke the
     // "disappear" callbacks if the ad is on-screen.
-    if (self.isOnScreen) {
-        [self.delegate interstitialCustomEventWillDisappear:self];
-        [self.delegate interstitialCustomEventDidDisappear:self];
-        self.isOnScreen = NO; //technically not necessary as iAd interstitials are single use
-    }
+    [self interstitialAdDismissed];
 
     // ADInterstitialAd can't be shown again after it has unloaded, so notify the controller.
     [self.delegate interstitialCustomEventDidExpire:self];
@@ -92,7 +99,12 @@
 - (BOOL)interstitialAdActionShouldBegin:(ADInterstitialAd *)interstitialAd
                    willLeaveApplication:(BOOL)willLeave {
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
-    return YES; // YES allows the banner action to execute (NO would instead cancel the action).
+    return YES; // YES allows the action to execute (NO would instead cancel the action).
+}
+
+- (void)interstitialAdActionDidFinish:(ADInterstitialAd *)interstitialAd
+{
+    [self interstitialAdDismissed];
 }
 
 @end
