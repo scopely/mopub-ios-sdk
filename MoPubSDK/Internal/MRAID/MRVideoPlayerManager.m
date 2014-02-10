@@ -28,17 +28,14 @@
     [super dealloc];
 }
 
-- (void)playVideo:(NSDictionary *)parameters
+- (void)playVideo:(NSURL *)url
 {
-    NSString *URLString = [[parameters objectForKey:@"uri"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSURL *URL = [NSURL URLWithString:URLString];
-
-    if (!URL) {
+    if (!url) {
         [self.delegate videoPlayerManager:self didFailToPlayVideoWithErrorMessage:@"URI was not valid."];
         return;
     }
 
-    MPMoviePlayerViewController *controller = [[MPInstanceProvider sharedProvider] buildMPMoviePlayerViewControllerWithURL:URL];
+    MPMoviePlayerViewController *controller = [[MPInstanceProvider sharedProvider] buildMPMoviePlayerViewControllerWithURL:url];
 
     [self.delegate videoPlayerManagerWillPresentVideo:self];
     [[self.delegate viewControllerForPresentingVideoPlayer] presentViewController:controller animated:MP_ANIMATED completion:nil];
