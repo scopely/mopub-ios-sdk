@@ -105,7 +105,7 @@
 {
     // Do nothing by default. Subclasses can override.
     CoreLogType(WBLogLevelTrace, WBLogTypeAdBanner, @"rotateToOrientation %d called for adapter %@ (%p)",
-          newOrientation, NSStringFromClass([self class]), self);
+          (int)newOrientation, NSStringFromClass([self class]), self);
 }
 
 #pragma mark - Metrics

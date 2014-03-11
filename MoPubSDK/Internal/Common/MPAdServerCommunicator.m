@@ -83,7 +83,7 @@ const NSTimeInterval kRequestTimeoutInterval = 10.0;
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
     if ([response respondsToSelector:@selector(statusCode)]) {
-        int statusCode = [(NSHTTPURLResponse *)response statusCode];
+        NSInteger statusCode = [(NSHTTPURLResponse *)response statusCode];
         if (statusCode >= 400) {
             [connection cancel];
             self.loading = NO;
