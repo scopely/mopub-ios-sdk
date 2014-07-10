@@ -59,16 +59,11 @@
     NSString *adUnitID = info[WBAdUnitID];
 #if (DEBUG || ADHOC)
     
-    switch ([[WBAdService sharedAdService] forcedAdNetwork]) {
-        case WBAdNetworkAM:
-            adUnitID = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdAM];
-            break;
-        case WBAdNetworkEva:
-            adUnitID = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdEva];
-            break;
-        default:
-            break;
+    if([[WBAdService sharedAdService] forcedAdNetwork] == WBAdNetworkAM)
+    {
+        adUnitID = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdAM];
     }
+    
 #endif
 
     self.interstitial.adUnitID = adUnitID;

@@ -54,7 +54,6 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting InMobi interstitial");
     self.inMobiInterstitial = [[MPInstanceProvider sharedProvider] buildIMInterstitialWithDelegate:self appId:[[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdIM]];
     self.inMobiInterstitial.additionaParameters = @{ @"tp" : @"c_mopub",
                                                      @"tp-ver"   : MP_SDK_VERSION };

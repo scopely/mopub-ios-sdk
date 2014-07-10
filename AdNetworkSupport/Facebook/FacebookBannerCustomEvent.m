@@ -7,6 +7,11 @@
 
 #import "FacebookBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
+#import "WBAdService+Internal.h"
+
+#if (DEBUG || ADHOC)
+#import "WBAdService+Debugging.h"
+#endif
 
 @interface MPInstanceProvider (FacebookBanners)
 
@@ -55,15 +60,26 @@
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
+    
+    NSString *placementId = [info objectForKey:@"placement_id"];
+    
+#if (DEBUG || ADHOC)
+    
+    if([[WBAdService sharedAdService] forcedAdNetwork] == WBAdNetworkFB)
+    {
+        placementId = [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdFB];
+    }
+    
+#endif
 
-    if (![info objectForKey:@"placement_id"]) {
+    if (placementId == nil) {
         CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Placement ID is required for Facebook banner ad");
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
 
     self.fbAdView =
-        [[MPInstanceProvider sharedProvider] buildFBAdViewWithPlacementID:[info objectForKey:@"placement_id"]
+        [[MPInstanceProvider sharedProvider] buildFBAdViewWithPlacementID:placementId
                                                        rootViewController:[self.delegate viewControllerForPresentingModalView]
                                                                  delegate:self];
 

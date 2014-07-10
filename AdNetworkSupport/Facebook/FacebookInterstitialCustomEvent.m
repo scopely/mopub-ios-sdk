@@ -7,7 +7,11 @@
 
 #import "FacebookInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
+#import "WBAdService+Internal.h"
 
+#if (DEBUG || ADHOC)
+#import "WBAdService+Debugging.h"
+#endif
 @interface MPInstanceProvider (FacebookInterstitials)
 
 - (FBInterstitialAd *)buildFBInterstitialAdWithPlacementID:(NSString *)placementID
@@ -42,14 +46,25 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    if (![info objectForKey:@"placement_id"]) {
+    NSString *placementId = [info objectForKey:@"placement_id"];
+    
+#if (DEBUG || ADHOC)
+    
+    if([[WBAdService sharedAdService] forcedAdNetwork] == WBAdNetworkFB)
+    {
+        placementId = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdFB];
+    }
+    
+#endif
+    
+    if (placementId == nil) {
         CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"Placement ID is required for Facebook interstitial ad");
         [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
 
     self.fbInterstitialAd =
-        [[MPInstanceProvider sharedProvider] buildFBInterstitialAdWithPlacementID:[info objectForKey:@"placement_id"]
+        [[MPInstanceProvider sharedProvider] buildFBInterstitialAdWithPlacementID:placementId
                                                                         delegate:self];
 
     [self.fbInterstitialAd loadAd];
