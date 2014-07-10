@@ -53,7 +53,6 @@ typedef enum {
 - (MPAdAlertGestureRecognizer *)buildMPAdAlertGestureRecognizerWithTarget:(id)target action:(SEL)action;
 - (NSOperationQueue *)sharedOperationQueue;
 - (MPAnalyticsTracker *)sharedMPAnalyticsTracker;
-- (MPReachability *)sharedMPReachability;
 
 // This call may return nil and may not update if the user hot-swaps the device's sim card.
 - (NSDictionary *)sharedCarrierInfo;

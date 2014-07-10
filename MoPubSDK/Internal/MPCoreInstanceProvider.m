@@ -13,7 +13,6 @@
 #import "MPAdServerCommunicator.h"
 #import "MPURLResolver.h"
 #import "MPAdDestinationDisplayAgent.h"
-#import "MPReachability.h"
 #import "MPTimer.h"
 #import "MPAnalyticsTracker.h"
 
@@ -196,13 +195,6 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 {
     return [self singletonForClass:[MPAnalyticsTracker class] provider:^id{
         return [MPAnalyticsTracker tracker];
-    }];
-}
-
-- (MPReachability *)sharedMPReachability
-{
-    return [self singletonForClass:[MPReachability class] provider:^id{
-        return [MPReachability reachabilityForLocalWiFi];
     }];
 }
 
