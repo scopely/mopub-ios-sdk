@@ -45,8 +45,8 @@
     self.interstitialCustomEvent = [[MPInstanceProvider sharedProvider] buildInterstitialCustomEventFromCustomClass:configuration.customEventClass delegate:self];
 
     if (self.interstitialCustomEvent) {
-        [self.interstitialCustomEvent requestInterstitialWithCustomEventInfo:configuration.customEventClassData];
         CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting %@ interstitial", self.interstitialCustomEvent);
+        [self.interstitialCustomEvent requestInterstitialWithCustomEventInfo:configuration.customEventClassData];
     } else {
         [self.delegate adapter:self didFailToLoadAdWithError:nil];
     }

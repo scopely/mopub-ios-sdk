@@ -78,22 +78,25 @@
     [super dealloc];
 }
 
+-(NSString *)description
+{
+    return @"InMobi";
+}
+
 #pragma mark - IMAdInterstitialDelegate
 
 
 - (void)interstitialDidReceiveAd:(IMInterstitial *)ad {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"InMobi interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:ad];
 }
 
 - (void)interstitial:(IMInterstitial *)ad didFailToReceiveAdWithError:(IMError *)error {
 
-    CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"InMobi interstitial did fail with error: %@", error.localizedDescription);
-    [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
+    [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)interstitialWillPresentScreen:(IMInterstitial *)ad {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"InMobi interstitial will present");
+
     [self.delegate interstitialCustomEventWillAppear:self];
 
     // InMobi doesn't seem to have a separate callback for the "did appear" event, so we
@@ -102,27 +105,22 @@
 }
 
 - (void)interstitial:(IMInterstitial *)ad didFailToPresentScreenWithError:(IMError *)error {
-    CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"InMobi interstitial failed to present with error: %@", error.localizedDescription);
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
 - (void)interstitialWillDismissScreen:(IMInterstitial *)ad {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"InMobi interstitial will dismiss");
     [self.delegate interstitialCustomEventWillDisappear:self];
 }
 
 - (void)interstitialDidDismissScreen:(IMInterstitial *)ad {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"InMobi interstitial did dismiss");
     [self.delegate interstitialCustomEventDidDisappear:self];
 }
 
 - (void)interstitialWillLeaveApplication:(IMInterstitial *)ad {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"InMobi interstitial will leave application");
     [self.delegate interstitialCustomEventWillLeaveApplication:self];
 }
 
 - (void) interstitialDidInteract:(IMInterstitial *)ad withParams:(NSDictionary *)dictionary {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"InMobi interstitial was tapped");
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
 }
 

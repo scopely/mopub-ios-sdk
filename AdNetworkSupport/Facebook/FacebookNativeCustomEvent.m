@@ -5,12 +5,11 @@
 //  Copyright (c) 2014 MoPub. All rights reserved.
 //
 
-#import <FBAudienceNetwork/FBAudienceNetwork.h>
+#import "FBAudienceNetwork.h"
 #import "FacebookNativeCustomEvent.h"
 #import "FacebookNativeAdAdapter.h"
 #import "MPNativeAd.h"
 #import "MPNativeAdError.h"
-#import "MPLogging.h"
 
 @interface FacebookNativeCustomEvent () <FBNativeAdDelegate>
 
@@ -58,8 +57,8 @@
 
     [super precacheImagesWithURLs:imageURLs completionBlock:^(NSArray *errors) {
         if (errors) {
-            MPLogDebug(@"%@", errors);
-            MPLogInfo(@"Error: data received was invalid.");
+//            MPLogDebug(@"%@", errors);
+//            MPLogInfo(@"Error: data received was invalid.");
             [self.delegate nativeCustomEvent:self didFailToLoadAdWithError:[NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorInvalidServerResponse userInfo:nil]];
         } else {
             [self.delegate nativeCustomEvent:self didLoadAd:interfaceAd];
@@ -70,6 +69,11 @@
 - (void)nativeAd:(FBNativeAd *)nativeAd didFailWithError:(NSError *)error
 {
     [self.delegate nativeCustomEvent:self didFailToLoadAdWithError:[NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorInvalidServerResponse userInfo:nil]];
+}
+
+-(void)nativeAdDidClick:(FBNativeAd *)nativeAd
+{
+
 }
 
 @end

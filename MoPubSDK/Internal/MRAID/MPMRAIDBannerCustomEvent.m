@@ -21,7 +21,6 @@
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Loading MoPub MRAID banner");
     MPAdConfiguration *configuration = [self.delegate configuration];
 
     CGRect adViewFrame = CGRectZero;
@@ -52,6 +51,11 @@
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation
 {
     [self.banner rotateToOrientation:newOrientation];
+}
+
+-(NSString *)description
+{
+    return @"MRAID";
 }
 
 #pragma mark - MRAdViewDelegate

@@ -92,8 +92,6 @@
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Requesting iAd banner");
-
     [[MPADBannerViewManager sharedManager] registerObserver:self];
 
     if (self.bannerView.isBannerLoaded) {

@@ -21,7 +21,6 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Loading MoPub HTML interstitial");
     MPAdConfiguration *configuration = [self.delegate configuration];
     CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"Loading HTML interstitial with source: %@", [configuration adResponseHTMLString]);
 

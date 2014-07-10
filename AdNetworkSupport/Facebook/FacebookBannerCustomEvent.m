@@ -6,9 +6,7 @@
 //
 
 #import "FacebookBannerCustomEvent.h"
-
 #import "MPInstanceProvider.h"
-#import "MPLogging.h"
 
 @interface MPInstanceProvider (FacebookBanners)
 
@@ -40,6 +38,11 @@
 
 @implementation FacebookBannerCustomEvent
 
+-(NSString *)description
+{
+    return @"Facebook";
+}
+
 - (BOOL)enableAutomaticImpressionAndClickTracking
 {
     return NO;
@@ -48,18 +51,17 @@
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
     if (!CGSizeEqualToSize(size, kFBAdSize320x50.size)) {
-        MPLogError(@"Invalid size for Facebook banner ad");
+        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Invalid size for Facebook banner ad");
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
 
     if (![info objectForKey:@"placement_id"]) {
-        MPLogError(@"Placement ID is required for Facebook banner ad");
+        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Placement ID is required for Facebook banner ad");
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
 
-    MPLogInfo(@"Requesting Facebook banner ad");
     self.fbAdView =
         [[MPInstanceProvider sharedProvider] buildFBAdViewWithPlacementID:[info objectForKey:@"placement_id"]
                                                        rootViewController:[self.delegate viewControllerForPresentingModalView]
@@ -83,20 +85,17 @@
 
 - (void)adView:(FBAdView *)adView didFailWithError:(NSError *)error;
 {
-    MPLogInfo(@"Facebook banner failed to load with error: %@", error.description);
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)adViewDidLoad:(FBAdView *)adView;
 {
-    MPLogInfo(@"Facebook banner ad did load");
     [self.delegate trackImpression];
     [self.delegate bannerCustomEvent:self didLoadAd:adView];
 }
 
 - (void)adViewDidClick:(FBAdView *)adView
 {
-    MPLogInfo(@"Facebook banner ad was clicked");
     [self.delegate trackClick];
 }
 

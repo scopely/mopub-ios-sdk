@@ -54,7 +54,6 @@
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Requesting InMobi banner");
     int imAdSizeConstant = [self imAdSizeConstantForCGSize:size];
     if (imAdSizeConstant == INVALID_INMOBI_AD_SIZE) {
         CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Failed to create an inMobi Banner with invalid size %@", NSStringFromCGSize(size));
@@ -101,6 +100,11 @@
     [self.inMobiBanner setDelegate:nil];
     self.inMobiBanner = nil;
     [super dealloc];
+}
+
+-(NSString *)description
+{
+    return @"InMobi";
 }
 
 #pragma mark - IMAdDelegate

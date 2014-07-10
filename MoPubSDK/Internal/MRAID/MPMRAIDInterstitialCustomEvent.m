@@ -20,7 +20,6 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Loading MoPub MRAID interstitial");
     self.interstitial = [[MPInstanceProvider sharedProvider] buildMPMRAIDInterstitialViewControllerWithDelegate:self
                                                                                                   configuration:[self.delegate configuration]];
     [self.interstitial setCloseButtonStyle:MPInterstitialCloseButtonStyleAdControlled];

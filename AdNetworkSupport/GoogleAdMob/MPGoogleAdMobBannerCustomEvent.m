@@ -63,9 +63,13 @@
     [super dealloc];
 }
 
+-(NSString *)description
+{
+    return @"AdMob";
+}
+
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Requesting Google AdMob banner");
     NSString *adUnitID = info[WBAdUnitID];
 #if (DEBUG || ADHOC)
     

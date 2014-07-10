@@ -44,6 +44,7 @@
     self.bannerCustomEvent = [[MPInstanceProvider sharedProvider] buildBannerCustomEventFromCustomClass:configuration.customEventClass
                                                                                                delegate:self];
     if (self.bannerCustomEvent) {
+        CoreLogType(WBLogLevelInfo, configuration.logType, @"Requesting %@ banner", self.bannerCustomEvent);
         [self.bannerCustomEvent requestAdWithSize:size customEventInfo:configuration.customEventClassData];
     } else {
         [self.delegate adapter:self didFailToLoadAdWithError:nil];
