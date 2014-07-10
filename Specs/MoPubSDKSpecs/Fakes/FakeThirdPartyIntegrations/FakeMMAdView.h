@@ -6,7 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "MMAdView.h"
+#import <MillennialMedia/MMAdView.h>
 
 @interface FakeMMAdView : UIView
 
@@ -20,6 +20,8 @@
 
 - (void)simulateLoadingAd;
 - (void)simulateFailingToLoad;
+
+- (void)simulateUserLeavingApplication:(BOOL)modalFirst;
 
 - (void)simulateUserTap;
 - (void)simulateUserEndingInteraction;

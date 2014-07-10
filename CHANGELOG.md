@@ -1,9 +1,50 @@
+## Version 2.2 (June 19th, 2014)
+
+  - **Native ads mediation**: integration instructions and documentation are available on the [GitHub wiki](https://github.com/mopub/mopub-ios-sdk/wiki/Integrating-Native-Third-Party-Ad-Networks). Facebook and InMobi native ads may be mediated using the MoPub SDK.
+  - **Native ads content filtering**: Added the ability to specify which native ad elements you want to receive from the MoPub Marketplace to optimize bandwidth use and download only required assets, via `MPNativeAdRequestTargeting.desiredAssets`. This feature only works for the six standard Marketplace assets, found in `MPNativeAdConstants.h`. Any additional elements added in direct sold ads will always be sent down in the extras.
+  - Added star rating information to the `MPNativeAd` object, via `MPNativeAd.starRating`. This method returns an `NSNumber` (double value) corresponding to an app's rating on a 5-star scale.
+  - Bug fixes
+    - Handle Millennial Media SDK's `MillennialMediaAdWillTerminateApplication` notification
+    - Ensured that banners never autorefresh until they have been loaded at least once
+
+## Version 2.1 (May 15th, 2014)
+
+  - Improved user privacy protection
+    - Device identifiers are removed from logging output
+  - Improved user protection against auto-dialing ads
+    - Prompt user for confirmation when a `tel` URL is encountered
+  - Updated Millennial Media custom events (Millennial Media SDK 5.2+ only)
+  - Updated Vungle custom event (Vungle SDK 2.0+ only)
+
+### Version 2.1.1 (May 22nd, 2014)
+
+  - Fixed Millennial Media SDK 5.2 banner custom event failover
+
+## Version 2.0 (April 23rd, 2014)
+
+  - Added support for MoPub Native Ads. Please view the integration wiki [here](https://github.com/mopub/mopub-ios-sdk/wiki/Native-Ads-Integration).
+  - Updated the minimum required iOS version to iOS 5.0
+    - Removed `TouchJSON` dependency. `TouchJSON` files may be removed from your project.
+
 ## Version 1.17 (November 20, 2013)
 
   - AdColony Custom Event
     - Supports AdColony as a custom native ad network for interstitial videos. Note that V4VC (virtual currency reward) is currently not supported. 
   - Handle ISO Latin-1 site encoding in addition to UTF-8
   - Bug fixes
+
+### Version 1.17.3.0 (March 20th, 2014)
+
+  - Updated Chartboost custom event (Chartboost SDK 4.0+ only)
+  - Bug fixes
+    - Fixed iOS 7 bug where certain interstitial images may fail to load
+
+### Version 1.17.2.0 (February 20th, 2014)
+
+  - Updated InMobi custom events (InMobi SDK 4.0.3+ only)
+  - Bug fixes
+    - MRAID viewable property now correctly updates on app background and resume
+    - MRAID command urls are no longer re-encoded for processing
 
 ### Version 1.17.1.0 (January 23rd, 2014)
 

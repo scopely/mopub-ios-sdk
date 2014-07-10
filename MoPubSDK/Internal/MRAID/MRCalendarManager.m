@@ -5,7 +5,7 @@
 #import "MRCalendarManager.h"
 #import <EventKit/EventKit.h>
 #import "MPInstanceProvider.h"
-#import "MPLastResortDelegate.h"
+#import "MPLastResortDelegate+EventKit.h"
 
 @interface MRCalendarManager ()
 
@@ -52,21 +52,21 @@
 {
     NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
     [formatter setDateFormat:format];
-
+    
     return formatter;
 }
 
 - (NSDate *)parseDateFromString:(NSString *)dateString
 {
     NSDate *result = nil;
-
+    
     for (NSDateFormatter *formatter in self.acceptedDateFormatters) {
         result = [formatter dateFromString:dateString];
         if (result != nil) {
             break;
         }
     }
-
+    
     return result;
 }
 

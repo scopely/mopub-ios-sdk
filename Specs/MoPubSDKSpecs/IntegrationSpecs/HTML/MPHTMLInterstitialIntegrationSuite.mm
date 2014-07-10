@@ -23,14 +23,14 @@ describe(@"MPHTMLInterstitialIntegrationSuite", ^{
     __block FakeMPAdServerCommunicator *communicator;
     __block MPAdConfiguration *configuration;
     __block FakeMPAdAlertManager *fakeAdAlertManager;
-
+    
     beforeEach(^{
         FakeMPAdAlertGestureRecognizer *fakeGestureRecognizer = [[FakeMPAdAlertGestureRecognizer alloc] init];
-        fakeProvider.fakeAdAlertGestureRecognizer = fakeGestureRecognizer;
-
+        fakeCoreProvider.fakeAdAlertGestureRecognizer = fakeGestureRecognizer;
+        
         fakeAdAlertManager = [[[FakeMPAdAlertManager alloc] init] autorelease];
-        fakeProvider.fakeAdAlertManager = fakeAdAlertManager;
-
+        fakeCoreProvider.fakeAdAlertManager = fakeAdAlertManager;
+        
         delegate = nice_fake_for(@protocol(MethodicalDelegate));
 
         interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:@"html_interstitial"];
@@ -41,7 +41,7 @@ describe(@"MPHTMLInterstitialIntegrationSuite", ^{
 
         // request an Ad
         [interstitial loadAd];
-        communicator = fakeProvider.lastFakeMPAdServerCommunicator;
+        communicator = fakeCoreProvider.lastFakeMPAdServerCommunicator;
         communicator.loadedURL.absoluteString should contain(@"html_interstitial");
 
         // prepare the fake and tell the injector about it
@@ -83,7 +83,7 @@ describe(@"MPHTMLInterstitialIntegrationSuite", ^{
             verify_fake_received_selectors(delegate, @[@"interstitialDidLoadAd:"]);
             interstitial.ready should equal(YES);
         });
-
+        
         context(@"and the user tries to load again", ^{ itShouldBehaveLike(anInterstitialThatHasAlreadyLoaded); });
         context(@"and the timeout interval elapses", ^{ itShouldBehaveLike(anInterstitialThatDoesNotTimeOut); });
 
@@ -97,14 +97,14 @@ describe(@"MPHTMLInterstitialIntegrationSuite", ^{
             });
 
             it(@"should track an impression (only once)", ^{
-                fakeProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations should contain(configuration);
+                fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations should contain(configuration);
 
                 [presentingController dismissModalViewControllerAnimated:NO];
                 [interstitial showFromViewController:presentingController];
                 UIViewController *presentedVC = [presentingController mp_presentedViewController];
                 [presentedVC viewWillAppear:MP_ANIMATED];
                 [presentedVC viewDidAppear:MP_ANIMATED];
-                fakeProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations.count should equal(1);
+                fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations.count should equal(1);
             });
 
             it(@"should tell the webview that it has been shown", ^{
@@ -126,22 +126,22 @@ describe(@"MPHTMLInterstitialIntegrationSuite", ^{
                     beforeEach(^{
                         [fakeAdAlertManager simulateGestureRecognized];
                     });
-
+                    
                     it(@"should have the correct ad unit id", ^{
                         fakeAdAlertManager.adUnitId should equal(interstitial.adUnitId);
                     });
-
+                    
                     it(@"should have the correct location", ^{
                         fakeAdAlertManager.location.coordinate.latitude should equal(interstitial.location.coordinate.latitude);
                         fakeAdAlertManager.location.coordinate.longitude should equal(interstitial.location.coordinate.longitude);
                     });
-
+                    
                     it(@"should have the correct ad configuration", ^{
                         fakeAdAlertManager.adConfiguration should equal(configuration);
                     });
                 });
             });
-
+            
             context(@"and the user tries to load again", ^{ itShouldBehaveLike(anInterstitialThatHasAlreadyLoaded); });
 
             context(@"when a modal viewcontroller is presented over the ad and then dismissed", ^{
@@ -158,7 +158,7 @@ describe(@"MPHTMLInterstitialIntegrationSuite", ^{
                 });
 
                 it(@"should not track an extra impression", ^{
-                    fakeProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations.count should equal(1);
+                    fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations.count should equal(1);
                 });
 
                 it(@"should not send any messages to the delegate", ^{

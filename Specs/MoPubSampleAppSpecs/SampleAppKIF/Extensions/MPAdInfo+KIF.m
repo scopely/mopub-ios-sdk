@@ -28,7 +28,7 @@
              [MPAdInfo infoWithTitle:@"Click-to-Safari Link MRAID" ID:@"d133d07aa80a4bf7a77d3a306b6dd3b3" type:MPAdInfoBanner],
              [MPAdInfo infoWithTitle:@"HTML MRECT Banner Ad" ID:@"agltb3B1Yi1pbmNyDQsSBFNpdGUYqKO5CAw" type:MPAdInfoMRectBanner],
              [MPAdInfo infoWithTitle:@"Malicious MRAID Banner Ad storePicture" ID:@"2db7c5aabc79406ea0c8fd20f0643f66" type:MPAdInfoBanner],
-             [MPAdInfo infoWithTitle:@"Malicious MRAID Banner Ad playVideo" ID:@"38dea1b00f1e456ea570121a2d178ed3" type:MPAdInfoBanner]
+             [MPAdInfo infoWithTitle:@"Malicious MRAID Banner Ad playVideo" ID:@"38dea1b00f1e456ea570121a2d178ed3" type:MPAdInfoBanner],
              ];
 }
 
@@ -46,7 +46,18 @@
              [MPAdInfo infoWithTitle:@"MRAID Interstitial" ID:@"3aba0056add211e281c11231392559e4" type:MPAdInfoInterstitial],
              [MPAdInfo infoWithTitle:@"Vungle Interstitial" ID:@"20e01fce81f611e295fa123138070049" type:MPAdInfoInterstitial],
              [MPAdInfo infoWithTitle:@"AdColony Interstitial" ID:@"e4b75cdda0544e59b668afe6b764c0a1" type:MPAdInfoInterstitial],
-             [MPAdInfo infoWithTitle:@"MRAID Interstitial auto playVideo" ID:@"644e65af01d142b8bb238d2dad0dd441" type:MPAdInfoInterstitial]
+             [MPAdInfo infoWithTitle:@"MRAID Interstitial auto playVideo" ID:@"644e65af01d142b8bb238d2dad0dd441" type:MPAdInfoInterstitial],
+
+             ];
+}
+
++ (NSArray *)nativeAds
+{
+    return @[
+             [MPAdInfo infoWithTitle:@"Native Ad" ID:@"8ce943e5b65a4689b434d72736dbed02" type:MPAdInfoNative],
+             [MPAdInfo infoWithTitle:@"InMobi Native Ad" ID:@"7e8c0239e49441a28de13b2b11d5282e" type:MPAdInfoNative],
+             [MPAdInfo infoWithTitle:@"Facebook Native Ad" ID:@"79ca92da81cb4e7c87f697b26c06700d" type:MPAdInfoNative],
+             [MPAdInfo infoWithTitle:@"Native Ad (TableView Example)" ID:@"8ce943e5b65a4689b434d72736dbed02" type:MPAdInfoNativeInTableView]
              ];
 }
 

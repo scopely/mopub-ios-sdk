@@ -8,7 +8,7 @@
 #import "MPSpecHelper.h"
 #import "MPInterstitialAdController.h"
 #import "GSSDKInfo.h"
-#import "MMSDK.h"
+#import <MillennialMedia/MMSDK.h>
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
@@ -16,6 +16,7 @@ using namespace Cedar::Doubles;
 static BOOL beforeAllDidRun = NO;
 
 FakeMPInstanceProvider *fakeProvider = nil;
+FakeMPCoreInstanceProvider *fakeCoreProvider = nil;
 
 void verify_fake_received_selectors(id<CedarDouble> fake, NSArray *selectors)
 {
@@ -52,6 +53,7 @@ void log_sent_messages(id<CedarDouble> fake)
     }
 
     fakeProvider = [[FakeMPInstanceProvider alloc] init];
+    fakeCoreProvider = [[FakeMPCoreInstanceProvider alloc] init];
 }
 
 + (void)afterEach

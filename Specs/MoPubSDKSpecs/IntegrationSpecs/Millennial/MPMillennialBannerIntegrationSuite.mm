@@ -38,7 +38,7 @@ describe(@"MPMillennialBannerIntegrationSuite", ^{
         configuration = [MPAdConfigurationFactory defaultBannerConfigurationWithHeaders:headers
                                                                              HTMLString:nil];
 
-        communicator = fakeProvider.lastFakeMPAdServerCommunicator;
+        communicator = fakeCoreProvider.lastFakeMPAdServerCommunicator;
         [communicator receiveConfiguration:configuration];
     });
 
@@ -54,16 +54,18 @@ describe(@"MPMillennialBannerIntegrationSuite", ^{
         beforeEach(^{
             [delegate reset_sent_messages];
             [fakeAd simulateLoadingAd];
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
         });
 
         it(@"should tell the delegate, show the ad, and track an impression (only once)", ^{
             verify_fake_received_selectors(delegate, @[@"adViewDidLoadAd:"]);
             banner.subviews should equal(@[fakeAd]);
             banner.adContentViewSize should equal(CGSizeMake(300, 250));
-            fakeProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations should equal(@[configuration]);
+            fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations should equal(@[configuration]);
 
             [fakeAd simulateLoadingAd];
-            fakeProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations should equal(@[configuration]);
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+            fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations should equal(@[configuration]);
         });
 
         context(@"when the user taps the ad", ^{
@@ -73,11 +75,11 @@ describe(@"MPMillennialBannerIntegrationSuite", ^{
             });
 
             it(@"should tell the delegate and track a click (just once)", ^{
-                verify_fake_received_selectors(delegate, @[@"willPresentModalViewForAd:"]);
-                fakeProvider.sharedFakeMPAnalyticsTracker.trackedClickConfigurations should equal(@[configuration]);
+                delegate should have_received(@selector(willPresentModalViewForAd:));
+                fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedClickConfigurations should equal(@[configuration]);
 
                 [fakeAd simulateUserTap];
-                fakeProvider.sharedFakeMPAnalyticsTracker.trackedClickConfigurations should equal(@[configuration]);
+                fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedClickConfigurations should equal(@[configuration]);
             });
 
             context(@"when the user dismisses the modal", ^{
@@ -91,11 +93,38 @@ describe(@"MPMillennialBannerIntegrationSuite", ^{
                 });
             });
         });
+
+        context(@"when the user taps and leaves the application after a modal", ^{
+            beforeEach(^{
+                [delegate reset_sent_messages];
+                [fakeAd simulateUserLeavingApplication:YES];
+            });
+
+            it(@"should tell the delegate", ^{
+                delegate should have_received(@selector(willPresentModalViewForAd:));
+                delegate should have_received(@selector(willLeaveApplicationFromAd:));
+                delegate should have_received(@selector(didDismissModalViewForAd:));
+            });
+        });
+
+        context(@"when the user taps and leaves the application without a modal", ^{
+            beforeEach(^{
+                [delegate reset_sent_messages];
+                [fakeAd simulateUserLeavingApplication:NO];
+            });
+
+            it(@"should tell the delegate", ^{
+                delegate should have_received(@selector(willPresentModalViewForAd:));
+                delegate should have_received(@selector(willLeaveApplicationFromAd:));
+                delegate should have_received(@selector(didDismissModalViewForAd:));
+            });
+        });
     });
 
     context(@"when the ad fails to load", ^{
         beforeEach(^{
             [fakeAd simulateFailingToLoad];
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
         });
 
         it(@"should start the waterfall", ^{

@@ -7,7 +7,7 @@
 
 #import "MPAnalyticsTracker.h"
 #import "MPAdConfiguration.h"
-#import "MPInstanceProvider.h"
+#import "MPCoreInstanceProvider.h"
 
 @interface MPAnalyticsTracker ()
 
@@ -38,7 +38,7 @@
 
 - (NSURLRequest *)requestForURL:(NSURL *)URL
 {
-    NSMutableURLRequest *request = [[MPInstanceProvider sharedProvider] buildConfiguredURLRequestWithURL:URL];
+    NSMutableURLRequest *request = [[MPCoreInstanceProvider sharedProvider] buildConfiguredURLRequestWithURL:URL];
     request.cachePolicy = NSURLRequestReloadIgnoringCacheData;
     return request;
 }

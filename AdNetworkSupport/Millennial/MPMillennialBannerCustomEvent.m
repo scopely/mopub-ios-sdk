@@ -6,11 +6,11 @@
 //
 
 #import "MPMillennialBannerCustomEvent.h"
-#import "MMAdView.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
-#import "MMRequest.h"
-#import "WBAdService+Internal.h"
+
+#import <MillennialMedia/MMAdView.h>
+#import <MillennialMedia/MMRequest.h>
 
 #define MM_SIZE_320x50    CGSizeMake(320, 50)
 #define MM_SIZE_300x250 CGSizeMake(300, 250)
@@ -46,6 +46,7 @@
 @property (nonatomic, retain) MMAdView *mmAdView;
 @property (nonatomic, assign) BOOL didTrackImpression;
 @property (nonatomic, assign) BOOL didTrackClick;
+@property (nonatomic, assign) BOOL didShowModal;
 @property (nonatomic, retain) MPMMCompletionBlockProxy *mmCompletionBlockProxy;
 
 - (void)onRequestCompletion:(BOOL)success;
@@ -80,7 +81,9 @@
     self = [super init];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(adWasTapped:) name:MillennialMediaAdWasTapped object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(modalWillAppear:) name:MillennialMediaAdModalWillAppear object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(modalDidDismiss:) name:MillennialMediaAdModalDidDismiss object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminateFromAd:) name:MillennialMediaAdWillTerminateApplication object:nil];
         self.mmCompletionBlockProxy = [[[MPMMCompletionBlockProxy alloc] init] autorelease];
         self.mmCompletionBlockProxy.event = self;
     }
@@ -132,7 +135,12 @@
 
     MPMMCompletionBlockProxy *proxy = self.mmCompletionBlockProxy;
     [self.mmAdView getAdWithRequest:request onCompletion:^(BOOL success, NSError *error) {
-        [proxy onRequestCompletion:success];
+        // In Millennial 5.2, request errors invoke the completion block on a background thread. This causes us
+        // to initialize the failover NSURLConnection on the background thread, resulting in the inability to
+        // receive callbacks from the connection.
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [proxy onRequestCompletion:success];
+        });
     }];
 }
 
@@ -176,7 +184,7 @@
             [self.delegate trackClick];
             self.didTrackClick = YES;
         }
-        
+
         // XXX: As of Millennial SDK version 5.1.0, a "tapped" notification for an MMAdView is
         // accompanied by the presentation of a modal loading indicator (spinner). Although this
         // spinner is modal, the Millennial SDK does not appropriately fire the
@@ -189,8 +197,33 @@
         // However, in 5.1.0, MMAdView causes crashes if deallocated while its spinner is on-screen.
         // Thus, we must call [self.delegate bannerCustomEventWillBeginAction:self] as soon as we
         // detect that the spinner has been presented.
-        
+
         [self.delegate bannerCustomEventWillBeginAction:self];
+    }
+}
+
+- (void)applicationWillTerminateFromAd:(NSNotification *)notification
+{
+    // no userinfo available for this notification, so we do our best to ensure that this notification
+    // is from us
+    if (self.didTrackClick) {
+        MPLogInfo(@"Millennial banner will leave application");
+        [self.delegate bannerCustomEventWillLeaveApplication:self];
+
+        // If this banner causes the user to leave the application without ever displaying a modal,
+        // we consider the banner action to be finished. We need to inform the delegate of this, to
+        // maintain the contract that every "begin action" is paired with an "end action".
+        if (!self.didShowModal) {
+            [self.delegate bannerCustomEventDidFinishAction:self];
+        }
+    }
+}
+
+- (void)modalWillAppear:(NSNotification *)notification
+{
+    if ([[notification.userInfo objectForKey:MillennialMediaAdObjectKey] isEqual:self.mmAdView]) {
+        MPLogInfo(@"Millennial banner will present modal");
+        self.didShowModal = YES;
     }
 }
 

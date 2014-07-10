@@ -10,7 +10,7 @@
 #import "MPConstants.h"
 #import "MPGlobal.h"
 #import "MPIdentityProvider.h"
-#import "MPInstanceProvider.h"
+#import "MPCoreInstanceProvider.h"
 
 #define MOPUB_CONVERSION_DEFAULTS_KEY @"com.mopub.conversion"
 
@@ -50,7 +50,7 @@
 {
     if (![[NSUserDefaults standardUserDefaults] boolForKey:MOPUB_CONVERSION_DEFAULTS_KEY]) {
         CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"Tracking conversion");
-        NSMutableURLRequest *request = [[MPInstanceProvider sharedProvider] buildConfiguredURLRequestWithURL:[self URLForAppID:appID]];
+        NSMutableURLRequest *request = [[MPCoreInstanceProvider sharedProvider] buildConfiguredURLRequestWithURL:[self URLForAppID:appID]];
         self.responseData = [NSMutableData data];
         [NSURLConnection connectionWithRequest:request delegate:self];
     }

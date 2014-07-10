@@ -26,11 +26,11 @@ describe(@"MPHTMLBannerIntegrationSuite", ^{
 
     beforeEach(^{
         FakeMPAdAlertGestureRecognizer *fakeGestureRecognizer = [[FakeMPAdAlertGestureRecognizer alloc] init];
-        fakeProvider.fakeAdAlertGestureRecognizer = fakeGestureRecognizer;
-
+        fakeCoreProvider.fakeAdAlertGestureRecognizer = fakeGestureRecognizer;
+        
         fakeAdAlertManager = [[[FakeMPAdAlertManager alloc] init] autorelease];
-        fakeProvider.fakeAdAlertManager = fakeAdAlertManager;
-
+        fakeCoreProvider.fakeAdAlertManager = fakeAdAlertManager;
+        
         presentingController = [[[UIViewController alloc] init] autorelease];
         delegate = nice_fake_for(@protocol(ChocolateMPAdViewDelegate));
         delegate stub_method(@selector(viewControllerForPresentingModalView)).and_return(presentingController);
@@ -45,7 +45,7 @@ describe(@"MPHTMLBannerIntegrationSuite", ^{
         banner.delegate = delegate;
         [banner loadAd];
 
-        communicator = fakeProvider.lastFakeMPAdServerCommunicator;
+        communicator = fakeCoreProvider.lastFakeMPAdServerCommunicator;
         [communicator receiveConfiguration:configuration];
     });
 
@@ -74,7 +74,7 @@ describe(@"MPHTMLBannerIntegrationSuite", ^{
             verify_fake_received_selectors(delegate, @[@"adViewDidLoadAd:"]);
             banner.subviews should equal(@[fakeAd]);
             banner.adContentViewSize should equal(fakeAd.frame.size);
-            fakeProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations should be_empty;
+            fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations should be_empty;
         });
 
         describe(@"MPAdAlertManager", ^{
@@ -82,22 +82,22 @@ describe(@"MPHTMLBannerIntegrationSuite", ^{
                 beforeEach(^{
                     [fakeAdAlertManager simulateGestureRecognized];
                 });
-
+                
                 it(@"should have the correct ad unit id", ^{
                     fakeAdAlertManager.adUnitId should equal(banner.adUnitId);
                 });
-
+                
                 it(@"should have the correct location", ^{
                     fakeAdAlertManager.location.coordinate.latitude should equal(banner.location.coordinate.latitude);
                     fakeAdAlertManager.location.coordinate.longitude should equal(banner.location.coordinate.longitude);
                 });
-
+                
                 it(@"should have the correct ad configuration", ^{
                     fakeAdAlertManager.adConfiguration should equal(configuration);
                 });
             });
         });
-
+        
         context(@"when the user taps the ad", ^{
             beforeEach(^{
                 [delegate reset_sent_messages];
@@ -106,7 +106,7 @@ describe(@"MPHTMLBannerIntegrationSuite", ^{
 
             it(@"should tell the delegate, but *not* track a click", ^{
                 verify_fake_received_selectors(delegate, @[@"willPresentModalViewForAd:"]);
-                fakeProvider.sharedFakeMPAnalyticsTracker.trackedClickConfigurations should be_empty;
+                fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedClickConfigurations should be_empty;
             });
 
             context(@"when the user dismisses the modal", ^{

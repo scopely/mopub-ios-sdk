@@ -22,7 +22,7 @@ describe(@"MPAdAlertManager", ^{
     
     beforeEach(^{
         FakeMPAdAlertGestureRecognizer *fakeGestureRecognizer = [[[FakeMPAdAlertGestureRecognizer alloc] init] autorelease];
-        fakeProvider.fakeAdAlertGestureRecognizer = fakeGestureRecognizer;
+        fakeCoreProvider.fakeAdAlertGestureRecognizer = fakeGestureRecognizer;
         
         UIViewController *presentingController = [[[UIViewController alloc] init] autorelease];
         

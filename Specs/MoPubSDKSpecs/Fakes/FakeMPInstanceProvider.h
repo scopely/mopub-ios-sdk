@@ -29,6 +29,7 @@
 #import "FakeMPAdAlertManager.h"
 #import "FakeMPAdAlertGestureRecognizer.h"
 #import "FakeMRAdView.h"
+#import <FBAudienceNetwork/FBAudienceNetwork.h>
 #import <Foundation/Foundation.h>
 
 @class MRJavaScriptEventEmitter;
@@ -42,9 +43,6 @@
 @class MRAdView;
 
 @interface FakeMPInstanceProvider : MPInstanceProvider
-
-#pragma mark - Fetching Ads
-@property (nonatomic, assign) FakeMPAdServerCommunicator *lastFakeMPAdServerCommunicator;
 
 #pragma mark - Banners
 @property (nonatomic, assign) MPBaseBannerAdapter *fakeBannerAdapter;
@@ -61,10 +59,6 @@
 @property (nonatomic, assign) MPAdWebView *fakeMPAdWebView;
 @property (nonatomic, assign) MPAdWebViewAgent *fakeMPAdWebViewAgent;
 
-#pragma mark - URL Handling
-@property (nonatomic, assign) MPURLResolver *fakeMPURLResolver;
-@property (nonatomic, assign) MPAdDestinationDisplayAgent *fakeMPAdDestinationDisplayAgent;
-
 #pragma mark - MRAID
 @property (nonatomic, assign) MRAdView *fakeMRAdView;
 @property (nonatomic, assign) MRBundleManager *fakeMRBundleManager;
@@ -78,19 +72,6 @@
 @property (nonatomic, assign) MRVideoPlayerManager *fakeMRVideoPlayerManager;
 @property (nonatomic, assign) MPMoviePlayerViewController *fakeMoviePlayerViewController;
 
-#pragma mark - Utilities
-@property (nonatomic, assign) FakeMPAdAlertManager *fakeAdAlertManager;
-@property (nonatomic, assign) FakeMPAdAlertGestureRecognizer *fakeAdAlertGestureRecognizer;
-@property (nonatomic, assign) FakeOperationQueue *fakeOperationQueue;
-@property (nonatomic, assign) FakeMPReachability *fakeMPReachability;
-@property (nonatomic, assign) NSDictionary *fakeCarrierInfo;
-
-- (NSString *)userAgent;
-- (FakeMPAnalyticsTracker *)sharedFakeMPAnalyticsTracker;
-- (void)advanceMPTimers:(NSTimeInterval)timeInterval;
-- (NSMutableArray *)fakeTimers;
-- (FakeMPTimer *)lastFakeMPTimerWithSelector:(SEL)selector;
-
 #pragma mark - Third Party Integrations
 
 #pragma mark iAd
@@ -99,6 +80,10 @@
 
 #pragma mark Chartboost
 @property (nonatomic, assign) Chartboost *fakeChartboost;
+
+#pragma mark Facebook
+@property (nonatomic, assign) FBAdView *fakeFBAdView;
+@property (nonatomic, assign) FBInterstitialAd *fakeFBInterstitialAd;
 
 #pragma mark Google Ad Mob
 @property (nonatomic, assign) GADRequest *fakeGADBannerRequest;

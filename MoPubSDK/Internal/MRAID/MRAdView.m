@@ -13,9 +13,11 @@
 #import "MRCommand.h"
 #import "MRProperty.h"
 #import "MPInstanceProvider.h"
+#import "MPCoreInstanceProvider.h"
 #import "MRCalendarManager.h"
 #import "MRJavaScriptEventEmitter.h"
 #import "MRBundleManager.h"
+#import "NSURL+MPAdditions.h"
 
 static NSString *const kExpandableCloseButtonImageName = @"MPCloseButtonX.png";
 static NSString *const kMraidURLScheme = @"mraid";
@@ -122,7 +124,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 
         [_closeButton addTarget:_displayController action:@selector(closeButtonPressed) forControlEvents:UIControlEventTouchUpInside];
 
-        _destinationDisplayAgent = [[[MPInstanceProvider sharedProvider]
+        _destinationDisplayAgent = [[[MPCoreInstanceProvider sharedProvider]
                                     buildMPAdDestinationDisplayAgentWithDelegate:self] retain];
         _calendarManager = [[[MPInstanceProvider sharedProvider]
                              buildMRCalendarManagerWithDelegate:self] retain];
@@ -132,15 +134,14 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
                                 buildMRVideoPlayerManagerWithDelegate:self] retain];
         _jsEventEmitter = [[[MPInstanceProvider sharedProvider]
                              buildMRJavaScriptEventEmitterWithWebView:_webView logType:logType] retain];
-
-        self.adAlertManager = [[MPInstanceProvider sharedProvider] buildMPAdAlertManagerWithDelegate:self];
+        self.adAlertManager = [[MPCoreInstanceProvider sharedProvider] buildMPAdAlertManagerWithDelegate:self];
 
         self.adType = MRAdViewAdTypeDefault;
-
+        
         self.tapRecognizer = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)] autorelease];
         [self addGestureRecognizer:self.tapRecognizer];
         self.tapRecognizer.delegate = self;
-
+        
         // XXX jren: inline videos seem to delay tap gesture recognition so that we get the click through
         // request in the webview delegate BEFORE we get the gesture recognizer triggered callback. For now
         // excuse all MRAID interstitials from the user interaction requirement.
@@ -267,12 +268,12 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (BOOL)safeHandleDisplayDestinationForURL:(NSURL *)URL
 {
     BOOL handled = NO;
-
+    
     if (self.userTappedWebView) {
         handled = YES;
         [self.destinationDisplayAgent displayDestinationForURL:URL];
     }
-
+    
     return handled;
 }
 
@@ -295,7 +296,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (void)loadRequest:(NSURLRequest *)request
 {
     [self initAdAlertManager];
-
+    
     NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate:self];
     if (connection) {
         self.data = [NSMutableData data];
@@ -305,7 +306,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (void)loadHTMLString:(NSString *)string baseURL:(NSURL *)baseURL
 {
     [self initAdAlertManager];
-
+    
     // Bail out if we can't locate mraid.js.
     if (![self MRAIDScriptPath]) {
         [self adDidFailToLoad];
@@ -400,9 +401,9 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
         cmd.delegate = self;
         success = [cmd executeWithParams:parameters];
     }
-
+    
     [self.jsEventEmitter fireNativeCommandCompleteEvent:command];
-
+    
     if (!success) {
         CoreLogType(WBLogLevelError, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Unknown command: %@", command);
         [self.jsEventEmitter fireErrorEventForAction:command withMessage:@"Specified command is not implemented."];
@@ -456,7 +457,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (void)mrCommand:(MRCommand *)command expandWithParams:(NSDictionary *)params
 {
     id urlValue = [params objectForKey:@"url"];
-
+    
     [self.displayController expandToFrame:CGRectFromString([params objectForKey:@"expandToFrame"])
                                   withURL:(urlValue == [NSNull null]) ? nil : urlValue
                            useCustomClose:[[params objectForKey:@"useCustomClose"] boolValue]
@@ -509,6 +510,9 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     } else if ([scheme isEqualToString:kMoPubURLScheme]) {
         [self performActionForMoPubSpecificURL:url];
         return NO;
+    } else if ([url mp_hasTelephoneScheme] || [url mp_hasTelephonePromptScheme]) {
+        [self safeHandleDisplayDestinationForURL:url];
+        return NO;
     } else if ([scheme isEqualToString:@"ios-log"]) {
         [urlString replaceOccurrencesOfString:@"%20"
                                    withString:@" "
@@ -540,7 +544,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     if (_isLoading) {
         _isLoading = NO;
         [self initializeJavascriptState];
-
+        
         switch (self.adType) {
             case MRAdViewAdTypeDefault:
                 [self adDidLoad];

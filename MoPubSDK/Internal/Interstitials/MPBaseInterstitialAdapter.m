@@ -10,7 +10,7 @@
 #import "MPAdConfiguration.h"
 #import "MPGlobal.h"
 #import "MPAnalyticsTracker.h"
-#import "MPInstanceProvider.h"
+#import "MPCoreInstanceProvider.h"
 #import "MPTimer.h"
 #import "MPConstants.h"
 
@@ -78,12 +78,11 @@
     
     if(timeInterval > 0)
     {
-        self.timeoutTimer = [[MPInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
+        self.timeoutTimer = [[MPCoreInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
                                                                                        target:self
                                                                                      selector:@selector(timeout)
                                                                                       repeats:NO
                                                                                       logType:WBLogTypeAdFullPage];
-
         [self.timeoutTimer scheduleNow];
     }
 }
@@ -110,12 +109,12 @@
 
 - (void)trackImpression
 {
-    [[[MPInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackImpressionForConfiguration:self.configuration];
+    [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackImpressionForConfiguration:self.configuration];
 }
 
 - (void)trackClick
 {
-    [[[MPInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackClickForConfiguration:self.configuration];
+    [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackClickForConfiguration:self.configuration];
 }
 
 @end

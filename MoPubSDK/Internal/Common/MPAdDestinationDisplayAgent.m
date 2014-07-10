@@ -6,8 +6,9 @@
 //
 
 #import "MPAdDestinationDisplayAgent.h"
-#import "MPInstanceProvider.h"
+#import "MPCoreInstanceProvider.h"
 #import "MPLastResortDelegate.h"
+#import "NSURL+MPAdditions.h"
 
 @interface MPAdDestinationDisplayAgent ()
 
@@ -20,6 +21,7 @@
 #endif
 
 @property (nonatomic, retain) MPAdBrowserController *browserController;
+@property (nonatomic, retain) MPTelephoneConfirmationController *telephoneConfirmationController;
 
 - (void)presentStoreKitControllerWithItemIdentifier:(NSString *)identifier fallbackURL:(NSURL *)URL;
 - (void)hideOverlay;
@@ -40,7 +42,7 @@
 {
     MPAdDestinationDisplayAgent *agent = [[[MPAdDestinationDisplayAgent alloc] init] autorelease];
     agent.delegate = delegate;
-    agent.resolver = [[MPInstanceProvider sharedProvider] buildMPURLResolver];
+    agent.resolver = [[MPCoreInstanceProvider sharedProvider] buildMPURLResolver];
     agent.overlayView = [[[MPProgressOverlayView alloc] initWithDelegate:agent] autorelease];
     return agent;
 }
@@ -49,6 +51,7 @@
 {
     [self dismissAllModalContent];
 
+    self.telephoneConfirmationController = nil;
     self.overlayView.delegate = nil;
     self.overlayView = nil;
     self.resolver.delegate = nil;
@@ -118,10 +121,29 @@
 - (void)openURLInApplication:(NSURL *)URL
 {
     [self hideOverlay];
-    [self.delegate displayAgentWillLeaveApplication];
 
-    [[UIApplication sharedApplication] openURL:URL];
-    self.isLoadingDestination = NO;
+    if ([URL mp_hasTelephoneScheme] || [URL mp_hasTelephonePromptScheme]) {
+        [self interceptTelephoneURL:URL];
+    } else {
+        [self.delegate displayAgentWillLeaveApplication];
+        [[UIApplication sharedApplication] openURL:URL];
+        self.isLoadingDestination = NO;
+    }
+}
+
+- (void)interceptTelephoneURL:(NSURL *)URL
+{
+    __block MPAdDestinationDisplayAgent *blockSelf = self;
+    self.telephoneConfirmationController = [[[MPTelephoneConfirmationController alloc] initWithURL:URL clickHandler:^(NSURL *targetTelephoneURL, BOOL confirmed) {
+        if (confirmed) {
+            [blockSelf.delegate displayAgentWillLeaveApplication];
+            [[UIApplication sharedApplication] openURL:targetTelephoneURL];
+        }
+        blockSelf.isLoadingDestination = NO;
+        [blockSelf.delegate displayAgentDidDismissModal];
+    }] autorelease];
+
+    [self.telephoneConfirmationController show];
 }
 
 - (void)failedToResolveURLWithError:(NSError *)error

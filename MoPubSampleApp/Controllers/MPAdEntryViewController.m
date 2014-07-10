@@ -12,6 +12,7 @@
 #import "MPLeaderboardBannerAdDetailViewController.h"
 #import "MPInterstitialAdDetailViewController.h"
 #import "MPAdPersistenceManager.h"
+#import "MPNativeAdDetailViewController.h"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -47,7 +48,7 @@
     if (self) {
         self.initialAdInfo = adInfo;
         self.title = (adInfo.title != nil) ? adInfo.title : @"New Ad";
-
+        
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_7_0
         if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)]) {
             self.edgesForExtendedLayout = UIRectEdgeNone;
@@ -63,7 +64,7 @@
     info.title = (self.adNameTextField.text.length > 0) ? self.adNameTextField.text : [[MPAdInfo supportedAdTypeNames] objectAtIndex:self.selectedAdType];
     info.type = self.selectedAdType;
     info.ID = self.adUnitTextField.text;
-
+    
     return info;
 }
 
@@ -72,9 +73,9 @@
 - (void)showAd
 {
     UIViewController *detailViewController = nil;
-
+    
     MPAdInfo *info = [self adInfoForCurrentInput];
-
+    
     switch (info.type) {
         case MPAdInfoBanner:
             detailViewController = [[MPBannerAdDetailViewController alloc] initWithAdInfo:info];
@@ -88,10 +89,13 @@
         case MPAdInfoInterstitial:
             detailViewController = [[MPInterstitialAdDetailViewController alloc] initWithAdInfo:info];
             break;
+        case MPAdInfoNative:
+            detailViewController = [[MPNativeAdDetailViewController alloc] initWithAdInfo:info];
+            break;
         default:
             break;
     }
-
+    
     if (detailViewController) {
         [self.navigationController pushViewController:detailViewController animated:YES];
     }
@@ -100,7 +104,7 @@
 - (IBAction)showAndSaveBarButtonClicked:(id)sender
 {
     [[MPAdPersistenceManager sharedManager] addSavedAd:[self adInfoForCurrentInput]];
-
+    
     [self showAd];
 }
 
@@ -127,10 +131,10 @@
 - (void)animateInPicker
 {
     [self.adUnitTextField endEditing:YES];
-
+    
     self.pickerDoneButton.alpha = self.adTypePicker.alpha = self.pickerToolbar.alpha = 0;
     self.pickerDoneButton.hidden = self.adTypePicker.hidden = self.pickerToolbar.hidden = NO;
-
+    
     [UIView animateWithDuration:0.2
                      animations:^{
                          self.pickerDoneButton.alpha = 0.5;
@@ -169,7 +173,7 @@
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     [textField endEditing:YES];
-
+    
     return YES;
 }
 
@@ -208,20 +212,20 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    
     self.selectedAdType = (self.initialAdInfo != nil) ? self.initialAdInfo.type : MPAdInfoBanner;
     self.adUnitTextField.text = self.initialAdInfo.ID;
     self.adNameTextField.text = self.initialAdInfo.title;
-
+    
     self.pickerDoneButton.hidden = self.adTypePicker.hidden = YES;
-
+   
     // add a border around this button on iOS 7
     if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0")) {
         self.adTypeButton.layer.borderWidth = 1.0f;
         self.adTypeButton.layer.cornerRadius = 10.0f;
         self.adTypeButton.layer.borderColor = [UIColor colorWithRed:63 / 255.0f green:117 / 255.0f blue:1.0f alpha:1.0f].CGColor;
     }
-
+    
     [self updateActionButtonStates];
 }
 

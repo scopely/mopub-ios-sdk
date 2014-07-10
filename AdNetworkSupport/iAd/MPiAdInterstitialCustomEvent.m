@@ -107,7 +107,6 @@
 - (void)interstitialAdActionDidFinish:(ADInterstitialAd *)interstitialAd
 {
     CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"iAd interstitial did finish");
-
     [self interstitialAdDismissed];
 }
 

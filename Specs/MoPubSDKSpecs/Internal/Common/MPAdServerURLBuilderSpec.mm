@@ -2,6 +2,7 @@
 #import "MPConstants.h"
 #import "MPIdentityProvider.h"
 #import "MPGlobal.h"
+#import "TWTweetComposeViewController+MPSpecs.h"
 #import <CoreLocation/CoreLocation.h>
 
 using namespace Cedar::Matchers;
@@ -177,8 +178,8 @@ describe(@"MPAdServerURLBuilder", ^{
     });
 
     it(@"should provide connectivity information", ^{
-        fakeProvider.fakeMPReachability = [[[FakeMPReachability alloc] init] autorelease];
-        FakeMPReachability *fakeMPReachability = fakeProvider.fakeMPReachability;
+        fakeCoreProvider.fakeMPReachability = [[[FakeMPReachability alloc] init] autorelease];
+        FakeMPReachability *fakeMPReachability = fakeCoreProvider.fakeMPReachability;
         fakeMPReachability.hasWifi = YES;
 
         URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
@@ -220,7 +221,7 @@ describe(@"MPAdServerURLBuilder", ^{
             @"mobileNetworkCode" : @"310",
             @"mobileCountryCode" : @"410"
         };
-        fakeProvider.fakeCarrierInfo = fakeCarrierInfo;
+        fakeCoreProvider.fakeCarrierInfo = fakeCarrierInfo;
 
         URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
                                            keywords:nil
@@ -238,6 +239,78 @@ describe(@"MPAdServerURLBuilder", ^{
                                            location:nil
                                             testing:YES];
         URL.absoluteString should contain([NSString stringWithFormat:@"&dn=%@", [[[UIDevice currentDevice] hardwareDeviceName] URLEncodedString]]);
+    });
+
+    describe(@"Twitter Availability", ^{
+        beforeEach(^{
+            [fakeCoreProvider resetTwitterAppInstallCheck];
+            [[UIApplication sharedApplication] setTwitterInstalled:NO];
+            [TWTweetComposeViewController setNativeTwitterAvailable:NO];
+        });
+
+        it(@"should not pass a query if no twitter is available", ^{
+            URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
+                                               keywords:nil
+                                               location:nil
+                                                testing:YES];
+            URL.absoluteString should_not contain([NSString stringWithFormat:@"&ts="]);
+        });
+
+        it(@"should create query for only having twitter app installed", ^{
+            [[UIApplication sharedApplication] setTwitterInstalled:YES];
+            URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
+                                               keywords:nil
+                                               location:nil
+                                                testing:YES];
+            URL.absoluteString should contain([NSString stringWithFormat:@"&ts=1"]);
+        });
+
+        it(@"should create query for only having native twitter account(s)", ^{
+            [TWTweetComposeViewController setNativeTwitterAvailable:YES];
+            URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
+                                               keywords:nil
+                                               location:nil
+                                                testing:YES];
+            URL.absoluteString should contain([NSString stringWithFormat:@"&ts=2"]);
+
+        });
+
+        it(@"should create query for having both twitter app and native account(s)", ^{
+            [[UIApplication sharedApplication] setTwitterInstalled:YES];
+            [TWTweetComposeViewController setNativeTwitterAvailable:YES];
+            URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
+                                               keywords:nil
+                                               location:nil
+                                                testing:YES];
+            URL.absoluteString should contain([NSString stringWithFormat:@"&ts=3"]);
+        });
+    });
+
+    describe(@"desired assets", ^{
+        it(@"should append desired ad assets as a query parameter", ^{
+            NSArray *assets = [NSArray arrayWithObjects:@"a", @"b", @"c", nil];
+            URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
+                                               keywords:nil
+                                               location:nil
+                                   versionParameterName:@"nsv"
+                                                version:MP_SDK_VERSION
+                                                testing:NO
+                                          desiredAssets:assets];
+
+            URL.absoluteString should contain(@"&assets=a,b,c");
+        });
+
+        it(@"should append not desired ad assets as a query parameter if none are set", ^{
+            URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
+                                               keywords:nil
+                                               location:nil
+                                   versionParameterName:@"nsv"
+                                                version:MP_SDK_VERSION
+                                                testing:NO
+                                          desiredAssets:nil];
+
+            URL.absoluteString should_not contain(@"&assets");
+        });
     });
 });
 

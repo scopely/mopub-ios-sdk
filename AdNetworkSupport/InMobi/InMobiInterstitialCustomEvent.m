@@ -2,7 +2,7 @@
 //  InMobiInterstitialCustomEvent.m
 //  MoPub
 //
-//  Copyright (c) 2012 MoPub, Inc. All rights reserved.
+//  Copyright (c) 2013 MoPub, Inc. All rights reserved.
 //
 
 #import "InMobiInterstitialCustomEvent.h"

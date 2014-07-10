@@ -22,11 +22,6 @@
     return lastResortDelegate;
 }
 
-- (void)eventEditViewController:(EKEventEditViewController *)controller didCompleteWithAction:(EKEventEditViewAction)action
-{
-    [controller dismissViewControllerAnimated:MP_ANIMATED completion:nil];
-}
-
 - (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(NSInteger)result error:(NSError*)error
 {
     [controller dismissViewControllerAnimated:MP_ANIMATED completion:nil];

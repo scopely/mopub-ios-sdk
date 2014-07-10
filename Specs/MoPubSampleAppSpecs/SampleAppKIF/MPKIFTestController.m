@@ -17,7 +17,10 @@
 #import "KIFTestScenario+Vungle.h"
 #import "KIFTestScenario+AdColony.h"
 #import "KIFTestScenario+iAd.h"
+#import "KIFTestScenario+Native.h"
+#import "KIFTestScenario+Facebook.h"
 #import "MPSampleAppTestScenario.h"
+#import "InMobi.h"
 
 @implementation MPKIFTestController
 
@@ -29,7 +32,6 @@
 - (void)initializeScenarios
 {
 //    [self addScenario:[MPSampleAppTestScenario scenarioToWarmUpAdUnits]];
-
     [KIFTestStep setDefaultTimeout:20];
 
     // banners
@@ -46,6 +48,14 @@
     [self addScenario:[KIFTestScenario scenarioForMRAIDAdThatTriesToStoreAPictureWithoutUserInteraction]];
     [self addScenario:[KIFTestScenario scenarioForMRAIDAdThatTriesToPlayAVideoWithoutUserInteraction]];
     [self addScenario:[KIFTestScenario scenarioForIAdBanner]];
+
+    // native
+    [self addScenario:[KIFTestScenario scenarioForNativeAd]];
+    [self addScenario:[KIFTestScenario scenarioForInMobiNativeAd]];
+    [self addScenario:[KIFTestScenario scenarioForFacebookNativeAd]];
+
+    //automated tap on ad tableviewcell not working
+//    [self addScenario:[KIFTestScenario scenarioForNativeAdInTableView]];
 
     // interstitials
     [self addScenario:[KIFTestScenario scenarioForInterstitialAdWithStoreKitLink]];

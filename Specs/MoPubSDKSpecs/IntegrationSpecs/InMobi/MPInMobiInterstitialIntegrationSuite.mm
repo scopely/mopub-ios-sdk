@@ -18,7 +18,7 @@ describe(@"MPInMobiInterstitialIntegrationSuite", ^{
 
     beforeEach(^{
         [InMobi initialize:@"YOUR_INMOBI_APP_ID"];
-
+        
         delegate = nice_fake_for(@protocol(MPInterstitialAdControllerDelegate));
 
         interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:@"inmobi_interstitial"];
@@ -35,7 +35,7 @@ describe(@"MPInMobiInterstitialIntegrationSuite", ^{
 
         // request an Ad
         [interstitial loadAd];
-        communicator = fakeProvider.lastFakeMPAdServerCommunicator;
+        communicator = fakeCoreProvider.lastFakeMPAdServerCommunicator;
         communicator.loadedURL.absoluteString should contain(@"inmobi_interstitial");
 
         // prepare the fake and tell the injector about it
@@ -56,9 +56,7 @@ describe(@"MPInMobiInterstitialIntegrationSuite", ^{
         it(@"should configure InMobi properly and start fetching the interstitial", ^{
             inMobi.appId should equal(@"YOUR_INMOBI_APP_ID");
         });
-
-        it(@"should set the location using the InMobi class method", PENDING);
-
+        
         it(@"should not tell the delegate anything, nor should it be ready", ^{
             delegate.sent_messages should be_empty;
             interstitial.ready should equal(NO);
@@ -88,14 +86,14 @@ describe(@"MPInMobiInterstitialIntegrationSuite", ^{
                 beforeEach(^{
                     inMobi.willPresentSuccessfully = YES;
                     [delegate reset_sent_messages];
-                    fakeProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations.count should equal(0);
+                    fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations.count should equal(0);
                     [interstitial showFromViewController:presentingController];
                 });
 
                 it(@"should track an impression and tell the custom event to show", ^{
                     verify_fake_received_selectors(delegate, @[@"interstitialWillAppear:", @"interstitialDidAppear:"]);
                     inMobi.didPresent should equal(YES);
-                    fakeProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations.count should equal(1);
+                    fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations.count should equal(1);
                 });
 
                 context(@"when the user interacts with the ad", ^{
@@ -105,10 +103,10 @@ describe(@"MPInMobiInterstitialIntegrationSuite", ^{
 
                     it(@"should track only one click, no matter how many interactions there are, and shouldn't tell the delegate anything", ^{
                         [inMobi simulateUserTap];
-                        fakeProvider.sharedFakeMPAnalyticsTracker.trackedClickConfigurations.count should equal(1);
+                        fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedClickConfigurations.count should equal(1);
 
                         [inMobi simulateUserTap];
-                        fakeProvider.sharedFakeMPAnalyticsTracker.trackedClickConfigurations.count should equal(1);
+                        fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedClickConfigurations.count should equal(1);
 
                         delegate.sent_messages.count should equal(0);
                     });
@@ -138,12 +136,12 @@ describe(@"MPInMobiInterstitialIntegrationSuite", ^{
                 beforeEach(^{
                     inMobi.willPresentSuccessfully = NO;
                     [delegate reset_sent_messages];
-                    fakeProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations.count should equal(0);
+                    fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations.count should equal(0);
                     [interstitial showFromViewController:presentingController];
                 });
 
                 it(@"should not track any impressions", ^{
-                    fakeProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations should be_empty;
+                    fakeCoreProvider.sharedFakeMPAnalyticsTracker.trackedImpressionConfigurations should be_empty;
                 });
 
                 it(@"should not tell InMobi to show", ^{
