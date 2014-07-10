@@ -7,7 +7,6 @@
 
 #import "MPTableViewCellImpressionTracker.h"
 #import "MPNativeAd+Internal.h"
-#import "MPLogging.h"
 #import "MPNativeAdRendering.h"
 #import "UITableViewCell+MPNativeAd.h"
 
@@ -75,9 +74,9 @@
         [adObject willAttachToView:cell];
         [(id<MPNativeAdRendering>)cell layoutAdAssets:adObject];
     } else {
-        MPLogWarn(@"A cell class (%@) passed to -adCellForAd:cellClass: does not conform to the "
-                  @"MPNativeAdRendering protocol. The resultant cell will not display any ad assets.",
-                  NSStringFromClass(cellClass));
+//        MPLogWarn(@"A cell class (%@) passed to -adCellForAd:cellClass: does not conform to the "
+//                  @"MPNativeAdRendering protocol. The resultant cell will not display any ad assets.",
+//                  NSStringFromClass(cellClass));
     }
 
     return cell;
