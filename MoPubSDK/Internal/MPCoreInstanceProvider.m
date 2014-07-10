@@ -15,7 +15,7 @@
 #import "MPAdDestinationDisplayAgent.h"
 #import "MPTimer.h"
 #import "MPAnalyticsTracker.h"
-
+#import <Twitter/Twitter.h>
 
 #define MOPUB_CARRIER_INFO_DEFAULTS_KEY @"com.mopub.carrierinfo"
 
@@ -234,27 +234,6 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     return (self.twitterDeepLinkStatus == MPTwitterDeepLinkEnabled);
 }
 
-+ (BOOL)deviceHasTwitterIntegration
-{
-    return !![MPCoreInstanceProvider tweetComposeVCClass];
-}
-
-+ (Class)tweetComposeVCClass
-{
-    return NSClassFromString(@"TWTweetComposeViewController");
-}
-
-- (BOOL)isNativeTwitterAccountPresent
-{
-    BOOL nativeTwitterAccountPresent = NO;
-    if ([MPCoreInstanceProvider deviceHasTwitterIntegration])
-    {
-        nativeTwitterAccountPresent = (BOOL)[[MPCoreInstanceProvider tweetComposeVCClass] performSelector:@selector(canSendTweet)];
-    }
-    
-    return nativeTwitterAccountPresent;
-}
-
 - (MPTwitterAvailability)twitterAvailabilityOnDevice
 {
     MPTwitterAvailability twitterAvailability = MPTwitterAvailabilityNone;
@@ -264,7 +243,7 @@ static MPCoreInstanceProvider *sharedProvider = nil;
         twitterAvailability |= MPTwitterAvailabilityApp;
     }
     
-    if ([self isNativeTwitterAccountPresent])
+    if ([SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter])
     {
         twitterAvailability |= MPTwitterAvailabilityNative;
     }
