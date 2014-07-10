@@ -13,10 +13,6 @@
 #import "MPLegacyInterstitialCustomEventAdapter.h"
 #import "MPHTMLInterstitialViewController.h"
 #import "MPMRAIDInterstitialViewController.h"
-<<<<<<< HEAD
-#import "MPTimer.h"
-=======
->>>>>>> 39b3c5652be92f263049a6df309ecd02f964f606
 #import "MPInterstitialCustomEvent.h"
 #import "MPBaseBannerAdapter.h"
 #import "MPBannerCustomEventAdapter.h"
@@ -35,14 +31,9 @@
 #import "MPNativeCustomEvent.h"
 
 
-<<<<<<< HEAD
 #if (DEBUG || ADHOC)
 #import "WBAdService+Debugging.h"
 #endif
-
-#define MOPUB_CARRIER_INFO_DEFAULTS_KEY @"com.mopub.carrierinfo"
-=======
->>>>>>> 39b3c5652be92f263049a6df309ecd02f964f606
 
 @interface MPInstanceProvider ()
 
