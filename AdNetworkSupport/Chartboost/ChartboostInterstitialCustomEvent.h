@@ -1,19 +1,14 @@
 //
 //  ChartboostInterstitialCustomEvent.h
-//  MoPub
+//  Justin Stofle
 //
-//  Copyright (c) 2012 MoPub, Inc. All rights reserved.
+//  Copyright (c) 2014 Scopely, Inc. All rights reserved.
 //
 
 #import "MPInterstitialCustomEvent.h"
 
-#import "Chartboost.h"
-
-/*
- * Certified with version 4.1.0 of the Chartboost SDK.
- */
-
-@interface ChartboostInterstitialCustomEvent : MPInterstitialCustomEvent <ChartboostDelegate>
+@interface ChartboostInterstitialCustomEvent : MPInterstitialCustomEvent
 
 +(void)trackInstall;
+
 @end
