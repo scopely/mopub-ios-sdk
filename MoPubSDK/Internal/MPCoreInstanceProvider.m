@@ -203,9 +203,9 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     return self.carrierInfo;
 }
 
-- (MPTimer *)buildMPTimerWithTimeInterval:(NSTimeInterval)seconds target:(id)target selector:(SEL)selector repeats:(BOOL)repeats
+- (MPTimer *)buildMPTimerWithTimeInterval:(NSTimeInterval)seconds target:(id)target selector:(SEL)selector repeats:(BOOL)repeats logType:(WBLogType)logType
 {
-    return [MPTimer timerWithTimeInterval:seconds target:target selector:selector repeats:repeats];
+    return [MPTimer timerWithTimeInterval:seconds target:target selector:selector repeats:repeats logType:logType];
 }
 
 #pragma mark - Twitter Availability
