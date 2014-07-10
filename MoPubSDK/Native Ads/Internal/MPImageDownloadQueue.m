@@ -6,7 +6,6 @@
 
 #import "MPImageDownloadQueue.h"
 #import "MPNativeAdError.h"
-#import "MPLogging.h"
 #import "MPNativeCache.h"
 
 @interface MPImageDownloadQueue ()
@@ -51,7 +50,7 @@
         [self.imageDownloadQueue addOperationWithBlock:^{
             @autoreleasepool {
                 if (![[MPNativeCache sharedCache] cachedDataExistsForKey:imageURL.absoluteString] || !useCachedImage) {
-                    MPLogDebug(@"Downloading %@", imageURL);
+//                    MPLogDebug(@"Downloading %@", imageURL);
                     
                     NSURLResponse *response = nil;
                     NSError *error = nil;

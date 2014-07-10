@@ -8,7 +8,6 @@
 
 #import "MPGlobal.h"
 #import "MPConstants.h"
-#import "MPLogging.h"
 #import "NSURL+MPAdditions.h"
 #import <CommonCrypto/CommonDigest.h>
 
@@ -198,7 +197,7 @@ BOOL MPViewIntersectsKeyWindow(UIView *view)
 {
     if (![url mp_hasTelephoneScheme] && ![url mp_hasTelephonePromptScheme]) {
         // Shouldn't be here as the url must have a tel or telPrompt scheme.
-        MPLogError(@"Processing URL as a telephone URL when %@ doesn't follow the tel:// or telprompt:// schemes", url.absoluteString);
+//        MPLogError(@"Processing URL as a telephone URL when %@ doesn't follow the tel:// or telprompt:// schemes", url.absoluteString);
         [self release];
         return nil;
     }
@@ -210,7 +209,7 @@ BOOL MPViewIntersectsKeyWindow(UIView *view)
         if (!phoneNumber) {
             phoneNumber = [url resourceSpecifier];
             if ([phoneNumber length] == 0) {
-                MPLogError(@"Invalid telelphone URL: %@.", url.absoluteString);
+//                MPLogError(@"Invalid telelphone URL: %@.", url.absoluteString);
                 [self release];
                 return nil;
             }

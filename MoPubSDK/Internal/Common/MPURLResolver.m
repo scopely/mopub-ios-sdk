@@ -8,7 +8,6 @@
 #import "MPURLResolver.h"
 #import "NSURL+MPAdditions.h"
 #import "MPInstanceProvider.h"
-#import "MPLogging.h"
 #import "MPCoreInstanceProvider.h"
 
 static NSString * const kMoPubSafariScheme = @"mopubnativebrowser";
@@ -164,7 +163,7 @@ static NSString * const kMoPubHTTPHeaderContentType = @"Content-Type";
     NSStringEncoding encoding = NSUTF8StringEncoding;
     
     if (![contentType length]) {
-        MPLogWarn(@"Attempting to set string encoding from nil %@", kMoPubHTTPHeaderContentType);
+//        MPLogWarn(@"Attempting to set string encoding from nil %@", kMoPubHTTPHeaderContentType);
         return encoding;
     }
     

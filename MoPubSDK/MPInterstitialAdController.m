@@ -111,7 +111,8 @@
     }
     
     if (![controller.view.window isKeyWindow]) {
-        MPLogWarn(@"Attempted to present an interstitial ad in non-key window. The ad may not render properly");
+        CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"The interstitial could not be shown: "
+                    @"a nil view controller was passed to -showFromViewController:.");
     }
 
     [self.manager presentInterstitialFromViewController:controller];

@@ -7,7 +7,6 @@
 #import "MPAdConfiguration.h"
 #import "MPCoreInstanceProvider.h"
 #import "MPNativeAdError.h"
-#import "MPLogging.h"
 #import "MPNativeCache.h"
 #import "MPNativeAdRendering.h"
 #import "MPImageDownloadQueue.h"
@@ -120,11 +119,11 @@
 - (void)trackImpression
 {
     if (self.hasTrackedImpression) {
-        MPLogDebug(@"Impression already tracked.");
+//        MPLogDebug(@"Impression already tracked.");
         return;
     }
 
-    MPLogDebug(@"Tracking an impression for %@.", self.adIdentifier);
+//    MPLogDebug(@"Tracking an impression for %@.", self.adIdentifier);
     self.hasTrackedImpression = YES;
     for (NSString *URLString in self.impressionTrackers) {
         NSURL *URL = [NSURL URLWithString:URLString];
@@ -252,7 +251,7 @@
         if (image) {
             [self safeMainQueueSetImage:image intoImageView:imageView];
         } else if (imageURL) {
-            MPLogDebug(@"Cache miss on %@. Re-downloading...", imageURL);
+//            MPLogDebug(@"Cache miss on %@. Re-downloading...", imageURL);
 
             [self.imageDownloadQueue addDownloadImageURLs:@[imageURL]
                                           completionBlock:^(NSArray *errors) {
@@ -261,7 +260,7 @@
 
                                                   [self safeMainQueueSetImage:image intoImageView:imageView];
                                               } else {
-                                                  MPLogDebug(@"Failed to download %@ on cache miss. Giving up for now.", imageURL);
+//                                                  MPLogDebug(@"Failed to download %@ on cache miss. Giving up for now.", imageURL);
                                               }
                                           }];
         }
@@ -282,7 +281,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         MPNativeAd *ad = [imageView mp_nativeAd];
         if (ad && ad != self) {
-            MPLogDebug(@"Cell was recycled. Don't bother setting the image.");
+//            MPLogDebug(@"Cell was recycled. Don't bother setting the image.");
             return;
         }
 

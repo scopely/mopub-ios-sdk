@@ -276,7 +276,7 @@ static MPInstanceProvider *sharedAdProvider = nil;
 {
     MPNativeCustomEvent *customEvent = [[[customClass alloc] init] autorelease];
     if (![customEvent isKindOfClass:[MPNativeCustomEvent class]]) {
-        MPLogError(@"**** Custom Event Class: %@ does not extend MPNativeCustomEvent ****", NSStringFromClass(customClass));
+//        MPLogError(@"**** Custom Event Class: %@ does not extend MPNativeCustomEvent ****", NSStringFromClass(customClass));
         return nil;
     }
     customEvent.delegate = delegate;

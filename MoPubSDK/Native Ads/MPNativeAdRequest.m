@@ -10,7 +10,6 @@
 #import "MPNativeAdError.h"
 #import "MPNativeAd+Internal.h"
 #import "MPNativeAdRequestTargeting.h"
-#import "MPLogging.h"
 #import "MPImageDownloadQueue.h"
 #import "MPConstants.h"
 #import "MPNativeCustomEventDelegate.h"
@@ -87,7 +86,7 @@
     }
     else
     {
-        MPLogWarn(@"Native Ad Request did not start - requires completion handler block.");
+//        MPLogWarn(@"Native Ad Request did not start - requires completion handler block.");
     }
 }
 
@@ -96,13 +95,13 @@
 - (void)loadAdWithURL:(NSURL *)URL
 {
     if (self.loading) {
-        MPLogWarn(@"Native ad request is already loading an ad. Wait for previous load to finish.");
+//        MPLogWarn(@"Native ad request is already loading an ad. Wait for previous load to finish.");
         return;
     }
 
     [self retain];
 
-    MPLogInfo(@"Starting ad request with URL: %@", self.URL);
+//    MPLogInfo(@"Starting ad request with URL: %@", self.URL);
 
     self.loading = YES;
     [self.communicator loadURL:URL];
@@ -110,7 +109,7 @@
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration
 {
-    MPLogInfo(@"Looking for custom event class named %@.", configuration.customEventClass);\
+//    MPLogInfo(@"Looking for custom event class named %@.", configuration.customEventClass);\
     // Adserver doesn't return a customEventClass for MoPub native ads
     if([configuration.networkType isEqualToString:kAdTypeNative] && configuration.customEventClass == nil) {
         configuration.customEventClass = [MPMoPubNativeCustomEvent class];
@@ -148,13 +147,13 @@
     self.adConfiguration = configuration;
 
     if ([configuration.networkType isEqualToString:kAdTypeClear]) {
-        MPLogInfo(@"No inventory available for ad unit: %@", self.adUnitIdentifier);
+//        MPLogInfo(@"No inventory available for ad unit: %@", self.adUnitIdentifier);
 
         [self completeAdRequestWithAdObject:nil error:[NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorNoInventory userInfo:nil]];
         [self release];
     }
     else {
-        MPLogInfo(@"Received data from MoPub to construct Native ad.");
+//        MPLogInfo(@"Received data from MoPub to construct Native ad.");
 
         [self getAdWithConfiguration:configuration];
     }
@@ -162,7 +161,7 @@
 
 - (void)communicatorDidFailWithError:(NSError *)error
 {
-    MPLogDebug(@"Error: Couldn't retrieve an ad from MoPub. Message: %@", error);
+//    MPLogDebug(@"Error: Couldn't retrieve an ad from MoPub. Message: %@", error);
 
     [self completeAdRequestWithAdObject:nil error:[NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorHTTPError userInfo:nil]];
     [self release];

@@ -9,7 +9,6 @@
 #import "MPMoPubNativeAdAdapter.h"
 #import "MPNativeAd+Internal.h"
 #import "MPNativeAdError.h"
-#import "MPLogging.h"
 
 @implementation MPMoPubNativeCustomEvent
 
@@ -30,8 +29,8 @@
         }
         [super precacheImagesWithURLs:imageURLs completionBlock:^(NSArray *errors) {
             if (errors) {
-                MPLogDebug(@"%@", errors);
-                MPLogInfo(@"Error: data received was invalid.");
+//                MPLogDebug(@"%@", errors);
+//                MPLogInfo(@"Error: data received was invalid.");
                 [self.delegate nativeCustomEvent:self didFailToLoadAdWithError:[NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorInvalidServerResponse userInfo:nil]];
             } else {
                 [self.delegate nativeCustomEvent:self didLoadAd:interfaceAd];

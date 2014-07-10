@@ -7,7 +7,6 @@
 
 #import "MPNativeCache.h"
 #import "MPDiskLRUCache.h"
-#import "MPLogging.h"
 
 typedef enum {
     MPNativeCacheMethodDisk = 0,
@@ -126,7 +125,7 @@ typedef enum {
     }
     
     if (data) {
-        MPLogDebug(@"RETRIEVE FROM MEMORY: %@", key);
+//        MPLogDebug(@"RETRIEVE FROM MEMORY: %@", key);
     }
     
     
@@ -134,15 +133,15 @@ typedef enum {
         data = [self.diskCache retrieveDataForKey:key];
         
         if (data && cacheMethod & MPNativeCacheMethodDiskAndMemory) {
-            MPLogDebug(@"RETRIEVE FROM DISK: %@", key);
+//            MPLogDebug(@"RETRIEVE FROM DISK: %@", key);
             
             [self.memoryCache setObject:data forKey:key];
-            MPLogDebug(@"STORED IN MEMORY: %@", key);
+//            MPLogDebug(@"STORED IN MEMORY: %@", key);
         }
     }
     
     if (data == nil) {
-        MPLogDebug(@"RETRIEVE FAILED: %@", key);
+//        MPLogDebug(@"RETRIEVE FAILED: %@", key);
     }
     
     return data;
@@ -156,11 +155,11 @@ typedef enum {
     
     if (cacheMethod & MPNativeCacheMethodDiskAndMemory) {
         [self.memoryCache setObject:data forKey:key];
-        MPLogDebug(@"STORED IN MEMORY: %@", key);
+//        MPLogDebug(@"STORED IN MEMORY: %@", key);
     }
     
     [self.diskCache storeData:data forKey:key];
-    MPLogDebug(@"STORED ON DISK: %@", key);
+//    MPLogDebug(@"STORED ON DISK: %@", key);
 }
 
 - (void)removeAllDataFromMemory
@@ -184,7 +183,7 @@ typedef enum {
 
 - (void)cache:(NSCache *)cache willEvictObject:(id)obj
 {
-    MPLogDebug(@"Evicting Object");
+//    MPLogDebug(@"Evicting Object");
 }
 
 
