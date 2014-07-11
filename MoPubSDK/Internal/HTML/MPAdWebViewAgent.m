@@ -109,7 +109,8 @@ NSString * const kMoPubCustomHost = @"custom";
             frame.size.height = configuration.preferredSize.height;
             self.view.frame = frame;
         }
-    }
+        //this fixed an old bug where there was no preferred size and the ad would be 0px tall
+        //this sets the size
 //    else
 //    {
 //        CoreWarning(adsf);
@@ -121,6 +122,7 @@ NSString * const kMoPubCustomHost = @"custom";
 ////            self.view.frame = frame;
 ////        }
 //    }
+    }
 
     [self.view mp_setScrollable:configuration.scrollable];
     [self.view disableJavaScriptDialogs];
