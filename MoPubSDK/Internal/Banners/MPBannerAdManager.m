@@ -198,8 +198,6 @@
 - (void)communicatorDidReceiveAdConfiguration:(MPAdConfiguration *)configuration
 {
     self.requestingConfiguration = configuration;
-    
-//    configuration.adSize = self.adView
 
     CoreLogType(WBLogLevelDebug, self.logType, @"Banner ad view is fetching ad network type: %@", self.requestingConfiguration.networkType);
 
