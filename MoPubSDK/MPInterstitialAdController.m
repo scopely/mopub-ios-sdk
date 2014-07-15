@@ -91,7 +91,7 @@
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"%@", ((MPInterstitialCustomEventAdapter *)self.manager.adapter).interstitialCustomEvent];
+    return [((MPInterstitialCustomEventAdapter *)self.manager.adapter).interstitialCustomEvent description];
 }
 
 - (void)loadAd
