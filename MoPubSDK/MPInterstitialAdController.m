@@ -123,12 +123,10 @@
 + (NSMutableArray *)sharedInterstitials
 {
     static NSMutableArray *sharedInterstitials;
-
-    @synchronized(self) {
-        if (!sharedInterstitials) {
-            sharedInterstitials = [[NSMutableArray array] retain];
-        }
-    }
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInterstitials = [[NSMutableArray array] retain];
+    });
 
     return sharedInterstitials;
 }
