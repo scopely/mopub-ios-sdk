@@ -59,6 +59,7 @@ extern NSString * const kAdTypeNative;
 @property (nonatomic, copy) NSData *adResponseData;
 @property (nonatomic, retain) NSDictionary *nativeSDKParameters;
 @property (nonatomic, copy) NSString *customSelectorName;
+@property (nonatomic, copy) NSString *customAdNetwork;
 @property (nonatomic, assign) Class customEventClass;
 @property (nonatomic, retain) NSDictionary *customEventClassData;
 @property (nonatomic, assign) MPInterstitialOrientationType orientationType;

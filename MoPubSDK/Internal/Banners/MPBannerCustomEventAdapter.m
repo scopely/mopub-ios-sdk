@@ -49,6 +49,8 @@
     if (self.bannerCustomEvent) {
         CoreLogType(WBLogLevelInfo, configuration.logType, @"Requesting %@ banner", self.bannerCustomEvent);
         [WBAdControllerEvent postNotification:[[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[self.bannerCustomEvent description] adType:WBAdTypeBanner]];
+        [WBAdEvent postNotification:[[WBAdEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:[self.bannerCustomEvent description] adType:WBAdTypeBanner]];
+        self.configuration.customAdNetwork = [self.bannerCustomEvent description];
         [self.bannerCustomEvent requestAdWithSize:size customEventInfo:configuration.customEventClassData];
     } else {
         [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonMalformedData adNetwork:NSStringFromClass(configuration.customEventClass) adType:WBAdTypeBanner];
@@ -97,6 +99,7 @@
 
 - (void)bannerCustomEvent:(MPBannerCustomEvent *)event didLoadAd:(UIView *)ad
 {
+    [WBAdEvent postNotification:[[WBAdEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[event description] adType:WBAdTypeBanner]];
     CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"%@ banner loaded", event);
     [self didStopLoading];
     if (ad) {
@@ -108,6 +111,7 @@
 
 - (void)bannerCustomEvent:(MPBannerCustomEvent *)event didFailToLoadAdWithError:(NSError *)error
 {
+    [WBAdEvent postAdFailedWithReason:WBAdFailureReasonUnknown adNetwork:[event description] adType:WBAdTypeBanner];
     CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"%@ banner didFailToLoadAdWithError %@", event, error.localizedDescription);
     [self didStopLoading];
     [self.delegate adapter:self didFailToLoadAdWithError:error];
@@ -128,6 +132,7 @@
 
 - (void)bannerCustomEventWillLeaveApplication:(MPBannerCustomEvent *)event
 {
+    [WBAdEvent postNotification:[[WBAdEvent alloc] initWithEventType:WBAdEventTypeLeaveApp adNetwork:[event description] adType:WBAdTypeBanner]];
     CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"%@ banner bannerCustomEventWillLeaveApplication", event);
     [self trackClickOnce];
     [self.delegate userWillLeaveApplicationFromAdapter:self];

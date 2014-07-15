@@ -17,6 +17,9 @@
 #import "WBAdEvent_Internal.h"
 #import "WBAdControllerEvent.h"
 
+#import "WBAdEvent_Internal.h"
+#import "WBAdControllerEvent.h"
+
 @interface MPBaseBannerAdapter ()
 
 @property (nonatomic, retain) MPAdConfiguration *configuration;
@@ -78,6 +81,7 @@
 
 - (void)didDisplayAd
 {
+    [WBAdEvent postNotification:[[WBAdEvent alloc] initWithEventType:WBAdEventTypeShow adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner]];
     [self trackImpression];
 }
 
@@ -115,11 +119,13 @@
 
 - (void)trackImpression
 {
+    [WBAdEvent postNotification:[[WBAdEvent alloc] initWithEventType:WBAdEventTypeImpression adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner]];
     [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackImpressionForConfiguration:self.configuration];
 }
 
 - (void)trackClick
 {
+    [WBAdEvent postNotification:[[WBAdEvent alloc] initWithEventType:WBAdEventTypeClick adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner]];
     [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackClickForConfiguration:self.configuration];
 }
 

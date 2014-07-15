@@ -183,7 +183,7 @@ NSString * const kAdTypeNative = @"json";
     self.customEventClassData = nil;
     self.dspCreativeId = nil;
     self.creationTimestamp = nil;
-
+    self.customAdNetwork = nil;
     [super dealloc];
 }
 
