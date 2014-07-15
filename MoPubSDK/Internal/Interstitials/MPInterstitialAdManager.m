@@ -16,6 +16,10 @@
 #import "MPCoreInstanceProvider.h"
 #import "MPInterstitialAdManagerDelegate.h"
 
+#import "WBAdEvent_Internal.h"
+#import "WBAdControllerEvent.h"
+
+
 @interface MPInterstitialAdManager ()
 
 @property (nonatomic) BOOL loading;
@@ -82,6 +86,8 @@
 
     CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"Interstitial controller is loading ad with MoPub server URL: %@", URL);
 
+    [WBAdControllerEvent postNotification:[[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:nil adType:WBAdTypeInterstitial]];
+    
     self.loading = YES;
     [self.communicator loadURL:URL];
 }
@@ -133,6 +139,7 @@
         CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"Ad server response indicated no ad available.");
         self.loading = NO;
         [self.delegate manager:self didFailToLoadInterstitialWithError:nil];
+        [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonNoFill adNetwork:nil adType:WBAdTypeInterstitial];
         return;
     }
 
@@ -140,6 +147,7 @@
         CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"Could not load ad: interstitial object received a non-interstitial ad unit ID.");
         self.loading = NO;
         [self.delegate manager:self didFailToLoadInterstitialWithError:nil];
+        [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonMalformedData adNetwork:nil adType:WBAdTypeInterstitial];
         return;
     }
 
@@ -150,6 +158,9 @@
 {
     self.ready = NO;
     self.loading = NO;
+    
+    WBAdFailureReason failureReason = ([error.domain isEqualToString:@"mopub.com"] ? WBAdFailureReasonMopubServer : WBAdFailureReasonNetworkError);
+    [WBAdControllerEvent postAdFailedWithReason:failureReason adNetwork:nil adType:WBAdTypeInterstitial];
 
     [self.delegate manager:self didFailToLoadInterstitialWithError:error];
 }
@@ -159,6 +170,7 @@
     MPBaseInterstitialAdapter *adapter = [[MPInstanceProvider sharedProvider] buildInterstitialAdapterForConfiguration:configuration
                                                                                                               delegate:self];
     if (!adapter) {
+        [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonMalformedData adNetwork:nil adType:WBAdTypeInterstitial];
         [self adapter:nil didFailToLoadAdWithError:nil];
         return;
     }

@@ -12,6 +12,9 @@
 #import "MPInterstitialCustomEvent.h"
 #import "MPInterstitialAdController.h"
 
+#import "WBAdEvent_Internal.h"
+#import "WBAdControllerEvent.h"
+
 @interface MPInterstitialCustomEventAdapter ()
 
 @property (nonatomic, retain) MPInterstitialCustomEvent *interstitialCustomEvent;
@@ -47,7 +50,9 @@
     if (self.interstitialCustomEvent) {
         CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting %@ interstitial", self.interstitialCustomEvent);
         [self.interstitialCustomEvent requestInterstitialWithCustomEventInfo:configuration.customEventClassData];
+        [WBAdControllerEvent postNotification:[[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[self.interstitialCustomEvent description] adType:WBAdTypeInterstitial]];
     } else {
+        [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonMalformedData adNetwork:NSStringFromClass(configuration.customEventClass) adType:WBAdTypeInterstitial];
         [self.delegate adapter:self didFailToLoadAdWithError:nil];
     }
 }

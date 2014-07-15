@@ -14,6 +14,9 @@
 #import "MPTimer.h"
 #import "MPConstants.h"
 
+#import "WBAdEvent_Internal.h"
+#import "WBAdControllerEvent.h"
+
 @interface MPBaseInterstitialAdapter ()
 
 @property (nonatomic, retain) MPAdConfiguration *configuration;
@@ -95,6 +98,7 @@
 - (void)timeout
 {
     CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"%@ custom event did time out", NSStringFromClass(self.configuration.customEventClass));
+    [WBAdEvent postAdFailedWithReason:WBAdFailureReasonTimeout adNetwork:[self.configuration.customEventClass description] adType:WBAdTypeInterstitial];
     [self.delegate adapter:self didFailToLoadAdWithError:nil];
 }
 
