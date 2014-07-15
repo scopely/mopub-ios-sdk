@@ -11,6 +11,9 @@
 #import "MPBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
 
+#import "WBAdEvent_Internal.h"
+#import "WBAdControllerEvent.h"
+
 @interface MPBannerCustomEventAdapter ()
 
 @property (nonatomic, retain) MPBannerCustomEvent *bannerCustomEvent;
@@ -45,8 +48,10 @@
                                                                                                delegate:self];
     if (self.bannerCustomEvent) {
         CoreLogType(WBLogLevelInfo, configuration.logType, @"Requesting %@ banner", self.bannerCustomEvent);
+        [WBAdControllerEvent postNotification:[[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[self.bannerCustomEvent description] adType:WBAdTypeBanner]];
         [self.bannerCustomEvent requestAdWithSize:size customEventInfo:configuration.customEventClassData];
     } else {
+        [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonMalformedData adNetwork:NSStringFromClass(configuration.customEventClass) adType:WBAdTypeBanner];
         [self.delegate adapter:self didFailToLoadAdWithError:nil];
     }
 }

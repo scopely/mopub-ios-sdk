@@ -15,6 +15,9 @@
 #import "MPConstants.h"
 #import "MPLegacyBannerCustomEventAdapter.h"
 
+#import "WBAdEvent_Internal.h"
+#import "WBAdControllerEvent.h"
+
 @interface MPBannerAdManager ()
 
 @property (nonatomic, retain) MPAdServerCommunicator *communicator;
@@ -157,6 +160,11 @@
                                                      location:[self.delegate location]
                                                       testing:[self.delegate isTesting]];
     CoreLogType(WBLogLevelTrace, self.logType, @"%@ view (%@) loading ad with MoPub server URL: %@", (self.logType == WBLogTypeAdBanner ? @"Banner" : @"MedRect"),[self.delegate adUnitId], URL);
+    
+    if(self.logType == WBLogTypeAdBanner)
+    {
+        [WBAdControllerEvent postNotification:[[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:nil adType:WBAdTypeBanner]];
+    }
 
     [self.communicator loadURL:URL];
 }
@@ -223,6 +231,7 @@
     self.requestingAdapter = [[MPInstanceProvider sharedProvider] buildBannerAdapterForConfiguration:configuration
                                                                                             delegate:self];
     if (!self.requestingAdapter) {
+        [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonMalformedData adNetwork:nil adType:WBAdTypeBanner];
         [self loadAdWithURL:self.requestingConfiguration.failoverURL];
         return;
     }
@@ -237,6 +246,28 @@
 
 - (void)didFailToLoadAdapterWithError:(NSError *)error
 {
+    
+    if(self.logType == WBLogTypeAdBanner)
+    {
+        WBAdFailureReason failureReason = WBAdFailureReasonNetworkError;
+        
+        switch (error.code) {
+            case MPErrorServerError:
+                failureReason = WBAdFailureReasonMalformedData;
+                break;
+            case MPErrorAdapterInvalid:
+                failureReason = WBAdFailureReasonMalformedData;
+                break;
+            case MPErrorNoInventory:
+                failureReason = WBAdFailureReasonNoFill;
+                break;
+            default:
+                break;
+        }
+        
+        [WBAdControllerEvent postAdFailedWithReason:failureReason adNetwork:nil adType:WBAdTypeBanner];
+    }
+
     [self.delegate managerDidFailToLoadAd];
     [self scheduleRefreshTimer];
 

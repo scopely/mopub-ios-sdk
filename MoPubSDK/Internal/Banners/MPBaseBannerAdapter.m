@@ -14,6 +14,9 @@
 #import "MPAnalyticsTracker.h"
 #import "MPTimer.h"
 
+#import "WBAdEvent_Internal.h"
+#import "WBAdControllerEvent.h"
+
 @interface MPBaseBannerAdapter ()
 
 @property (nonatomic, retain) MPAdConfiguration *configuration;
@@ -95,6 +98,7 @@
 
 - (void)timeout
 {
+    [WBAdEvent postAdFailedWithReason:WBAdFailureReasonTimeout adNetwork:[self.configuration.customEventClass description] adType:WBAdTypeBanner];
     [self.delegate adapter:self didFailToLoadAdWithError:nil];
 }
 
