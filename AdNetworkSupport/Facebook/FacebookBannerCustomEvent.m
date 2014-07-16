@@ -61,17 +61,8 @@
         return;
     }
     
-    NSString *placementId = [info objectForKey:@"placement_id"];
+    NSString *placementId = [info objectForKey:@"placement_id"] ?: [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdFB];
     
-#if (DEBUG || ADHOC)
-    
-    if([[WBAdService sharedAdService] forcedAdNetwork] == WBAdNetworkFB)
-    {
-        placementId = [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdFB];
-    }
-    
-#endif
-
     if (placementId == nil) {
         CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Placement ID is required for Facebook banner ad");
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];

@@ -46,16 +46,7 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    NSString *placementId = [info objectForKey:@"placement_id"];
-    
-#if (DEBUG || ADHOC)
-    
-    if([[WBAdService sharedAdService] forcedAdNetwork] == WBAdNetworkFB)
-    {
-        placementId = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdFB];
-    }
-    
-#endif
+    NSString *placementId = [info objectForKey:@"placement_id"] ?: [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdFB];
     
     if (placementId == nil) {
         CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"Placement ID is required for Facebook interstitial ad");
