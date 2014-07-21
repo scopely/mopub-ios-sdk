@@ -205,7 +205,7 @@ static void exponentialDecayInterpolation(void *info, const CGFloat *input, CGFl
 {
     // output is an RGBA array corresponding to the color black with an alpha value somewhere on
     // our exponential decay curve.
-    float progress = *input;
+    CGFloat progress = *input;
     output[0] = 0.0;
     output[1] = 0.0;
     output[2] = 0.0;

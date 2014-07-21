@@ -238,7 +238,7 @@ BOOL MPViewIntersectsKeyWindow(UIView *view)
     self.alertView.delegate = nil;
     [self.alertView dismissWithClickedButtonIndex:0 animated:YES];
     self.alertView = nil;
-    
+
     self.clickHandler = nil;
     self.telephoneURL = nil;
     [super dealloc];

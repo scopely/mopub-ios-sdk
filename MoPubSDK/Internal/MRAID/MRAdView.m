@@ -12,6 +12,7 @@
 #import "MRAdViewDisplayController.h"
 #import "MRCommand.h"
 #import "MRProperty.h"
+#import "MPUserInteractionGestureRecognizer.h"
 #import "MPInstanceProvider.h"
 #import "MPCoreInstanceProvider.h"
 #import "MRCalendarManager.h"
@@ -34,8 +35,9 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 @property (nonatomic, retain) MRVideoPlayerManager *videoPlayerManager;
 @property (nonatomic, retain) MRJavaScriptEventEmitter *jsEventEmitter;
 @property (nonatomic, retain) id<MPAdAlertManagerProtocol> adAlertManager;
-@property (nonatomic, assign) BOOL userTappedWebView;
-@property (nonatomic, retain) UITapGestureRecognizer *tapRecognizer;
+@property (nonatomic, assign) BOOL userInteractedWithWebView;
+@property (nonatomic, retain) MPUserInteractionGestureRecognizer *userInteractionRecognizer;
+@property (nonatomic, assign) BOOL shouldHandleRequests;
 
 - (void)loadRequest:(NSURLRequest *)request;
 - (void)loadHTMLString:(NSString *)string baseURL:(NSURL *)baseURL;
@@ -114,8 +116,8 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
         _allowsExpansion = expansion;
         _closeButtonStyle = style;
         _placementType = type;
-        
         WBLogType logType = (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage);
+        _shouldHandleRequests = YES;
 
         _displayController = [[MRAdViewDisplayController alloc] initWithAdView:self
                                                                allowsExpansion:expansion
@@ -134,19 +136,21 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
                                 buildMRVideoPlayerManagerWithDelegate:self] retain];
         _jsEventEmitter = [[[MPInstanceProvider sharedProvider]
                              buildMRJavaScriptEventEmitterWithWebView:_webView logType:logType] retain];
+
         self.adAlertManager = [[MPCoreInstanceProvider sharedProvider] buildMPAdAlertManagerWithDelegate:self];
 
         self.adType = MRAdViewAdTypeDefault;
-        
-        self.tapRecognizer = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)] autorelease];
-        [self addGestureRecognizer:self.tapRecognizer];
-        self.tapRecognizer.delegate = self;
-        
+
+        self.userInteractionRecognizer = [[[MPUserInteractionGestureRecognizer alloc] initWithTarget:self action:@selector(handleInteraction:)] autorelease];
+        self.userInteractionRecognizer.cancelsTouchesInView = NO;
+        [self addGestureRecognizer:self.userInteractionRecognizer];
+        self.userInteractionRecognizer.delegate = self;
+
         // XXX jren: inline videos seem to delay tap gesture recognition so that we get the click through
         // request in the webview delegate BEFORE we get the gesture recognizer triggered callback. For now
         // excuse all MRAID interstitials from the user interaction requirement.
         if (_placementType == MRAdViewPlacementTypeInterstitial) {
-            self.userTappedWebView = YES;
+            self.userInteractedWithWebView = YES;
         }
     }
     return self;
@@ -171,17 +175,16 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     self.adAlertManager.targetAdView = nil;
     self.adAlertManager.delegate = nil;
     self.adAlertManager = nil;
-    self.tapRecognizer.delegate = nil;
-    [self.tapRecognizer removeTarget:self action:nil];
-    self.tapRecognizer = nil;
+    self.userInteractionRecognizer.delegate = nil;
+    [self.userInteractionRecognizer removeTarget:self action:nil];
+    self.userInteractionRecognizer = nil;
     [super dealloc];
 }
 
-- (void)handleTap:(UITapGestureRecognizer *)sender
+- (void)handleInteraction:(UITapGestureRecognizer *)sender
 {
-    if(sender.state == UIGestureRecognizerStateEnded)
-    {
-        self.userTappedWebView = YES;
+    if (sender.state == UIGestureRecognizerStateEnded) {
+        self.userInteractedWithWebView = YES;
     }
 }
 
@@ -190,16 +193,6 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer;
 {
     return YES;
-}
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
-{
-    if([touch.view isKindOfClass:[UIButton class]])
-    {
-        // we touched a button
-        return NO; // ignore the touch
-    }
-    return YES; // handle the touch
 }
 
 #pragma mark - <MPAdAlertManagerDelegate>
@@ -268,18 +261,29 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (BOOL)safeHandleDisplayDestinationForURL:(NSURL *)URL
 {
     BOOL handled = NO;
-    
-    if (self.userTappedWebView) {
+
+    if (self.userInteractedWithWebView) {
         handled = YES;
         [self.destinationDisplayAgent displayDestinationForURL:URL];
     }
-    
+
     return handled;
 }
 
 - (void)handleMRAIDOpenCallForURL:(NSURL *)URL
 {
     [self safeHandleDisplayDestinationForURL:URL];
+}
+
+- (void)disableRequestHandling
+{
+    self.shouldHandleRequests = NO;
+    [self.destinationDisplayAgent cancel];
+}
+
+- (void)enableRequestHandling
+{
+    self.shouldHandleRequests = YES;
 }
 
 #pragma mark - Private
@@ -296,7 +300,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (void)loadRequest:(NSURLRequest *)request
 {
     [self initAdAlertManager];
-    
+
     NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate:self];
     if (connection) {
         self.data = [NSMutableData data];
@@ -306,7 +310,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (void)loadHTMLString:(NSString *)string baseURL:(NSURL *)baseURL
 {
     [self initAdAlertManager];
-    
+
     // Bail out if we can't locate mraid.js.
     if (![self MRAIDScriptPath]) {
         [self adDidFailToLoad];
@@ -401,9 +405,9 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
         cmd.delegate = self;
         success = [cmd executeWithParams:parameters];
     }
-    
+
     [self.jsEventEmitter fireNativeCommandCompleteEvent:command];
-    
+
     if (!success) {
         CoreLogType(WBLogLevelError, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Unknown command: %@", command);
         [self.jsEventEmitter fireErrorEventForAction:command withMessage:@"Specified command is not implemented."];
@@ -413,7 +417,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (BOOL)shouldExecuteMRCommand:(MRCommand *)cmd
 {
     // some MRAID commands may not require user interaction
-    return ![cmd requiresUserInteractionForPlacementType:_placementType] || self.userTappedWebView;
+    return ![cmd requiresUserInteractionForPlacementType:_placementType] || self.userInteractedWithWebView;
 }
 
 - (void)performActionForMoPubSpecificURL:(NSURL *)url
@@ -457,7 +461,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (void)mrCommand:(MRCommand *)command expandWithParams:(NSDictionary *)params
 {
     id urlValue = [params objectForKey:@"url"];
-    
+
     [self.displayController expandToFrame:CGRectFromString([params objectForKey:@"expandToFrame"])
                                   withURL:(urlValue == [NSNull null]) ? nil : urlValue
                            useCustomClose:[[params objectForKey:@"useCustomClose"] boolValue]
@@ -499,6 +503,10 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request
  navigationType:(UIWebViewNavigationType)navigationType
 {
+    if (!self.shouldHandleRequests) {
+        return NO;
+    }
+
     NSURL *url = [request URL];
     NSMutableString *urlString = [NSMutableString stringWithString:[url absoluteString]];
     NSString *scheme = url.scheme;
@@ -522,16 +530,20 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
         return NO;
     }
 
+    BOOL safeToAutoloadLink = navigationType == UIWebViewNavigationTypeLinkClicked || self.userInteractedWithWebView || [url mp_isSafeForLoadingWithoutUserAction];
+
     if (!_isLoading && (navigationType == UIWebViewNavigationTypeOther ||
             navigationType == UIWebViewNavigationTypeLinkClicked)) {
         BOOL iframe = ![request.URL isEqual:request.mainDocumentURL];
-        if (iframe) return YES;
+        if (iframe) {
+            return safeToAutoloadLink;
+        }
 
         [self safeHandleDisplayDestinationForURL:url];
         return NO;
     }
 
-    return YES;
+    return safeToAutoloadLink;
 }
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
@@ -544,7 +556,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     if (_isLoading) {
         _isLoading = NO;
         [self initializeJavascriptState];
-        
+
         switch (self.adType) {
             case MRAdViewAdTypeDefault:
                 [self adDidLoad];
