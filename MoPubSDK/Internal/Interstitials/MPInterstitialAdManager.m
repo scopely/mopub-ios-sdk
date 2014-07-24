@@ -86,7 +86,9 @@
 
     CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"Interstitial controller is loading ad with MoPub server URL: %@", URL);
 
-    [WBAdControllerEvent postNotification:[[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:nil adType:WBAdTypeInterstitial]];
+    WBAdControllerEvent *controllerEvent = [[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:nil adType:WBAdTypeInterstitial];
+    [WBAdControllerEvent postNotification:controllerEvent];
+    [controllerEvent release];
     
     self.loading = YES;
     [self.communicator loadURL:URL];

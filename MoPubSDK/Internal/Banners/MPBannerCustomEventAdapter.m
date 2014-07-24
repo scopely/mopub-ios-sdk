@@ -48,8 +48,15 @@
                                                                                                delegate:self];
     if (self.bannerCustomEvent) {
         CoreLogType(WBLogLevelInfo, configuration.logType, @"Requesting %@ banner", self.bannerCustomEvent);
-        [WBAdControllerEvent postNotification:[[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[self.bannerCustomEvent description] adType:WBAdTypeBanner]];
-        [WBAdEvent postNotification:[[WBAdEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:[self.bannerCustomEvent description] adType:WBAdTypeBanner]];
+        
+        WBAdControllerEvent *controllerEvent = [[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[self.bannerCustomEvent description] adType:WBAdTypeBanner];
+        [WBAdControllerEvent postNotification:controllerEvent];
+        [controllerEvent release];
+        
+        WBAdEvent *event = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:[self.bannerCustomEvent description] adType:WBAdTypeBanner];
+        [WBAdEvent postNotification:event];
+        [event release];
+        
         self.configuration.customAdNetwork = [self.bannerCustomEvent description];
         [self.bannerCustomEvent requestAdWithSize:size customEventInfo:configuration.customEventClassData];
     } else {
@@ -99,7 +106,9 @@
 
 - (void)bannerCustomEvent:(MPBannerCustomEvent *)event didLoadAd:(UIView *)ad
 {
-    [WBAdEvent postNotification:[[WBAdEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[event description] adType:WBAdTypeBanner]];
+    WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[event description] adType:WBAdTypeBanner];
+    [WBAdEvent postNotification:adEvent];
+    [adEvent release];
     CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"%@ banner loaded", event);
     [self didStopLoading];
     if (ad) {
@@ -132,7 +141,9 @@
 
 - (void)bannerCustomEventWillLeaveApplication:(MPBannerCustomEvent *)event
 {
-    [WBAdEvent postNotification:[[WBAdEvent alloc] initWithEventType:WBAdEventTypeLeaveApp adNetwork:[event description] adType:WBAdTypeBanner]];
+    WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLeaveApp adNetwork:[event description] adType:WBAdTypeBanner];
+    [WBAdEvent postNotification:adEvent];
+    [adEvent release];
     CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"%@ banner bannerCustomEventWillLeaveApplication", event);
     [self trackClickOnce];
     [self.delegate userWillLeaveApplicationFromAdapter:self];

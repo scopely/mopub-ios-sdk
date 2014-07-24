@@ -81,7 +81,9 @@
 
 - (void)didDisplayAd
 {
-    [WBAdEvent postNotification:[[WBAdEvent alloc] initWithEventType:WBAdEventTypeShow adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner]];
+    WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeShow adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner];
+    [WBAdEvent postNotification:adEvent];
+    [adEvent release];
     [self trackImpression];
 }
 
@@ -119,13 +121,17 @@
 
 - (void)trackImpression
 {
-    [WBAdEvent postNotification:[[WBAdEvent alloc] initWithEventType:WBAdEventTypeImpression adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner]];
+    WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeImpression adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner];
+    [WBAdEvent postNotification:adEvent];
+    [adEvent release];
     [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackImpressionForConfiguration:self.configuration];
 }
 
 - (void)trackClick
 {
-    [WBAdEvent postNotification:[[WBAdEvent alloc] initWithEventType:WBAdEventTypeClick adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner]];
+    WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeClick adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner];
+    [WBAdEvent postNotification:adEvent];
+    [adEvent release];
     [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackClickForConfiguration:self.configuration];
 }
 

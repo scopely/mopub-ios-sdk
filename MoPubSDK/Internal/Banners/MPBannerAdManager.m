@@ -163,7 +163,9 @@
     
     if(self.logType == WBLogTypeAdBanner)
     {
-        [WBAdControllerEvent postNotification:[[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:nil adType:WBAdTypeBanner]];
+        WBAdControllerEvent *controllerEvent = [[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:nil adType:WBAdTypeBanner];
+        [WBAdControllerEvent postNotification:controllerEvent];
+        [controllerEvent release];
     }
 
     [self.communicator loadURL:URL];
