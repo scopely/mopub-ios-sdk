@@ -15,7 +15,7 @@
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        [InMobi initialize:[[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdIMPublisherAppId]];
+        [InMobi initialize:[[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdIM]];
         [InMobi setLogLevel:IMLogLevelNone];
 #if (DEBUG || INTERNAL)
         [InMobi setLogLevel:IMLogLevelVerbose];
