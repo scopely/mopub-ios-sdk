@@ -137,7 +137,7 @@
 
     CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Interstatial Ad view is fetching ad network type: %@", self.configuration.networkType);
 
-    if ([self.configuration.networkType isEqualToString:@"clear"]) {
+    if ([self.configuration.networkType isEqualToString:kAdTypeClear]) {
         [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonNoFill adNetwork:nil adType:WBAdTypeInterstitial];
         CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"Ad server response indicated no ad available.");
         self.loading = NO;
@@ -224,9 +224,14 @@
     [self.delegate managerDidExpireInterstitial:self];
 }
 
+- (void)interstitialDidReceiveTapEventForAdapter:(MPBaseInterstitialAdapter *)adapter
+{
+    [self.delegate managerDidReceiveTapEventFromInterstitial:self];
+}
+
 - (void)interstitialWillLeaveApplicationForAdapter:(MPBaseInterstitialAdapter *)adapter
 {
-    // TODO: Signal to delegate.
+    //noop
 }
 
 #pragma mark - Legacy Custom Events

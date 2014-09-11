@@ -8,7 +8,7 @@
 #import "MPTableViewCellImpressionTracker.h"
 #import "MPNativeAd+Internal.h"
 #import "MPNativeAdRendering.h"
-#import "UITableViewCell+MPNativeAd.h"
+#import "UIView+MPNativeAd.h"
 
 @interface MPTableViewAdManager () <MPTableViewCellImpressionTrackerDelegate>
 

@@ -109,7 +109,7 @@
                   @"a nil view controller was passed to -showFromViewController:.");
         return;
     }
-    
+
     if (![controller.view.window isKeyWindow]) {
         CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"The interstitial could not be shown: "
                     @"a nil view controller was passed to -showFromViewController:.");
@@ -190,6 +190,13 @@
 {
     if ([self.delegate respondsToSelector:@selector(interstitialDidExpire:)]) {
         [self.delegate interstitialDidExpire:self];
+    }
+}
+
+- (void)managerDidReceiveTapEventFromInterstitial:(MPInterstitialAdManager *)manager
+{
+    if ([self.delegate respondsToSelector:@selector(interstitialDidReceiveTapEvent:)]) {
+        [self.delegate interstitialDidReceiveTapEvent:self];
     }
 }
 

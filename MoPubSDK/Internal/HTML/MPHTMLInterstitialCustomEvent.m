@@ -90,6 +90,11 @@
     [self.delegate interstitialCustomEventDidDisappear:self];
 }
 
+- (void)interstitialDidReceiveTapEvent:(MPInterstitialViewController *)interstitial
+{
+    [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
+}
+
 - (void)interstitialWillLeaveApplication:(MPInterstitialViewController *)interstitial
 {
     [self.delegate interstitialCustomEventWillLeaveApplication:self];

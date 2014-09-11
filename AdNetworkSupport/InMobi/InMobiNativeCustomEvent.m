@@ -11,6 +11,7 @@
 #import "MPNativeAd.h"
 #import "MPNativeAdError.h"
 #import "MPNativeAdConstants.h"
+#import "MPNativeAdUtils.h"
 
 @interface InMobiNativeCustomEvent () <IMNativeDelegate>
 
@@ -49,11 +50,15 @@
     NSMutableArray *imageURLs = [NSMutableArray array];
 
     if ([[interfaceAd.properties objectForKey:kAdIconImageKey] length]) {
-        [imageURLs addObject:[NSURL URLWithString:[interfaceAd.properties objectForKey:kAdIconImageKey]]];
+        if (![MPNativeAdUtils addURLString:[interfaceAd.properties objectForKey:kAdIconImageKey] toURLArray:imageURLs]) {
+            [self.delegate nativeCustomEvent:self didFailToLoadAdWithError:[NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorInvalidServerResponse userInfo:nil]];
+        }
     }
 
     if ([[interfaceAd.properties objectForKey:kAdMainImageKey] length]) {
-        [imageURLs addObject:[NSURL URLWithString:[interfaceAd.properties objectForKey:kAdMainImageKey]]];
+        if (![MPNativeAdUtils addURLString:[interfaceAd.properties objectForKey:kAdMainImageKey] toURLArray:imageURLs]) {
+            [self.delegate nativeCustomEvent:self didFailToLoadAdWithError:[NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorInvalidServerResponse userInfo:nil]];
+        }
     }
 
     [super precacheImagesWithURLs:imageURLs completionBlock:^(NSArray *errors) {

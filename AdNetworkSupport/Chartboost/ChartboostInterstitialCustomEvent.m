@@ -6,38 +6,27 @@
 //
 
 #import "ChartboostInterstitialCustomEvent.h"
-#import "WBAdService+Internal.h"
-#import "Chartboost.h"
+#import "ChartboostInterstitialDelegate.h"
 
-@interface ChartboostInterstitialCustomEvent() <ChartboostDelegate>
+@interface ChartboostInterstitialCustomEvent()
 
 @end
 
 @implementation ChartboostInterstitialCustomEvent
-
-+(void)initialize
-{
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        [Chartboost startWithAppId:[[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdCB]
-                      appSignature:[[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdCBSignature]
-                          delegate:nil];
-    });
-}
 
 -(id)init
 {
     self = [super init];
     if(self)
     {
-        [Chartboost sharedChartboost].delegate = self;
+        [ChartboostInterstitialDelegate sharedChartboostInterstitialDelegate].chartboostInterstitialCustomEvent = self;
     }
     return self;
 }
 
 -(void)invalidate
 {
-    [Chartboost sharedChartboost].delegate = nil;
+    [ChartboostInterstitialDelegate sharedChartboostInterstitialDelegate].chartboostInterstitialCustomEvent = nil;
 }
 
 #pragma mark - methods
@@ -47,55 +36,21 @@
     return @"Chartboost";
 }
 
-+(void)trackInstall
-{
-    //initialize fires
-}
-
 -(void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    if([[Chartboost sharedChartboost]hasCachedInterstitial:CBLocationTurnComplete] == YES)
+    if([Chartboost hasInterstitial:CBLocationTurnComplete] == YES)
     {
-        [self didCacheInterstitial:CBLocationTurnComplete];
+        [[ChartboostInterstitialDelegate sharedChartboostInterstitialDelegate] didCacheInterstitial:CBLocationTurnComplete];
     }
     else
     {
-        [[Chartboost sharedChartboost] cacheInterstitial:CBLocationTurnComplete];
+        [Chartboost cacheInterstitial:CBLocationTurnComplete];
     }
 }
 
 -(void)showInterstitialFromRootViewController:(UIViewController *)rootViewController
 {
-    [[Chartboost sharedChartboost] showInterstitial:CBLocationTurnComplete];
-}
-
-#pragma mark - ChartboostDelegate
-
-// Called when an interstitial has been displayed on the screen.
-- (void)didDisplayInterstitial:(CBLocation)location
-{
-    [self.delegate interstitialCustomEventWillAppear:self];
-    [self.delegate interstitialCustomEventDidAppear:self];
-}
-
-/// Called when an interstitial has been received and cached.
-- (void)didCacheInterstitial:(CBLocation)location
-{
-    [self.delegate interstitialCustomEvent:self didLoadAd:nil];
-}
-
-/// Called when an interstitial has failed to come back from the server
-- (void)didFailToLoadInterstitial:(CBLocation)location  withError:(CBLoadError)error
-{
-    [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:[NSError errorWithDomain:WBAdSDKDomain code:error userInfo:nil]];
-}
-
-/// Called when the user dismisses the interstitial
-/// If you are displaying the add yourself, dismiss it now.
-- (void)didDismissInterstitial:(CBLocation)location
-{
-    [self.delegate interstitialCustomEventWillDisappear:self];
-    [self.delegate interstitialCustomEventDidDisappear:self];
+    [Chartboost showInterstitial:CBLocationTurnComplete];
 }
 
 @end

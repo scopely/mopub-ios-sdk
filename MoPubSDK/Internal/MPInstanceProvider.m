@@ -30,10 +30,13 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import "MPNativeCustomEvent.h"
 
-
 #if (DEBUG || ADHOC)
 #import "WBAdService+Debugging.h"
 #endif
+
+#import "MPNativeAdSource.h"
+#import "MPStreamAdPlacementData.h"
+#import "MPStreamAdPlacer.h"
 
 @interface MPInstanceProvider ()
 
@@ -281,6 +284,24 @@ static MPInstanceProvider *sharedAdProvider = nil;
     }
     customEvent.delegate = delegate;
     return customEvent;
+}
+
+- (MPNativeAdSource *)buildNativeAdSourceWithDelegate:(id<MPNativeAdSourceDelegate>)delegate
+{
+    MPNativeAdSource *source = [MPNativeAdSource source];
+    source.delegate = delegate;
+    return source;
+}
+
+- (MPStreamAdPlacementData *)buildStreamAdPlacementDataWithPositioning:(MPAdPositioning *)positioning
+{
+    MPStreamAdPlacementData *placementData = [[[MPStreamAdPlacementData alloc] initWithPositioning:positioning] autorelease];
+    return placementData;
+}
+
+- (MPStreamAdPlacer *)buildStreamAdPlacerWithViewController:(UIViewController *)controller adPositioning:(MPAdPositioning *)positioning defaultAdRenderingClass:defaultAdRenderingClass
+{
+    return [MPStreamAdPlacer placerWithViewController:controller adPositioning:positioning defaultAdRenderingClass:defaultAdRenderingClass];
 }
 
 @end
