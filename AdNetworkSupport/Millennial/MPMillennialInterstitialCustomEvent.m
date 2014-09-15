@@ -9,7 +9,7 @@
 #import "MPInstanceProvider.h"
 #import "WBAdService+Internal.h"
 
-#import <MillennialMedia/MMInterstitial.h>
+#import "MMInterstitial.h"
 
 @interface MPMillennialInterstitialRouter : NSObject
 

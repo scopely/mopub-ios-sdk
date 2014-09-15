@@ -8,9 +8,9 @@
 #import "MPMillennialBannerCustomEvent.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
-
-#import <MillennialMedia/MMAdView.h>
-#import <MillennialMedia/MMRequest.h>
+#import "WBAdService+Internal.h"
+#import "MMAdView.h"
+#import "MMRequest.h"
 
 #define MM_SIZE_320x50    CGSizeMake(320, 50)
 #define MM_SIZE_300x250 CGSizeMake(300, 250)
@@ -147,14 +147,12 @@
 - (void)onRequestCompletion:(BOOL)success
 {
     if (success) {
-        CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Millennial banner did load");
         [self.delegate bannerCustomEvent:self didLoadAd:self.mmAdView];
         if (!self.didTrackImpression) {
             [self.delegate trackImpression];
             self.didTrackImpression = YES;
         }
     } else {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Millennial banner did fail");
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
     }
 }
@@ -179,7 +177,6 @@
 - (void)adWasTapped:(NSNotification *)notification
 {
     if ([[notification.userInfo objectForKey:MillennialMediaAdObjectKey] isEqual:self.mmAdView]) {
-       CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Millennial banner was tapped");
         if (!self.didTrackClick) {
             [self.delegate trackClick];
             self.didTrackClick = YES;
@@ -206,8 +203,8 @@
 {
     // no userinfo available for this notification, so we do our best to ensure that this notification
     // is from us
-    if (self.didTrackClick) {
-        MPLogInfo(@"Millennial banner will leave application");
+    if (self.didTrackClick)
+    {
         [self.delegate bannerCustomEventWillLeaveApplication:self];
 
         // If this banner causes the user to leave the application without ever displaying a modal,
@@ -221,8 +218,9 @@
 
 - (void)modalWillAppear:(NSNotification *)notification
 {
-    if ([[notification.userInfo objectForKey:MillennialMediaAdObjectKey] isEqual:self.mmAdView]) {
-        MPLogInfo(@"Millennial banner will present modal");
+    if ([[notification.userInfo objectForKey:MillennialMediaAdObjectKey] isEqual:self.mmAdView])
+    {
+        CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Millennial banner will present modal");
         self.didShowModal = YES;
     }
 }
@@ -230,7 +228,6 @@
 - (void)modalDidDismiss:(NSNotification *)notification
 {
     if ([[notification.userInfo objectForKey:MillennialMediaAdObjectKey] isEqual:self.mmAdView]) {
-        CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Millennial banner did dismiss modal");
         [self.delegate bannerCustomEventDidFinishAction:self];
     }
 }
