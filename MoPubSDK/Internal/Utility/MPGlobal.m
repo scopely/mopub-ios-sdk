@@ -33,7 +33,14 @@ UIWindow *MPKeyWindow()
 
 UIWindow *MPApplicationWindow()
 {
-    return [[UIApplication sharedApplication].delegate window];
+    if ([[UIApplication sharedApplication].delegate respondsToSelector:@selector(window)])
+    {
+        return [[UIApplication sharedApplication].delegate window];
+    }
+    else
+    {
+        return [UIApplication sharedApplication].keyWindow;
+    }
 }
 
 CGFloat MPStatusBarHeight() {
