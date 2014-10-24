@@ -11,7 +11,7 @@
 
 @interface MPMRAIDBannerCustomEvent ()
 
-@property (nonatomic, retain) MRAdView *banner;
+@property (nonatomic, strong) MRAdView *banner;
 
 @end
 
@@ -34,7 +34,7 @@
                                                              closeButtonStyle:MRAdViewCloseButtonStyleAdControlled
                                                                 placementType:MRAdViewPlacementTypeInline
                                                                      delegate:self];
-    
+
     self.banner.delegate = self;
     [self.banner loadCreativeWithHTMLString:[configuration adResponseHTMLString]
                                     baseURL:nil];
@@ -43,9 +43,6 @@
 - (void)dealloc
 {
     self.banner.delegate = nil;
-    self.banner = nil;
-
-    [super dealloc];
 }
 
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation

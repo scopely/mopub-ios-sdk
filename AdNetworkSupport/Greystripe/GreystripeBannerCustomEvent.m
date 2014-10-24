@@ -41,7 +41,7 @@
 
 @interface GreystripeBannerCustomEvent ()
 
-@property (nonatomic, retain) GSBannerAdView *greystripeBanner;
+@property (nonatomic, strong) GSBannerAdView *greystripeBanner;
 
 @end
 
@@ -74,8 +74,6 @@
 - (void)dealloc
 {
     self.greystripeBanner.delegate = nil;
-    self.greystripeBanner = nil;
-    [super dealloc];
 }
 
 -(NSString *)description

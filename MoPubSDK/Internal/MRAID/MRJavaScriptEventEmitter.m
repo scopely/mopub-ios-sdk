@@ -11,8 +11,8 @@
 
 @interface MRJavaScriptEventEmitter ()
 
-@property (nonatomic, assign) WBLogType logType;
-@property (nonatomic, retain) UIWebView *webView;
+@property (nonatomic) WBLogType logType;
+@property (nonatomic, strong) UIWebView *webView;
 
 @end
 
@@ -29,16 +29,11 @@
     self = [super init];
     if (self) {
         _logType = logType;
-        _webView = [webView retain];
+        _webView = webView;
     }
     return self;
 }
 
-- (void)dealloc
-{
-    self.webView = nil;
-    [super dealloc];
-}
 
 - (NSString *)executeJavascript:(NSString *)javascript, ... {
     va_list args;
@@ -74,7 +69,7 @@
 }
 
 - (NSString *)executeJavascript:(NSString *)javascript withVarArgs:(va_list)args {
-    NSString *js = [[[NSString alloc] initWithFormat:javascript arguments:args] autorelease];
+    NSString *js = [[NSString alloc] initWithFormat:javascript arguments:args];
     return [_webView stringByEvaluatingJavaScriptFromString:js];
 }
 

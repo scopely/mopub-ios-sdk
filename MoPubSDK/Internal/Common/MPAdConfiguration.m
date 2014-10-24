@@ -169,24 +169,6 @@ NSString * const kAdTypeNative = @"json";
     return result;
 }
 
-- (void)dealloc
-{
-    self.networkType = nil;
-    self.clickTrackingURL = nil;
-    self.impressionTrackingURL = nil;
-    self.failoverURL = nil;
-    self.interceptURLPrefix = nil;
-    self.adResponseData = nil;
-    self.adResponseHTMLString = nil;
-    self.nativeSDKParameters = nil;
-    self.customSelectorName = nil;
-    self.customEventClassData = nil;
-    self.dspCreativeId = nil;
-    self.creationTimestamp = nil;
-    self.customAdNetwork = nil;
-    [super dealloc];
-}
-
 - (BOOL)hasPreferredSize
 {
     return (self.preferredSize.width > 0 && self.preferredSize.height > 0);
@@ -195,8 +177,8 @@ NSString * const kAdTypeNative = @"json";
 - (NSString *)adResponseHTMLString
 {
     if (!_adResponseHTMLString) {
-        self.adResponseHTMLString = [[[NSString alloc] initWithData:self.adResponseData
-                                                           encoding:NSUTF8StringEncoding] autorelease];
+        self.adResponseHTMLString = [[NSString alloc] initWithData:self.adResponseData
+                                                           encoding:NSUTF8StringEncoding];
     }
 
     return _adResponseHTMLString;

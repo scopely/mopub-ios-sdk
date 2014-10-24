@@ -19,8 +19,8 @@
 
 @interface MPBaseInterstitialAdapter ()
 
-@property (nonatomic, retain) MPAdConfiguration *configuration;
-@property (nonatomic, retain) MPTimer *timeoutTimer;
+@property (nonatomic, strong) MPAdConfiguration *configuration;
+@property (nonatomic, strong) MPTimer *timeoutTimer;
 
 - (void)startTimeoutTimerWithConfiguration:(MPAdConfiguration *)configuration;
 
@@ -43,11 +43,14 @@
 
 - (void)dealloc
 {
-    _delegate = nil;
-    [_configuration release];
-    [_timeoutTimer invalidate];
+    [self unregisterDelegate];
 
-    [super dealloc];
+    [self.timeoutTimer invalidate];
+}
+
+- (void)unregisterDelegate
+{
+    self.delegate = nil;
 }
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration
@@ -62,9 +65,8 @@
 
     [self startTimeoutTimerWithConfiguration:configuration];
 
-    [self retain];
-    [self getAdWithConfiguration:configuration];
-    [self release];
+    MPBaseInterstitialAdapter *strongSelf = self;
+    [strongSelf getAdWithConfiguration:configuration];
 }
 
 - (void)startTimeoutTimerWithConfiguration:(MPAdConfiguration *)configuration
@@ -115,7 +117,6 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeImpression adNetwork:self.configuration.customAdNetwork adType:WBAdTypeInterstitial];
     [WBAdEvent postNotification:adEvent];
-    [adEvent release];
     [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackImpressionForConfiguration:self.configuration];
 }
 
@@ -123,7 +124,6 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeClick adNetwork:self.configuration.customAdNetwork adType:WBAdTypeInterstitial];
     [WBAdEvent postNotification:adEvent];
-    [adEvent release];
     [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackClickForConfiguration:self.configuration];
 }
 

@@ -24,9 +24,9 @@
 
 @property (nonatomic) BOOL loading;
 @property (nonatomic) BOOL ready;
-@property (nonatomic, retain) MPBaseInterstitialAdapter *adapter;
-@property (nonatomic, retain) MPAdServerCommunicator *communicator;
-@property (nonatomic, retain) MPAdConfiguration *configuration;
+@property (nonatomic, strong) MPBaseInterstitialAdapter *adapter;
+@property (nonatomic, strong) MPAdServerCommunicator *communicator;
+@property (nonatomic, strong) MPAdConfiguration *configuration;
 
 - (void)setUpAdapterWithConfiguration:(MPAdConfiguration *)configuration;
 
@@ -57,20 +57,17 @@
 {
     [self.communicator cancel];
     [self.communicator setDelegate:nil];
-    self.communicator = nil;
 
     self.adapter = nil;
 
-    self.configuration = nil;
 
-    [super dealloc];
 }
 
 - (void)setAdapter:(MPBaseInterstitialAdapter *)adapter
 {
     if (self.adapter != adapter) {
-        [_adapter release];
-        _adapter = [adapter retain];
+        [self.adapter unregisterDelegate];
+        _adapter = adapter;
     }
 }
 
@@ -88,7 +85,6 @@
 
     WBAdControllerEvent *controllerEvent = [[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:nil adType:WBAdTypeInterstitial];
     [WBAdControllerEvent postNotification:controllerEvent];
-    [controllerEvent release];
     
     self.loading = YES;
     [self.communicator loadURL:URL];

@@ -96,6 +96,6 @@
  */
 -(BOOL)ready;
 
-@property (nonatomic, assign) id<MPInterstitialCustomEventDelegate> delegate;
+@property (nonatomic, weak) id<MPInterstitialCustomEventDelegate> delegate;
 
 @end

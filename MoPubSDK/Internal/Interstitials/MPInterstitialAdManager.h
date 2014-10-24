@@ -14,12 +14,10 @@
 @interface MPInterstitialAdManager : NSObject <MPAdServerCommunicatorDelegate,
     MPInterstitialAdapterDelegate>
 
-@property (nonatomic, retain, readonly) MPBaseInterstitialAdapter *adapter;
-@property (nonatomic, assign) id<MPInterstitialAdManagerDelegate> delegate;
+@property (nonatomic, strong, readonly) MPBaseInterstitialAdapter *adapter;
+@property (nonatomic, weak) id<MPInterstitialAdManagerDelegate> delegate;
 @property (nonatomic, readonly) BOOL ready;
 @property (nonatomic, readonly) BOOL loading;
-
-
 
 - (id)initWithDelegate:(id<MPInterstitialAdManagerDelegate>)delegate;
 

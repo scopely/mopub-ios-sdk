@@ -24,7 +24,7 @@
 
 - (GADBannerView *)buildGADBannerViewWithFrame:(CGRect)frame
 {
-    return [[[GADBannerView alloc] initWithFrame:frame] autorelease];
+    return [[GADBannerView alloc] initWithFrame:frame];
 }
 
 - (GADRequest *)buildGADBannerRequest
@@ -38,7 +38,7 @@
 
 @interface MPGoogleAdMobBannerCustomEvent ()
 
-@property (nonatomic, retain) GADBannerView *adBannerView;
+@property (nonatomic, strong) GADBannerView *adBannerView;
 
 @end
 
@@ -59,8 +59,6 @@
 - (void)dealloc
 {
     self.adBannerView.delegate = nil;
-    self.adBannerView = nil;
-    [super dealloc];
 }
 
 -(NSString *)description

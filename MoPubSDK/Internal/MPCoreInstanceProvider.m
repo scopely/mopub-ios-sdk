@@ -30,8 +30,8 @@ typedef enum
 @interface MPCoreInstanceProvider ()
 
 @property (nonatomic, copy) NSString *userAgent;
-@property (nonatomic, retain) NSMutableDictionary *singletons;
-@property (nonatomic, retain) NSMutableDictionary *carrierInfo;
+@property (nonatomic, strong) NSMutableDictionary *singletons;
+@property (nonatomic, strong) NSMutableDictionary *carrierInfo;
 @property (nonatomic, assign) MPTwitterDeepLink twitterDeepLinkStatus;
 
 @end
@@ -51,7 +51,7 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     dispatch_once(&once, ^{
         sharedProvider = [[self alloc] init];
     });
-    
+
     return sharedProvider;
 }
 
@@ -60,18 +60,12 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     self = [super init];
     if (self) {
         self.singletons = [NSMutableDictionary dictionary];
-        
+
         [self initializeCarrierInfo];
     }
     return self;
 }
 
-- (void)dealloc
-{
-    self.singletons = nil;
-    self.carrierInfo = nil;
-    [super dealloc];
-}
 
 - (id)singletonForClass:(Class)klass provider:(MPSingletonProviderBlock)provider
 {
@@ -83,21 +77,37 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     return singleton;
 }
 
+// This method ensures that "anObject" is retained until the next runloop iteration when
+// performNoOp: is executed.
+//
+// This is useful in situations where, potentially due to a callback chain reaction, an object
+// is synchronously deallocated as it's trying to do more work, especially invoking self, after
+// the callback.
+- (void)keepObjectAliveForCurrentRunLoopIteration:(id)anObject
+{
+    [self performSelector:@selector(performNoOp:) withObject:anObject afterDelay:0];
+}
+
+- (void)performNoOp:(id)anObject
+{
+    ; // noop
+}
+
 #pragma mark - Initializing Carrier Info
 
 - (void)initializeCarrierInfo
 {
     self.carrierInfo = [NSMutableDictionary dictionary];
-    
+
     // check if we have a saved copy
     NSDictionary *saved = [[NSUserDefaults standardUserDefaults] dictionaryForKey:MOPUB_CARRIER_INFO_DEFAULTS_KEY];
     if(saved != nil) {
         [self.carrierInfo addEntriesFromDictionary:saved];
     }
-    
+
     // now asynchronously load a fresh copy
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        CTTelephonyNetworkInfo *networkInfo = [[[CTTelephonyNetworkInfo alloc] init] autorelease];
+        CTTelephonyNetworkInfo *networkInfo = [[CTTelephonyNetworkInfo alloc] init];
         [self performSelectorOnMainThread:@selector(updateCarrierInfoForCTCarrier:) withObject:networkInfo.subscriberCellularProvider waitUntilDone:NO];
     });
 }
@@ -109,7 +119,7 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     [self.carrierInfo setValue:ctCarrier.isoCountryCode forKey:@"isoCountryCode"];
     [self.carrierInfo setValue:ctCarrier.mobileCountryCode forKey:@"mobileCountryCode"];
     [self.carrierInfo setValue:ctCarrier.mobileNetworkCode forKey:@"mobileNetworkCode"];
-    
+
     [[NSUserDefaults standardUserDefaults] setObject:self.carrierInfo forKey:MOPUB_CARRIER_INFO_DEFAULTS_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
@@ -126,15 +136,15 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 - (NSString *)userAgent
 {
     if (!_userAgent) {
-        self.userAgent = [[[[UIWebView alloc] init] autorelease] stringByEvaluatingJavaScriptFromString:@"navigator.userAgent"];
+        self.userAgent = [[[UIWebView alloc] init] stringByEvaluatingJavaScriptFromString:@"navigator.userAgent"];
     }
-    
+
     return _userAgent;
 }
 
 - (MPAdServerCommunicator *)buildMPAdServerCommunicatorWithDelegate:(id<MPAdServerCommunicatorDelegate>)delegate
 {
-    return [[(MPAdServerCommunicator *)[MPAdServerCommunicator alloc] initWithDelegate:delegate] autorelease];
+    return [(MPAdServerCommunicator *)[MPAdServerCommunicator alloc] initWithDelegate:delegate];
 }
 
 
@@ -155,27 +165,27 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 - (id<MPAdAlertManagerProtocol>)buildMPAdAlertManagerWithDelegate:(id)delegate
 {
     id<MPAdAlertManagerProtocol> adAlertManager = nil;
-    
+
     Class adAlertManagerClass = NSClassFromString(@"MPAdAlertManager");
     if(adAlertManagerClass != nil)
     {
-        adAlertManager = [[[adAlertManagerClass alloc] init] autorelease];
+        adAlertManager = [[adAlertManagerClass alloc] init];
         [adAlertManager performSelector:@selector(setDelegate:) withObject:delegate];
     }
-    
+
     return adAlertManager;
 }
 
 - (MPAdAlertGestureRecognizer *)buildMPAdAlertGestureRecognizerWithTarget:(id)target action:(SEL)action
 {
     MPAdAlertGestureRecognizer *gestureRecognizer = nil;
-    
+
     Class gestureRecognizerClass = NSClassFromString(@"MPAdAlertGestureRecognizer");
     if(gestureRecognizerClass != nil)
     {
-        gestureRecognizer = [[[gestureRecognizerClass alloc] initWithTarget:target action:action] autorelease];
+        gestureRecognizer = [[gestureRecognizerClass alloc] initWithTarget:target action:action];
     }
-    
+
     return gestureRecognizer;
 }
 
@@ -183,11 +193,11 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 {
     static NSOperationQueue *sharedOperationQueue = nil;
     static dispatch_once_t pred;
-    
+
     dispatch_once(&pred, ^{
         sharedOperationQueue = [[NSOperationQueue alloc] init];
     });
-    
+
     return sharedOperationQueue;
 }
 
@@ -217,7 +227,7 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 
 - (BOOL)isTwitterInstalled
 {
-    
+
     if (self.twitterDeepLinkStatus == MPTwitterDeepLinkNotChecked)
     {
         BOOL twitterDeepLinkEnabled = [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitter://timeline"]];
@@ -230,14 +240,14 @@ static MPCoreInstanceProvider *sharedProvider = nil;
             self.twitterDeepLinkStatus = MPTwitterDeepLinkDisabled;
         }
     }
-    
+
     return (self.twitterDeepLinkStatus == MPTwitterDeepLinkEnabled);
 }
 
 - (MPTwitterAvailability)twitterAvailabilityOnDevice
 {
     MPTwitterAvailability twitterAvailability = MPTwitterAvailabilityNone;
-    
+
     if ([self isTwitterInstalled])
     {
         twitterAvailability |= MPTwitterAvailabilityApp;
@@ -247,7 +257,7 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     {
         twitterAvailability |= MPTwitterAvailabilityNative;
     }
-    
+
     return twitterAvailability;
 }
 

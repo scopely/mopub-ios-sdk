@@ -15,18 +15,23 @@
 
 @interface MPBaseBannerAdapter : NSObject
 {
-    id<MPBannerAdapterDelegate> _delegate;
+    id<MPBannerAdapterDelegate> __weak _delegate;
 }
 
-@property (nonatomic, assign) id<MPBannerAdapterDelegate> delegate;
+@property (nonatomic, weak) id<MPBannerAdapterDelegate> delegate;
 @property (nonatomic, copy) NSURL *impressionTrackingURL;
 @property (nonatomic, copy) NSURL *clickTrackingURL;
 
 - (id)initWithDelegate:(id<MPBannerAdapterDelegate>)delegate;
 
 /*
- * -_getAdWithConfiguration wraps -getAdWithConfiguration in retain/release calls to prevent the
- * adapter from being prematurely deallocated.
+ * Sets the adapter's delegate to nil.
+ */
+- (void)unregisterDelegate;
+
+/*
+ * -_getAdWithConfiguration creates a strong reference to self before calling
+ * -getAdWithConfiguration to prevent the adapter from being prematurely deallocated.
  */
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration containerSize:(CGSize)size;
 - (void)_getAdWithConfiguration:(MPAdConfiguration *)configuration containerSize:(CGSize)size;

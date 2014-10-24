@@ -17,12 +17,12 @@
 + (NSMutableDictionary *)sharedCommandClassMap
 {
     static NSMutableDictionary *sharedMap = nil;
-    
+
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         sharedMap = [[NSMutableDictionary alloc] init];
     });
-    
+
     return sharedMap;
 }
 
@@ -50,7 +50,7 @@
 + (id)commandForString:(NSString *)string
 {
     Class commandClass = [self commandClassForString:string];
-    return [[[commandClass alloc] init] autorelease];
+    return [[commandClass alloc] init];
 }
 
 // return YES by default for user safety
@@ -166,7 +166,7 @@
     CoreLogType(WBLogLevelTrace, WBLogTypeAdBanner, @"Expanding to (%.1f, %.1f, %.1f, %.1f); displaying %@.", x, y, w, h, url);
 
     CGRect newFrame = CGRectMake(x, y, w, h);
-    
+
     NSDictionary *expandParams = [NSDictionary dictionaryWithObjectsAndKeys:
                                   NSStringFromCGRect(newFrame), @"expandToFrame",
                                   (url == nil) ? [NSNull null] : url , @"url",
@@ -174,7 +174,7 @@
                                   [NSNumber numberWithBool:NO], @"isModal",
                                   [NSNumber numberWithBool:[self boolFromParameters:params forKey:@"lockOrientation"]], @"shouldLockOrientation",
                                   nil];
-    
+
     [self.delegate mrCommand:self expandWithParams:expandParams];
 
     return YES;
@@ -204,7 +204,7 @@
 - (BOOL)executeWithParams:(NSDictionary *)params
 {
     [self.delegate mrCommand:self shouldUseCustomClose:[self boolFromParameters:params forKey:@"shouldUseCustomClose"]];
-    
+
     return YES;
 }
 
@@ -227,7 +227,7 @@
 - (BOOL)executeWithParams:(NSDictionary *)params
 {
     [self.delegate mrCommand:self openURL:[self urlFromParameters:params forKey:@"url"]];
-    
+
     return YES;
 }
 
@@ -250,7 +250,7 @@
 - (BOOL)executeWithParams:(NSDictionary *)params
 {
     [self.delegate mrCommand:self createCalendarEventWithParams:params];
-    
+
     return YES;
 }
 
@@ -279,7 +279,7 @@
 - (BOOL)executeWithParams:(NSDictionary *)params
 {
     [self.delegate mrCommand:self playVideoWithURL:[self urlFromParameters:params forKey:@"uri"]];
-    
+
     return YES;
 }
 
@@ -302,7 +302,7 @@
 - (BOOL)executeWithParams:(NSDictionary *)params
 {
     [self.delegate mrCommand:self storePictureWithURL:[self urlFromParameters:params forKey:@"uri"]];
-    
+
     return YES;
 }
 

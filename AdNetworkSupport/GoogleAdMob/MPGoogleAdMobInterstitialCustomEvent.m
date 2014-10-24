@@ -27,7 +27,7 @@
 
 - (GADInterstitial *)buildGADInterstitialAd
 {
-    return [[[GADInterstitial alloc] init] autorelease];
+    return [[GADInterstitial alloc] init];
 }
 
 - (GADRequest *)buildGADInterstitialRequest
@@ -41,7 +41,7 @@
 
 @interface MPGoogleAdMobInterstitialCustomEvent ()
 
-@property (nonatomic, retain) GADInterstitial *interstitial;
+@property (nonatomic, strong) GADInterstitial *interstitial;
 @property (nonatomic) BOOL ready;
 
 @end
@@ -96,8 +96,6 @@
 - (void)dealloc
 {
     self.interstitial.delegate = nil;
-    self.interstitial = nil;
-    [super dealloc];
 }
 
 -(NSString *)description

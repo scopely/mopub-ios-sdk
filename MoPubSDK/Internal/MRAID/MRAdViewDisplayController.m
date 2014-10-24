@@ -32,7 +32,7 @@ static NSString *const kMovieWillExitNotification42 =
 
 @interface MRAdViewDisplayController ()
 
-@property (nonatomic, retain) MRAdView *twoPartExpansionView;
+@property (nonatomic, strong) MRAdView *twoPartExpansionView;
 @property (nonatomic, assign) MRAdViewState currentState;
 
 - (CGRect)defaultPosition;
@@ -78,7 +78,7 @@ static NSString *const kMovieWillExitNotification42 =
 {
     self = [super init];
     if (self) {
-        _jsEventEmitter = [jsEventEmitter retain];
+        _jsEventEmitter = jsEventEmitter;
         _view = adView;
         _allowsExpansion = allowsExpansion;
         _closeButtonStyle = closeButtonStyle;
@@ -87,11 +87,11 @@ static NSString *const kMovieWillExitNotification42 =
         _defaultFrame = _view.frame;
         _maxSize = _view.frame.size;
 
-        _viewabilityTimer = [[[MPCoreInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:kViewabilityTimerInterval
+        _viewabilityTimer = [[MPCoreInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:kViewabilityTimerInterval
                                                                                         target:self
                                                                                       selector:@selector(checkViewability)
                                                                                        repeats:YES
-                                                                                       logType:(adView.placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage)] retain];
+                                                                                       logType:(adView.placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage)];
         [_viewabilityTimer scheduleNow];
 
 
@@ -128,13 +128,8 @@ static NSString *const kMovieWillExitNotification42 =
 }
 
 - (void)dealloc {
-    [_twoPartExpansionView release];
     [_viewabilityTimer invalidate];
-    [_viewabilityTimer release];
-    [_dimmingView release];
-    [_jsEventEmitter release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [super dealloc];
 }
 
 #pragma mark - Public

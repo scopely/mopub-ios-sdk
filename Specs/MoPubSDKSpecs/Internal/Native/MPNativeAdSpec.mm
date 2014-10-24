@@ -6,6 +6,7 @@
 #import "MPMoPubNativeAdAdapter.h"
 #import "MPNativeAd+Internal.h"
 #import "UIView+MPNativeAd.h"
+#import "MPNativeAdDelegate.h"
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
@@ -35,9 +36,9 @@ describe(@"MPNativeAd", ^{
         configuration = [MPAdConfigurationFactory defaultNativeAdConfiguration];
 
         NSDictionary *properties = [NSJSONSerialization mp_JSONObjectWithData:configuration.adResponseData options:0 clearNullObjects:YES error:nil];
-        adAdapter = [[[MPMoPubNativeAdAdapter alloc] initWithAdProperties:[[properties mutableCopy] autorelease]] autorelease];
-        nativeAd = [[[MPNativeAd alloc] initWithAdAdapter:adAdapter] autorelease];
-        adView =  [[[AdView alloc] init] autorelease];
+        adAdapter = [[MPMoPubNativeAdAdapter alloc] initWithAdProperties:[properties mutableCopy]];
+        nativeAd = [[MPNativeAd alloc] initWithAdAdapter:adAdapter];
+        adView =  [[AdView alloc] init];
         [MPNativeAd mp_clearTrackMetricURLCallsCount];
     });
 
@@ -71,7 +72,7 @@ describe(@"MPNativeAd", ^{
 
             beforeEach(^{
                 nativeAdAdapter = nice_fake_for(@protocol(MPNativeAdAdapter));
-                starRatingNativeAd = [[[MPNativeAd alloc] initWithAdAdapter:nativeAdAdapter] autorelease];
+                starRatingNativeAd = [[MPNativeAd alloc] initWithAdAdapter:nativeAdAdapter];
             });
 
             it(@"should return a valid star rating object if the backing ad provides a valid value", ^{
@@ -126,7 +127,7 @@ describe(@"MPNativeAd", ^{
         __block MPNativeAd *nativeAd2;
 
         beforeEach(^{
-            nativeAd2 = [[[MPNativeAd alloc] initWithAdAdapter:adAdapter] autorelease];
+            nativeAd2 = [[MPNativeAd alloc] initWithAdAdapter:adAdapter];
         });
 
         it(@"should set the native ad as an associated object on the view", ^{
@@ -157,8 +158,8 @@ describe(@"MPNativeAd", ^{
         __block UITableViewCell *tableViewCell;
 
         beforeEach(^{
-            tableViewCell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"reuseme"] autorelease];
-            nativeAd2 = [[[MPNativeAd alloc] initWithAdAdapter:adAdapter] autorelease];
+            tableViewCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"reuseme"];
+            nativeAd2 = [[MPNativeAd alloc] initWithAdAdapter:adAdapter];
         });
 
         it(@"should set the native ad as an associated object on the cell", ^{
@@ -189,8 +190,8 @@ describe(@"MPNativeAd", ^{
         __block UICollectionViewCell *collectionViewCell;
 
         beforeEach(^{
-            collectionViewCell = [[[UICollectionViewCell alloc] initWithFrame:CGRectMake(0, 0, 10, 10)] autorelease];
-            nativeAd2 = [[[MPNativeAd alloc] initWithAdAdapter:adAdapter] autorelease];
+            collectionViewCell = [[UICollectionViewCell alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
+            nativeAd2 = [[MPNativeAd alloc] initWithAdAdapter:adAdapter];
         });
 
         it(@"should set the native ad as an associated object on the cell", ^{
@@ -220,7 +221,7 @@ describe(@"MPNativeAd", ^{
         __block UIViewController *rootController;
 
         beforeEach(^{
-            rootController = [[[UIViewController alloc] init] autorelease];
+            rootController = [[UIViewController alloc] init];
             // Make sure it has an engagement tracking url.
             nativeAd.engagementTrackingURL = [NSURL URLWithString:@"http://www.mopub.com"];
         });
@@ -270,44 +271,92 @@ describe(@"MPNativeAd", ^{
             [nativeAd trackImpression];
             [MPNativeAd mp_trackMetricURLCallsCount] should equal(1);
         });
+
+        context(@"-displayContentForURL:completion:", ^{
+            context(@"when the native ad has a delegate", ^{
+                __block id <CedarDouble, MPNativeAdDelegate> adDelegate;
+
+                beforeEach(^{
+                    rootController = [[UIViewController alloc] init];
+                    adDelegate = fake_for(@protocol(MPNativeAdDelegate));
+                    nativeAd.delegate = adDelegate;
+                });
+
+                it(@"should pass the delegate's viewControllerForPresentingModalView to the adAdapter", ^{
+                    adDelegate stub_method("viewControllerForPresentingModalView").and_return(rootController);
+                    spy_on(adAdapter);
+                    [nativeAd displayContentForURL:nil completion:nil];
+                    adAdapter should have_received(@selector(displayContentForURL:rootViewController:completion:)).with(nil).and_with(rootController).and_with(nil);
+                });
+
+                it(@"should call completion block with an error when displaying with a nil view controller", ^{
+                    adDelegate stub_method("viewControllerForPresentingModalView").and_return(nil);
+                    __block BOOL wasSuccessful = YES;
+                    [nativeAd displayContentForURL:[NSURL URLWithString:@"http://www.mopub.com"] completion:^(BOOL success, NSError *error) {
+                        wasSuccessful = success;
+                    }];
+
+                    wasSuccessful should be_falsy;
+                });
+            });
+
+            context(@"when the native ad does not have a delegate", ^{
+                it(@"should call displayContentForURL:rootViewController:completion: on the ad adapter", ^{
+                    spy_on(adAdapter);
+                    [nativeAd displayContentForURL:nil completion:nil];
+                    adAdapter should have_received(@selector(displayContentForURL:rootViewController:completion:));
+                });
+
+                it(@"should call the completion block without success", ^{
+                    __block BOOL wasSuccessful = YES;
+                    [nativeAd displayContentForURL:[NSURL URLWithString:@"http://www.mopub.com"] completion:^(BOOL success, NSError *error) {
+                        wasSuccessful = success;
+                    }];
+
+                    wasSuccessful should_not be_truthy;
+                });
+            });
+        });
     });
 
-    context(@"when receiving messages along with a delegate that implements all protocol methods", ^{
+    context(@"when its native ad adapter implements all protocol methods and does not handle click or impression tracking", ^{
         __block id<CedarDouble, MPNativeAdAdapter> mockadAdapter;
         __block MPNativeAd *nativeAd;
 
         beforeEach(^{
             mockadAdapter = nice_fake_for(@protocol(MPNativeAdAdapter));
-            nativeAd = [[[MPNativeAd alloc] initWithAdAdapter:mockadAdapter] autorelease];
+            mockadAdapter stub_method(@selector(enableThirdPartyImpressionTracking)).and_return(NO);
+            mockadAdapter stub_method(@selector(enableThirdPartyClickTracking)).and_return(NO);
+            nativeAd = [[MPNativeAd alloc] initWithAdAdapter:mockadAdapter];
         });
 
-        it(@"should forward track click to backing object", ^{
+        it(@"should forward track click to native ad adapter", ^{
             [nativeAd trackClick];
             mockadAdapter should have_received(@selector(trackClick));
         });
 
-        it(@"should forward track impression to backing object", ^{
+        it(@"should forward track impression to native ad adapter", ^{
             [nativeAd trackImpression];
             mockadAdapter should have_received(@selector(trackImpression));
         });
 
-        it(@"should forward willAttachToView to backing object", ^{
+        it(@"should forward willAttachToView to native ad adapter", ^{
             [nativeAd prepareForDisplayInView:adView];
-            mockadAdapter should have_received(@selector(willAttachToView:));
+            mockadAdapter should have_received(@selector(willAttachToView:)).with(adView);
         });
 
-        it(@"should forward requiredSecondsForImpression to backing object", ^{
+        it(@"should forward requiredSecondsForImpression to native ad adapter", ^{
             [nativeAd requiredSecondsForImpression];
             mockadAdapter should have_received(@selector(requiredSecondsForImpression));
         });
 
         it(@"should forward displayContentForURL (URL version) to the adAdapter", ^{
-            [nativeAd displayContentForURL:[NSURL URLWithString:@"http://www.mopub.com"] rootViewController:[[[UIViewController alloc] init] autorelease] completion:nil];
+            [nativeAd displayContentForURL:[NSURL URLWithString:@"http://www.mopub.com"] rootViewController:[[UIViewController alloc] init] completion:nil];
             mockadAdapter should have_received(@selector(displayContentForURL:rootViewController:completion:));
         });
 
         it(@"should forward displayContentForURL (no-URL version) to the adAdapter", ^{
-            [nativeAd displayContentFromRootViewController:[[[UIViewController alloc] init] autorelease] completion:nil];
+            [nativeAd displayContentFromRootViewController:[[UIViewController alloc] init] completion:nil];
             mockadAdapter should have_received(@selector(displayContentForURL:rootViewController:completion:));
         });
 
@@ -322,33 +371,85 @@ describe(@"MPNativeAd", ^{
         });
     });
 
-    context(@"when receiving messages along with a delegate that implements none of the optional protocol methods", ^{
+    context(@"when its native ad adapter implements none of the optional protocol methods", ^{
         __block id<CedarDouble, MPNativeAdAdapter> mockadAdapter;
         __block MPNativeAd *nativeAd;
 
         beforeEach(^{
             mockadAdapter = fake_for(@protocol(MPNativeAdAdapter));
-            nativeAd = [[[MPNativeAd alloc] initWithAdAdapter:mockadAdapter] autorelease];
+            nativeAd = [[MPNativeAd alloc] initWithAdAdapter:mockadAdapter];
         });
 
-        it(@"should not forward track click to backing object", ^{
+        it(@"should not forward track click to native ad adapter", ^{
             [nativeAd trackClick];
             mockadAdapter should_not have_received(@selector(trackClick));
         });
 
-        it(@"should not forward track impression to backing object", ^{
+        it(@"should not forward track impression to native ad adapter", ^{
             [nativeAd trackImpression];
             mockadAdapter should_not have_received(@selector(trackImpression));
         });
 
-        it(@"should not forward willAttachToView to backing object", ^{
+        it(@"should not forward willAttachToView to native ad adapter", ^{
             [nativeAd prepareForDisplayInView:adView];
             mockadAdapter should_not have_received(@selector(willAttachToView:));
         });
 
-        it(@"should not forward requiredSecondsForImpression to backing object", ^{
+        it(@"should not forward requiredSecondsForImpression to native ad adapter", ^{
             [nativeAd requiredSecondsForImpression];
             mockadAdapter should_not have_received(@selector(requiredSecondsForImpression));
+        });
+    });
+
+    context(@"when its native ad adapter handles click and impression tracking", ^{
+        __block id<CedarDouble, MPNativeAdAdapter> mockadAdapter;
+        __block MPNativeAd *nativeAd;
+
+        beforeEach(^{
+            mockadAdapter = nice_fake_for(@protocol(MPNativeAdAdapter));
+            mockadAdapter stub_method("enableThirdPartyImpressionTracking").and_return(YES);
+            mockadAdapter stub_method("enableThirdPartyClickTracking").and_return(YES);
+            nativeAd = [[MPNativeAd alloc] initWithAdAdapter:mockadAdapter];
+        });
+
+        it(@"should not forward track click to native ad adapter", ^{
+            [nativeAd trackClick];
+            mockadAdapter should_not have_received(@selector(trackClick));
+        });
+
+        it(@"should not forward track impression to native ad adapter", ^{
+            [nativeAd trackImpression];
+            mockadAdapter should_not have_received(@selector(trackImpression));
+        });
+
+        it(@"should forward willAttachToView to native ad adapter", ^{
+            [nativeAd prepareForDisplayInView:adView];
+            mockadAdapter should have_received(@selector(willAttachToView:)).with(adView);
+        });
+
+        it(@"should forward requiredSecondsForImpression to native ad adapter", ^{
+            [nativeAd requiredSecondsForImpression];
+            mockadAdapter should have_received(@selector(requiredSecondsForImpression));
+        });
+
+        it(@"should not forward displayContentForURL (URL version) to the adAdapter", ^{
+            [nativeAd displayContentForURL:[NSURL URLWithString:@"http://www.mopub.com"] rootViewController:[[UIViewController alloc] init] completion:nil];
+            mockadAdapter should_not have_received(@selector(displayContentForURL:rootViewController:completion:));
+        });
+
+        it(@"should not forward displayContentForURL (no-URL version) to the adAdapter", ^{
+            [nativeAd displayContentFromRootViewController:[[UIViewController alloc] init] completion:nil];
+            mockadAdapter should_not have_received(@selector(displayContentForURL:rootViewController:completion:));
+        });
+
+        it(@"should forward properties to the adAdapter", ^{
+            [nativeAd properties];
+            mockadAdapter should have_received(@selector(properties));
+        });
+
+        it(@"should forward defaultActionURL to the adAdapter", ^{
+            [nativeAd defaultActionURL];
+            mockadAdapter should have_received(@selector(defaultActionURL));
         });
     });
 });

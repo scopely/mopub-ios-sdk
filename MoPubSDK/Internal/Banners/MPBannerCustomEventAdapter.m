@@ -16,8 +16,8 @@
 
 @interface MPBannerCustomEventAdapter ()
 
-@property (nonatomic, retain) MPBannerCustomEvent *bannerCustomEvent;
-@property (nonatomic, retain) MPAdConfiguration *configuration;
+@property (nonatomic, strong) MPBannerCustomEvent *bannerCustomEvent;
+@property (nonatomic, strong) MPAdConfiguration *configuration;
 @property (nonatomic, assign) BOOL hasTrackedImpression;
 @property (nonatomic, assign) BOOL hasTrackedClick;
 
@@ -29,12 +29,20 @@
 @synthesize hasTrackedImpression = _hasTrackedImpression;
 @synthesize hasTrackedClick = _hasTrackedClick;
 
-- (void)dealloc {
-    [_bannerCustomEvent invalidate];
-    _bannerCustomEvent.delegate = nil;
-    [_bannerCustomEvent release];
-    [_configuration release];
-    [super dealloc];
+- (void)unregisterDelegate
+{
+    if ([self.bannerCustomEvent respondsToSelector:@selector(invalidate)]) {
+        // Secret API to allow us to detach the custom event from (shared instance) routers synchronously
+        // See the iAd banner custom event for an example use case.
+        [self.bannerCustomEvent performSelector:@selector(invalidate)];
+    }
+    self.bannerCustomEvent.delegate = nil;
+
+    // make sure the custom event isn't released synchronously as objects owned by the custom event
+    // may do additional work after a callback that results in unregisterDelegate being called
+    [[MPCoreInstanceProvider sharedProvider] keepObjectAliveForCurrentRunLoopIteration:_bannerCustomEvent];
+
+    [super unregisterDelegate];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,11 +59,9 @@
         
         WBAdControllerEvent *controllerEvent = [[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[self.bannerCustomEvent description] adType:WBAdTypeBanner];
         [WBAdControllerEvent postNotification:controllerEvent];
-        [controllerEvent release];
         
         WBAdEvent *event = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:[self.bannerCustomEvent description] adType:WBAdTypeBanner];
         [WBAdEvent postNotification:event];
-        [event release];
         
         self.configuration.customAdNetwork = [self.bannerCustomEvent description];
         [self.bannerCustomEvent requestAdWithSize:size customEventInfo:configuration.customEventClassData];
@@ -108,7 +114,6 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[event description] adType:WBAdTypeBanner];
     [WBAdEvent postNotification:adEvent];
-    [adEvent release];
     CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"%@ banner loaded", event);
     [self didStopLoading];
     if (ad) {
@@ -143,7 +148,6 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLeaveApp adNetwork:[event description] adType:WBAdTypeBanner];
     [WBAdEvent postNotification:adEvent];
-    [adEvent release];
     CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"%@ banner bannerCustomEventWillLeaveApplication", event);
     [self trackClickOnce];
     [self.delegate userWillLeaveApplicationFromAdapter:self];

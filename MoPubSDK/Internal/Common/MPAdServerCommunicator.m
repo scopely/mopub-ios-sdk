@@ -18,9 +18,9 @@ const NSTimeInterval kRequestTimeoutInterval = 10.0;
 
 @property (nonatomic, assign, readwrite) BOOL loading;
 @property (nonatomic, copy) NSURL *URL;
-@property (nonatomic, retain) NSURLConnection *connection;
-@property (nonatomic, retain) NSMutableData *responseData;
-@property (nonatomic, retain) NSDictionary *responseHeaders;
+@property (nonatomic, strong) NSURLConnection *connection;
+@property (nonatomic, strong) NSMutableData *responseData;
+@property (nonatomic, strong) NSDictionary *responseHeaders;
 
 - (NSError *)errorForStatusCode:(NSInteger)statusCode;
 - (NSURLRequest *)adRequestForURL:(NSURL *)URL;
@@ -49,13 +49,8 @@ const NSTimeInterval kRequestTimeoutInterval = 10.0;
 
 - (void)dealloc
 {
-    self.URL = nil;
     [self.connection cancel];
-    self.connection = nil;
-    self.responseData = nil;
-    self.responseHeaders = nil;
 
-    [super dealloc];
 }
 
 #pragma mark - Public
@@ -109,9 +104,9 @@ const NSTimeInterval kRequestTimeoutInterval = 10.0;
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    MPAdConfiguration *configuration = [[[MPAdConfiguration alloc]
+    MPAdConfiguration *configuration = [[MPAdConfiguration alloc]
                                          initWithHeaders:self.responseHeaders
-                                         data:self.responseData] autorelease];
+                                         data:self.responseData];
     self.loading = NO;
     [self.delegate communicatorDidReceiveAdConfiguration:configuration];
 }

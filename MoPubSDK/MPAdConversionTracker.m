@@ -16,7 +16,7 @@
 
 @interface MPAdConversionTracker ()
 
-@property (nonatomic, retain) NSMutableData *responseData;
+@property (nonatomic, strong) NSMutableData *responseData;
 @property (nonatomic, assign) NSInteger statusCode;
 
 - (NSURL *)URLForAppID:(NSString *)appID;
@@ -40,11 +40,6 @@
     }
 }
 
-- (void)dealloc
-{
-    self.responseData = nil;
-    [super dealloc];
-}
 
 - (void)reportApplicationOpenForApplicationID:(NSString *)appID
 {

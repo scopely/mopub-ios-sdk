@@ -19,7 +19,7 @@
 
 + (MPAnalyticsTracker *)tracker
 {
-    return [[[MPAnalyticsTracker alloc] init] autorelease];
+    return [[MPAnalyticsTracker alloc] init];
 }
 
 - (void)trackImpressionForConfiguration:(MPAdConfiguration *)configuration

@@ -22,8 +22,8 @@
 
 @interface MPBaseBannerAdapter ()
 
-@property (nonatomic, retain) MPAdConfiguration *configuration;
-@property (nonatomic, retain) MPTimer *timeoutTimer;
+@property (nonatomic, strong) MPAdConfiguration *configuration;
+@property (nonatomic, strong) MPTimer *timeoutTimer;
 
 - (void)startTimeoutTimer;
 
@@ -47,13 +47,14 @@
 
 - (void)dealloc
 {
-    _delegate = nil;
-    [_configuration release];
-    [_timeoutTimer invalidate];
-
-    [super dealloc];
+    [self unregisterDelegate];
+    [self.timeoutTimer invalidate];
 }
 
+- (void)unregisterDelegate
+{
+    self.delegate = nil;
+}
 
 #pragma mark - Requesting Ads
 
@@ -69,9 +70,8 @@
 
     [self startTimeoutTimer];
 
-    [self retain];
-    [self getAdWithConfiguration:configuration containerSize:size];
-    [self release];
+    MPBaseBannerAdapter *strongSelf = self;
+    [strongSelf getAdWithConfiguration:configuration containerSize:size];
 }
 
 - (void)didStopLoading
@@ -83,7 +83,6 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeShow adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner];
     [WBAdEvent postNotification:adEvent];
-    [adEvent release];
     [self trackImpression];
 }
 
@@ -91,7 +90,7 @@
 {
     NSTimeInterval timeInterval = (self.configuration && self.configuration.adTimeoutInterval >= 0) ?
     self.configuration.adTimeoutInterval : BANNER_TIMEOUT_INTERVAL;
-    
+
     if (timeInterval > 0) {
         self.timeoutTimer = [[MPCoreInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
                                                                                        target:self
@@ -123,7 +122,6 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeImpression adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner];
     [WBAdEvent postNotification:adEvent];
-    [adEvent release];
     [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackImpressionForConfiguration:self.configuration];
 }
 
@@ -131,7 +129,6 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeClick adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner];
     [WBAdEvent postNotification:adEvent];
-    [adEvent release];
     [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackClickForConfiguration:self.configuration];
 }
 

@@ -26,9 +26,9 @@
                         rootViewController:(UIViewController *)controller
                                   delegate:(id<FBAdViewDelegate>)delegate
 {
-    FBAdView *adView = [[[FBAdView alloc] initWithPlacementID:placementID
+    FBAdView *adView = [[FBAdView alloc] initWithPlacementID:placementID
                                                        adSize:kFBAdSize320x50
-                                           rootViewController:controller] autorelease];
+                                           rootViewController:controller];
     adView.delegate = delegate;
     return adView;
 }
@@ -37,7 +37,7 @@
 
 @interface FacebookBannerCustomEvent ()
 
-@property (nonatomic, retain) FBAdView *fbAdView;
+@property (nonatomic, strong) FBAdView *fbAdView;
 
 @end
 
@@ -84,8 +84,7 @@
 
 - (void)dealloc
 {
-    [_fbAdView release];
-    [super dealloc];
+    _fbAdView.delegate = nil;
 }
 
 #pragma mark FBAdViewDelegate methods

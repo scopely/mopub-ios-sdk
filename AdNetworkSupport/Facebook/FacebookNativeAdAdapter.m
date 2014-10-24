@@ -9,10 +9,11 @@
 #import "FacebookNativeAdAdapter.h"
 #import "MPNativeAdConstants.h"
 #import "MPNativeAdError.h"
+#import "MPLogging.h"
 
-@interface FacebookNativeAdAdapter ()
+@interface FacebookNativeAdAdapter () <FBNativeAdDelegate>
 
-@property (nonatomic, readonly, retain) FBNativeAd *fbNativeAd;
+@property (nonatomic, readonly, strong) FBNativeAd *fbNativeAd;
 
 @end
 
@@ -23,7 +24,8 @@
 - (instancetype)initWithFBNativeAd:(FBNativeAd *)fbNativeAd
 {
     if (self = [super init]) {
-        _fbNativeAd = [fbNativeAd retain];
+        _fbNativeAd = fbNativeAd;
+        _fbNativeAd.delegate = self;
 
         NSNumber *starRating = nil;
 
@@ -68,19 +70,12 @@
             [properties setObject:fbNativeAd.socialContext forKey:@"socialContext"];
         }
 
-        _properties = [properties retain];
+        _properties = properties;
     }
 
     return self;
 }
 
-- (void)dealloc
-{
-    [_fbNativeAd release];
-    [_properties release];
-
-    [super dealloc];
-}
 
 #pragma mark - MPNativeAdAdapter
 
@@ -94,36 +89,42 @@
     return nil;
 }
 
-- (void)displayContentForURL:(NSURL *)URL rootViewController:(UIViewController *)controller
-                  completion:(void (^)(BOOL success, NSError *error))completionBlock
+- (BOOL)enableThirdPartyImpressionTracking
 {
-    NSError *error = nil;
-
-    if (!controller) {
-        NSDictionary *userInfo = [NSDictionary dictionaryWithObject:@"Cannot display content without a root view controller."
-                                                             forKey:MPNativeAdErrorContentDisplayErrorReasonKey];
-        error = [NSError errorWithDomain:MoPubNativeAdsSDKDomain
-                                    code:MPNativeAdErrorContentDisplayError
-                                userInfo:userInfo];
-
-        if (completionBlock) {
-            completionBlock(NO, error);
-        }
-
-        return;
-    }
-
-    [self.fbNativeAd handleClickWithViewController:controller
-                                        callback:^(FBNativeAd *nativeAd) {
-                                            if (completionBlock) {
-                                                completionBlock(YES, nil);
-                                            }
-                                        }];
+    return YES;
 }
 
-- (void)trackImpression
+- (BOOL)enableThirdPartyClickTracking
 {
-    [self.fbNativeAd logImpression];
+    return YES;
+}
+
+- (void)willAttachToView:(UIView *)view
+{
+    [self.fbNativeAd registerViewForInteraction:view withViewController:[self.delegate viewControllerForPresentingModalView]];
+}
+- (void)didDetachFromView:(UIView *)view
+{
+    [self.fbNativeAd unregisterView];
+}
+#pragma mark - FBNativeAdDelegate
+
+- (void)nativeAdWillLogImpression:(FBNativeAd *)nativeAd
+{
+    if ([self.delegate respondsToSelector:@selector(nativeAdWillLogImpression:)]) {
+        [self.delegate nativeAdWillLogImpression:self];
+    } else {
+        MPLogWarn(@"Delegate does not implement impression tracking callback. Impressions likely not being tracked.");
+    }
+}
+
+- (void)nativeAdDidClick:(FBNativeAd *)nativeAd
+{
+    if ([self.delegate respondsToSelector:@selector(nativeAdDidClick:)]) {
+        [self.delegate nativeAdDidClick:self];
+    } else {
+        MPLogWarn(@"Delegate does not implement click tracking callback. Clicks likely not being tracked.");
+    }
 }
 
 @end

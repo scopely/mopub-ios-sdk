@@ -9,7 +9,6 @@
 #import "MPNativeAd+Internal.h"
 #import "MPNativeAdRequestTargeting.h"
 #import "MPNativeAdRequest+MPNativeAdSource.h"
-#import "MPLogging.h"
 #import "MPNativeAdError.h"
 
 static NSUInteger const kCacheSizeLimit = 3;
@@ -18,10 +17,10 @@ static CGFloat const kBaseBackoffTimeMultiplier = 1.5;
 
 @interface MPNativeAdSourceQueue ()
 
-@property (nonatomic, retain) NSMutableArray *adQueue;
+@property (nonatomic, strong) NSMutableArray *adQueue;
 @property (nonatomic, assign) NSUInteger backoffCounter;
 @property (nonatomic, copy) NSString *adUnitIdentifier;
-@property (nonatomic, retain) MPNativeAdRequestTargeting *targeting;
+@property (nonatomic, strong) MPNativeAdRequestTargeting *targeting;
 @property (nonatomic, assign) BOOL isAdLoading;
 
 @end
@@ -35,26 +34,18 @@ static CGFloat const kBaseBackoffTimeMultiplier = 1.5;
     self = [super init];
     if (self) {
         _adUnitIdentifier = [identifier copy];
-        _targeting = [targeting retain];
+        _targeting = targeting;
         _adQueue = [[NSMutableArray alloc] init];
     }
     return self;
 }
 
-- (void)dealloc
-{
-    [_adUnitIdentifier release];
-    [_targeting release];
-    [_adQueue release];
-
-    [super dealloc];
-}
 
 #pragma mark - Public Methods
 
 - (MPNativeAd *)dequeueAd
 {
-    MPNativeAd *nextAd = [[[self.adQueue firstObject] retain] autorelease];
+    MPNativeAd *nextAd = [self.adQueue firstObject];
     [self.adQueue removeObject:nextAd];
     [self loadAds];
     return nextAd;
@@ -131,7 +122,7 @@ static CGFloat const kBaseBackoffTimeMultiplier = 1.5;
             }
         }
         else {
-            MPLogDebug(@"%@", error);
+//            MPLogDebug(@"%@", error);
             //increment in this failure case to prevent retrying a request that wasn't bid on.
             //currently under discussion on whether we do this or not.
             if (error.code == MPNativeAdErrorNoInventory) {
@@ -142,9 +133,9 @@ static CGFloat const kBaseBackoffTimeMultiplier = 1.5;
             self.backoffCounter++;
             if (backoffTime < kMaxBackoffTimeInterval) {
                 [self performSelector:@selector(replenishCache) withObject:nil afterDelay:backoffTime];
-                MPLogDebug(@"Scheduled the backoff to try again in %.1f seconds.", backoffTime);
+//                MPLogDebug(@"Scheduled the backoff to try again in %.1f seconds.", backoffTime);
             } else {
-                MPLogDebug(@"Backoff has timed out", backoffTime);
+//                MPLogDebug(@"Backoff has timed out", backoffTime);
                 self.backoffCounter = 0;
             }
         }

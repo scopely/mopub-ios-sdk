@@ -17,8 +17,8 @@
 
 @interface MPInterstitialCustomEventAdapter ()
 
-@property (nonatomic, retain) MPInterstitialCustomEvent *interstitialCustomEvent;
-@property (nonatomic, retain) MPAdConfiguration *configuration;
+@property (nonatomic, strong) MPInterstitialCustomEvent *interstitialCustomEvent;
+@property (nonatomic, strong) MPAdConfiguration *configuration;
 @property (nonatomic, assign) BOOL hasTrackedImpression;
 @property (nonatomic, assign) BOOL hasTrackedClick;
 
@@ -32,12 +32,16 @@
 
 - (void)dealloc
 {
-    [_interstitialCustomEvent invalidate];
-    _interstitialCustomEvent.delegate = nil;
-    [_interstitialCustomEvent release];
-    [_configuration release];
-    
-    [super dealloc];
+    if ([self.interstitialCustomEvent respondsToSelector:@selector(invalidate)]) {
+        // Secret API to allow us to detach the custom event from (shared instance) routers synchronously
+        // See the chartboost interstitial custom event for an example use case.
+        [self.interstitialCustomEvent performSelector:@selector(invalidate)];
+    }
+    self.interstitialCustomEvent.delegate = nil;
+
+    // make sure the custom event isn't released synchronously as objects owned by the custom event
+    // may do additional work after a callback that results in dealloc being called
+    [[MPCoreInstanceProvider sharedProvider] keepObjectAliveForCurrentRunLoopIteration:_interstitialCustomEvent];
 }
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration
@@ -51,13 +55,11 @@
         CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting %@ interstitial", self.interstitialCustomEvent);
         WBAdControllerEvent *controllerEvent = [[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[self.interstitialCustomEvent description] adType:WBAdTypeInterstitial];
         [WBAdControllerEvent postNotification:controllerEvent];
-        [controllerEvent release];
         
         self.configuration.customAdNetwork = [self.interstitialCustomEvent description];
         
         WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:[self.interstitialCustomEvent description] adType:WBAdTypeInterstitial];
         [WBAdEvent postNotification:adEvent];
-        [adEvent release];
         
         [self.interstitialCustomEvent requestInterstitialWithCustomEventInfo:configuration.customEventClassData];
     } else {
@@ -93,7 +95,6 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[customEvent description] adType:WBAdTypeInterstitial];
     [WBAdEvent postNotification:adEvent];
-    [adEvent release];
     
     CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"%@ interstitial did load", customEvent);
     [self didStopLoading];
@@ -119,7 +120,6 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeShow adNetwork:[customEvent description] adType:WBAdTypeInterstitial];
     [WBAdEvent postNotification:adEvent];
-    [adEvent release];
     CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"%@ interstitial did appear", customEvent);
     if ([self.interstitialCustomEvent enableAutomaticImpressionAndClickTracking] && !self.hasTrackedImpression) {
         self.hasTrackedImpression = YES;
@@ -162,7 +162,7 @@
 {
     WBAdEvent *event = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLeaveApp adNetwork:[customEvent description] adType:WBAdTypeInterstitial];
     [WBAdEvent postNotification:event];
-    [event release];
+
     CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"%@ interstitial will leave application", customEvent);
     [self.delegate interstitialWillLeaveApplicationForAdapter:self];
 }

@@ -26,7 +26,7 @@
 
 - (MMAdView *)buildMMAdViewWithFrame:(CGRect)frame apid:(NSString *)apid rootViewController:(UIViewController *)controller
 {
-    return [[[MMAdView alloc] initWithFrame:frame apid:apid rootViewController:controller] autorelease];
+    return [[MMAdView alloc] initWithFrame:frame apid:apid rootViewController:controller];
 }
 
 @end
@@ -35,7 +35,7 @@
 
 @interface MPMMCompletionBlockProxy : NSObject
 
-@property (nonatomic, assign) MPMillennialBannerCustomEvent *event;
+@property (nonatomic, weak) MPMillennialBannerCustomEvent *event;
 
 - (void)onRequestCompletion:(BOOL)success;
 
@@ -43,11 +43,11 @@
 
 @interface MPMillennialBannerCustomEvent ()
 
-@property (nonatomic, retain) MMAdView *mmAdView;
+@property (nonatomic, strong) MMAdView *mmAdView;
 @property (nonatomic, assign) BOOL didTrackImpression;
 @property (nonatomic, assign) BOOL didTrackClick;
 @property (nonatomic, assign) BOOL didShowModal;
-@property (nonatomic, retain) MPMMCompletionBlockProxy *mmCompletionBlockProxy;
+@property (nonatomic, strong) MPMMCompletionBlockProxy *mmCompletionBlockProxy;
 
 - (void)onRequestCompletion:(BOOL)success;
 - (CGSize)sizeFromCustomEventInfo:(NSDictionary *)info;
@@ -84,7 +84,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(modalWillAppear:) name:MillennialMediaAdModalWillAppear object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(modalDidDismiss:) name:MillennialMediaAdModalDidDismiss object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminateFromAd:) name:MillennialMediaAdWillTerminateApplication object:nil];
-        self.mmCompletionBlockProxy = [[[MPMMCompletionBlockProxy alloc] init] autorelease];
+        self.mmCompletionBlockProxy = [[MPMMCompletionBlockProxy alloc] init];
         self.mmCompletionBlockProxy.event = self;
     }
     return self;
@@ -98,10 +98,7 @@
 - (void)dealloc
 {
     self.mmCompletionBlockProxy.event = nil;
-    self.mmCompletionBlockProxy = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    self.mmAdView = nil;
-    [super dealloc];
 }
 
 -(NSString *)description

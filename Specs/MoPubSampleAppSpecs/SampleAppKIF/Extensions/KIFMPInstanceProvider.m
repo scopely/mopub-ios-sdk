@@ -40,12 +40,12 @@ static KIFMPInstanceProvider *sharedProvider = nil;
 
 - (GSFullscreenAd *)buildGSFullscreenAdWithDelegate:(id<GSAdDelegate>)delegate GUID:(NSString *)GUID
 {
-    return [super buildGSFullscreenAdWithDelegate:delegate GUID:@"1d73efc1-c8c5-44e6-9b02-b6dd29374c1c"];
+    return [super buildGSFullscreenAdWithDelegate:delegate GUID:@"31d51c95-d79b-48c1-925e-ad328eb48c87"];
 }
 
 - (GSBannerAdView *)buildGreystripeBannerAdViewWithDelegate:(id<GSAdDelegate>)delegate GUID:(NSString *)GUID size:(CGSize)size
 {
-    return [super buildGreystripeBannerAdViewWithDelegate:delegate GUID:@"1d73efc1-c8c5-44e6-9b02-b6dd29374c1c" size:size];
+    return [super buildGreystripeBannerAdViewWithDelegate:delegate GUID:@"31d51c95-d79b-48c1-925e-ad328eb48c87" size:size];
 }
 
 - (IMInterstitial *)buildIMInterstitialWithDelegate:(id<IMInterstitialDelegate>)delegate appId:(NSString *)appId

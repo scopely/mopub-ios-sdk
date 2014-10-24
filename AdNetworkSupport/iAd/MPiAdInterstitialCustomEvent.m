@@ -18,7 +18,7 @@
 
 - (ADInterstitialAd *)buildADInterstitialAd
 {
-    return [[[ADInterstitialAd alloc] init] autorelease];
+    return [[ADInterstitialAd alloc] init];
 }
 
 @end
@@ -27,7 +27,7 @@
 
 @interface MPiAdInterstitialCustomEvent ()
 
-@property (nonatomic, retain) ADInterstitialAd *iAdInterstitial;
+@property (nonatomic, strong) ADInterstitialAd *iAdInterstitial;
 @property (nonatomic, assign) BOOL isOnScreen;
 
 @end
@@ -43,10 +43,9 @@
     self.iAdInterstitial.delegate = self;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     self.iAdInterstitial.delegate = nil;
-    self.iAdInterstitial = nil;
-    [super dealloc];
 }
 
 - (void)showInterstitialFromRootViewController:(UIViewController *)controller {

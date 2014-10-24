@@ -23,7 +23,7 @@
 
 - (IMBanner *)buildIMBannerWithFrame:(CGRect)frame appId:(NSString *)appId adSize:(int)adSize
 {
-    return [[[IMBanner alloc] initWithFrame:frame appId:appId adSize:adSize] autorelease];
+    return [[IMBanner alloc] initWithFrame:frame appId:appId adSize:adSize];
 }
 
 @end
@@ -32,7 +32,7 @@
 
 @interface InMobiBannerCustomEvent ()
 
-@property (nonatomic, retain) IMBanner *inMobiBanner;
+@property (nonatomic, strong) IMBanner *inMobiBanner;
 
 - (int)imAdSizeConstantForCGSize:(CGSize)size;
 
@@ -91,15 +91,13 @@
 - (BOOL)enableAutomaticImpressionAndClickTracking
 {
     // Override this method to return NO to perform impression and click tracking manually.
-    
+
     return NO;
 }
 
 - (void)dealloc
 {
     [self.inMobiBanner setDelegate:nil];
-    self.inMobiBanner = nil;
-    [super dealloc];
 }
 
 -(NSString *)description

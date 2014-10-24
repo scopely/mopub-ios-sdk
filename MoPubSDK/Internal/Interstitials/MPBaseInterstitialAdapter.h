@@ -15,12 +15,17 @@
 
 @interface MPBaseInterstitialAdapter : NSObject
 
-@property (nonatomic, assign) id<MPInterstitialAdapterDelegate> delegate;
+@property (nonatomic, weak) id<MPInterstitialAdapterDelegate> delegate;
 
 /*
  * Creates an adapter with a reference to an MPInterstitialAdManager.
  */
 - (instancetype)initWithDelegate:(id<MPInterstitialAdapterDelegate>)delegate;
+
+/*
+ * Sets the adapter's delegate to nil.
+ */
+- (void)unregisterDelegate;
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration;
 - (void)_getAdWithConfiguration:(MPAdConfiguration *)configuration;

@@ -9,7 +9,7 @@
 
 @interface MPNativeCustomEvent ()
 
-@property (nonatomic, retain) MPImageDownloadQueue *imageDownloadQueue;
+@property (nonatomic, strong) MPImageDownloadQueue *imageDownloadQueue;
 
 @end
 
@@ -23,13 +23,6 @@
     }
 
     return self;
-}
-
-- (void)dealloc
-{
-    [_imageDownloadQueue release];
-
-    [super dealloc];
 }
 
 - (void)precacheImagesWithURLs:(NSArray *)imageURLs completionBlock:(void (^)(NSArray *errors))completionBlock
