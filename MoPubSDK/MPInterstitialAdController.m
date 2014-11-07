@@ -81,9 +81,19 @@
     return self.manager.loading;
 }
 
+-(MPInterstitialCustomEvent *)currentInterstitialCustomEvent
+{
+    return [self adapter].interstitialCustomEvent;
+}
+
+-(MPInterstitialCustomEventAdapter *)adapter
+{
+    return ((MPInterstitialCustomEventAdapter *)self.manager.adapter);
+}
+
 -(NSString *)description
 {
-    return [((MPInterstitialCustomEventAdapter *)self.manager.adapter).interstitialCustomEvent description];
+    return [[self currentInterstitialCustomEvent] description];
 }
 
 - (void)loadAd

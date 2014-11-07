@@ -14,7 +14,8 @@
  * The `MPInterstitialAdController` class provides a full-screen advertisement that can be
  * displayed during natural transition points in your application.
  */
-
+@class MPInterstitialCustomEvent;
+@class MPInterstitialCustomEventAdapter;
 @interface MPInterstitialAdController : UIViewController
 
 /** @name Obtaining an Interstitial Ad */
@@ -107,6 +108,8 @@
  */
 -(BOOL)ready;
 
+-(MPInterstitialCustomEvent *)currentInterstitialCustomEvent;
+-(MPInterstitialCustomEventAdapter *)adapter;
 /**
  *  A Boolean value that represents whether the interstitial is loading an advertisement
  */
