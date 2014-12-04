@@ -91,7 +91,7 @@ static NSString *const kMovieWillExitNotification42 =
                                                                                         target:self
                                                                                       selector:@selector(checkViewability)
                                                                                        repeats:YES
-                                                                                       logType:(adView.placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage)];
+                                                                                       logType:adView.logType];
         [_viewabilityTimer scheduleNow];
 
 
@@ -507,7 +507,7 @@ shouldLockOrientation:(BOOL)shouldLockOrientation {
 
 - (void)updateViewabilityWithBool:(BOOL)currentViewability {
     if (_isViewable != currentViewability) {
-        CoreLogType(WBLogLevelDebug, (self.view.placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Viewable changed to: %@", currentViewability ? @"YES" : @"NO");
+        CoreLogType(WBLogLevelDebug, self.view.logType, @"Viewable changed to: %@", currentViewability ? @"YES" : @"NO");
         _isViewable = currentViewability;
         [_view adViewableDidChange:_isViewable];
     }

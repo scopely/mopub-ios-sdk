@@ -27,7 +27,6 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 
 @interface MRAdView () <UIGestureRecognizerDelegate, MRCommandDelegate>
 
-@property (nonatomic) MRAdViewPlacementType placementType;
 @property (nonatomic, strong) NSMutableData *data;
 @property (nonatomic, strong) MPAdDestinationDisplayAgent *destinationDisplayAgent;
 @property (nonatomic, strong) MRCalendarManager *calendarManager;
@@ -88,55 +87,63 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         self.opaque = NO;
-
+        
         _webView = [[MPInstanceProvider sharedProvider] buildUIWebViewWithFrame:frame];
         _webView.autoresizingMask = UIViewAutoresizingFlexibleWidth |
-                UIViewAutoresizingFlexibleHeight;
+        UIViewAutoresizingFlexibleHeight;
         _webView.backgroundColor = [UIColor clearColor];
         _webView.clipsToBounds = YES;
         _webView.delegate = self;
         _webView.opaque = NO;
         [_webView mp_setScrollable:NO];
-
+        
         if ([_webView respondsToSelector:@selector(setAllowsInlineMediaPlayback:)]) {
             [_webView setAllowsInlineMediaPlayback:YES];
         }
-
+        
         if ([_webView respondsToSelector:@selector(setMediaPlaybackRequiresUserAction:)]) {
             [_webView setMediaPlaybackRequiresUserAction:NO];
         }
-
+        
         [self addSubview:_webView];
-
+        
+        _closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
         _closeButton.frame = CGRectMake(0, 0, 50, 50);
         UIImage *image = [UIImage imageNamed:kExpandableCloseButtonImageName];
         [_closeButton setImage:image forState:UIControlStateNormal];
-        [_closeButton sizeToFit];
-
+        
         _allowsExpansion = expansion;
         _closeButtonStyle = style;
         _placementType = type;
-        WBLogType logType = (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage);
         _shouldHandleRequests = YES;
-
+        _logType = (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage);
         _displayController = [[MRAdViewDisplayController alloc] initWithAdView:self
                                                                allowsExpansion:expansion
                                                               closeButtonStyle:style
-                                                               jsEventEmitter:[[MPInstanceProvider sharedProvider] buildMRJavaScriptEventEmitterWithWebView:_webView logType:logType]];
-
+                                                                jsEventEmitter:[[MPInstanceProvider sharedProvider] buildMRJavaScriptEventEmitterWithWebView:_webView logType:_logType]];
+        
         [_closeButton addTarget:_displayController action:@selector(closeButtonPressed) forControlEvents:UIControlEventTouchUpInside];
-
+        
+        _destinationDisplayAgent = [[MPCoreInstanceProvider sharedProvider]
+                                    buildMPAdDestinationDisplayAgentWithDelegate:self];
+        _calendarManager = [[MPInstanceProvider sharedProvider]
+                            buildMRCalendarManagerWithDelegate:self];
+        _pictureManager = [[MPInstanceProvider sharedProvider]
+                           buildMRPictureManagerWithDelegate:self];
+        _videoPlayerManager = [[MPInstanceProvider sharedProvider]
+                               buildMRVideoPlayerManagerWithDelegate:self];
         _jsEventEmitter = [[MPInstanceProvider sharedProvider]
-                             buildMRJavaScriptEventEmitterWithWebView:_webView logType:logType];
+                           buildMRJavaScriptEventEmitterWithWebView:_webView logType:_logType];
+        
         self.adAlertManager = [[MPCoreInstanceProvider sharedProvider] buildMPAdAlertManagerWithDelegate:self];
-
+        
         self.adType = MRAdViewAdTypeDefault;
-
+        
         self.userInteractionRecognizer = [[MPUserInteractionGestureRecognizer alloc] initWithTarget:self action:@selector(handleInteraction:)];
         self.userInteractionRecognizer.cancelsTouchesInView = NO;
         [self addGestureRecognizer:self.userInteractionRecognizer];
         self.userInteractionRecognizer.delegate = self;
-
+        
         // inline videos seem to delay tap gesture recognition so that we get the click through
         // request in the webview delegate BEFORE we get the gesture recognizer triggered callback. For now
         // excuse all MRAID interstitials from the user interaction requirement.
@@ -193,9 +200,9 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     [_closeButton removeTarget:delegate
                         action:NULL
               forControlEvents:UIControlEventTouchUpInside];
-
+    
     _delegate = delegate;
-
+    
     [_closeButton addTarget:_delegate
                      action:@selector(closeButtonPressed)
            forControlEvents:UIControlEventTouchUpInside];
@@ -240,12 +247,12 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (BOOL)safeHandleDisplayDestinationForURL:(NSURL *)URL
 {
     BOOL handled = NO;
-
+    
     if (self.userInteractedWithWebView) {
         handled = YES;
         [self.destinationDisplayAgent displayDestinationForURL:URL];
     }
-
+    
     return handled;
 }
 
@@ -279,7 +286,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (void)loadRequest:(NSURLRequest *)request
 {
     [self initAdAlertManager];
-
+    
     NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate:self];
     if (connection) {
         self.data = [NSMutableData data];
@@ -289,13 +296,13 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (void)loadHTMLString:(NSString *)string baseURL:(NSURL *)baseURL
 {
     [self initAdAlertManager];
-
+    
     // Bail out if we can't locate mraid.js.
     if (![self MRAIDScriptPath]) {
         [self adDidFailToLoad];
         return;
     }
-
+    
     NSString *HTML = [self HTMLWithJavaScriptBridge:string];
     if (HTML) {
         [_webView disableJavaScriptDialogs];
@@ -306,19 +313,19 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (NSMutableString *)HTMLWithJavaScriptBridge:(NSString *)HTML
 {
     NSMutableString *resultHTML = [HTML mutableCopy];
-
+    
     if ([self HTMLStringIsMRAIDFragment:HTML]) {
         CoreLogType(WBLogLevelDebug, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage),@"Fragment detected: converting to full payload.");
         resultHTML = [self fullHTMLFromMRAIDFragment:resultHTML];
     }
-
+    
     NSURL *MRAIDScriptURL = [NSURL fileURLWithPath:[self MRAIDScriptPath]];
-
+    
     NSRange headTagRange = [resultHTML rangeOfString:@"<head>"];
     NSString *MRAIDScriptTag = [NSString stringWithFormat:@"<script src='%@'></script>",
                                 [MRAIDScriptURL absoluteString]];
     [resultHTML insertString:MRAIDScriptTag atIndex:headTagRange.location + headTagRange.length];
-
+    
     return resultHTML;
 }
 
@@ -331,14 +338,14 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (NSMutableString *)fullHTMLFromMRAIDFragment:(NSString *)fragment
 {
     NSMutableString *result = [fragment mutableCopy];
-
+    
     NSString *prepend = @"<html><head>"
-        @"<meta name='viewport' content='user-scalable=no; initial-scale=1.0'/>"
-        @"</head>"
-        @"<body style='margin:0;padding:0;overflow:hidden;background:transparent;'>";
+    @"<meta name='viewport' content='user-scalable=no; initial-scale=1.0'/>"
+    @"</head>"
+    @"<body style='margin:0;padding:0;overflow:hidden;background:transparent;'>";
     [result insertString:prepend atIndex:0];
     [result appendString:@"</body></html>"];
-
+    
     return result;
 }
 
@@ -353,7 +360,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     if (!_usesCustomCloseButton) {
         CGRect frame = _closeButton.frame;
         frame.origin.x = CGRectGetWidth(CGRectApplyAffineTransform(self.frame, self.transform)) -
-                _closeButton.frame.size.width;
+        _closeButton.frame.size.width;
         _closeButton.frame = frame;
         _closeButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
         [self addSubview:_closeButton];
@@ -367,8 +374,8 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 {
     CoreLogType(WBLogLevelDebug, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Injecting initial JavaScript state.");
     [_displayController initializeJavascriptStateWithViewProperties:@[
-            [MRPlacementTypeProperty propertyWithType:_placementType],
-            [MRSupportsProperty defaultProperty]]];
+                                                                      [MRPlacementTypeProperty propertyWithType:_placementType],
+                                                                      [MRSupportsProperty defaultProperty]]];
 }
 
 - (void)handleCommandWithURL:(NSURL *)URL
@@ -376,7 +383,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     NSString *command = URL.host;
     NSDictionary *parameters = MPDictionaryFromQueryString(URL.query);
     BOOL success = YES;
-
+    
     MRCommand *cmd = [MRCommand commandForString:command];
     if (cmd == nil) {
         success = NO;
@@ -384,9 +391,9 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
         cmd.delegate = self;
         success = [cmd executeWithParams:parameters];
     }
-
+    
     [self.jsEventEmitter fireNativeCommandCompleteEvent:command];
-
+    
     if (!success) {
         CoreLogType(WBLogLevelError, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Unknown command: %@", command);
         [self.jsEventEmitter fireErrorEventForAction:command withMessage:@"Specified command is not implemented."];
@@ -440,7 +447,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (void)mrCommand:(MRCommand *)command expandWithParams:(NSDictionary *)params
 {
     id urlValue = [params objectForKey:@"url"];
-
+    
     [self.displayController expandToFrame:CGRectFromString([params objectForKey:@"expandToFrame"])
                                   withURL:(urlValue == [NSNull null]) ? nil : urlValue
                            useCustomClose:[[params objectForKey:@"useCustomClose"] boolValue]
@@ -484,11 +491,11 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     if (!self.shouldHandleRequests) {
         return NO;
     }
-
+    
     NSURL *url = [request URL];
     NSMutableString *urlString = [NSMutableString stringWithString:[url absoluteString]];
     NSString *scheme = url.scheme;
-
+    
     if ([scheme isEqualToString:kMraidURLScheme]) {
         CoreLogType(WBLogLevelTrace, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Trying to process command: %@", urlString);
         [self handleCommandWithURL:url];
@@ -507,20 +514,20 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
         CoreLogType(WBLogLevelTrace, (_placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Web console: %@", urlString);
         return NO;
     }
-
+    
     BOOL safeToAutoloadLink = navigationType == UIWebViewNavigationTypeLinkClicked || self.userInteractedWithWebView || [url mp_isSafeForLoadingWithoutUserAction];
-
+    
     if (!_isLoading && (navigationType == UIWebViewNavigationTypeOther ||
-            navigationType == UIWebViewNavigationTypeLinkClicked)) {
+                        navigationType == UIWebViewNavigationTypeLinkClicked)) {
         BOOL iframe = ![request.URL isEqual:request.mainDocumentURL];
         if (iframe) {
             return safeToAutoloadLink;
         }
-
+        
         [self safeHandleDisplayDestinationForURL:url];
         return NO;
     }
-
+    
     return safeToAutoloadLink;
 }
 
@@ -534,7 +541,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     if (_isLoading) {
         _isLoading = NO;
         [self initializeJavascriptState];
-
+        
         switch (self.adType) {
             case MRAdViewAdTypeDefault:
                 [self adDidLoad];
@@ -580,10 +587,10 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 #pragma mark - <MRCalendarManagerDelegate>
 
 - (void)calendarManager:(MRCalendarManager *)manager
-        didFailToCreateCalendarEventWithErrorMessage:(NSString *)message
+didFailToCreateCalendarEventWithErrorMessage:(NSString *)message
 {
     [self.jsEventEmitter fireErrorEventForAction:@"createCalendarEvent"
-                                      withMessage:message];
+                                     withMessage:message];
 }
 
 - (void)calendarManagerWillPresentCalendarEditor:(MRCalendarManager *)manager
@@ -686,7 +693,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (void)adWillPresentModalView
 {
     [_displayController additionalModalViewWillPresent];
-
+    
     _modalViewCount++;
     if (_modalViewCount == 1) [self appShouldSuspend];
 }
@@ -694,7 +701,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 - (void)adDidDismissModalView
 {
     [_displayController additionalModalViewDidDismiss];
-
+    
     _modalViewCount--;
     if (_modalViewCount == 0) [self appShouldResume];
 }

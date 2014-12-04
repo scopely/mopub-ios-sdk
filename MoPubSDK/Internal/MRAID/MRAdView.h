@@ -83,11 +83,10 @@ typedef NSUInteger MRAdViewAdType;
     MRAdViewAdType _adType;
 }
 
+@property (nonatomic, readonly) WBLogType logType;
 @property (nonatomic, weak) id<MRAdViewDelegate> delegate;
 @property (nonatomic, assign) BOOL usesCustomCloseButton;
 @property (nonatomic, assign) BOOL expanded;
-// Enum indicating whether this view is being used as an inline ad or an interstitial ad.
-@property (nonatomic, assign, readonly) MRAdViewPlacementType placementType;
 @property (nonatomic, strong) MRAdViewDisplayController *displayController;
 @property (nonatomic, assign) MRAdViewAdType adType;
 
