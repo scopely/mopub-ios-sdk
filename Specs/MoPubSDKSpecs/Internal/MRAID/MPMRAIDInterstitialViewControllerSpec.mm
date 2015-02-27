@@ -6,9 +6,10 @@
 //
 
 #import "MPMRAIDInterstitialViewController.h"
-#import "MRAdView.h"
+#import "MRController.h"
 #import "MPAdConfigurationFactory.h"
 #import "MPInstanceProvider.h"
+#import "CedarAsync.h"
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
@@ -17,7 +18,7 @@ SPEC_BEGIN(MPMRAIDInterstitialViewControllerSpec)
 
 describe(@"MPMRAIDInterstitialViewController", ^{
     __block MPMRAIDInterstitialViewController *controller;
-    __block MRAdView *backingView;
+    __block MRController *backingController;
     __block MPAdConfiguration *configuration;
     __block id<CedarDouble, MPInterstitialViewControllerDelegate> delegate;
     __block UIViewController *presentingViewController;
@@ -27,8 +28,8 @@ describe(@"MPMRAIDInterstitialViewController", ^{
         configuration = [MPAdConfigurationFactory defaultMRAIDInterstitialConfiguration];
         delegate = nice_fake_for(@protocol(MPInterstitialViewControllerDelegate));
 
-        backingView = nice_fake_for([MRAdView class]);
-        fakeProvider.fakeMRAdView = backingView;
+        backingController = nice_fake_for([MRController class]);
+        fakeProvider.fakeMRController = backingController;
 
         controller = [[MPMRAIDInterstitialViewController alloc] initWithAdConfiguration:configuration];
         controller.delegate = delegate;
@@ -42,7 +43,7 @@ describe(@"MPMRAIDInterstitialViewController", ^{
         });
 
         it(@"should tell its backing view to stop handling requests", ^{
-            backingView should have_received(@selector(disableRequestHandling));
+            backingController should have_received(@selector(disableRequestHandling));
         });
 
         it(@"should tell its delegate interstitialWillDisappear:", ^{
@@ -55,7 +56,7 @@ describe(@"MPMRAIDInterstitialViewController", ^{
             });
 
             it(@"should tell the backing view that it was dismissed", ^{
-                backingView should have_received(@selector(disableRequestHandling));
+                backingController should have_received(@selector(disableRequestHandling));
             });
 
             it(@"should tell its delegate interstitialDidDisappear:", ^{
@@ -70,7 +71,7 @@ describe(@"MPMRAIDInterstitialViewController", ^{
         });
 
         it(@"should tell its delegate interstitialWillAppear:", ^{
-            delegate should have_received(@selector(interstitialWillAppear:)).with(controller);
+            in_time(delegate) should have_received(@selector(interstitialWillAppear:)).with(controller);
         });
 
         describe(@"after being presented", ^{
@@ -78,16 +79,15 @@ describe(@"MPMRAIDInterstitialViewController", ^{
                 [controller didPresentInterstitial];
             });
 
-            it(@"should tell the backing view that it was presented", ^{
-                backingView should have_received(@selector(enableRequestHandling));
+            it(@"should tell the backing controller that it was presented", ^{
+                in_time(backingController) should have_received(@selector(handleMRAIDInterstitialDidPresentWithViewController:));
             });
 
             it(@"should tell its delegate interstitialDidAppear:", ^{
-                delegate should have_received(@selector(interstitialDidAppear:)).with(controller);
+                in_time(delegate) should have_received(@selector(interstitialDidAppear:)).with(controller);
             });
         });
     });
-
 });
 
 SPEC_END

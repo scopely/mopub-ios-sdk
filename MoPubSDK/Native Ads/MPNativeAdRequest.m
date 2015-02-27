@@ -62,8 +62,7 @@
 
 - (void)startWithCompletionHandler:(MPNativeAdRequestHandler)handler
 {
-    if (handler)
-    {
+    if (handler) {
         self.URL = [MPAdServerURLBuilder URLWithAdUnitID:self.adUnitIdentifier
                                                 keywords:self.targeting.keywords
                                                 location:self.targeting.location
@@ -84,8 +83,7 @@
 
 - (void)startForAdSequence:(NSInteger)adSequence withCompletionHandler:(MPNativeAdRequestHandler)handler
 {
-    if (handler)
-    {
+    if (handler) {
         self.URL = [MPAdServerURLBuilder URLWithAdUnitID:self.adUnitIdentifier
                                                 keywords:self.targeting.keywords
                                                 location:self.targeting.location

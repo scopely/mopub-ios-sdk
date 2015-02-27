@@ -386,7 +386,7 @@ static const CGFloat kMoPubImpressionTimerInterval = 0.25;
         }
     }
 
-    if(completionBlock && !displayedURL) {
+    if (completionBlock && !displayedURL) {
         completionBlock(YES, nil);
     }
 }

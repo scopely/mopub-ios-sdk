@@ -5,6 +5,7 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
+#import "GADBannerView.h"
 #import "MPGoogleAdMobBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "WBAdService+Internal.h"
@@ -36,7 +37,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-@interface MPGoogleAdMobBannerCustomEvent ()
+@interface MPGoogleAdMobBannerCustomEvent () <GADBannerViewDelegate>
 
 @property (nonatomic, strong) GADBannerView *adBannerView;
 
