@@ -173,8 +173,9 @@
     NSDate *newFireDate = [NSDate dateWithTimeInterval:self.secondsLeft sinceDate:[NSDate date]];
     [self.timer setFireDate:newFireDate];
 
-    if (![self isScheduled])
+    if (![self isScheduled]) {
         [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:self.runLoopMode];
+    }
 
     self.isPaused = NO;
     return YES;

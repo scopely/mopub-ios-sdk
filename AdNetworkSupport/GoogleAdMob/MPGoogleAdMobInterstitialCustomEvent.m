@@ -5,6 +5,7 @@
 //  Copyright (c) 2012 MoPub, Inc. All rights reserved.
 //
 
+#import "GADInterstitial.h"
 #import "MPGoogleAdMobInterstitialCustomEvent.h"
 #import "MPInterstitialAdController.h"
 #import "MPAdConfiguration.h"
@@ -39,7 +40,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-@interface MPGoogleAdMobInterstitialCustomEvent ()
+@interface MPGoogleAdMobInterstitialCustomEvent () <GADInterstitialDelegate>
 
 @property (nonatomic, strong) GADInterstitial *interstitial;
 @property (nonatomic) BOOL ready;

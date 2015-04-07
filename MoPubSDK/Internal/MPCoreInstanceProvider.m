@@ -16,6 +16,7 @@
 #import "MPTimer.h"
 #import "MPAnalyticsTracker.h"
 #import <Twitter/Twitter.h>
+#import "MPGeolocationProvider.h"
 
 #define MOPUB_CARRIER_INFO_DEFAULTS_KEY @"com.mopub.carrierinfo"
 
@@ -101,7 +102,7 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 
     // check if we have a saved copy
     NSDictionary *saved = [[NSUserDefaults standardUserDefaults] dictionaryForKey:MOPUB_CARRIER_INFO_DEFAULTS_KEY];
-    if(saved != nil) {
+    if (saved != nil) {
         [self.carrierInfo addEntriesFromDictionary:saved];
     }
 
@@ -162,13 +163,24 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 
 #pragma mark - Utilities
 
+- (MPGeolocationProvider *)sharedMPGeolocationProvider
+{
+    return [self singletonForClass:[MPGeolocationProvider class] provider:^id{
+        return [MPGeolocationProvider sharedProvider];
+    }];
+}
+
+- (CLLocationManager *)buildCLLocationManager
+{
+    return [[CLLocationManager alloc] init];
+}
+
 - (id<MPAdAlertManagerProtocol>)buildMPAdAlertManagerWithDelegate:(id)delegate
 {
     id<MPAdAlertManagerProtocol> adAlertManager = nil;
 
     Class adAlertManagerClass = NSClassFromString(@"MPAdAlertManager");
-    if(adAlertManagerClass != nil)
-    {
+    if (adAlertManagerClass != nil) {
         adAlertManager = [[adAlertManagerClass alloc] init];
         [adAlertManager performSelector:@selector(setDelegate:) withObject:delegate];
     }
@@ -181,8 +193,7 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     MPAdAlertGestureRecognizer *gestureRecognizer = nil;
 
     Class gestureRecognizerClass = NSClassFromString(@"MPAdAlertGestureRecognizer");
-    if(gestureRecognizerClass != nil)
-    {
+    if (gestureRecognizerClass != nil) {
         gestureRecognizer = [[gestureRecognizerClass alloc] initWithTarget:target action:action];
     }
 
@@ -228,15 +239,11 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 - (BOOL)isTwitterInstalled
 {
 
-    if (self.twitterDeepLinkStatus == MPTwitterDeepLinkNotChecked)
-    {
+    if (self.twitterDeepLinkStatus == MPTwitterDeepLinkNotChecked) {
         BOOL twitterDeepLinkEnabled = [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitter://timeline"]];
-        if (twitterDeepLinkEnabled)
-        {
+        if (twitterDeepLinkEnabled) {
             self.twitterDeepLinkStatus = MPTwitterDeepLinkEnabled;
-        }
-        else
-        {
+        } else {
             self.twitterDeepLinkStatus = MPTwitterDeepLinkDisabled;
         }
     }
@@ -248,8 +255,7 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 {
     MPTwitterAvailability twitterAvailability = MPTwitterAvailabilityNone;
 
-    if ([self isTwitterInstalled])
-    {
+    if ([self isTwitterInstalled]) {
         twitterAvailability |= MPTwitterAvailabilityApp;
     }
     
@@ -260,7 +266,6 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 
     return twitterAvailability;
 }
-
 
 
 @end
