@@ -17,6 +17,7 @@
 
 @implementation MPHTMLInterstitialCustomEvent
 
+@dynamic delegate;
 @synthesize interstitial = _interstitial;
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info

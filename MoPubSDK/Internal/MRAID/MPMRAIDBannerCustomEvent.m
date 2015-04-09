@@ -17,6 +17,7 @@
 
 @implementation MPMRAIDBannerCustomEvent
 
+@dynamic delegate;
 @synthesize banner = _banner;
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
