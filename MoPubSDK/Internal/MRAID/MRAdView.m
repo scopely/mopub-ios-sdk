@@ -6,6 +6,7 @@
 //  Copyright (c) 2011 MoPub, Inc. All rights reserved.
 //
 
+#import <WithBuddiesAds/WithBuddiesAds.h>
 #import "MRAdView.h"
 #import "UIWebView+MPAdditions.h"
 #import "MPGlobal.h"

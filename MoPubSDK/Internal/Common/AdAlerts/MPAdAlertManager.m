@@ -12,6 +12,7 @@
 #import "MPCoreInstanceProvider.h"
 #import "MPLastResortDelegate.h"
 #import "MPConstants.h"
+#import "WBAdLogging.h"
 
 #import <QuartzCore/QuartzCore.h>
 #import <CoreLocation/CoreLocation.h>

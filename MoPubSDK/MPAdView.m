@@ -11,6 +11,7 @@
 #import "MPBannerAdManager.h"
 #import "MPInstanceProvider.h"
 #import "MPBannerAdManagerDelegate.h"
+#import "WBAdLogging.h"
 
 @interface MPAdView () <MPBannerAdManagerDelegate>
 

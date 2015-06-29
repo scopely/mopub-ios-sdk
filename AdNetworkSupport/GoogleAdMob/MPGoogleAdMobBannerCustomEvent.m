@@ -8,6 +8,7 @@
 #import "MPGoogleAdMobBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "WBAdService+Internal.h"
+#import <WithBuddiesAds/WithBuddiesAds.h>
 
 #if (DEBUG || ADHOC)
 #import "WBAdService+Debugging.h"

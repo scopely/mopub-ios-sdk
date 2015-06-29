@@ -12,6 +12,7 @@
 #import "MPInterstitialAdManagerDelegate.h"
 #import "MPInterstitialCustomEventAdapter.h"
 #import "MPInterstitialCustomEvent.h"
+#import "WBAdLogging.h"
 
 @interface MPInterstitialAdController () <MPInterstitialAdManagerDelegate>
 

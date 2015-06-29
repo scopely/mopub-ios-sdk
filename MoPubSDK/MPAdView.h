@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 #import "MPConstants.h"
+#import "WBAdType.h"
 
 typedef enum
 {

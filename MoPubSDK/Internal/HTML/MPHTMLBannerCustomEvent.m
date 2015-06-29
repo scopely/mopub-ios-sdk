@@ -10,6 +10,7 @@
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
 #import "MPConstants.h"
+#import "WBAdLogging.h"
 
 @interface MPHTMLBannerCustomEvent ()
 

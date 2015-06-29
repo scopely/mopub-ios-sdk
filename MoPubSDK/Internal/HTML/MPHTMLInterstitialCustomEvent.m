@@ -8,6 +8,7 @@
 #import "MPHTMLInterstitialCustomEvent.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
+#import "WBAdLogging.h"
 
 @interface MPHTMLInterstitialCustomEvent ()
 

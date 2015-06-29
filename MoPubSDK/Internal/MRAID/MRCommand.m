@@ -9,6 +9,7 @@
 #import "MRCommand.h"
 #import "MRAdView.h"
 #import "MPGlobal.h"
+#import "WBAdLogging.h"
 
 @implementation MRCommand
 

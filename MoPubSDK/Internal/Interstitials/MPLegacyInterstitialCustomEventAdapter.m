@@ -8,6 +8,7 @@
 #import "MPLegacyInterstitialCustomEventAdapter.h"
 #import "MPAdConfiguration.h"
 #import "MPInternalUtils.h"
+#import "WBAdLogging.h"
 
 @interface MPLegacyInterstitialCustomEventAdapter ()
 

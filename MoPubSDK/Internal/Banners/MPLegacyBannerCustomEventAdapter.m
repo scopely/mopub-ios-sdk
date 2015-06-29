@@ -5,6 +5,7 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
+#import <WithBuddiesAds/WithBuddiesAds.h>
 #import "MPLegacyBannerCustomEventAdapter.h"
 #import "MPAdConfiguration.h"
 #import "MPInternalUtils.h"

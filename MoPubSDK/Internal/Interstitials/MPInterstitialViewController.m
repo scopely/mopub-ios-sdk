@@ -5,8 +5,8 @@
 //  Copyright (c) 2012 MoPub, Inc. All rights reserved.
 //
 
+#import <WithBuddiesAds/WithBuddiesAds.h>
 #import "MPInterstitialViewController.h"
-
 #import "MPGlobal.h"
 
 static const CGFloat kCloseButtonPadding = 6.0;

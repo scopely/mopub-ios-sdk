@@ -8,6 +8,7 @@
 #import "MRProperty.h"
 #import "MRAdView.h"
 #import "MRJavaScriptEventEmitter.h"
+#import "WBAdLogging.h"
 
 @interface MRJavaScriptEventEmitter ()
 

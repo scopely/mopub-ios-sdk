@@ -5,6 +5,7 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
+#import <WithBuddiesAds/WithBuddiesAds.h>
 #import "MPMRAIDBannerCustomEvent.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"

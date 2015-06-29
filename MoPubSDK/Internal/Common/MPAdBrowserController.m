@@ -8,6 +8,7 @@
 
 #import "MPAdBrowserController.h"
 #import "MPGlobal.h"
+#import "WBAdLogging.h"
 
 @interface MPAdBrowserController ()
 

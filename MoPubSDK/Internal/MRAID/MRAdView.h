@@ -12,6 +12,7 @@
 #import "MRCalendarManager.h"
 #import "MRPictureManager.h"
 #import "MRVideoPlayerManager.h"
+#import "WBAdType.h"
 
 @class MRAdViewDisplayController, MRProperty, MPAdConfiguration;
 @protocol MRAdViewDelegate;

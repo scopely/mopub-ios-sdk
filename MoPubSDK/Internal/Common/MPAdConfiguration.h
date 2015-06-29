@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import "MPGlobal.h"
+#import "WBAdType.h"
 
 enum {
     MPAdTypeUnknown = -1,

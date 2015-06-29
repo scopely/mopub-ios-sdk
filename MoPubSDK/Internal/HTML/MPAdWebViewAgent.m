@@ -18,6 +18,7 @@
 #import "NSJSONSerialization+MPAdditions.h"
 #import "NSURL+MPAdditions.h"
 #import "MPInternalUtils.h"
+#import "WBAdLogging.h"
 
 #ifndef NSFoundationVersionNumber_iOS_6_1
 #define NSFoundationVersionNumber_iOS_6_1 993.00

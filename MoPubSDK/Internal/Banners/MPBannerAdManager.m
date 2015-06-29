@@ -17,6 +17,7 @@
 
 #import "WBAdEvent_Internal.h"
 #import "WBAdControllerEvent.h"
+#import "WBAdLogging.h"
 
 @interface MPBannerAdManager ()
 

@@ -15,6 +15,7 @@
 #import "MPAdDestinationDisplayAgent.h"
 #import "MPTimer.h"
 #import "MPAnalyticsTracker.h"
+#import "MPReachability.h"
 #import <Twitter/Twitter.h>
 
 #define MOPUB_CARRIER_INFO_DEFAULTS_KEY @"com.mopub.carrierinfo"
@@ -205,6 +206,13 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 {
     return [self singletonForClass:[MPAnalyticsTracker class] provider:^id{
         return [MPAnalyticsTracker tracker];
+    }];
+}
+
+- (MPReachability *)sharedMPReachability
+{
+    return [self singletonForClass:[MPReachability class] provider:^id{
+        return [MPReachability reachabilityForLocalWiFi];
     }];
 }
 

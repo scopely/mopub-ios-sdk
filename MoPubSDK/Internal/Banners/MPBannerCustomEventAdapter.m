@@ -13,6 +13,7 @@
 
 #import "WBAdEvent_Internal.h"
 #import "WBAdControllerEvent.h"
+#import <WithBuddiesAds/WithBuddiesAds.h>
 
 @interface MPBannerCustomEventAdapter ()
 

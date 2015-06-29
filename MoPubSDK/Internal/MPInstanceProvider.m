@@ -13,6 +13,7 @@
 #import "MPLegacyInterstitialCustomEventAdapter.h"
 #import "MPHTMLInterstitialViewController.h"
 #import "MPMRAIDInterstitialViewController.h"
+#import "MPReachability.h"
 #import "MPInterstitialCustomEvent.h"
 #import "MPBaseBannerAdapter.h"
 #import "MPBannerCustomEventAdapter.h"
@@ -33,6 +34,7 @@
 #if (DEBUG || ADHOC)
 #import "WBAdService+Debugging.h"
 #endif
+#import <WithBuddiesAds/WithBuddiesAds.h>
 
 #import "MPNativeAdSource.h"
 #import "MPNativePositionSource.h"

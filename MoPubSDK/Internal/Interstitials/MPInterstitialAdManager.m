@@ -18,6 +18,8 @@
 
 #import "WBAdEvent_Internal.h"
 #import "WBAdControllerEvent.h"
+#import "WBAdLogLevel.h"
+#import "WBAdLogging.h"
 
 
 @interface MPInterstitialAdManager ()

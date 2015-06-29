@@ -10,6 +10,7 @@
 #import "MPConstants.h"
 #import "math.h"
 #import "NSJSONSerialization+MPAdditions.h"
+#import "WBAdLogging.h"
 
 NSString * const kAdTypeHeaderKey = @"X-Adtype";
 NSString * const kClickthroughHeaderKey = @"X-Clickthrough";
