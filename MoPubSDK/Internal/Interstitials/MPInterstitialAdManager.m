@@ -78,12 +78,12 @@
 - (void)loadAdWithURL:(NSURL *)URL
 {
     if (self.loading) {
-        CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"Interstitial controller is already loading an ad. "
+        CoreLogType(WBLogLevelWarn, WBAdTypeInterstitial, @"Interstitial controller is already loading an ad. "
                   @"Wait for previous load to finish.");
         return;
     }
 
-    CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"Interstitial controller is loading ad with MoPub server URL: %@", URL);
+    CoreLogType(WBLogLevelTrace, WBAdTypeInterstitial, @"Interstitial controller is loading ad with MoPub server URL: %@", URL);
 
     WBAdControllerEvent *controllerEvent = [[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:nil adType:WBAdTypeInterstitial];
     [WBAdControllerEvent postNotification:controllerEvent];
@@ -133,11 +133,11 @@
 {
     self.configuration = configuration;
 
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Interstatial Ad view is fetching ad network type: %@", self.configuration.networkType);
+    CoreLogType(WBLogLevelInfo, WBAdTypeInterstitial, @"Interstatial Ad view is fetching ad network type: %@", self.configuration.networkType);
 
     if ([self.configuration.networkType isEqualToString:kAdTypeClear]) {
         [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonNoFill adNetwork:nil adType:WBAdTypeInterstitial];
-        CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"Ad server response indicated no ad available.");
+        CoreLogType(WBLogLevelError, WBAdTypeInterstitial, @"Ad server response indicated no ad available.");
         self.loading = NO;
         [self.delegate manager:self didFailToLoadInterstitialWithError:nil];
         return;
@@ -145,7 +145,7 @@
 
     if (self.configuration.adType != MPAdTypeInterstitial) {
         [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonMalformedData adNetwork:nil adType:WBAdTypeInterstitial];
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"Could not load ad: interstitial object received a non-interstitial ad unit ID.");
+        CoreLogType(WBLogLevelFatal, WBAdTypeInterstitial, @"Could not load ad: interstitial object received a non-interstitial ad unit ID.");
         self.loading = NO;
         [self.delegate manager:self didFailToLoadInterstitialWithError:nil];
         return;

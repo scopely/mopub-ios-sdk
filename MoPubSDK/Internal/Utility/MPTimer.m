@@ -15,7 +15,7 @@
 @property (nonatomic, copy) NSDate *pauseDate;
 @property (nonatomic, assign) BOOL isPaused;
 @property (nonatomic, assign) NSTimeInterval secondsLeft;
-@property (nonatomic, assign) WBLogType logType;
+@property (nonatomic, assign) WBAdType logType;
 @end
 
 @interface MPTimer ()
@@ -39,7 +39,7 @@
                             target:(id)target
                           selector:(SEL)aSelector
                            repeats:(BOOL)repeats
-                           logType:(WBLogType)logType
+                           logType:(WBAdType)logType
 {
     MPTimer *timer = [[MPTimer alloc] init];
     timer.target = target;

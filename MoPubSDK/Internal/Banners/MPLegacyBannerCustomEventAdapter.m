@@ -14,7 +14,7 @@
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration containerSize:(CGSize)size
 {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Looking for custom event selector named %@.", configuration.customSelectorName);
+    CoreLogType(WBLogLevelDebug, WBAdTypeBanner, @"Looking for custom event selector named %@.", configuration.customSelectorName);
 
     SEL customEventSelector = NSSelectorFromString(configuration.customSelectorName);
     if ([self.delegate.bannerDelegate respondsToSelector:customEventSelector]) {
@@ -27,7 +27,7 @@
     NSString *oneArgumentSelectorName = [configuration.customSelectorName
                                          stringByAppendingString:@":"];
 
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Looking for custom event selector named %@.", oneArgumentSelectorName);
+    CoreLogType(WBLogLevelDebug, WBAdTypeBanner, @"Looking for custom event selector named %@.", oneArgumentSelectorName);
 
     SEL customEventOneArgumentSelector = NSSelectorFromString(oneArgumentSelectorName);
     if ([self.delegate.bannerDelegate respondsToSelector:customEventOneArgumentSelector]) {

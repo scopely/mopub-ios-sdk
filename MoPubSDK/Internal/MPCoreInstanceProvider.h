@@ -61,7 +61,7 @@ typedef enum {
 // This call may return nil and may not update if the user hot-swaps the device's sim card.
 - (NSDictionary *)sharedCarrierInfo;
 
-- (MPTimer *)buildMPTimerWithTimeInterval:(NSTimeInterval)seconds target:(id)target selector:(SEL)selector repeats:(BOOL)repeats logType:(WBLogType)logType;
+- (MPTimer *)buildMPTimerWithTimeInterval:(NSTimeInterval)seconds target:(id)target selector:(SEL)selector repeats:(BOOL)repeats logType:(WBAdType)logType;
 
 - (MPTwitterAvailability)twitterAvailabilityOnDevice;
 - (void)resetTwitterAppInstallCheck;

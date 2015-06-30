@@ -164,7 +164,7 @@
 
     NSURL *url = [self urlFromParameters:params forKey:@"url"];
 
-    CoreLogType(WBLogLevelTrace, WBLogTypeAdBanner, @"Expanding to (%.1f, %.1f, %.1f, %.1f); displaying %@.", x, y, w, h, url);
+    CoreLogType(WBLogLevelTrace, WBAdTypeBanner, @"Expanding to (%.1f, %.1f, %.1f, %.1f); displaying %@.", x, y, w, h, url);
 
     CGRect newFrame = CGRectMake(x, y, w, h);
 

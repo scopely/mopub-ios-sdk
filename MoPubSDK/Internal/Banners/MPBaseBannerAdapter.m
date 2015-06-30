@@ -98,7 +98,7 @@
                                                                                        target:self
                                                                                      selector:@selector(timeout)
                                                                                       repeats:NO
-                                                                                      logType:(self.configuration.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdFullPage)];
+                                                                                      logType:(self.configuration.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial)];
         [self.timeoutTimer scheduleNow];
     }
 }
@@ -114,7 +114,7 @@
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation
 {
     // Do nothing by default. Subclasses can override.
-    CoreLogType(WBLogLevelTrace, WBLogTypeAdBanner, @"rotateToOrientation %d called for adapter %@ (%p)",
+    CoreLogType(WBLogLevelTrace, WBAdTypeBanner, @"rotateToOrientation %d called for adapter %@ (%p)",
           (int)newOrientation, NSStringFromClass([self class]), self);
 }
 

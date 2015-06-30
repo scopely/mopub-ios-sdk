@@ -25,7 +25,7 @@
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration
 {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"Looking for custom event selector named %@.", configuration.customSelectorName);
+    CoreLogType(WBLogLevelDebug, WBAdTypeInterstitial, @"Looking for custom event selector named %@.", configuration.customSelectorName);
 
     SEL customEventSelector = NSSelectorFromString(configuration.customSelectorName);
     if ([self.delegate.interstitialDelegate respondsToSelector:customEventSelector]) {
@@ -38,7 +38,7 @@
     NSString *oneArgumentSelectorName = [configuration.customSelectorName
                                          stringByAppendingString:@":"];
 
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdFullPage, @"Looking for custom event selector named %@.", oneArgumentSelectorName);
+    CoreLogType(WBLogLevelDebug, WBAdTypeInterstitial, @"Looking for custom event selector named %@.", oneArgumentSelectorName);
 
     SEL customEventOneArgumentSelector = NSSelectorFromString(oneArgumentSelectorName);
     if ([self.delegate.interstitialDelegate respondsToSelector:customEventOneArgumentSelector]) {

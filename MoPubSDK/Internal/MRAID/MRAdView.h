@@ -84,7 +84,7 @@ typedef NSUInteger MRAdViewAdType;
     MRAdViewAdType _adType;
 }
 
-@property (nonatomic, readonly) WBLogType logType;
+@property (nonatomic, readonly) WBAdType logType;
 @property (nonatomic, weak) id<MRAdViewDelegate> delegate;
 @property (nonatomic, assign) BOOL usesCustomCloseButton;
 @property (nonatomic, assign) BOOL expanded;

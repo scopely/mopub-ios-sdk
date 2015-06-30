@@ -108,14 +108,14 @@ static MPInstanceProvider *sharedAdProvider = nil;
     Class classOverride = [[WBAdService sharedAdService] forcedAdNetworkBannerClass];
     if(classOverride)
     {
-        CoreLogType(WBLogLevelWarn, WBLogTypeAdBanner, @"Override is on showing %@ instead of %@", classOverride, customClass);
+        CoreLogType(WBLogLevelWarn, WBAdTypeBanner, @"Override is on showing %@ instead of %@", classOverride, customClass);
         customClass = classOverride;
     }
 #endif
 
     MPBannerCustomEvent *customEvent = [[customClass alloc] init];
     if ([customEvent isKindOfClass:[MPBannerCustomEvent class]] == NO) {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"**** Custom Event Class: %@ does not extend MPBannerCustomEvent ****", NSStringFromClass(customClass));
+        CoreLogType(WBLogLevelFatal, WBAdTypeBanner, @"**** Custom Event Class: %@ does not extend MPBannerCustomEvent ****", NSStringFromClass(customClass));
         return nil;
     }
     customEvent.delegate = delegate;
@@ -149,14 +149,14 @@ static MPInstanceProvider *sharedAdProvider = nil;
     Class classOverride = [[WBAdService sharedAdService] forcedAdNetworkFullpageClass];
     if(classOverride)
     {
-        CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"Override is on showing %@ instead of %@", classOverride, customClass);
+        CoreLogType(WBLogLevelWarn, WBAdTypeInterstitial, @"Override is on showing %@ instead of %@", classOverride, customClass);
         customClass = classOverride;
     }
 #endif
     
     MPInterstitialCustomEvent *customEvent = [[customClass alloc] init];
     if ([customEvent isKindOfClass:[MPInterstitialCustomEvent class]] == NO) {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"**** Custom Event Class: %@ does not extend MPInterstitialCustomEvent ****", NSStringFromClass(customClass));
+        CoreLogType(WBLogLevelFatal, WBAdTypeInterstitial, @"**** Custom Event Class: %@ does not extend MPInterstitialCustomEvent ****", NSStringFromClass(customClass));
         return nil;
     }
     customEvent.delegate = delegate;
@@ -219,7 +219,7 @@ static MPInstanceProvider *sharedAdProvider = nil;
     return [[UIWebView alloc] initWithFrame:frame];
 }
 
-- (MRJavaScriptEventEmitter *)buildMRJavaScriptEventEmitterWithWebView:(UIWebView *)webView logType:(WBLogType)logType
+- (MRJavaScriptEventEmitter *)buildMRJavaScriptEventEmitterWithWebView:(UIWebView *)webView logType:(WBAdType)logType
 {
     return [[MRJavaScriptEventEmitter alloc] initWithWebView:webView logType:logType];
 }

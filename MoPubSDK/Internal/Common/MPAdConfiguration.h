@@ -73,5 +73,5 @@ extern NSString * const kAdTypeNative;
 - (BOOL)hasPreferredSize;
 - (NSString *)adResponseHTMLString;
 - (NSString *)clickDetectionURLPrefix;
--(WBLogType)logType;
+- (WBAdType)logType;
 @end

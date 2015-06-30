@@ -99,7 +99,7 @@
                             delegate:(id<MRAdViewDelegate>)delegate;
 - (MRBundleManager *)buildMRBundleManager;
 - (UIWebView *)buildUIWebViewWithFrame:(CGRect)frame;
-- (MRJavaScriptEventEmitter *)buildMRJavaScriptEventEmitterWithWebView:(UIWebView *)webView logType:(WBLogType)logType;
+- (MRJavaScriptEventEmitter *)buildMRJavaScriptEventEmitterWithWebView:(UIWebView *)webView logType:(WBAdType)logType;
 - (MRCalendarManager *)buildMRCalendarManagerWithDelegate:(id<MRCalendarManagerDelegate>)delegate;
 - (EKEventEditViewController *)buildEKEventEditViewControllerWithEditViewDelegate:(id<EKEventEditViewDelegate>)editViewDelegate;
 - (EKEventStore *)buildEKEventStore;

@@ -153,7 +153,7 @@ NSString * const kAdTypeNative = @"json";
     Class customEventClass = NSClassFromString(customEventClassName);
 
     if (customEventClassName && !customEventClass) {
-        CoreLogType(WBLogLevelError, (self.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdFullPage), @"Could not find custom event class named %@", customEventClassName);
+        CoreLogType(WBLogLevelError, (self.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial), @"Could not find custom event class named %@", customEventClassName);
     }
 
     return customEventClass;
@@ -190,9 +190,9 @@ NSString * const kAdTypeNative = @"json";
     return self.interceptURLPrefix.absoluteString ? self.interceptURLPrefix.absoluteString : @"";
 }
 
--(WBLogType)logType
+-(WBAdType)logType
 {
-    return self.preferredSize.height == MOPUB_MEDIUM_RECT_SIZE.height ? WBLogTypeAdFullPage : WBLogTypeAdBanner;
+    return self.preferredSize.height == MOPUB_MEDIUM_RECT_SIZE.height ? WBAdTypeInterstitial : WBAdTypeBanner;
 }
 #pragma mark - Private
 

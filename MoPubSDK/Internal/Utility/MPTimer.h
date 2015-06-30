@@ -20,7 +20,7 @@
                             target:(id)target
                           selector:(SEL)aSelector
                            repeats:(BOOL)repeats
-                           logType:(WBLogType)logType;
+                           logType:(WBAdType)logType;
 
 - (BOOL)isValid;
 - (void)invalidate;

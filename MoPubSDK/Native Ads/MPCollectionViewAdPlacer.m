@@ -49,7 +49,7 @@
         _streamAdPlacer = [[MPInstanceProvider sharedProvider] buildStreamAdPlacerWithViewController:controller adPositioning:positioning defaultAdRenderingClass:defaultAdRenderingClass];
         _streamAdPlacer.delegate = self;
 
-        _insertionTimer = [MPTimer timerWithTimeInterval:kUpdateVisibleCellsInterval target:self selector:@selector(updateVisibleCells) repeats:YES logType:WBLogTypeAdFullPage];
+        _insertionTimer = [MPTimer timerWithTimeInterval:kUpdateVisibleCellsInterval target:self selector:@selector(updateVisibleCells) repeats:YES logType:WBAdTypeInterstitial];
         _insertionTimer.runLoopMode = NSRunLoopCommonModes;
         [_insertionTimer scheduleNow];
 

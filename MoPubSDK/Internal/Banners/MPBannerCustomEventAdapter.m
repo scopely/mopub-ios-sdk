@@ -115,7 +115,7 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[event description] adType:WBAdTypeBanner];
     [WBAdEvent postNotification:adEvent];
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"%@ banner loaded", event);
+    CoreLogType(WBLogLevelInfo, WBAdTypeBanner, @"%@ banner loaded", event);
     [self didStopLoading];
     if (ad) {
         [self.delegate adapter:self didFinishLoadingAd:ad];
@@ -127,21 +127,21 @@
 - (void)bannerCustomEvent:(MPBannerCustomEvent *)event didFailToLoadAdWithError:(NSError *)error
 {
     [WBAdEvent postAdFailedWithReason:WBAdFailureReasonUnknown adNetwork:[event description] adType:WBAdTypeBanner];
-    CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"%@ banner didFailToLoadAdWithError %@", event, error.localizedDescription);
+    CoreLogType(WBLogLevelFatal, WBAdTypeBanner, @"%@ banner didFailToLoadAdWithError %@", event, error.localizedDescription);
     [self didStopLoading];
     [self.delegate adapter:self didFailToLoadAdWithError:error];
 }
 
 - (void)bannerCustomEventWillBeginAction:(MPBannerCustomEvent *)event
 {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"%@ banner bannerCustomEventWillBeginAction", event);
+    CoreLogType(WBLogLevelDebug, WBAdTypeBanner, @"%@ banner bannerCustomEventWillBeginAction", event);
     [self trackClickOnce];
     [self.delegate userActionWillBeginForAdapter:self];
 }
 
 - (void)bannerCustomEventDidFinishAction:(MPBannerCustomEvent *)event
 {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"%@ banner bannerCustomEventDidFinishAction", event);
+    CoreLogType(WBLogLevelDebug, WBAdTypeBanner, @"%@ banner bannerCustomEventDidFinishAction", event);
     [self.delegate userActionDidFinishForAdapter:self];
 }
 
@@ -149,7 +149,7 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLeaveApp adNetwork:[event description] adType:WBAdTypeBanner];
     [WBAdEvent postNotification:adEvent];
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"%@ banner bannerCustomEventWillLeaveApplication", event);
+    CoreLogType(WBLogLevelDebug, WBAdTypeBanner, @"%@ banner bannerCustomEventWillLeaveApplication", event);
     [self trackClickOnce];
     [self.delegate userWillLeaveApplicationFromAdapter:self];
 }

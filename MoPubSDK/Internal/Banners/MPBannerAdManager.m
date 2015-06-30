@@ -31,7 +31,7 @@
 @property (nonatomic, assign) BOOL automaticallyRefreshesContents;
 @property (nonatomic, assign) BOOL hasRequestedAtLeastOneAd;
 @property (nonatomic, assign) UIInterfaceOrientation currentOrientation;
-@property (nonatomic, assign) WBLogType logType;
+@property (nonatomic, assign) WBAdType logType;
 
 - (void)loadAdWithURL:(NSURL *)URL;
 - (void)applicationWillEnterForeground;
@@ -70,7 +70,7 @@
 
         self.automaticallyRefreshesContents = YES;
         self.currentOrientation = MPInterfaceOrientation();
-        self.logType = (delegate.containerSize.height == MOPUB_MEDIUM_RECT_SIZE.height ? WBLogTypeAdFullPage : WBLogTypeAdBanner);
+        self.logType = (delegate.containerSize.height == MOPUB_MEDIUM_RECT_SIZE.height ? WBAdTypeInterstitial : WBAdTypeBanner);
     }
     return self;
 }
@@ -102,7 +102,7 @@
     }
 
     if (self.loading) {
-        CoreLogType(WBLogLevelWarn, self.logType, @"%@ view (%@) is already loading an ad. Wait for previous load to finish.", (self.logType == WBLogTypeAdBanner ? @"Banner" : @"MedRect"), [self.delegate adUnitId]);
+        CoreLogType(WBLogLevelWarn, self.logType, @"%@ view (%@) is already loading an ad. Wait for previous load to finish.", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"), [self.delegate adUnitId]);
         return;
     }
 
@@ -170,9 +170,9 @@
                                                      keywords:[self.delegate keywords]
                                                      location:[self.delegate location]
                                                       testing:[self.delegate isTesting]];
-    CoreLogType(WBLogLevelTrace, self.logType, @"%@ view (%@) loading ad with MoPub server URL: %@", (self.logType == WBLogTypeAdBanner ? @"Banner" : @"MedRect"),[self.delegate adUnitId], URL);
+    CoreLogType(WBLogLevelTrace, self.logType, @"%@ view (%@) loading ad with MoPub server URL: %@", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"),[self.delegate adUnitId], URL);
     
-    if(self.logType == WBLogTypeAdBanner)
+    if(self.logType == WBAdTypeBanner)
     {
         WBAdControllerEvent *controllerEvent = [[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:nil adType:WBAdTypeBanner];
         [WBAdControllerEvent postNotification:controllerEvent];
@@ -259,7 +259,7 @@
 - (void)didFailToLoadAdapterWithError:(NSError *)error
 {
     
-    if(self.logType == WBLogTypeAdBanner)
+    if(self.logType == WBAdTypeBanner)
     {
         WBAdFailureReason failureReason = WBAdFailureReasonNetworkError;
         
@@ -283,7 +283,7 @@
     [self.delegate managerDidFailToLoadAd];
     [self scheduleRefreshTimer];
 
-    CoreLogType(WBLogLevelError, self.logType, @"%@ view (%@) failed. Error: %@", (self.logType == WBLogTypeAdBanner ? @"Banner" : @"MedRect"), [self.delegate adUnitId], error);
+    CoreLogType(WBLogLevelError, self.logType, @"%@ view (%@) failed. Error: %@", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"), [self.delegate adUnitId], error);
 }
 
 #pragma mark - <MPBannerAdapterDelegate>

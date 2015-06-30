@@ -12,7 +12,7 @@
 
 @interface MRJavaScriptEventEmitter ()
 
-@property (nonatomic) WBLogType logType;
+@property (nonatomic) WBAdType logType;
 @property (nonatomic, strong) UIWebView *webView;
 
 @end
@@ -25,7 +25,7 @@
 
 @synthesize webView = _webView;
 
-- (id)initWithWebView:(UIWebView *)webView logType:(WBLogType)logType
+- (id)initWithWebView:(UIWebView *)webView logType:(WBAdType)logType
 {
     self = [super init];
     if (self) {

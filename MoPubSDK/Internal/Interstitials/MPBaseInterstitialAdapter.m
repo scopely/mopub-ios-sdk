@@ -78,7 +78,7 @@
     if([t isKindOfClass:[NSString class]] == YES)
     {
         timeInterval = [t intValue];
-        CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"%@ Override timeout available timeout set to %f", NSStringFromClass(configuration.customEventClass), timeInterval);
+        CoreLogType(WBLogLevelTrace, WBAdTypeInterstitial, @"%@ Override timeout available timeout set to %f", NSStringFromClass(configuration.customEventClass), timeInterval);
     }
     
     if(timeInterval > 0)
@@ -87,7 +87,7 @@
                                                                                        target:self
                                                                                      selector:@selector(timeout)
                                                                                       repeats:NO
-                                                                                      logType:WBLogTypeAdFullPage];
+                                                                                      logType:WBAdTypeInterstitial];
         [self.timeoutTimer scheduleNow];
     }
 }
@@ -99,7 +99,7 @@
 
 - (void)timeout
 {
-    CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"%@ custom event did time out", NSStringFromClass(self.configuration.customEventClass));
+    CoreLogType(WBLogLevelWarn, WBAdTypeInterstitial, @"%@ custom event did time out", NSStringFromClass(self.configuration.customEventClass));
     [WBAdEvent postAdFailedWithReason:WBAdFailureReasonTimeout adNetwork:[self.configuration.customEventClass description] adType:WBAdTypeInterstitial];
     [self.delegate adapter:self didFailToLoadAdWithError:nil];
 }
