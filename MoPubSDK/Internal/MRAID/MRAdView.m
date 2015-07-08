@@ -316,7 +316,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     NSMutableString *resultHTML = [HTML mutableCopy];
     
     if ([self HTMLStringIsMRAIDFragment:HTML]) {
-        CoreLogType(WBLogLevelDebug, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial),@"Fragment detected: converting to full payload.");
+        AdLogType(WBAdLogLevelDebug, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial),@"Fragment detected: converting to full payload.");
         resultHTML = [self fullHTMLFromMRAIDFragment:resultHTML];
     }
     
@@ -373,7 +373,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 
 - (void)initializeJavascriptState
 {
-    CoreLogType(WBLogLevelDebug, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial), @"Injecting initial JavaScript state.");
+    AdLogType(WBAdLogLevelDebug, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial), @"Injecting initial JavaScript state.");
     [_displayController initializeJavascriptStateWithViewProperties:@[
                                                                       [MRPlacementTypeProperty propertyWithType:_placementType],
                                                                       [MRSupportsProperty defaultProperty]]];
@@ -396,7 +396,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     [self.jsEventEmitter fireNativeCommandCompleteEvent:command];
     
     if (!success) {
-        CoreLogType(WBLogLevelError, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial), @"Unknown command: %@", command);
+        AdLogType(WBAdLogLevelError, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial), @"Unknown command: %@", command);
         [self.jsEventEmitter fireErrorEventForAction:command withMessage:@"Specified command is not implemented."];
     }
 }
@@ -409,12 +409,12 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
 
 - (void)performActionForMoPubSpecificURL:(NSURL *)url
 {
-    CoreLogType(WBLogLevelDebug, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial), @"MRAdView - loading MoPub URL: %@", url);
+    AdLogType(WBAdLogLevelDebug, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial), @"MRAdView - loading MoPub URL: %@", url);
     NSString *host = [url host];
     if ([host isEqualToString:kMoPubPrecacheCompleteHost] && self.adType == MRAdViewAdTypePreCached) {
         [self adDidLoad];
     } else {
-        CoreLogType(WBLogLevelWarn, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial), @"MRAdView - unsupported MoPub URL: %@", [url absoluteString]);
+        AdLogType(WBAdLogLevelWarn, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial), @"MRAdView - unsupported MoPub URL: %@", [url absoluteString]);
     }
 }
 
@@ -498,7 +498,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
     NSString *scheme = url.scheme;
     
     if ([scheme isEqualToString:kMraidURLScheme]) {
-        CoreLogType(WBLogLevelTrace, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial), @"Trying to process command: %@", urlString);
+        AdLogType(WBAdLogLevelTrace, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial), @"Trying to process command: %@", urlString);
         [self handleCommandWithURL:url];
         return NO;
     } else if ([scheme isEqualToString:kMoPubURLScheme]) {
@@ -512,7 +512,7 @@ static NSString *const kMoPubPrecacheCompleteHost = @"precacheComplete";
                                    withString:@" "
                                       options:NSLiteralSearch
                                         range:NSMakeRange(0, [urlString length])];
-        CoreLogType(WBLogLevelTrace, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial), @"Web console: %@", urlString);
+        AdLogType(WBAdLogLevelTrace, (_placementType == MRAdViewPlacementTypeInline ? WBAdTypeBanner : WBAdTypeInterstitial), @"Web console: %@", urlString);
         return NO;
     }
     

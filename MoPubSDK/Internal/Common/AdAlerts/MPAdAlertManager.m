@@ -65,7 +65,7 @@
 {
     static NSDateFormatter *dateFormatter = nil;
     
-    CoreLogType(WBLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager processing ad alert");
+    AdLogType(WBAdLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager processing ad alert");
     
     // don't even try if this device can't send emails
     if(![MFMailComposeViewController canSendMail])
@@ -119,14 +119,14 @@
             [params setValue:[dateFormatter stringFromDate:self.adConfiguration.creationTimestamp] forKey:kTimestampParamKey];
 
             [self processAdParams:params andScreenshot:image];
-            CoreLogType(WBLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager finished processing ad alert");
+            AdLogType(WBAdLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager finished processing ad alert");
         });
     });
 }
 
 - (void)handleAdAlertGesture
 {
-    CoreLogType(WBLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager alert gesture recognized");
+    AdLogType(WBAdLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager alert gesture recognized");
     [self.delegate adAlertManagerDidTriggerAlert:self];
 }
 

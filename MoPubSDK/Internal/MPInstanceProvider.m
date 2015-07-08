@@ -108,14 +108,14 @@ static MPInstanceProvider *sharedAdProvider = nil;
     Class classOverride = [[WBAdService sharedAdService] forcedAdNetworkBannerClass];
     if(classOverride)
     {
-        CoreLogType(WBLogLevelWarn, WBAdTypeBanner, @"Override is on showing %@ instead of %@", classOverride, customClass);
+        AdLogType(WBAdLogLevelWarn, WBAdTypeBanner, @"Override is on showing %@ instead of %@", classOverride, customClass);
         customClass = classOverride;
     }
 #endif
 
     MPBannerCustomEvent *customEvent = [[customClass alloc] init];
     if ([customEvent isKindOfClass:[MPBannerCustomEvent class]] == NO) {
-        CoreLogType(WBLogLevelFatal, WBAdTypeBanner, @"**** Custom Event Class: %@ does not extend MPBannerCustomEvent ****", NSStringFromClass(customClass));
+        AdLogType(WBAdLogLevelFatal, WBAdTypeBanner, @"**** Custom Event Class: %@ does not extend MPBannerCustomEvent ****", NSStringFromClass(customClass));
         return nil;
     }
     customEvent.delegate = delegate;
@@ -149,14 +149,14 @@ static MPInstanceProvider *sharedAdProvider = nil;
     Class classOverride = [[WBAdService sharedAdService] forcedAdNetworkFullpageClass];
     if(classOverride)
     {
-        CoreLogType(WBLogLevelWarn, WBAdTypeInterstitial, @"Override is on showing %@ instead of %@", classOverride, customClass);
+        AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"Override is on showing %@ instead of %@", classOverride, customClass);
         customClass = classOverride;
     }
 #endif
     
     MPInterstitialCustomEvent *customEvent = [[customClass alloc] init];
     if ([customEvent isKindOfClass:[MPInterstitialCustomEvent class]] == NO) {
-        CoreLogType(WBLogLevelFatal, WBAdTypeInterstitial, @"**** Custom Event Class: %@ does not extend MPInterstitialCustomEvent ****", NSStringFromClass(customClass));
+        AdLogType(WBAdLogLevelFatal, WBAdTypeInterstitial, @"**** Custom Event Class: %@ does not extend MPInterstitialCustomEvent ****", NSStringFromClass(customClass));
         return nil;
     }
     customEvent.delegate = delegate;

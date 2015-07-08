@@ -45,7 +45,7 @@
 - (void)reportApplicationOpenForApplicationID:(NSString *)appID
 {
     if (![[NSUserDefaults standardUserDefaults] boolForKey:MOPUB_CONVERSION_DEFAULTS_KEY]) {
-        CoreLogType(WBLogLevelWarn, WBAdTypeInterstitial, @"Tracking conversion");
+        AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"Tracking conversion");
         NSMutableURLRequest *request = [[MPCoreInstanceProvider sharedProvider] buildConfiguredURLRequestWithURL:[self URLForAppID:appID]];
         self.responseData = [NSMutableData data];
         [NSURLConnection connectionWithRequest:request delegate:self];

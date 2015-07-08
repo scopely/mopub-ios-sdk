@@ -507,7 +507,7 @@ shouldLockOrientation:(BOOL)shouldLockOrientation {
 
 - (void)updateViewabilityWithBool:(BOOL)currentViewability {
     if (_isViewable != currentViewability) {
-        CoreLogType(WBLogLevelDebug, self.view.logType, @"Viewable changed to: %@", currentViewability ? @"YES" : @"NO");
+        AdLogType(WBAdLogLevelDebug, self.view.logType, @"Viewable changed to: %@", currentViewability ? @"YES" : @"NO");
         _isViewable = currentViewability;
         [_view adViewableDidChange:_isViewable];
     }

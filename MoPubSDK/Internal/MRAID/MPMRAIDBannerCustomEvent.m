@@ -81,13 +81,13 @@
 
 - (void)adDidLoad:(MRAdView *)adView
 {
-    CoreLogType(WBLogLevelInfo, WBAdTypeBanner, @"MoPub MRAID banner did load");
+    AdLogType(WBAdLogLevelInfo, WBAdTypeBanner, @"MoPub MRAID banner did load");
     [self.delegate bannerCustomEvent:self didLoadAd:adView];
 }
 
 - (void)adDidFailToLoad:(MRAdView *)adView
 {
-    CoreLogType(WBLogLevelFatal, WBAdTypeBanner, @"MoPub MRAID banner did fail");
+    AdLogType(WBAdLogLevelFatal, WBAdTypeBanner, @"MoPub MRAID banner did fail");
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
@@ -98,13 +98,13 @@
 
 - (void)appShouldSuspendForAd:(MRAdView *)adView
 {
-    CoreLogType(WBLogLevelDebug, WBAdTypeBanner, @"MoPub MRAID banner will begin action");
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"MoPub MRAID banner will begin action");
     [self.delegate bannerCustomEventWillBeginAction:self];
 }
 
 - (void)appShouldResumeFromAd:(MRAdView *)adView
 {
-    CoreLogType(WBLogLevelDebug, WBAdTypeBanner, @"MoPub MRAID banner did end action");
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"MoPub MRAID banner did end action");
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 

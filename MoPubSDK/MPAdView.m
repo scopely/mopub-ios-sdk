@@ -80,10 +80,10 @@
 
     if (_ignoresAutorefresh) {
         [self.adManager stopAutomaticallyRefreshingContents];
-        CoreLogType(WBLogLevelWarn, self.logType, @"pauseBanners");
+        AdLogType(WBAdLogLevelWarn, self.logType, @"pauseBanners");
     } else {
         [self.adManager startAutomaticallyRefreshingContents];
-        CoreLogType(WBLogLevelWarn, self.logType, @"unpauseBanners");
+        AdLogType(WBAdLogLevelWarn, self.logType, @"unpauseBanners");
     }
 }
 
@@ -105,7 +105,7 @@
 {
     self.calledLoadedOnce = YES;
     [self.adManager loadAd];
-    CoreLogType(WBLogLevelWarn, self.logType, @"banner loadAd");
+    AdLogType(WBAdLogLevelWarn, self.logType, @"banner loadAd");
 }
 
 - (void)refreshAd
@@ -121,7 +121,7 @@
 - (void)forceRefreshAd
 {
     [self.adManager forceRefreshAd];
-    CoreLogType(WBLogLevelWarn, self.logType, @"forceRefresh");
+    AdLogType(WBAdLogLevelWarn, self.logType, @"forceRefresh");
 }
 
 - (void)stopAutomaticallyRefreshingContents

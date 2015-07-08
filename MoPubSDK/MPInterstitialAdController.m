@@ -108,13 +108,13 @@
 - (void)showFromViewController:(UIViewController *)controller
 {
     if (!controller) {
-        CoreLogType(WBLogLevelFatal, WBAdTypeInterstitial, @"The interstitial could not be shown: "
+        AdLogType(WBAdLogLevelFatal, WBAdTypeInterstitial, @"The interstitial could not be shown: "
                   @"a nil view controller was passed to -showFromViewController:.");
         return;
     }
 
     if (![controller.view.window isKeyWindow]) {
-        CoreLogType(WBLogLevelWarn, WBAdTypeInterstitial, @"The interstitial could not be shown: "
+        AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"The interstitial could not be shown: "
                     @"a nil view controller was passed to -showFromViewController:.");
     }
 

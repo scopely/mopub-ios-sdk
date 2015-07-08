@@ -153,7 +153,7 @@ NSString * const kAdTypeNative = @"json";
     Class customEventClass = NSClassFromString(customEventClassName);
 
     if (customEventClassName && !customEventClass) {
-        CoreLogType(WBLogLevelError, (self.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial), @"Could not find custom event class named %@", customEventClassName);
+        AdLogType(WBAdLogLevelError, (self.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial), @"Could not find custom event class named %@", customEventClassName);
     }
 
     return customEventClass;

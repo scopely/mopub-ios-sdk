@@ -73,7 +73,7 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
 - (void)presentInterstitialFromViewController:(UIViewController *)controller
 {
     if (_isOnViewControllerStack) {
-        CoreLogType(WBLogLevelWarn, WBAdTypeInterstitial, @"Cannot present an interstitial that is already on-screen.");
+        AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"Cannot present an interstitial that is already on-screen.");
         return;
     }
 
@@ -242,7 +242,7 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
     // just return the application's supported orientations.
 
     if (!interstitialSupportedOrientations) {
-        CoreLogType(WBLogLevelFatal, WBAdTypeInterstitial, @"Your application does not support this interstitial's desired orientation "
+        AdLogType(WBAdLogLevelFatal, WBAdTypeInterstitial, @"Your application does not support this interstitial's desired orientation "
                    @"(%@).", orientationDescription);
         return applicationSupportedOrientations;
     }

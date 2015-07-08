@@ -114,7 +114,7 @@
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation
 {
     // Do nothing by default. Subclasses can override.
-    CoreLogType(WBLogLevelTrace, WBAdTypeBanner, @"rotateToOrientation %d called for adapter %@ (%p)",
+    AdLogType(WBAdLogLevelTrace, WBAdTypeBanner, @"rotateToOrientation %d called for adapter %@ (%p)",
           (int)newOrientation, NSStringFromClass([self class]), self);
 }
 

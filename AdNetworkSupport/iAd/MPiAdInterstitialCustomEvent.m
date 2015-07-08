@@ -107,7 +107,7 @@
     }
     else
     {
-        CoreLogType(WBLogLevelError, WBAdTypeInterstitial, @"Failed to show iAd interstitial: a previously loaded iAd interstitial now claims not to be ready.");
+        AdLogType(WBAdLogLevelError, WBAdTypeInterstitial, @"Failed to show iAd interstitial: a previously loaded iAd interstitial now claims not to be ready.");
     }
 }
 

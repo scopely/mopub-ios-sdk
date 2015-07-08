@@ -102,7 +102,7 @@
     }
 
     if (self.loading) {
-        CoreLogType(WBLogLevelWarn, self.logType, @"%@ view (%@) is already loading an ad. Wait for previous load to finish.", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"), [self.delegate adUnitId]);
+        AdLogType(WBAdLogLevelWarn, self.logType, @"%@ view (%@) is already loading an ad. Wait for previous load to finish.", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"), [self.delegate adUnitId]);
         return;
     }
 
@@ -170,7 +170,7 @@
                                                      keywords:[self.delegate keywords]
                                                      location:[self.delegate location]
                                                       testing:[self.delegate isTesting]];
-    CoreLogType(WBLogLevelTrace, self.logType, @"%@ view (%@) loading ad with MoPub server URL: %@", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"),[self.delegate adUnitId], URL);
+    AdLogType(WBAdLogLevelTrace, self.logType, @"%@ view (%@) loading ad with MoPub server URL: %@", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"),[self.delegate adUnitId], URL);
     
     if(self.logType == WBAdTypeBanner)
     {
@@ -202,7 +202,7 @@
                                                                                       repeats:NO
                                                                                       logType:self.logType];
         [self.refreshTimer scheduleNow];
-        CoreLogType(WBLogLevelDebug, self.logType, @"Scheduled the autorefresh timer to fire in %.1f seconds (%p).", timeInterval, self.refreshTimer);
+        AdLogType(WBAdLogLevelDebug, self.logType, @"Scheduled the autorefresh timer to fire in %.1f seconds (%p).", timeInterval, self.refreshTimer);
     }
 }
 
@@ -219,7 +219,7 @@
 {
     self.requestingConfiguration = configuration;
 
-    CoreLogType(WBLogLevelDebug, self.logType, @"Banner ad view is fetching ad network type: %@", self.requestingConfiguration.networkType);
+    AdLogType(WBAdLogLevelDebug, self.logType, @"Banner ad view is fetching ad network type: %@", self.requestingConfiguration.networkType);
 
     if (configuration.adType == MPAdTypeUnknown) {
         [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorServerError]];
@@ -227,14 +227,14 @@
     }
 
     if (configuration.adType == MPAdTypeInterstitial) {
-        CoreLogType(WBLogLevelWarn, self.logType, @"Could not load ad: banner object received an interstitial ad unit ID.");
+        AdLogType(WBAdLogLevelWarn, self.logType, @"Could not load ad: banner object received an interstitial ad unit ID.");
 
         [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorAdapterInvalid]];
         return;
     }
 
     if ([configuration.networkType isEqualToString:kAdTypeClear]) {
-        CoreLogType(WBLogLevelError, self.logType, @"Ad server response indicated no ad available.");
+        AdLogType(WBAdLogLevelError, self.logType, @"Ad server response indicated no ad available.");
 
         [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorNoInventory]];
         return;
@@ -283,7 +283,7 @@
     [self.delegate managerDidFailToLoadAd];
     [self scheduleRefreshTimer];
 
-    CoreLogType(WBLogLevelError, self.logType, @"%@ view (%@) failed. Error: %@", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"), [self.delegate adUnitId], error);
+    AdLogType(WBAdLogLevelError, self.logType, @"%@ view (%@) failed. Error: %@", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"), [self.delegate adUnitId], error);
 }
 
 #pragma mark - <MPBannerAdapterDelegate>
@@ -396,7 +396,7 @@
 - (void)customEventDidLoadAd
 {
     if (![self.requestingAdapter isKindOfClass:[MPLegacyBannerCustomEventAdapter class]]) {
-        CoreLogType(WBLogLevelWarn, self.logType, @"-customEventDidLoadAd should not be called unless a custom event is in "
+        AdLogType(WBAdLogLevelWarn, self.logType, @"-customEventDidLoadAd should not be called unless a custom event is in "
                   @"progress.");
         return;
     }
@@ -414,7 +414,7 @@
 - (void)customEventDidFailToLoadAd
 {
     if (![self.requestingAdapter isKindOfClass:[MPLegacyBannerCustomEventAdapter class]]) {
-        CoreLogType(WBLogLevelWarn, self.logType, @"-customEventDidFailToLoadAd should not be called unless a custom event is in "
+        AdLogType(WBAdLogLevelWarn, self.logType, @"-customEventDidFailToLoadAd should not be called unless a custom event is in "
                   @"progress.");
         return;
     }
@@ -425,7 +425,7 @@
 - (void)customEventActionWillBegin
 {
     if (![self.onscreenAdapter isKindOfClass:[MPLegacyBannerCustomEventAdapter class]]) {
-        CoreLogType(WBLogLevelWarn, self.logType, @"-customEventActionWillBegin should not be called unless a custom event is in "
+        AdLogType(WBAdLogLevelWarn, self.logType, @"-customEventActionWillBegin should not be called unless a custom event is in "
                   @"progress.");
         return;
     }
@@ -437,7 +437,7 @@
 - (void)customEventActionDidEnd
 {
     if (![self.onscreenAdapter isKindOfClass:[MPLegacyBannerCustomEventAdapter class]]) {
-        CoreLogType(WBLogLevelWarn, self.logType, @"-customEventActionDidEnd should not be called unless a custom event is in "
+        AdLogType(WBAdLogLevelWarn, self.logType, @"-customEventActionDidEnd should not be called unless a custom event is in "
                   @"progress.");
         return;
     }

@@ -232,7 +232,7 @@
 
 - (void)bannerViewDidLoadAd:(ADBannerView *)banner
 {
-    CoreLogType(WBLogLevelInfo, WBAdTypeBanner, @"iAd banner did load");
+    AdLogType(WBAdLogLevelInfo, WBAdTypeBanner, @"iAd banner did load");
     self.hasTrackedImpression = NO;
     self.hasTrackedClick = NO;
 
@@ -243,7 +243,7 @@
 
 - (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
 {
-    CoreLogType(WBLogLevelFatal, WBAdTypeBanner, @"iAd banner did fail with error %@", error.localizedDescription);
+    AdLogType(WBAdLogLevelFatal, WBAdTypeBanner, @"iAd banner did fail with error %@", error.localizedDescription);
     for (id<MPADBannerViewManagerObserver> observer in [self.observers copy]) {
         [observer bannerDidFail];
     }
@@ -251,7 +251,7 @@
 
 - (BOOL)bannerViewActionShouldBegin:(ADBannerView *)banner willLeaveApplication:(BOOL)willLeave
 {
-    CoreLogType(WBLogLevelDebug, WBAdTypeBanner, @"iAd banner action will begin");
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"iAd banner action will begin");
     for (id<MPADBannerViewManagerObserver> observer in [self.observers copy]) {
         [observer bannerActionWillBeginAndWillLeaveApplication:willLeave];
     }
@@ -260,7 +260,7 @@
 
 - (void)bannerViewActionDidFinish:(ADBannerView *)banner
 {
-    CoreLogType(WBLogLevelDebug, WBAdTypeBanner, @"iAd banner action did finish");
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"iAd banner action did finish");
     for (id<MPADBannerViewManagerObserver> observer in [self.observers copy]) {
         [observer bannerActionDidFinish];
     }

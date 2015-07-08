@@ -49,7 +49,7 @@
         self.URL = URL;
         self.HTMLString = HTMLString;
 
-        CoreLogType(WBLogLevelTrace, WBAdTypeInterstitial, @"Ad browser (%p) initialized with URL: %@", self, self.URL);
+        AdLogType(WBAdLogLevelTrace, WBAdTypeInterstitial, @"Ad browser (%p) initialized with URL: %@", self, self.URL);
 
         self.webView = [[UIWebView alloc] initWithFrame:CGRectZero];
         self.webView.autoresizingMask = UIViewAutoresizingFlexibleWidth |
@@ -196,7 +196,7 @@
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request
  navigationType:(UIWebViewNavigationType)navigationType
 {
-    CoreLogType(WBLogLevelTrace, WBAdTypeInterstitial, @"Ad browser (%p) starting to load URL: %@", self, request.URL);
+    AdLogType(WBAdLogLevelTrace, WBAdTypeInterstitial, @"Ad browser (%p) starting to load URL: %@", self, request.URL);
     self.URL = request.URL;
     return YES;
 }
@@ -238,7 +238,7 @@
     // Ignore "Frame Load Interrupted" errors after navigating to iTunes or the App Store.
     if (error.code == 102 && [error.domain isEqual:@"WebKitErrorDomain"]) return;
 
-    CoreLogType(WBLogLevelError, WBAdTypeInterstitial, @"Ad browser (%p) experienced an error: %@.", self, [error localizedDescription]);
+    AdLogType(WBAdLogLevelError, WBAdTypeInterstitial, @"Ad browser (%p) experienced an error: %@.", self, [error localizedDescription]);
 }
 
 #pragma mark -

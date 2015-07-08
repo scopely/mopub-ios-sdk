@@ -237,7 +237,7 @@ NSString * const kMoPubCustomHost = @"custom";
 #pragma mark - MoPub-specific URL handlers
 - (void)performActionForMoPubSpecificURL:(NSURL *)URL
 {
-    CoreLogType(WBLogLevelTrace, self.configuration.logType, @"MPAdWebView - loading MoPub URL: %@", URL);
+    AdLogType(WBAdLogLevelTrace, self.configuration.logType, @"MPAdWebView - loading MoPub URL: %@", URL);
     NSString *host = [URL host];
     if ([host isEqualToString:kMoPubCloseHost]) {
         [self.delegate adDidClose:self.view];
@@ -248,7 +248,7 @@ NSString * const kMoPubCustomHost = @"custom";
     } else if ([host isEqualToString:kMoPubCustomHost]) {
         [self handleMoPubCustomURL:URL];
     } else {
-        CoreLogType(WBLogLevelWarn, self.configuration.logType, @"MPAdWebView - unsupported MoPub URL: %@", [URL absoluteString]);
+        AdLogType(WBAdLogLevelWarn, self.configuration.logType, @"MPAdWebView - unsupported MoPub URL: %@", [URL absoluteString]);
     }
 }
 
@@ -275,7 +275,7 @@ NSString * const kMoPubCustomHost = @"custom";
             [self.customMethodDelegate performSelector:oneArgumentSelector withObject:dataDictionary]
         );
     } else {
-        CoreLogType(WBLogLevelError, self.configuration.logType, @"Custom method delegate does not implement custom selectors %@ or %@.",
+        AdLogType(WBAdLogLevelError, self.configuration.logType, @"Custom method delegate does not implement custom selectors %@ or %@.",
                    selectorName, oneArgumentSelectorName);
     }
 }

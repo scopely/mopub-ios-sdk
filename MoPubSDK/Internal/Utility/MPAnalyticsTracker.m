@@ -25,14 +25,14 @@
 
 - (void)trackImpressionForConfiguration:(MPAdConfiguration *)configuration
 {
-    CoreLogType(WBLogLevelTrace, (configuration.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial), @"Tracking impression: %@", configuration.impressionTrackingURL);
+    AdLogType(WBAdLogLevelTrace, (configuration.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial), @"Tracking impression: %@", configuration.impressionTrackingURL);
     [NSURLConnection connectionWithRequest:[self requestForURL:configuration.impressionTrackingURL]
                                   delegate:nil];
 }
 
 - (void)trackClickForConfiguration:(MPAdConfiguration *)configuration
 {
-    CoreLogType(WBLogLevelTrace, (configuration.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial), @"Tracking click: %@", configuration.clickTrackingURL);
+    AdLogType(WBAdLogLevelTrace, (configuration.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial), @"Tracking click: %@", configuration.clickTrackingURL);
     [NSURLConnection connectionWithRequest:[self requestForURL:configuration.clickTrackingURL]
                                   delegate:nil];
 }

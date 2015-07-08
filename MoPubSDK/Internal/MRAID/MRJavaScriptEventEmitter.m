@@ -47,14 +47,14 @@
 - (void)fireChangeEventForProperty:(MRProperty *)property {
     NSString *JSON = [NSString stringWithFormat:@"{%@}", property];
     [self executeJavascript:@"window.mraidbridge.fireChangeEvent(%@);", JSON];
-    CoreLogType(WBLogLevelTrace, self.logType, @"JSON: %@", JSON);
+    AdLogType(WBAdLogLevelTrace, self.logType, @"JSON: %@", JSON);
 }
 
 - (void)fireChangeEventsForProperties:(NSArray *)properties {
     NSString *JSON = [NSString stringWithFormat:@"{%@}",
                       [properties componentsJoinedByString:@", "]];
     [self executeJavascript:@"window.mraidbridge.fireChangeEvent(%@);", JSON];
-    CoreLogType(WBLogLevelTrace, self.logType, @"JSON: %@", JSON);
+    AdLogType(WBAdLogLevelTrace, self.logType, @"JSON: %@", JSON);
 }
 
 - (void)fireErrorEventForAction:(NSString *)action withMessage:(NSString *)message {

@@ -24,7 +24,7 @@
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
     MPAdConfiguration *configuration = [self.delegate configuration];
-    CoreLogType(WBLogLevelTrace, WBAdTypeInterstitial, @"Loading HTML interstitial with source: %@", [configuration adResponseHTMLString]);
+    AdLogType(WBAdLogLevelTrace, WBAdTypeInterstitial, @"Loading HTML interstitial with source: %@", [configuration adResponseHTMLString]);
 
     self.interstitial = [[MPInstanceProvider sharedProvider] buildMPHTMLInterstitialViewControllerWithDelegate:self
                                                                                                orientationType:configuration.orientationType
