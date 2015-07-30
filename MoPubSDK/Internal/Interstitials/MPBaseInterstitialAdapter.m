@@ -14,8 +14,8 @@
 #import "MPTimer.h"
 #import "MPConstants.h"
 
+#import <WithBuddiesAds/WithBuddiesAds.h>
 #import "WBAdEvent_Internal.h"
-#import "WBAdControllerEvent.h"
 
 @interface MPBaseInterstitialAdapter ()
 
@@ -84,10 +84,9 @@
     if(timeInterval > 0)
     {
         self.timeoutTimer = [[MPCoreInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
-                                                                                       target:self
-                                                                                     selector:@selector(timeout)
-                                                                                      repeats:NO
-                                                                                      logType:WBAdTypeInterstitial];
+                                                                                           target:self
+                                                                                         selector:@selector(timeout)
+                                                                                          repeats:NO];
         [self.timeoutTimer scheduleNow];
     }
 }

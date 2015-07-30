@@ -95,10 +95,9 @@
 
     if (timeInterval > 0) {
         self.timeoutTimer = [[MPCoreInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
-                                                                                       target:self
-                                                                                     selector:@selector(timeout)
-                                                                                      repeats:NO
-                                                                                      logType:(self.configuration.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial)];
+                                                                                           target:self
+                                                                                         selector:@selector(timeout)
+                                                                                          repeats:NO];
         [self.timeoutTimer scheduleNow];
     }
 }

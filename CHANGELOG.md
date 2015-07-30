@@ -1,3 +1,55 @@
+## Version 3.9 (July 1st, 2015)
+
+- **Added VAST 3.0 standard support for video ads**.
+- **Improved video player UX**.
+- **Improved error messages**.
+- **Improved deep link handling**.
+- **Bug fixes**.
+	- Fixed clickthrough behavior for MRAID ads that use iframes.
+
+## Version 3.8 (June 1st, 2015)
+
+- **Minor improvements**.
+
+## Version 3.7 (April 30th, 2015)
+
+- **Added iAd medium rectangle ad support**.
+- **Certified Google AdMob SDK version 7.1.0**.
+- **Certified Greystripe SDK version 4.4.0**.
+- **Certified Vungle SDK version 3.0.13**.
+	- Added click callback support.
+- **Bug fixes**.
+	- Addressed a race condition when receiving location updates after calling -`[MPGeolocationProvider disableLocationUpdates:]`.
+    
+## Version 3.6 (April 3rd, 2015)
+
+  - **Bug fixes**.
+    - Fixed crash caused by some MRAID ads attempting to set an orientation that the app doesn't support.
+    
+## Version 3.5 (March 10th, 2015)
+
+  - **Deprecated custom event class methods and constants for setting ad network parameters**.
+  - **Changed banner minimum refresh time interval to 10 seconds**.
+  - **Greystripe custom events now accept parameters configured using app.mopub.com**.
+
+## Version 3.4 (January 30th, 2015)
+
+  - **Certified Facebook SDK Version 3.21.1**.
+  - **Bug fixes**.
+    - Fixed MRAID force orientation command for MRAID interstitials.
+    - Fixed interstitial bug where sound and video would continue to play after dismissal.
+
+## Version 3.3 (December 8th, 2014)
+
+  - **MRAID 2.0 support**. The MoPub SDK is now compliant with the MRAID 2.0 specification to enable rich media ads in banners and interstitial ad units. Learn more about MRAID from the [IAB](http://www.iab.net/MRAID#MRAID). To minimize integration errors, please completely remove the existing MoPub SDK from your project and then integrate the latest version.
+  - **Automatic geolocation updates**. If your app already has location permissions, the MoPub SDK will automatically attempt to acquire location data for ad requests. Please use `locationUpdatesEnabled` in `MoPub.h` to opt out of this functionality. The MoPub SDK will never prompt the user for permission if location permissions are not currently granted.
+  - **Added support for AdColony SDK 2.4.12**.
+  - **Bug fixes**.
+    - Fixed displaying previously cached Chartboost interstitials.
+    - Fixed crash caused by refreshing Facebook banners after click.
+    - Fixed iAd interstitial dismissed callback on iOS 8
+    - Fixed HTML interstitial duplicate click trackers
+
 ## Version 3.2 (October 17th, 2014)
 
   - **We have launched a new license as of version 3.2.0.** To view the full license, visit [http://www.mopub.com/legal/sdk-license-agreement/](http://www.mopub.com/legal/sdk-license-agreement/)

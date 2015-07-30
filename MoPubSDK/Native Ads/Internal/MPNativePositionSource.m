@@ -11,6 +11,7 @@
 #import "MPAdPositioning.h"
 #import "MPClientAdPositioning.h"
 #import "MPNativePositionResponseDeserializer.h"
+#import "MPAPIEndpoints.h"
 
 static NSString * const kPositioningSourceErrorDomain = @"com.mopub.iossdk.positioningsource";
 static const NSTimeInterval kMaximumRetryInterval = 60.0;
@@ -92,7 +93,12 @@ static const CGFloat kRetryIntervalBackoffMultiplier = 2.0;
 
 - (NSURL *)serverURLWithAdUnitIdentifier:(NSString *)identifier
 {
-    NSString *URLString = [NSString stringWithFormat:@"http://%@/m/pos?id=%@&v=%@&nsv=%@&udid=%@", HOSTNAME, identifier, MP_SERVER_VERSION, MP_SDK_VERSION, [MPIdentityProvider identifier]];
+    NSString *URLString = [NSString stringWithFormat:@"%@?id=%@&v=%@&nsv=%@&udid=%@",
+                           [MPAPIEndpoints baseURLStringWithPath:MOPUB_API_PATH_NATIVE_POSITIONING testing:NO],
+                           identifier,
+                           MP_SERVER_VERSION,
+                           MP_SDK_VERSION,
+                           [MPIdentityProvider identifier]];
     return [NSURL URLWithString:URLString];
 }
 

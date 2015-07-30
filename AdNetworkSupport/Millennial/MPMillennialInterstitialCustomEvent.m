@@ -132,7 +132,7 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    self.apid = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdM];
+    self.apid = [info objectForKey:@"adUnitID"] ?: [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdM];
 
     if (!self.apid || [self.router eventForApid:self.apid]) {
         [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];

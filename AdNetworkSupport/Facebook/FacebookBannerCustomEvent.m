@@ -5,6 +5,7 @@
 //  Copyright (c) 2014 MoPub. All rights reserved.
 //
 
+#import <FBAudienceNetwork/FBAudienceNetwork.h>
 #import "FacebookBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "WBAdService+Internal.h"
@@ -16,6 +17,7 @@
 @interface MPInstanceProvider (FacebookBanners)
 
 - (FBAdView *)buildFBAdViewWithPlacementID:(NSString *)placementID
+                                      size:(FBAdSize)size
                         rootViewController:(UIViewController *)controller
                                   delegate:(id<FBAdViewDelegate>)delegate;
 @end
@@ -23,19 +25,21 @@
 @implementation MPInstanceProvider (FacebookBanners)
 
 - (FBAdView *)buildFBAdViewWithPlacementID:(NSString *)placementID
+                                      size:(FBAdSize)size
                         rootViewController:(UIViewController *)controller
                                   delegate:(id<FBAdViewDelegate>)delegate
 {
     FBAdView *adView = [[FBAdView alloc] initWithPlacementID:placementID
-                                                       adSize:kFBAdSize320x50
-                                           rootViewController:controller];
+                                                      adSize:size
+                                          rootViewController:controller];
     adView.delegate = delegate;
+    [adView disableAutoRefresh];
     return adView;
 }
 
 @end
 
-@interface FacebookBannerCustomEvent ()
+@interface FacebookBannerCustomEvent () <FBAdViewDelegate>
 
 @property (nonatomic, strong) FBAdView *fbAdView;
 
@@ -55,8 +59,21 @@
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    if (!CGSizeEqualToSize(size, kFBAdSize320x50.size)) {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Invalid size for Facebook banner ad");
+    /**
+     * Facebook Banner ads can accept arbitrary widths for given heights of 50 and 90. We convert these sizes
+     * to Facebook's constants and set the fbAdView's size to the intended size ("size" passed to this method).
+     */
+    FBAdSize fbAdSize;
+    if (CGSizeEqualToSize(size, kFBAdSize320x50.size)) {
+        fbAdSize = kFBAdSize320x50;
+    } else if (CGSizeEqualToSize(size, kFBAdSizeHeight250Rectangle.size)) {
+        fbAdSize = kFBAdSizeHeight250Rectangle;
+    } else if (size.height == kFBAdSizeHeight90Banner.size.height) {
+        fbAdSize = kFBAdSizeHeight90Banner;
+    } else if (size.height == kFBAdSizeHeight50Banner.size.height) {
+        fbAdSize = kFBAdSizeHeight50Banner;
+    } else {
+        AdLogType(WBAdLogLevelError, WBAdTypeBanner, @"Invalid size for Facebook banner ad");
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
@@ -64,13 +81,14 @@
     NSString *placementId = [info objectForKey:@"placement_id"] ?: [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdFB];
     
     if (placementId == nil) {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Placement ID is required for Facebook banner ad");
+        AdLogType(wBAdLogLevelFatal, WBAdTypeBanner, @"Placement ID is required for Facebook banner ad");
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
 
     self.fbAdView =
         [[MPInstanceProvider sharedProvider] buildFBAdViewWithPlacementID:placementId
+                                                                     size:fbAdSize
                                                        rootViewController:[self.delegate viewControllerForPresentingModalView]
                                                                  delegate:self];
 
@@ -78,6 +96,15 @@
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
+
+    /*
+     * Manually resize the frame of the FBAdView due to a bug in the Facebook SDK that sets the ad's width
+     * to the width of the device instead of the width of the container it's placed in.
+     * (Confirmed in email with a FB Solutions Engineer)
+     */
+    CGRect fbAdFrame = self.fbAdView.frame;
+    fbAdFrame.size = size;
+    self.fbAdView.frame = fbAdFrame;
 
     [self.fbAdView loadAd];
 }
@@ -103,6 +130,18 @@
 - (void)adViewDidClick:(FBAdView *)adView
 {
     [self.delegate trackClick];
+    [self.delegate bannerCustomEventWillBeginAction:self];
+}
+
+- (void)adViewDidFinishHandlingClick:(FBAdView *)adView
+{
+    MPLogInfo(@"Facebook banner ad did finish handling click");
+    [self.delegate bannerCustomEventDidFinishAction:self];
+}
+
+- (UIViewController *)viewControllerForPresentingModalView
+{
+    return [self.delegate viewControllerForPresentingModalView];
 }
 
 @end

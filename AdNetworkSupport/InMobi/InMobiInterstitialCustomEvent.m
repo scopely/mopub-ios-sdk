@@ -5,11 +5,16 @@
 //  Copyright (c) 2013 MoPub, Inc. All rights reserved.
 //
 
+#import <WithBuddiesAds/WithBuddiesAds.h>
+#import "WBAdService+Internal.h"
+#import "IMInterstitial.h"
+#import "IMInterstitialDelegate.h"
 #import "InMobiInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "MPConstants.h"
-#import "WBAdService+Internal.h"
-#import "InMobi+InitializeSdk.h"
+
+static NSString *gAppId = nil;
+
+#define kInMobiAppID    @"YOUR_INMOBI_APP_ID"
 
 @interface MPInstanceProvider (InMobiInterstitials)
 
@@ -30,7 +35,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-@interface InMobiInterstitialCustomEvent ()
+@interface InMobiInterstitialCustomEvent () <IMInterstitialDelegate>
 
 @property (nonatomic, strong) IMInterstitial *inMobiInterstitial;
 
@@ -40,27 +45,31 @@
 
 @synthesize inMobiInterstitial = _inMobiInterstitial;
 
--(id)init
++ (void)setAppId:(NSString *)appId
 {
-    self = [super init];
-    if(self)
-    {
-        [InMobi inititializeSdk];
-    }
-    return self;
+    gAppId = [appId copy];
 }
 
 #pragma mark - MPInterstitialCustomEvent Subclass Methods
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
+    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Requesting InMobi interstitial");
+
+    NSString *appId = gAppId;
+    if ([appId length] == 0) {
+        appId = kInMobiAppID;
+    }
+
     self.inMobiInterstitial = [[MPInstanceProvider sharedProvider] buildIMInterstitialWithDelegate:self appId:[[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdIM]];
-    self.inMobiInterstitial.additionaParameters = @{ @"tp" : @"c_mopub",
-                                                     @"tp-ver"   : MP_SDK_VERSION };
+    NSMutableDictionary *paramsDict = [NSMutableDictionary dictionary];
+    [paramsDict setObject:@"c_mopub" forKey:@"tp"];
+    [paramsDict setObject:MP_SDK_VERSION forKey:@"tp-ver"];
+    self.inMobiInterstitial.additionaParameters = paramsDict; // For supply source identification
     if (self.delegate.location) {
         [InMobi setLocationWithLatitude:self.delegate.location.coordinate.latitude
-                               longitude:self.delegate.location.coordinate.longitude
-                                accuracy:self.delegate.location.horizontalAccuracy];
+                              longitude:self.delegate.location.coordinate.longitude
+                               accuracy:self.delegate.location.horizontalAccuracy];
     }
     [self.inMobiInterstitial loadInterstitial];
 }

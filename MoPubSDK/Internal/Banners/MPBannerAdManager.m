@@ -17,6 +17,7 @@
 
 #import "WBAdEvent_Internal.h"
 #import "WBAdControllerEvent.h"
+#import "MPLogging.h"
 #import "WBAdLogging.h"
 
 @interface MPBannerAdManager ()
@@ -161,6 +162,7 @@
     URL = [URL copy]; //if this is the URL from the requestingConfiguration, it's about to die...
     // Cancel the current request/requesting adapter
     self.requestingConfiguration = nil;
+    [self.requestingAdapter unregisterDelegate];
     self.requestingAdapter = nil;
     self.requestingAdapterAdContentView = nil;
 
@@ -199,8 +201,7 @@
         self.refreshTimer = [[MPCoreInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
                                                                                        target:self
                                                                                      selector:@selector(refreshTimerDidFire)
-                                                                                      repeats:NO
-                                                                                      logType:self.logType];
+                                                                                      repeats:NO];
         [self.refreshTimer scheduleNow];
         AdLogType(WBAdLogLevelDebug, self.logType, @"Scheduled the autorefresh timer to fire in %.1f seconds (%p).", timeInterval, self.refreshTimer);
     }
@@ -228,14 +229,18 @@
 
     if (configuration.adType == MPAdTypeInterstitial) {
         AdLogType(WBAdLogLevelWarn, self.logType, @"Could not load ad: banner object received an interstitial ad unit ID.");
-
         [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorAdapterInvalid]];
         return;
     }
 
-    if ([configuration.networkType isEqualToString:kAdTypeClear]) {
-        AdLogType(WBAdLogLevelError, self.logType, @"Ad server response indicated no ad available.");
+    if (configuration.adUnitWarmingUp) {
+        AdLogType(WBAdLogLevelInfo, self.logType, kMPWarmingUpErrorLogFormatWithAdUnitID, self.delegate.adUnitId);
+        [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorAdUnitWarmingUp]];
+        return;
+    }
 
+    if ([configuration.networkType isEqualToString:kAdTypeClear]) {
+        AdLogType(WBAdLogLevelInfo, self.logType, kMPClearErrorLogFormatWithAdUnitID, self.delegate.adUnitId);
         [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorNoInventory]];
         return;
     }
@@ -321,6 +326,7 @@
 - (void)presentRequestingAdapter
 {
     if (!self.adActionInProgress && self.requestingAdapterIsReadyToBePresented) {
+        [self.onscreenAdapter unregisterDelegate];
         self.onscreenAdapter = self.requestingAdapter;
         self.requestingAdapter = nil;
 
@@ -354,6 +360,7 @@
         // 3) and note that there can't possibly be a modal on display any more
         [self.delegate managerDidFailToLoadAd];
         [self.delegate invalidateContentView];
+        [self.onscreenAdapter unregisterDelegate];
         self.onscreenAdapter = nil;
         if (self.adActionInProgress) {
             [self.delegate userActionDidFinish];
@@ -403,6 +410,7 @@
 
     //NOTE: this will immediately deallocate the onscreen adapter, even if there is a modal onscreen.
 
+    [self.onscreenAdapter unregisterDelegate];
     self.onscreenAdapter = self.requestingAdapter;
     self.requestingAdapter = nil;
 

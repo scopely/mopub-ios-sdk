@@ -1,24 +1,18 @@
 #import "MPAdConfigurationFactory.h"
 #import "MPInterstitialAdController.h"
 #import "Chartboost+Specs.h"
+#import "MPChartboostRouter.h"
+#import "MPInstanceProvider+Chartboost.h"
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
-
-@class MPChartboostRouter;
-
-@interface MPInstanceProvider (Specs)
-
-- (MPChartboostRouter *)sharedMPCharboostRouter;
-
-@end
 
 SPEC_BEGIN(MPChartboostInterstitialIntegrationSuite)
 
 describe(@"Chartboost Integration", ^{
     beforeEach(^{
         [Chartboost clearRequestedLocations];
-        [Chartboost setDelegate:[fakeProvider sharedMPCharboostRouter]];
+        [Chartboost setDelegate:[fakeProvider sharedMPChartboostRouter]];
     });
 
     describe(@"MPChartboostInterstitialIntegrationSuite", ^{
@@ -50,6 +44,31 @@ describe(@"Chartboost Integration", ^{
             [communicator resetLoadedURL];
 
             setUpInterstitialSharedContext(communicator, delegate, interstitial, @"chartboost_interstitial", nice_fake_for(@protocol(FakeInterstitialAd)), configuration.failoverURL);
+        });
+
+        context(@"when Chartboost already has a cached interstitial", ^{
+            beforeEach(^{
+                [Chartboost setHasInterstitial:@YES forLocation:@"HazIt"];
+
+                delegate = nice_fake_for(@protocol(MPInterstitialAdControllerDelegate));
+                interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:@"chartboost_interstitial_cached_test"];
+                interstitial.delegate = delegate;
+
+                presentingController = [[UIViewController alloc] init];
+
+                // request an Ad
+                [interstitial loadAd];
+
+                communicator = fakeCoreProvider.lastFakeMPAdServerCommunicator;
+
+                // receive the configuration -- this will create an adapter which will use our fake interstitial
+                configuration = [MPAdConfigurationFactory defaultChartboostInterstitialConfigurationWithLocation:@"HazIt"];
+                [communicator receiveConfiguration:configuration];
+            });
+
+            it(@"should let the delegate know the interstitial is ready", ^{
+                delegate should have_received(@selector(interstitialDidLoadAd:));
+            });
         });
 
         context(@"while the ad is loading", ^{

@@ -5,6 +5,8 @@
 //  Copyright (c) 2012 MoPub, Inc. All rights reserved.
 //
 
+#import "GSFullscreenAd.h"
+#import "GSAdDelegate.h"
 #import "GreystripeInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "GSSDKInfo.h"
@@ -28,9 +30,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// This is a sample Greystripe GUID. You will need to replace it with your Greystripe GUID.
+static NSString *gGUID = nil;
 
-@interface GreystripeInterstitialCustomEvent ()
+#define kGreystripeGUID @"YOUR_GREYSTRIPE_GUID"
+
+@interface GreystripeInterstitialCustomEvent () <GSAdDelegate>
 
 @property (nonatomic, strong) GSFullscreenAd *greystripeFullscreenAd;
 
@@ -40,11 +44,28 @@
 
 @synthesize greystripeFullscreenAd = _greystripeFullscreenAd;
 
++ (void)setGUID:(NSString *)GUID
+{
+    MPLogWarn(@"+setGUID for class GreystripeInterstitialCustomEvent is deprecated. Use the GUID parameter when configuring your network in the MoPub website.");
+    gGUID = [GUID copy];
+}
+
 #pragma mark - MPInterstitialCustomEvent Subclass Methods
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    self.greystripeFullscreenAd = [[MPInstanceProvider sharedProvider] buildGSFullscreenAdWithDelegate:self GUID:[[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdGS]];
+    MPLogInfo(@"Requesting Greystripe interstitial");
+
+    NSString *GUID = [info objectForKey:@"GUID"];
+    if (GUID == nil) {
+        GUID = gGUID;
+        if ([GUID length] == 0) {
+            MPLogWarn(@"Setting kGreystripeGUID in GreystripeBannerCustomEvent.m is deprecated. Use the GUID parameter when configuring your network in the MoPub website.");
+            GUID = kGreystripeGUID;
+        }
+    }
+
+    self.greystripeFullscreenAd = [[MPInstanceProvider sharedProvider] buildGSFullscreenAdWithDelegate:self GUID:GUID];
 
     if (self.delegate.location) {
         [GSSDKInfo updateLocation:self.delegate.location];
@@ -58,7 +79,7 @@
     if ([self.greystripeFullscreenAd isAdReady]) {
         [self.greystripeFullscreenAd displayFromViewController:rootViewController];
     } else {
-        CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"Failed to show Greystripe interstitial: a previously loaded Greystripe interstitial now claims not to be ready.");
+        MPLogInfo(@"Failed to show Greystripe interstitial: a previously loaded Greystripe interstitial now claims not to be ready.");
         [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
     }
 }

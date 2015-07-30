@@ -6,7 +6,6 @@
 //  Copyright 2011 MoPub, Inc. All rights reserved.
 //
 
-#import <WithBuddiesAds/WithBuddiesAds.h>
 #import <Foundation/Foundation.h>
 
 /*
@@ -19,8 +18,7 @@
 + (MPTimer *)timerWithTimeInterval:(NSTimeInterval)seconds
                             target:(id)target
                           selector:(SEL)aSelector
-                           repeats:(BOOL)repeats
-                           logType:(WBAdType)logType;
+                           repeats:(BOOL)repeats;
 
 - (BOOL)isValid;
 - (void)invalidate;

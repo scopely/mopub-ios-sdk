@@ -10,8 +10,7 @@
 #import "FakeInterstitialAdapter.h"
 #import "FakeMPAnalyticsTracker.h"
 #import <iAd/iAd.h>
-#import "GADInterstitial.h"
-#import "GADBannerView.h"
+#import <GoogleMobileAds/GoogleMobileAds.h>
 #import "FakeMMInterstitial.h"
 #import "FakeInterstitialCustomEvent.h"
 #import <Chartboost/Chartboost.h>
@@ -19,24 +18,25 @@
 #import "IMInterstitial.h"
 #import "IMBanner.h"
 #import "MPInterstitialAdManager.h"
-#import "GADRequest.h"
 #import "FakeMMAdView.h"
-#import "FakeMPReachability.h"
 #import "FakeGSBannerAdView.h"
 #import "MPBaseBannerAdapter.h"
 #import "FakeBannerCustomEvent.h"
 #import "FakeMPTimer.h"
 #import "FakeMPAdAlertManager.h"
 #import "FakeMPAdAlertGestureRecognizer.h"
-#import "FakeMRAdView.h"
+#import "FakeMRController.h"
 #import <FBAudienceNetwork/FBAudienceNetwork.h>
 #import <Foundation/Foundation.h>
 #import "MPNativeAdSource.h"
 #import "MPNativePositionSource.h"
 #import "MPStreamAdPlacer.h"
 #import "FakeMPStreamAdPlacer.h"
+#import "MPClosableView.h"
+#import "MPRewardedVideoAdManager.h"
+#import "MPRewardedVideoAdapter.h"
+#import "MPRewardedVideoCustomEvent.h"
 
-@class MRJavaScriptEventEmitter;
 @class MRCalendarManager;
 @class EKEventStore;
 @class EKEventEditViewController;
@@ -44,8 +44,9 @@
 @class MRVideoPlayerManager;
 @class MPMoviePlayerViewController;
 @class MRBundleManager;
-@class MRAdView;
+@class MRBridge;
 @class MPStreamAdPlacementData;
+@class MRNativeCommandHandler;
 
 @interface FakeMPInstanceProvider : MPInstanceProvider
 
@@ -60,15 +61,21 @@
 @property (nonatomic, strong) MPHTMLInterstitialViewController *fakeMPHTMLInterstitialViewController;
 @property (nonatomic, strong) MPMRAIDInterstitialViewController *fakeMPMRAIDInterstitialViewController;
 
+#pragma mark - Rewarded Video
+@property (nonatomic, strong) MPRewardedVideoAdManager *fakeMPRewardedVideoAdManager;
+@property (nonatomic, strong) MPRewardedVideoAdapter *fakeMPRewardedVideoAdapter;
+@property (nonatomic, strong) MPRewardedVideoCustomEvent *fakeMPRewardedVideoCustomEvent;
+
 #pragma mark - HTML Ads
 @property (nonatomic, strong) MPAdWebView *fakeMPAdWebView;
 @property (nonatomic, strong) MPAdWebViewAgent *fakeMPAdWebViewAgent;
 
 #pragma mark - MRAID
-@property (nonatomic, strong) MRAdView *fakeMRAdView;
+@property (nonatomic, strong) MPClosableView *fakeMRAIDMPClosableView;
+@property (nonatomic, strong) MRController *fakeMRController;
+@property (nonatomic, strong) MRBridge *fakeMRBridge;
 @property (nonatomic, strong) MRBundleManager *fakeMRBundleManager;
 @property (nonatomic, strong) UIWebView *fakeUIWebView;
-@property (nonatomic, strong) MRJavaScriptEventEmitter *fakeMRJavaScriptEventEmitter;
 @property (nonatomic, strong) MRCalendarManager *fakeMRCalendarManager;
 @property (nonatomic, strong) EKEventEditViewController *fakeEKEventEditViewController;
 @property (nonatomic, strong) EKEventStore *fakeEKEventStore;
@@ -76,6 +83,7 @@
 @property (nonatomic, strong) MRImageDownloader *fakeImageDownloader;
 @property (nonatomic, strong) MRVideoPlayerManager *fakeMRVideoPlayerManager;
 @property (nonatomic, strong) MPMoviePlayerViewController *fakeMoviePlayerViewController;
+@property (nonatomic, strong) MRNativeCommandHandler *fakeNativeCommandHandler;
 
 #pragma mark - Native
 @property (nonatomic, strong) MPNativeAdSource *fakeNativeAdSource;
@@ -87,6 +95,7 @@
 
 #pragma mark iAd
 @property (nonatomic, strong) ADBannerView *fakeADBannerView;
+@property (nonatomic, strong) ADBannerView *fakeADBannerViewMediumRectangle;
 @property (nonatomic, strong) ADInterstitialAd *fakeADInterstitialAd;
 
 #pragma mark Facebook

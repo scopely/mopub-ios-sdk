@@ -72,6 +72,59 @@ describe(@"NSURL_MPAdditions", ^{
             [URL mp_hasTelephonePromptScheme] should equal(NO);
         });
     });
+
+    describe(@"mopubCommand", ^ {
+        it(@"should reject non-mopub schemes", ^{
+            NSURL *URL = [NSURL URLWithString:@"hargau://close"];
+            [URL mp_mopubHostCommand] should equal(MPMoPubHostCommandUnrecognized);
+        });
+
+        it(@"should return correct enum for known commands", ^{
+            NSURL *URL = [NSURL URLWithString:@"mopub://close"];
+            [URL mp_mopubHostCommand] should equal(MPMoPubHostCommandClose);
+
+            URL = [NSURL URLWithString:@"mopub://finishLoad"];
+            [URL mp_mopubHostCommand] should equal(MPMoPubHostCommandFinishLoad);
+
+            URL = [NSURL URLWithString:@"mopub://failLoad"];
+            [URL mp_mopubHostCommand] should equal(MPMoPubHostCommandFailLoad);
+
+            URL = [NSURL URLWithString:@"mopub://precacheComplete"];
+            [URL mp_mopubHostCommand] should equal(MPMoPubHostCommandPrecacheComplete);
+        });
+
+        it(@"should return unrecognized for unknown commands", ^{
+            NSURL *URL = [NSURL URLWithString:@"mopub://hargau"];
+            [URL mp_mopubHostCommand] should equal(MPMoPubHostCommandUnrecognized);
+        });
+    });
+
+    describe(@"shareCommand", ^ {
+        it(@"should reject non-share schemes", ^{
+            NSURL *URL = [NSURL URLWithString:@"hargau://tweet"];
+            [URL mp_MoPubShareHostCommand] should equal(MPMoPubShareHostCommandUnrecognized);
+        });
+
+        it(@"should return correct enum for known commands", ^{
+            NSURL *URL = [NSURL URLWithString:@"mopubshare://tweet"];
+            [URL mp_MoPubShareHostCommand] should equal(MPMoPubShareHostCommandTweet);
+        });
+
+        it(@"should return unrecognized for unknown commands", ^{
+            NSURL *URL = [NSURL URLWithString:@"mopubshare://hargau"];
+            [URL mp_MoPubShareHostCommand] should equal(MPMoPubShareHostCommandUnrecognized);
+        });
+
+        it(@"should return NO for non-share schemes", ^{
+            NSURL *URL = [NSURL URLWithString:@"shared://hargau"];
+            [URL mp_isMoPubShareScheme] should equal(NO);
+        });
+
+        it(@"should return YES for share schemes", ^{
+            NSURL *URL = [NSURL URLWithString:@"mopubshare://hargau"];
+            [URL mp_isMoPubShareScheme] should equal(YES);
+        });
+    });
 });
 
 SPEC_END

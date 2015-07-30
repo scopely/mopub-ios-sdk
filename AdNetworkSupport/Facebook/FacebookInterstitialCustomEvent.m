@@ -5,6 +5,7 @@
 //  Copyright (c) 2014 MoPub. All rights reserved.
 //
 
+#import <FBAudienceNetwork/FBAudienceNetwork.h>
 #import "FacebookInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "WBAdService+Internal.h"
@@ -31,7 +32,7 @@
 
 @end
 
-@interface FacebookInterstitialCustomEvent ()
+@interface FacebookInterstitialCustomEvent () <FBInterstitialAdDelegate>
 
 @property (nonatomic, strong) FBInterstitialAd *fbInterstitialAd;
 
@@ -57,7 +58,6 @@
     self.fbInterstitialAd =
         [[MPInstanceProvider sharedProvider] buildFBInterstitialAdWithPlacementID:placementId
                                                                         delegate:self];
-
     [self.fbInterstitialAd loadAd];
 }
 
@@ -102,6 +102,5 @@
 {
     [self.delegate interstitialCustomEventWillDisappear:self];
 }
-
 
 @end

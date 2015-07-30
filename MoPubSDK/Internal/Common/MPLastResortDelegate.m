@@ -7,6 +7,7 @@
 
 #import "MPLastResortDelegate.h"
 #import "MPGlobal.h"
+#import "UIViewController+MPAdditions.h"
 
 @class MFMailComposeViewController;
 
@@ -24,13 +25,13 @@
 
 - (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(NSInteger)result error:(NSError*)error
 {
-    [(UIViewController *)controller dismissViewControllerAnimated:MP_ANIMATED completion:nil];
+    [(UIViewController *)controller mp_dismissModalViewControllerAnimated:MP_ANIMATED];
 }
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 60000
 - (void)productViewControllerDidFinish:(SKStoreProductViewController *)viewController
 {
-    [viewController dismissViewControllerAnimated:MP_ANIMATED completion:nil];
+    [viewController mp_dismissModalViewControllerAnimated:MP_ANIMATED];
 }
 #endif
 

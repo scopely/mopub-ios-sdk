@@ -6,6 +6,8 @@
 //
 
 #import "FakeMPCoreInstanceProvider.h"
+#import "MPGeolocationProvider.h"
+#import "FakeMPURLResolver.h"
 
 @interface FakeMPCoreInstanceProvider ()
 
@@ -48,11 +50,14 @@
 
 #pragma mark - URL Handling
 
-- (MPURLResolver *)buildMPURLResolver
+- (MPURLResolver *)buildMPURLResolverWithURL:(NSURL *)URL completion:(MPURLResolverCompletionBlock)completion
 {
-    return [self returnFake:self.fakeMPURLResolver
+    FakeMPURLResolver *fakeResolver = self.fakeMPURLResolver;
+    fakeResolver.URL = URL;
+    fakeResolver.completion = completion;
+    return [self returnFake:fakeResolver
                      orCall:^{
-                         return [super buildMPURLResolver];
+                         return [super buildMPURLResolverWithURL:URL completion:completion];
                      }];
 }
 
@@ -65,6 +70,30 @@
 }
 
 #pragma mark - Utilities
+
+- (UIDevice *)sharedCurrentDevice
+{
+    return [self returnFake:self.fakeUIDevice
+                     orCall:^id{
+                         return [super sharedCurrentDevice];
+                     }];
+}
+
+- (MPGeolocationProvider *)sharedMPGeolocationProvider
+{
+    return [self returnFake:self.fakeGeolocationProvider
+                     orCall:^id{
+                         return [super sharedMPGeolocationProvider];
+                     }];
+}
+
+- (CLLocationManager *)buildCLLocationManager
+{
+    return [self returnFake:self.fakeLocationManager
+                     orCall:^{
+                         return [super buildCLLocationManager];
+                     }];
+}
 
 - (MPAdAlertManager *)buildMPAdAlertManagerWithDelegate:(id<MPAdAlertManagerDelegate>)delegate
 {
@@ -110,6 +139,22 @@
                      }];
 }
 
+- (MPLogEventRecorder *)sharedLogEventRecorder
+{
+    return [self returnFake:self.fakeLogEventRecorder
+                     orCall:^{
+                         return [super sharedLogEventRecorder];
+                     }];
+}
+
+- (MPNetworkManager *)sharedNetworkManager
+{
+    return [self returnFake:self.fakeNetworkManager
+                     orCall:^{
+                         return [super sharedNetworkManager];
+                     }];
+}
+
 - (MPAnalyticsTracker *)sharedMPAnalyticsTracker
 {
     return [self sharedFakeMPAnalyticsTracker];
@@ -135,7 +180,7 @@
     NSTimeInterval advanceBy = 0;
     while (timeInterval > 0) {
         advanceBy = delta < timeInterval ? delta : timeInterval;
-        for (FakeMPTimer *timer in self.fakeTimers) {
+        for (FakeMPTimer *timer in [self.fakeTimers copy]) {
             [timer advanceTime:advanceBy];
         }
         timeInterval -= advanceBy;

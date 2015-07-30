@@ -9,8 +9,10 @@
 
 static NSString *gAppId, *gAppSignature;
 static id<ChartboostDelegate> gDelegate;
-static NSMutableArray *gRequestedLocations;
+static NSMutableArray *gRequestedInterstitialLocations;
+static NSMutableArray *gRequestedRewardedVideoLocations;
 static NSMutableDictionary *gCachedInterstitials;
+static NSMutableDictionary *gCachedRewardedVideos;
 static NSString *gCurrentVisibleLocation;
 
 @implementation Chartboost (Specs)
@@ -23,18 +25,37 @@ static NSString *gCurrentVisibleLocation;
     gAppSignature = [appSignature copy];
     [self setDelegate:delegate];
 
-    gRequestedLocations = [NSMutableArray array];
-    gCachedInterstitials = [NSMutableDictionary dictionary];
+    gRequestedInterstitialLocations = [NSMutableArray array];
+    gRequestedRewardedVideoLocations = [NSMutableArray array];
+    [self initCachedInterstitials];
+}
+
++ (void)initCachedInterstitials
+{
+    if (gCachedInterstitials == nil) {
+        gCachedInterstitials = [NSMutableDictionary dictionary];
+    }
+
+    if (gCachedRewardedVideos == nil) {
+        gCachedRewardedVideos = [NSMutableDictionary dictionary];
+    }
 }
 
 + (void)cacheInterstitial:(CBLocation)location
 {
-    [gRequestedLocations addObject:location];
+    [gRequestedInterstitialLocations addObject:location];
 }
 
 + (void)setHasInterstitial:(NSNumber *)hasInterstitial forLocation:(CBLocation)location
 {
+    [self initCachedInterstitials];
     [gCachedInterstitials setObject:hasInterstitial forKey:location];
+}
+
++ (void)setHasRewardedVideo:(NSNumber *)hasRewardedVideo forLocation:(CBLocation)location
+{
+    [self initCachedInterstitials];
+    [gCachedRewardedVideos setObject:hasRewardedVideo forKey:location];
 }
 
 + (BOOL)hasInterstitial:(CBLocation)location
@@ -88,12 +109,18 @@ static NSString *gCurrentVisibleLocation;
 
 + (NSArray *)requestedLocations
 {
-    return gRequestedLocations;
+    return gRequestedInterstitialLocations;
+}
+
++(NSArray *)requestedRewardedLocations
+{
+    return gRequestedRewardedVideoLocations;
 }
 
 + (void)clearRequestedLocations
 {
-    [gRequestedLocations removeAllObjects];
+    [gRequestedInterstitialLocations removeAllObjects];
+    [gRequestedRewardedVideoLocations removeAllObjects];
 }
 
 + (NSString *)currentVisibleLocation

@@ -21,6 +21,8 @@
 #import "WBAdLogLevel.h"
 #import "WBAdLogging.h"
 
+#import "MPLogging.h"
+#import "MPError.h"
 
 @interface MPInterstitialAdManager ()
 
@@ -61,8 +63,6 @@
     [self.communicator setDelegate:nil];
 
     self.adapter = nil;
-
-
 }
 
 - (void)setAdapter:(MPBaseInterstitialAdapter *)adapter
@@ -135,11 +135,18 @@
 
     AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Interstatial Ad view is fetching ad network type: %@", self.configuration.networkType);
 
+    if (self.configuration.adUnitWarmingUp) {
+        AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, kMPWarmingUpErrorLogFormatWithAdUnitID, self.delegate.interstitialAdController.adUnitId);
+        self.loading = NO;
+        [self.delegate manager:self didFailToLoadInterstitialWithError:[MPError errorWithCode:MPErrorAdUnitWarmingUp]];
+        return;
+    }
+
     if ([self.configuration.networkType isEqualToString:kAdTypeClear]) {
         [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonNoFill adNetwork:nil adType:WBAdTypeInterstitial];
         AdLogType(WBAdLogLevelError, WBAdTypeInterstitial, @"Ad server response indicated no ad available.");
         self.loading = NO;
-        [self.delegate manager:self didFailToLoadInterstitialWithError:nil];
+        [self.delegate manager:self didFailToLoadInterstitialWithError:[MPError errorWithCode:MPErrorNoInventory]];
         return;
     }
 
@@ -147,7 +154,7 @@
         [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonMalformedData adNetwork:nil adType:WBAdTypeInterstitial];
         AdLogType(WBAdLogLevelFatal, WBAdTypeInterstitial, @"Could not load ad: interstitial object received a non-interstitial ad unit ID.");
         self.loading = NO;
-        [self.delegate manager:self didFailToLoadInterstitialWithError:nil];
+        [self.delegate manager:self didFailToLoadInterstitialWithError:[MPError errorWithCode:MPErrorAdapterInvalid]];
         return;
     }
 

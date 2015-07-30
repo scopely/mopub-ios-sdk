@@ -7,7 +7,9 @@
 
 #import <WithBuddiesAds/WithBuddiesAds.h>
 #import "MPInterstitialViewController.h"
+
 #import "MPGlobal.h"
+#import "UIViewController+MPAdditions.h"
 
 static const CGFloat kCloseButtonPadding = 6.0;
 static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
@@ -15,7 +17,6 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
 @interface MPInterstitialViewController ()
 
 @property (nonatomic, assign) BOOL applicationHasStatusBar;
-@property (nonatomic, assign) BOOL isOnViewControllerStack;
 
 - (void)setCloseButtonImageWithImageNamed:(NSString *)imageName;
 - (void)setCloseButtonStyle:(MPInterstitialCloseButtonStyle)style;
@@ -33,7 +34,6 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
 @synthesize closeButtonStyle = _closeButtonStyle;
 @synthesize orientationType = _orientationType;
 @synthesize applicationHasStatusBar = _applicationHasStatusBar;
-@synthesize isOnViewControllerStack = _isOnViewControllerStack;
 @synthesize delegate = _delegate;
 
 
@@ -44,35 +44,11 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
     self.view.backgroundColor = [UIColor blackColor];
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-
-    if (!self.isOnViewControllerStack) {
-        self.isOnViewControllerStack = YES;
-        [self didPresentInterstitial];
-    }
-}
-
-- (void)viewDidDisappear:(BOOL)animated
-{
-    [super viewDidDisappear:animated];
-
-    // When the interstitial is dismissed, we want to
-    // -viewDidDisappear: is called 1) when the interstitial is dismissed and 2) when a modal view
-    // controller is presented atop the interstitial (e.g. the ad browser).
-
-    if (![self presentedViewController]) {
-        self.isOnViewControllerStack = NO;
-        //self.view.alpha = 0.0;
-    }
-}
-
 #pragma mark - Public
 
 - (void)presentInterstitialFromViewController:(UIViewController *)controller
 {
-    if (_isOnViewControllerStack) {
+    if (self.presentingViewController) {
         AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"Cannot present an interstitial that is already on-screen.");
         return;
     }
@@ -83,7 +59,10 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
     [self setApplicationStatusBarHidden:YES];
 
     [self layoutCloseButton];
-    [controller presentViewController:self animated:MP_ANIMATED completion:nil];
+
+    [controller presentViewController:self animated:MP_ANIMATED completion:^{
+        [self didPresentInterstitial];
+    }];
 }
 
 - (void)willPresentInterstitial
@@ -120,7 +99,7 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
         _closeButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin |
         UIViewAutoresizingFlexibleBottomMargin;
 
-        UIImage *closeButtonImage = [UIImage imageNamed:kCloseButtonXImageName];
+        UIImage *closeButtonImage = [UIImage imageNamed:MPResourcePathForResource(kCloseButtonXImageName)];
         [_closeButton setImage:closeButtonImage forState:UIControlStateNormal];
         [_closeButton sizeToFit];
 
@@ -183,10 +162,10 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
 
     [self willDismissInterstitial];
 
-    UIViewController *presentingViewController = [self presentingViewController];
+    UIViewController *presentingViewController = [self mp_presentingViewController];
     // TODO: Is this check necessary?
-    if ([presentingViewController presentedViewController] == self) {
-        [presentingViewController dismissViewControllerAnimated:MP_ANIMATED completion:nil];
+    if ([presentingViewController mp_presentedViewController] == self) {
+        [presentingViewController mp_dismissModalViewControllerAnimated:MP_ANIMATED];
     }
 
     [self didDismissInterstitial];
@@ -196,18 +175,7 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
 
 - (void)setApplicationStatusBarHidden:(BOOL)hidden
 {
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_3_2
-    if ([UIApplication instancesRespondToSelector:@selector(setStatusBarHidden:withAnimation:)]) {
-        // Hiding the status bar should use a fade effect.
-        // Displaying the status bar should use no animation.
-        UIStatusBarAnimation animation = hidden ?
-        UIStatusBarAnimationFade : UIStatusBarAnimationNone;
-        [[UIApplication sharedApplication] setStatusBarHidden:hidden withAnimation:animation];
-        return;
-    }
-#endif
-
-    [[UIApplication sharedApplication] setStatusBarHidden:hidden];
+    [[UIApplication sharedApplication] mp_preIOS7setApplicationStatusBarHidden:hidden];
 }
 
 #pragma mark - Hidding status bar (iOS 7 and above)
@@ -218,6 +186,12 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
 }
 
 #pragma mark - Autorotation (iOS 6.0 and above)
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_6_0
+- (BOOL)shouldAutorotate
+{
+    return YES;
+}
 
 - (NSUInteger)supportedInterfaceOrientations
 {
@@ -232,8 +206,7 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
         interstitialSupportedOrientations &=
         (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown);
         orientationDescription = @"portrait";
-    }
-    else if (_orientationType == MPInterstitialOrientationTypeLandscape) {
+    } else if (_orientationType == MPInterstitialOrientationTypeLandscape) {
         interstitialSupportedOrientations &= UIInterfaceOrientationMaskLandscape;
         orientationDescription = @"landscape";
     }
@@ -245,8 +218,7 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
         AdLogType(WBAdLogLevelFatal, WBAdTypeInterstitial, @"Your application does not support this interstitial's desired orientation "
                    @"(%@).", orientationDescription);
         return applicationSupportedOrientations;
-    }
-    else {
+    } else {
         return interstitialSupportedOrientations;
     }
 }
@@ -262,18 +234,30 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
 
     if (supportedInterfaceOrientations & currentInterfaceOrientationMask) {
         return currentInterfaceOrientation;
-    }
-    else if (supportedInterfaceOrientations & UIInterfaceOrientationMaskPortrait) {
+    } else if (supportedInterfaceOrientations & UIInterfaceOrientationMaskPortrait) {
         return UIInterfaceOrientationPortrait;
-    }
-    else if (supportedInterfaceOrientations & UIInterfaceOrientationMaskPortraitUpsideDown) {
+    } else if (supportedInterfaceOrientations & UIInterfaceOrientationMaskPortraitUpsideDown) {
         return UIInterfaceOrientationPortraitUpsideDown;
-    }
-    else if (supportedInterfaceOrientations & UIInterfaceOrientationMaskLandscapeLeft) {
+    } else if (supportedInterfaceOrientations & UIInterfaceOrientationMaskLandscapeLeft) {
         return UIInterfaceOrientationLandscapeLeft;
-    }
-    else {
+    } else {
         return UIInterfaceOrientationLandscapeRight;
+    }
+}
+#endif
+
+#pragma mark - Autorotation (before iOS 6.0)
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    if (_orientationType == MPInterstitialOrientationTypePortrait) {
+        return (interfaceOrientation == UIInterfaceOrientationPortrait ||
+                interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown);
+    } else if (_orientationType == MPInterstitialOrientationTypeLandscape) {
+        return (interfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
+                interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+    } else {
+        return YES;
     }
 }
 

@@ -37,15 +37,13 @@
 
     CGRect adWebViewFrame = CGRectMake(0, 0, size.width, size.height);
     self.bannerAgent = [[MPInstanceProvider sharedProvider] buildMPAdWebViewAgentWithAdWebViewFrame:adWebViewFrame
-                                                                                           delegate:self
-                                                                               customMethodDelegate:[self.delegate bannerDelegate]];
+                                                                                           delegate:self];
     [self.bannerAgent loadConfiguration:[self.delegate configuration]];
 }
 
 - (void)dealloc
 {
     self.bannerAgent.delegate = nil;
-    self.bannerAgent.customMethodDelegate = nil;
 }
 
 -(NSString *)description

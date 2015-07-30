@@ -5,6 +5,7 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
+#import <GoogleMobileAds/GoogleMobileAds.h>
 #import "MPGoogleAdMobBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "WBAdService+Internal.h"
@@ -37,7 +38,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-@interface MPGoogleAdMobBannerCustomEvent ()
+@interface MPGoogleAdMobBannerCustomEvent () <GADBannerViewDelegate>
 
 @property (nonatomic, strong) GADBannerView *adBannerView;
 
@@ -98,12 +99,13 @@
                                 accuracy:location.horizontalAccuracy];
     }
 
-    // Here, you can specify a list of devices that will receive test ads.
-    // See: http://code.google.com/mobile/ads/docs/ios/intermediate.html#testdevices
+    // Here, you can specify a list of device IDs that will receive test ads.
+    // Running in the simulator will automatically show test ads.
     request.testDevices = [NSArray arrayWithObjects:
-                           GAD_SIMULATOR_ID,
                            // more UDIDs here,
                            nil];
+
+    request.requestAgent = @"MoPub";
 
     [self.adBannerView loadRequest:request];
 }

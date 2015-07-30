@@ -7,13 +7,14 @@
 
 #import "MPLastResortDelegate+EventKit.h"
 #import "MPGlobal.h"
+#import "UIViewController+MPAdditions.h"
 
 
 @implementation MPLastResortDelegate (EventKit)
 
 - (void)eventEditViewController:(EKEventEditViewController *)controller didCompleteWithAction:(EKEventEditViewAction)action
 {
-    [controller dismissViewControllerAnimated:MP_ANIMATED completion:nil];
+    [controller mp_dismissModalViewControllerAnimated:MP_ANIMATED];
 }
 
 @end

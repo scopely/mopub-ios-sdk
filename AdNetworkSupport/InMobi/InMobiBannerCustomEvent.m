@@ -5,6 +5,7 @@
 //  Copyright (c) 2013 MoPub, Inc. All rights reserved.
 //
 
+#import "IMBanner.h"
 #import "InMobiBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "MPConstants.h"
@@ -12,6 +13,8 @@
 #import "InMobi+InitializeSdk.h"
 
 #define INVALID_INMOBI_AD_SIZE  -1
+
+static NSString *gAppId = nil;
 
 @interface MPInstanceProvider (InMobiBanners)
 
@@ -30,7 +33,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-@interface InMobiBannerCustomEvent ()
+@interface InMobiBannerCustomEvent () <IMBannerDelegate>
 
 @property (nonatomic, strong) IMBanner *inMobiBanner;
 
@@ -52,11 +55,16 @@
 
 #pragma mark - MPBannerCustomEvent Subclass Methods
 
++ (void)setAppId:(NSString *)appId
+{
+    gAppId = [appId copy];
+}
+
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
     int imAdSizeConstant = [self imAdSizeConstantForCGSize:size];
     if (imAdSizeConstant == INVALID_INMOBI_AD_SIZE) {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Failed to create an inMobi Banner with invalid size %@", NSStringFromCGSize(size));
+        AdLogType(WBAdLogLevelFatal, WBAdTypeBanner, @"Failed to create an inMobi Banner with invalid size %@", NSStringFromCGSize(size));
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
@@ -68,8 +76,8 @@
                                                @"tp-ver"   : MP_SDK_VERSION };
     if (self.delegate.location) {
         [InMobi setLocationWithLatitude:self.delegate.location.coordinate.latitude
-                               longitude:self.delegate.location.coordinate.longitude
-                                accuracy:self.delegate.location.horizontalAccuracy];
+                              longitude:self.delegate.location.coordinate.longitude
+                               accuracy:self.delegate.location.horizontalAccuracy];
     }
 
     [self.inMobiBanner loadBanner];
@@ -110,37 +118,37 @@
 #pragma mark InMobiAdDelegate methods
 
 - (void)bannerDidReceiveAd:(IMBanner *)banner {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"InMobi banner did load");
+    MPLogInfo(@"InMobi banner did load");
     [self.delegate trackImpression];
     [self.delegate bannerCustomEvent:self didLoadAd:banner];
 }
 
 - (void)banner:(IMBanner *)banner didFailToReceiveAdWithError:(IMError *)error {
-    CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"InMobi banner did fail with error: %@", error.localizedDescription);
+    MPLogInfo(@"InMobi banner did fail with error: %@", error.localizedDescription);
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)bannerDidDismissScreen:(IMBanner *)banner {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"adViewDidDismissScreen");
+    MPLogInfo(@"adViewDidDismissScreen");
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 
 - (void)bannerWillDismissScreen:(IMBanner *)banner {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"adViewWillDismissScreen");
+    MPLogInfo(@"adViewWillDismissScreen");
 }
 
 - (void)bannerWillPresentScreen:(IMBanner *)banner {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"InMobi banner will present modal");
+    MPLogInfo(@"InMobi banner will present modal");
     [self.delegate bannerCustomEventWillBeginAction:self];
 }
 
 - (void)bannerWillLeaveApplication:(IMBanner *)banner {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"InMobi banner will leave application");
+    MPLogInfo(@"InMobi banner will leave application");
     [self.delegate bannerCustomEventWillLeaveApplication:self];
 }
 
 - (void)bannerDidInteract:(IMBanner *)banner withParams:(NSDictionary *)dictionary {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"InMobi banner was clicked");
+    MPLogInfo(@"InMobi banner was clicked");
     [self.delegate trackClick];
 }
 

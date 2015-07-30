@@ -3,7 +3,11 @@
 #import "MPIdentityProvider.h"
 #import "MPGlobal.h"
 #import "TWTweetComposeViewController+MPSpecs.h"
+#import "FakeMPGeolocationProvider.h"
 #import <CoreLocation/CoreLocation.h>
+#import "MPAPIEndpoints.h"
+#import "MPGlobalSpecHelper.h"
+#import "NSDate+MPSpecs.h"
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
@@ -113,31 +117,75 @@ describe(@"MPAdServerURLBuilder", ^{
     });
 
     it(@"should process location", ^{
+        [NSDate mp_swizzleDateMethod];
+
+        const NSInteger startInterval = 2000;
+        const NSInteger endInterval = 3000;
+        const NSInteger dateDiffMillis = 1000 * (endInterval - startInterval);
+        NSDate * const locationDate = [NSDate dateWithTimeIntervalSinceReferenceDate:startInterval];
+        NSDate * const timingNowDate = [NSDate dateWithTimeIntervalSinceReferenceDate:endInterval];
+
+        FakeMPGeolocationProvider *fakeGeolocationProvider = [[FakeMPGeolocationProvider alloc] init];
+        fakeCoreProvider.fakeGeolocationProvider = fakeGeolocationProvider;
+
         URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
                                            keywords:nil
                                            location:nil
                                             testing:YES];
         URL.absoluteString should_not contain(@"&ll=");
+        URL.absoluteString should_not contain(@"&llsdk=");
+        URL.absoluteString should_not contain(@"&llf=");
+
+        [NSDate mp_setFakeDate:locationDate];
 
         CLLocation *validLocationNoAccuracy = [[CLLocation alloc] initWithLatitude:10.1 longitude:-40.23];
+
+        [NSDate mp_setFakeDate:timingNowDate];
+
         URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
                                            keywords:nil
                                            location:validLocationNoAccuracy
                                             testing:YES];
         URL.absoluteString should contain(@"&ll=10.1,-40.23");
         URL.absoluteString should_not contain(@"&lla=");
+        URL.absoluteString should_not contain(@"&llsdk=");
+        URL.absoluteString should contain(@"&llf=");
+        [[MPGlobalSpecHelper dictionaryFromQueryString:URL.query][@"llf"] integerValue] should equal(dateDiffMillis);
 
         CLLocation *validLocationWithAccuracy = [[CLLocation alloc] initWithCoordinate:CLLocationCoordinate2DMake(10.1, -40.23)
                                                                                altitude:30.4
                                                                      horizontalAccuracy:500.1
                                                                        verticalAccuracy:60
-                                                                              timestamp:[NSDate date]];
+                                                                              timestamp:locationDate];
         URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
                                            keywords:nil
                                            location:validLocationWithAccuracy
                                             testing:YES];
         URL.absoluteString should contain(@"&ll=10.1,-40.23");
         URL.absoluteString should contain(@"&lla=500.1");
+        URL.absoluteString should_not contain(@"&llsdk=");
+        URL.absoluteString should contain(@"&llf=");
+        [[MPGlobalSpecHelper dictionaryFromQueryString:URL.query][@"llf"] integerValue] should equal(dateDiffMillis);
+
+        NSDate *bogusTimestamp = [NSDate dateWithTimeIntervalSinceReferenceDate:1000];
+        NSDate *bogusNowTimestamp = [NSDate dateWithTimeIntervalSinceReferenceDate:9000];
+        CLLocation *validLocationWithBogusTimestamp = [[CLLocation alloc] initWithCoordinate:CLLocationCoordinate2DMake(10.1, -40.23)
+                                                                                    altitude:30.4
+                                                                          horizontalAccuracy:500.1
+                                                                            verticalAccuracy:60
+                                                                                   timestamp:bogusTimestamp];
+
+        [NSDate mp_setFakeDate:bogusNowTimestamp];
+
+        URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
+                                           keywords:nil
+                                           location:validLocationWithBogusTimestamp
+                                            testing:YES];
+        URL.absoluteString should contain(@"&ll=10.1,-40.23");
+        URL.absoluteString should contain(@"&lla=500.1");
+        URL.absoluteString should_not contain(@"&llsdk=");
+        URL.absoluteString should contain(@"&llf=");
+        [[MPGlobalSpecHelper dictionaryFromQueryString:URL.query][@"llf"] integerValue] should equal((8000000));
 
         CLLocation *invalidLocation = [[CLLocation alloc] initWithCoordinate:CLLocationCoordinate2DMake(10.1, -40.23)
                                                                      altitude:30.4
@@ -150,6 +198,29 @@ describe(@"MPAdServerURLBuilder", ^{
                                             testing:YES];
         URL.absoluteString should_not contain(@"&ll=");
         URL.absoluteString should_not contain(@"&lla=");
+        URL.absoluteString should_not contain(@"&llsdk=");
+        URL.absoluteString should_not contain(@"&llf=");
+
+        // When the SDK's own location provider has retrieved location data, the URL builder should
+        // use that, rather than the developer-supplied location.
+        CLLocation *locationFromProvider = [[CLLocation alloc] initWithCoordinate:CLLocationCoordinate2DMake(42, -42) altitude:10 horizontalAccuracy:60 verticalAccuracy:60 timestamp:locationDate];
+
+        [NSDate mp_setFakeDate:timingNowDate];
+
+        fakeGeolocationProvider.fakeLastKnownLocation = locationFromProvider;
+
+        URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
+                                           keywords:nil
+                                           location:validLocationWithAccuracy
+                                            testing:YES];
+        URL.absoluteString should contain(@"&ll=42,-42");
+        URL.absoluteString should contain(@"&lla=60");
+        URL.absoluteString should contain(@"&llsdk=1");
+        URL.absoluteString should contain(@"&llf=");
+
+        [[MPGlobalSpecHelper dictionaryFromQueryString:URL.query][@"llf"] integerValue] should equal(dateDiffMillis);
+
+        [NSDate mp_swizzleDateMethod];
     });
 
     it(@"should have mraid", ^{
@@ -241,49 +312,27 @@ describe(@"MPAdServerURLBuilder", ^{
         URL.absoluteString should contain([NSString stringWithFormat:@"&dn=%@", [[[UIDevice currentDevice] hardwareDeviceName] URLEncodedString]]);
     });
 
-    describe(@"Twitter Availability", ^{
-        beforeEach(^{
-            [fakeCoreProvider resetTwitterAppInstallCheck];
-            [[UIApplication sharedApplication] setTwitterInstalled:NO];
-            [TWTweetComposeViewController setNativeTwitterAvailable:NO];
-        });
+    it(@"should provide the screen size in pixels", ^{
+        CGSize screenSize = [MPGlobalSpecHelper screenResolution];
+        NSString *screenSizeStr = [NSString stringWithFormat:@"&w=%.0f&h=%.0f", screenSize.width, screenSize.height];
 
-        it(@"should not pass a query if no twitter is available", ^{
-            URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
-                                               keywords:nil
-                                               location:nil
-                                                testing:YES];
-            URL.absoluteString should_not contain([NSString stringWithFormat:@"&ts="]);
-        });
+        URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
+                                           keywords:nil
+                                           location:nil
+                                            testing:YES];
 
-        it(@"should create query for only having twitter app installed", ^{
-            [[UIApplication sharedApplication] setTwitterInstalled:YES];
-            URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
-                                               keywords:nil
-                                               location:nil
-                                                testing:YES];
-            URL.absoluteString should contain([NSString stringWithFormat:@"&ts=1"]);
-        });
+        URL.absoluteString should contain(screenSizeStr);
+    });
 
-        it(@"should create query for only having native twitter account(s)", ^{
-            [TWTweetComposeViewController setNativeTwitterAvailable:YES];
-            URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
-                                               keywords:nil
-                                               location:nil
-                                                testing:YES];
-            URL.absoluteString should contain([NSString stringWithFormat:@"&ts=2"]);
+    it(@"should provide the app's bundle identifier", ^{
+        NSString *bundleParam = [NSString stringWithFormat:@"&bundle=%@", [[[NSBundle mainBundle] bundleIdentifier] URLEncodedString]];
 
-        });
+        URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
+                                           keywords:nil
+                                           location:nil
+                                            testing:YES];
 
-        it(@"should create query for having both twitter app and native account(s)", ^{
-            [[UIApplication sharedApplication] setTwitterInstalled:YES];
-            [TWTweetComposeViewController setNativeTwitterAvailable:YES];
-            URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
-                                               keywords:nil
-                                               location:nil
-                                                testing:YES];
-            URL.absoluteString should contain([NSString stringWithFormat:@"&ts=3"]);
-        });
+        URL.absoluteString should contain(bundleParam);
     });
 
     describe(@"desired assets", ^{
@@ -338,6 +387,27 @@ describe(@"MPAdServerURLBuilder", ^{
                                           desiredAssets:nil];
 
             URL.absoluteString should_not contain(@"&seq");
+        });
+    });
+
+    context(@"when HTTPS is enabled", ^{
+        beforeEach(^{
+            [MPAPIEndpoints setUsesHTTPS:YES];
+        });
+
+        afterEach(^{
+            [MPAPIEndpoints setUsesHTTPS:NO];
+        });
+
+        it(@"should return HTTPS URLs", ^{
+            URL = [MPAdServerURLBuilder URLWithAdUnitID:@"guy"
+                                               keywords:nil
+                                               location:nil
+                                                testing:NO];
+            expected = [NSString stringWithFormat:@"https://ads.mopub.com/m/ad?v=8&udid=%@&id=guy&nv=%@",
+                        [MPIdentityProvider identifier],
+                        MP_SDK_VERSION];
+            URL.absoluteString should contain(expected);
         });
     });
 });

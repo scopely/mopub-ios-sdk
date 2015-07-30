@@ -5,52 +5,23 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
+#import <AdColony/AdColony.h>
 #import "AdColonyInterstitialCustomEvent.h"
-#import "MPInstanceProvider.h"
+#import "MPAdColonyRouter.h"
+#import "MPInstanceProvider+AdColony.h"
 #import "MPLogging.h"
+#import "AdColonyCustomEvent.h"
+
+static NSString *gAppId = nil;
+static NSString *gDefaultZoneId = nil;
+static NSArray *gAllZoneIds = nil;
 
 #define kAdColonyAppId @"YOUR_ADCOLONY_APPID"
 #define kAdColonyDefaultZoneId @"YOUR_ADCOLONY_DEFAULT_ZONEID" // This zone id will be used if "zoneId" is not passed through the custom info dictionary
 
 #define AdColonyZoneIds() [NSArray arrayWithObjects:@"YOUR_ADCOLONY_ZONEID1", @"YOUR_ADCOLONY_ZONEID2", nil]
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-@interface MPAdColonyRouter : NSObject <AdColonyDelegate>
-
-@property (nonatomic, strong) NSMutableDictionary *events;
-
-+ (MPAdColonyRouter *)sharedRouter;
-
-- (void)addEvent:(AdColonyInterstitialCustomEvent *)event forZone:(NSString *)zone;
-- (void)removeEvent:(AdColonyInterstitialCustomEvent *)event forZone:(NSString *)zone;
-
-@end
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-@interface MPInstanceProvider (AdColony)
-
-- (MPAdColonyRouter *)sharedMPAdColonyRouter;
-
-@end
-
-@implementation MPInstanceProvider (AdColony)
-
-- (MPAdColonyRouter *)sharedMPAdColonyRouter
-{
-    return [self singletonForClass:[MPAdColonyRouter class]
-                          provider:^id
-            {
-                return [[MPAdColonyRouter alloc] init];
-            }];
-}
-
-@end
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-@interface AdColonyInterstitialCustomEvent ()
+@interface AdColonyInterstitialCustomEvent () <AdColonyAdDelegate, MPAdColonyRouterDelegate>
 
 @property (nonatomic, copy) NSString *zoneId;
 @property (nonatomic, assign) BOOL zoneAvailable;
@@ -61,6 +32,23 @@
 
 @synthesize zoneId = _zoneId;
 
++ (void)setAppId:(NSString *)appId
+{
+    MPLogWarn(@"+setAppId for class AdColonyInterstitialCustomEvent is deprecated. Use the appId parameter when configuring your network in the MoPub website.");
+    gAppId = [appId copy];
+}
+
++ (void)setDefaultZoneId:(NSString *)defaultZoneId
+{
+    MPLogWarn(@"+setDefaultZoneId for class AdColonyInterstitialCustomEvent is deprecated. Use the zoneId parameter when configuring your network in the MoPub website.");
+    gDefaultZoneId = [defaultZoneId copy];
+}
+
++ (void)setAllZoneIds:(NSArray *)zoneIds
+{
+    MPLogWarn(@"+setAllZoneIds for class AdColonyInterstitialCustomEvent is deprecated. Use the allZoneIds parameter when configuring your network in the MoPub website.");
+    gAllZoneIds = zoneIds;
+}
 
 #pragma mark - MPInterstitialCustomEvent Subclass Methods
 
@@ -69,27 +57,36 @@
     NSString *appId = [info objectForKey:@"appId"];
     if(appId == nil)
     {
-        appId = kAdColonyAppId;
+        appId = gAppId;
+
+        if ([appId length] == 0) {
+            MPLogWarn(@"Setting kAdColonyAppId in AdColonyInterstitialCustomEvent.m is deprecated. Use the appId parameter when configuring your network in the MoPub website.");
+            appId = kAdColonyAppId;
+        }
     }
 
     NSArray *allZoneIds = [info objectForKey:@"allZoneIds"];
     if(allZoneIds.count == 0)
     {
-        allZoneIds = AdColonyZoneIds();
+        allZoneIds = gAllZoneIds;
+
+        if ([allZoneIds count] == 0) {
+            MPLogWarn(@"Setting AdColonyZoneIds in AdColonyInterstitialCustomEvent.m is deprecated. Use the allZoneIds parameter when configuring your network in the MoPub website.");
+            allZoneIds = AdColonyZoneIds();
+        }
     }
 
-    static dispatch_once_t once;
-    dispatch_once(&once, ^{
-        [AdColony configureWithAppID:appId
-                             zoneIDs:allZoneIds
-                            delegate:[MPAdColonyRouter sharedRouter]
-                             logging:NO];
-    });
+    [AdColonyCustomEvent initializeAdColonyCustomEventWithAppId:appId allZoneIds:allZoneIds];
 
     NSString *zoneId = [info objectForKey:@"zoneId"];
     if(zoneId == nil)
     {
-        zoneId = kAdColonyDefaultZoneId;
+        zoneId = gDefaultZoneId;
+
+        if ([zoneId length] == 0) {
+            MPLogWarn(@"Setting kAdColonyDefaultZoneId in AdColonyInterstitialCustomEvent.m is deprecated. Use the zondId parameter when configuring your network in the MoPub website.");
+            zoneId = kAdColonyDefaultZoneId;
+        }
     }
 
     self.zoneId = zoneId;
@@ -97,7 +94,7 @@
 
     if(self.zoneId != nil && appId != nil)
     {
-        [[MPAdColonyRouter sharedRouter] addEvent:self forZone:self.zoneId];
+        [[MPAdColonyRouter sharedRouter] setCustomEvent:self forZoneId:self.zoneId];
     }
 
     if([AdColony zoneStatusForZone:self.zoneId] == ADCOLONY_ZONE_STATUS_ACTIVE)
@@ -125,8 +122,10 @@
 
 - (void)invalidate
 {
-    [[MPAdColonyRouter sharedRouter] removeEvent:self forZone:self.zoneId];
+    [[MPAdColonyRouter sharedRouter] removeCustomEvent:self forZoneId:self.zoneId];
 }
+
+#pragma mark - MPAdColonyRouterDelegate
 
 - (void)zoneDidLoad
 {
@@ -147,72 +146,12 @@
     MPLogInfo(@"AdColony zone %@ started", zoneID);
     [self.delegate interstitialCustomEventDidAppear:self];
 }
+
 - (void)onAdColonyAdAttemptFinished:(BOOL)shown inZone:(NSString *)zoneID
 {
     MPLogInfo(@"AdColony zone %@ finished", zoneID);
     [self.delegate interstitialCustomEventWillDisappear:self];
     [self.delegate interstitialCustomEventDidDisappear:self];
-}
-
-@end
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-@implementation MPAdColonyRouter
-
-@synthesize events = _events;
-
-+ (MPAdColonyRouter *)sharedRouter
-{
-    return [[MPInstanceProvider sharedProvider] sharedMPAdColonyRouter];
-}
-
-- (id)init
-{
-    self = [super init];
-    if(self != nil)
-    {
-        self.events = [NSMutableDictionary dictionary];
-    }
-    return self;
-}
-
-
-- (void)addEvent:(AdColonyInterstitialCustomEvent *)event forZone:(NSString *)zone
-{
-    [self.events setObject:event forKey:zone];
-}
-
-- (void)removeEvent:(AdColonyInterstitialCustomEvent *)event forZone:(NSString *)zone
-{
-    if([[self.events objectForKey:zone] isEqual:event])
-    {
-        [self.events removeObjectForKey:zone];
-    }
-}
-
-#pragma mark - AdColonyDelegate
-
-- (void)onAdColonyAdAvailabilityChange:(BOOL)available inZone:(NSString *)zoneID
-{
-    AdColonyInterstitialCustomEvent *event = [self.events objectForKey:zoneID];
-
-    if(available)
-    {
-        MPLogInfo(@"AdColony zone %@ just became available", zoneID);
-        if(!event.zoneAvailable)
-        {
-            [event zoneDidLoad];
-        }
-    }
-    else
-    {
-        MPLogInfo(@"AdColony zone %@ just became unavailable", zoneID);
-        if(event.zoneAvailable)
-        {
-            [event zoneDidExpire];
-        }
-    }
 }
 
 @end

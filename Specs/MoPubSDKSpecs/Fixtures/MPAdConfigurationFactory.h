@@ -13,6 +13,7 @@
 + (NSMutableDictionary *)defaultNativeProperties;
 + (MPAdConfiguration *)defaultNativeAdConfiguration;
 + (MPAdConfiguration *)defaultNativeAdConfigurationWithCustomEventClassName:(NSString *)eventClassName;
++ (MPAdConfiguration *)defaultNativeAdConfigurationWithNetworkType:(NSString *)type;
 + (MPAdConfiguration *)defaultNativeAdConfigurationWithHeaders:(NSDictionary *)dictionary
                                                     properties:(NSDictionary *)properties;
 
@@ -32,5 +33,8 @@
 + (MPAdConfiguration *)defaultInterstitialConfigurationWithCustomEventClassName:(NSString *)eventClassName;
 + (MPAdConfiguration *)defaultInterstitialConfigurationWithHeaders:(NSDictionary *)dictionary
                                                         HTMLString:(NSString *)HTMLString;
+
++ (NSMutableDictionary *)defaultRewardedVideoHeaders;
++ (MPAdConfiguration *)defaultRewardedVideoConfiguration;
 
 @end
