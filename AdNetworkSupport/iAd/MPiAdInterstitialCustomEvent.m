@@ -84,7 +84,6 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Requesting iAd interstitial");
     self.iAdInterstitial = [[MPInstanceProvider sharedProvider] buildADInterstitialAd];
     self.iAdInterstitial.delegate = self;
 
@@ -161,7 +160,6 @@
 #pragma mark - <ADInterstitialAdDelegate>
 
 - (void)interstitialAdDidLoad:(ADInterstitialAd *)interstitialAd {
-    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"iAd interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:self.iAdInterstitial];
 }
 
