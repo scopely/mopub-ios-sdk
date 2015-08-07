@@ -8,6 +8,7 @@
 
 #import "MPAdBrowserController.h"
 #import "MPGlobal.h"
+#import "WBAdLogging.h"
 
 static NSString * const kAdBrowserControllerNibName = @"MPAdBrowserController";
 
@@ -49,7 +50,7 @@ static NSString * const kAdBrowserControllerNibName = @"MPAdBrowserController";
         self.URL = URL;
         self.HTMLString = HTMLString;
 
-        CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"Ad browser (%p) initialized with URL: %@", self, self.URL);
+        AdLogType(WBAdLogLevelTrace, WBAdTypeInterstitial, @"Ad browser (%p) initialized with URL: %@", self, self.URL);
 
         self.webView = [[UIWebView alloc] initWithFrame:CGRectZero];
         self.webView.autoresizingMask = UIViewAutoresizingFlexibleWidth |
@@ -192,7 +193,7 @@ static NSString * const kAdBrowserControllerNibName = @"MPAdBrowserController";
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request
  navigationType:(UIWebViewNavigationType)navigationType
 {
-    CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"Ad browser (%p) starting to load URL: %@", self, request.URL);
+    AdLogType(WBAdLogLevelTrace, WBAdTypeInterstitial, @"Ad browser (%p) starting to load URL: %@", self, request.URL);
     self.URL = request.URL;
     return YES;
 }
@@ -234,7 +235,7 @@ static NSString * const kAdBrowserControllerNibName = @"MPAdBrowserController";
     // Ignore "Frame Load Interrupted" errors after navigating to iTunes or the App Store.
     if (error.code == 102 && [error.domain isEqual:@"WebKitErrorDomain"]) return;
 
-    CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"Ad browser (%p) experienced an error: %@.", self, [error localizedDescription]);
+    AdLogType(WBAdLogLevelError, WBAdTypeInterstitial, @"Ad browser (%p) experienced an error: %@.", self, [error localizedDescription]);
 }
 
 #pragma mark -
@@ -289,6 +290,13 @@ static NSString * const kAdBrowserControllerNibName = @"MPAdBrowserController";
     UIImage *image = [[UIImage alloc] initWithCGImage:imageRef];
     CGImageRelease(imageRef);
     return image;
+}
+
+#pragma mark -
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return YES;
 }
 
 @end

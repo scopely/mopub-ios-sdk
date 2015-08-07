@@ -13,6 +13,7 @@
 
 #import "WBAdEvent_Internal.h"
 #import "WBAdControllerEvent.h"
+#import <WithBuddiesAds/WithBuddiesAds.h>
 
 @interface MPBannerCustomEventAdapter ()
 
@@ -49,13 +50,13 @@
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration containerSize:(CGSize)size
 {
-    CoreLogType(WBLogLevelDebug, configuration.logType, @"Looking for custom event class named %@.", configuration.customEventClass);
+    AdLogType(WBAdLogLevelDebug, configuration.logType, @"Looking for custom event class named %@.", configuration.customEventClass);
     self.configuration = configuration;
 
     self.bannerCustomEvent = [[MPInstanceProvider sharedProvider] buildBannerCustomEventFromCustomClass:configuration.customEventClass
                                                                                                delegate:self];
     if (self.bannerCustomEvent) {
-        CoreLogType(WBLogLevelInfo, configuration.logType, @"Requesting %@ banner", self.bannerCustomEvent);
+        AdLogType(WBAdLogLevelInfo, configuration.logType, @"Requesting %@ banner", self.bannerCustomEvent);
         
         WBAdControllerEvent *controllerEvent = [[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[self.bannerCustomEvent description] adType:WBAdTypeBanner];
         [WBAdControllerEvent postNotification:controllerEvent];
@@ -114,7 +115,7 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[event description] adType:WBAdTypeBanner];
     [WBAdEvent postNotification:adEvent];
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"%@ banner loaded", event);
+    AdLogType(WBAdLogLevelInfo, WBAdTypeBanner, @"%@ banner loaded", event);
     [self didStopLoading];
     if (ad) {
         [self.delegate adapter:self didFinishLoadingAd:ad];
@@ -126,21 +127,21 @@
 - (void)bannerCustomEvent:(MPBannerCustomEvent *)event didFailToLoadAdWithError:(NSError *)error
 {
     [WBAdEvent postAdFailedWithReason:WBAdFailureReasonUnknown adNetwork:[event description] adType:WBAdTypeBanner];
-    CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"%@ banner didFailToLoadAdWithError %@", event, error.localizedDescription);
+    AdLogType(WBAdLogLevelFatal, WBAdTypeBanner, @"%@ banner didFailToLoadAdWithError %@", event, error.localizedDescription);
     [self didStopLoading];
     [self.delegate adapter:self didFailToLoadAdWithError:error];
 }
 
 - (void)bannerCustomEventWillBeginAction:(MPBannerCustomEvent *)event
 {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"%@ banner bannerCustomEventWillBeginAction", event);
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"%@ banner bannerCustomEventWillBeginAction", event);
     [self trackClickOnce];
     [self.delegate userActionWillBeginForAdapter:self];
 }
 
 - (void)bannerCustomEventDidFinishAction:(MPBannerCustomEvent *)event
 {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"%@ banner bannerCustomEventDidFinishAction", event);
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"%@ banner bannerCustomEventDidFinishAction", event);
     [self.delegate userActionDidFinishForAdapter:self];
 }
 
@@ -148,7 +149,7 @@
 {
     WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLeaveApp adNetwork:[event description] adType:WBAdTypeBanner];
     [WBAdEvent postNotification:adEvent];
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"%@ banner bannerCustomEventWillLeaveApplication", event);
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"%@ banner bannerCustomEventWillLeaveApplication", event);
     [self trackClickOnce];
     [self.delegate userWillLeaveApplicationFromAdapter:self];
 }

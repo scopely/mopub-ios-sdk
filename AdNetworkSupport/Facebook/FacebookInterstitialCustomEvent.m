@@ -5,7 +5,7 @@
 //  Copyright (c) 2014 MoPub. All rights reserved.
 //
 
-#import "FBAudienceNetwork.h"
+#import <FBAudienceNetwork/FBAudienceNetwork.h>
 #import "FacebookInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "WBAdService+Internal.h"
@@ -58,7 +58,6 @@
     self.fbInterstitialAd =
         [[MPInstanceProvider sharedProvider] buildFBInterstitialAdWithPlacementID:placementId
                                                                         delegate:self];
-
     [self.fbInterstitialAd loadAd];
 }
 

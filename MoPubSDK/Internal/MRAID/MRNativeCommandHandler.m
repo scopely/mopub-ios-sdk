@@ -9,6 +9,7 @@
 #import "MRCommand.h"
 #import "MPGlobal.h"
 #import "MPInstanceProvider.h"
+#import "MPLogging.h"
 #import "MRCalendarManager.h"
 #import "MRPictureManager.h"
 #import "MRVideoPlayerManager.h"
@@ -53,6 +54,7 @@
     [self.delegate nativeCommandCompleted:command];
 
     if (!success) {
+        MPLogDebug(@"Unknown command: %@", command);
         [self.delegate nativeCommandFailed:command withMessage:@"Specified command is not implemented."];
     }
 }

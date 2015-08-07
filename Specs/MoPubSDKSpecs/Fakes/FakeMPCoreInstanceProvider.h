@@ -9,6 +9,8 @@
 #import "FakeOperationQueue.h"
 #import "FakeMPReachability.h"
 #import "FakeMPGeolocationProvider.h"
+#import "FakeUIDevice.h"
+#import "FakeMPURLResolver.h"
 
 @interface FakeMPCoreInstanceProvider : MPCoreInstanceProvider
 
@@ -16,10 +18,11 @@
 @property (nonatomic, strong) FakeMPAdServerCommunicator *lastFakeMPAdServerCommunicator;
 
 #pragma mark - URL Handling
-@property (nonatomic, strong) MPURLResolver *fakeMPURLResolver;
+@property (nonatomic, strong) FakeMPURLResolver *fakeMPURLResolver;
 @property (nonatomic, strong) MPAdDestinationDisplayAgent *fakeMPAdDestinationDisplayAgent;
 
 #pragma mark - Utilities
+@property (nonatomic, strong) FakeUIDevice *fakeUIDevice;
 @property (nonatomic, strong) CLLocationManager *fakeLocationManager;
 @property (nonatomic, strong) FakeMPAdAlertManager *fakeAdAlertManager;
 @property (nonatomic, strong) FakeMPAdAlertGestureRecognizer *fakeAdAlertGestureRecognizer;
@@ -27,6 +30,8 @@
 @property (nonatomic, strong) FakeMPReachability *fakeMPReachability;
 @property (nonatomic, strong) MPGeolocationProvider *fakeGeolocationProvider;
 @property (nonatomic, strong) NSDictionary *fakeCarrierInfo;
+@property (nonatomic, strong) MPLogEventRecorder *fakeLogEventRecorder;
+@property (nonatomic, strong) MPNetworkManager *fakeNetworkManager;
 
 - (NSString *)userAgent;
 - (FakeMPAnalyticsTracker *)sharedFakeMPAnalyticsTracker;

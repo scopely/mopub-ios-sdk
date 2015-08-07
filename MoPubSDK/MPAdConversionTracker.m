@@ -11,6 +11,8 @@
 #import "MPGlobal.h"
 #import "MPIdentityProvider.h"
 #import "MPCoreInstanceProvider.h"
+#import "WBAdLogging.h"
+#import "MPAPIEndpoints.h"
 
 #define MOPUB_CONVERSION_DEFAULTS_KEY @"com.mopub.conversion"
 
@@ -44,7 +46,7 @@
 - (void)reportApplicationOpenForApplicationID:(NSString *)appID
 {
     if (![[NSUserDefaults standardUserDefaults] boolForKey:MOPUB_CONVERSION_DEFAULTS_KEY]) {
-        CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"Tracking conversion");
+        AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"Tracking conversion");
         NSMutableURLRequest *request = [[MPCoreInstanceProvider sharedProvider] buildConfiguredURLRequestWithURL:[self URLForAppID:appID]];
         self.responseData = [NSMutableData data];
         [NSURLConnection connectionWithRequest:request delegate:self];
@@ -81,8 +83,8 @@
 
 - (NSURL *)URLForAppID:(NSString *)appID
 {
-    NSString *path = [NSString stringWithFormat:@"http://%@/m/open?v=%@&udid=%@&id=%@&av=%@",
-                      HOSTNAME,
+    NSString *path = [NSString stringWithFormat:@"%@?v=%@&udid=%@&id=%@&av=%@",
+                      [MPAPIEndpoints baseURLStringWithPath:MOPUB_API_PATH_CONVERSION testing:NO],
                       MP_SERVER_VERSION,
                       [MPIdentityProvider identifier],
                       appID,

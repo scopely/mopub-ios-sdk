@@ -12,6 +12,7 @@
 #import "MPInterstitialAdManagerDelegate.h"
 #import "MPInterstitialCustomEventAdapter.h"
 #import "MPInterstitialCustomEvent.h"
+#import "WBAdLogging.h"
 
 @interface MPInterstitialAdController () <MPInterstitialAdManagerDelegate>
 
@@ -107,13 +108,13 @@
 - (void)showFromViewController:(UIViewController *)controller
 {
     if (!controller) {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"The interstitial could not be shown: "
+        AdLogType(WBAdLogLevelFatal, WBAdTypeInterstitial, @"The interstitial could not be shown: "
                   @"a nil view controller was passed to -showFromViewController:.");
         return;
     }
 
     if (![controller.view.window isKeyWindow]) {
-        CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"The interstitial could not be shown: "
+        AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"The interstitial could not be shown: "
                     @"a nil view controller was passed to -showFromViewController:.");
     }
 

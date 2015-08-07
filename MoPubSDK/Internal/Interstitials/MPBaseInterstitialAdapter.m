@@ -14,8 +14,8 @@
 #import "MPTimer.h"
 #import "MPConstants.h"
 
+#import <WithBuddiesAds/WithBuddiesAds.h>
 #import "WBAdEvent_Internal.h"
-#import "WBAdControllerEvent.h"
 
 @interface MPBaseInterstitialAdapter ()
 
@@ -78,16 +78,15 @@
     if([t isKindOfClass:[NSString class]] == YES)
     {
         timeInterval = [t intValue];
-        CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"%@ Override timeout available timeout set to %f", NSStringFromClass(configuration.customEventClass), timeInterval);
+        AdLogType(WBAdLogLevelTrace, WBAdTypeInterstitial, @"%@ Override timeout available timeout set to %f", NSStringFromClass(configuration.customEventClass), timeInterval);
     }
     
     if(timeInterval > 0)
     {
         self.timeoutTimer = [[MPCoreInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
-                                                                                       target:self
-                                                                                     selector:@selector(timeout)
-                                                                                      repeats:NO
-                                                                                      logType:WBLogTypeAdFullPage];
+                                                                                           target:self
+                                                                                         selector:@selector(timeout)
+                                                                                          repeats:NO];
         [self.timeoutTimer scheduleNow];
     }
 }
@@ -99,7 +98,7 @@
 
 - (void)timeout
 {
-    CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"%@ custom event did time out", NSStringFromClass(self.configuration.customEventClass));
+    AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"%@ custom event did time out", NSStringFromClass(self.configuration.customEventClass));
     [WBAdEvent postAdFailedWithReason:WBAdFailureReasonTimeout adNetwork:[self.configuration.customEventClass description] adType:WBAdTypeInterstitial];
     [self.delegate adapter:self didFailToLoadAdWithError:nil];
 }

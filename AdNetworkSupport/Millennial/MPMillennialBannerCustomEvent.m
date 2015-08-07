@@ -108,7 +108,7 @@
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Requesting Millennial banner");
+    MPLogInfo(@"Requesting Millennial banner");
 
     CGRect frame = [self frameFromCustomEventInfo:info];
     NSString *apid = [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdM];
@@ -217,7 +217,7 @@
 {
     if ([[notification.userInfo objectForKey:MillennialMediaAdObjectKey] isEqual:self.mmAdView])
     {
-        CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Millennial banner will present modal");
+        MPLogInfo(@"Millennial banner will present modal");
         self.didShowModal = YES;
     }
 }

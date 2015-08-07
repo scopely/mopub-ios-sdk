@@ -5,15 +5,16 @@
 //  Copyright (c) 2013 MoPub, Inc. All rights reserved.
 //
 
+#import <WithBuddiesAds/WithBuddiesAds.h>
+#import "WBAdService+Internal.h"
 #import "IMInterstitial.h"
 #import "IMInterstitialDelegate.h"
 #import "InMobiInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
-#import "MPConstants.h"
-#import "WBAdService+Internal.h"
-#import "InMobi+InitializeSdk.h"
 
 static NSString *gAppId = nil;
+
+#define kInMobiAppID    @"YOUR_INMOBI_APP_ID"
 
 @interface MPInstanceProvider (InMobiInterstitials)
 
@@ -53,14 +54,14 @@ static NSString *gAppId = nil;
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting InMobi interstitial");
+    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Requesting InMobi interstitial");
 
     NSString *appId = gAppId;
     if ([appId length] == 0) {
-        appId = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdIM];
+        appId = kInMobiAppID;
     }
 
-    self.inMobiInterstitial = [[MPInstanceProvider sharedProvider] buildIMInterstitialWithDelegate:self appId:appId];
+    self.inMobiInterstitial = [[MPInstanceProvider sharedProvider] buildIMInterstitialWithDelegate:self appId:[[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdIM]];
     NSMutableDictionary *paramsDict = [NSMutableDictionary dictionary];
     [paramsDict setObject:@"c_mopub" forKey:@"tp"];
     [paramsDict setObject:MP_SDK_VERSION forKey:@"tp-ver"];

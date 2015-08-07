@@ -9,6 +9,7 @@
 #import "MPConstants.h"
 #import "NSURL+MPAdditions.h"
 #import <CommonCrypto/CommonDigest.h>
+#import <WithBuddiesAds/WithBuddiesAds.h>
 
 #import <sys/types.h>
 #import <sys/sysctl.h>
@@ -58,6 +59,14 @@ CGRect MPScreenBounds()
     }
 
     return bounds;
+}
+
+CGSize MPScreenResolution()
+{
+    CGRect bounds = MPScreenBounds();
+    CGFloat scale = MPDeviceScaleFactor();
+
+    return CGSizeMake(bounds.size.width*scale, bounds.size.height*scale);
 }
 
 CGFloat MPDeviceScaleFactor()
@@ -196,52 +205,6 @@ NSString *MPResourcePathForResource(NSString *resourceName)
 
 @implementation UIDevice (MPAdditions)
 
-- (BOOL)supportsOrientationMask:(UIInterfaceOrientationMask)orientationMask
-{
-    NSArray *supportedOrientations = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"UISupportedInterfaceOrientations"];
-
-    if (orientationMask & UIInterfaceOrientationMaskLandscape) {
-        if ([supportedOrientations containsObject:@"UIInterfaceOrientationLandscapeLeft"] || [supportedOrientations containsObject:@"UIInterfaceOrientationLandscapeRight"]) {
-            return YES;
-        }
-    }
-
-    if (orientationMask & UIInterfaceOrientationMaskPortrait) {
-        if ([supportedOrientations containsObject:@"UIInterfaceOrientationPortrait"]) {
-            return YES;
-        }
-    }
-
-    if (orientationMask & UIInterfaceOrientationMaskPortraitUpsideDown) {
-        if ([supportedOrientations containsObject:@"UIInterfaceOrientationPortraitUpsideDown"]) {
-            return YES;
-        }
-    }
-
-    return NO;
-}
-
-- (BOOL)doesOrientation:(UIInterfaceOrientation)orientation matchOrientationMask:(UIInterfaceOrientationMask)orientationMask
-{
-    BOOL supportsLandscape = (orientationMask & UIInterfaceOrientationMaskLandscape) > 0;
-    BOOL supportsPortrait = (orientationMask & UIInterfaceOrientationMaskPortrait) > 0;
-    BOOL supportsPortraitUpsideDown = (orientationMask & UIInterfaceOrientationMaskPortraitUpsideDown) > 0;
-
-    if (supportsLandscape && (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)) {
-        return YES;
-    }
-
-    if (supportsPortrait && (orientation == UIInterfaceOrientationPortrait)) {
-        return YES;
-    }
-
-    if (supportsPortraitUpsideDown && (orientation == UIInterfaceOrientationPortraitUpsideDown)) {
-        return YES;
-    }
-
-    return NO;
-}
-
 - (NSString *)hardwareDeviceName
 {
     size_t size;
@@ -265,6 +228,64 @@ NSString *MPResourcePathForResource(NSString *resourceName)
     UIStatusBarAnimationFade : UIStatusBarAnimationNone;
     [[UIApplication sharedApplication] setStatusBarHidden:hidden withAnimation:animation];
 }
+
+- (BOOL)mp_supportsOrientationMask:(UIInterfaceOrientationMask)orientationMask
+{
+    NSArray *supportedOrientations = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"UISupportedInterfaceOrientations"];
+
+    if (orientationMask & UIInterfaceOrientationMaskLandscapeLeft) {
+        if ([supportedOrientations containsObject:@"UIInterfaceOrientationLandscapeLeft"]) {
+            return YES;
+        }
+    }
+
+    if (orientationMask & UIInterfaceOrientationMaskLandscapeRight) {
+        if ([supportedOrientations containsObject:@"UIInterfaceOrientationLandscapeRight"]) {
+            return YES;
+        }
+    }
+
+    if (orientationMask & UIInterfaceOrientationMaskPortrait) {
+        if ([supportedOrientations containsObject:@"UIInterfaceOrientationPortrait"]) {
+            return YES;
+        }
+    }
+
+    if (orientationMask & UIInterfaceOrientationMaskPortraitUpsideDown) {
+        if ([supportedOrientations containsObject:@"UIInterfaceOrientationPortraitUpsideDown"]) {
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+- (BOOL)mp_doesOrientation:(UIInterfaceOrientation)orientation matchOrientationMask:(UIInterfaceOrientationMask)orientationMask
+{
+    BOOL supportsLandscapeLeft = (orientationMask & UIInterfaceOrientationMaskLandscapeLeft) > 0;
+    BOOL supportsLandscapeRight = (orientationMask & UIInterfaceOrientationMaskLandscapeRight) > 0;
+    BOOL supportsPortrait = (orientationMask & UIInterfaceOrientationMaskPortrait) > 0;
+    BOOL supportsPortraitUpsideDown = (orientationMask & UIInterfaceOrientationMaskPortraitUpsideDown) > 0;
+
+    if (supportsLandscapeLeft && orientation == UIInterfaceOrientationLandscapeLeft) {
+        return YES;
+    }
+
+    if (supportsLandscapeRight && orientation == UIInterfaceOrientationLandscapeRight) {
+        return YES;
+    }
+
+    if (supportsPortrait && orientation == UIInterfaceOrientationPortrait) {
+        return YES;
+    }
+
+    if (supportsPortraitUpsideDown && orientation == UIInterfaceOrientationPortraitUpsideDown) {
+        return YES;
+    }
+
+    return NO;
+}
+
 @end
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -282,7 +303,7 @@ NSString *MPResourcePathForResource(NSString *resourceName)
 {
     if (![url mp_hasTelephoneScheme] && ![url mp_hasTelephonePromptScheme]) {
         // Shouldn't be here as the url must have a tel or telPrompt scheme.
-//        MPLogError(@"Processing URL as a telephone URL when %@ doesn't follow the tel:// or telprompt:// schemes", url.absoluteString);
+        AdLogType(WBAdLogLevelError, WBAdTypeNone, @"Processing URL as a telephone URL when %@ doesn't follow the tel:// or telprompt:// schemes", url.absoluteString);
         return nil;
     }
 
@@ -293,7 +314,7 @@ NSString *MPResourcePathForResource(NSString *resourceName)
         if (!phoneNumber) {
             phoneNumber = [url resourceSpecifier];
             if ([phoneNumber length] == 0) {
-//                MPLogError(@"Invalid telelphone URL: %@.", url.absoluteString);
+                AdLogType(WBAdLogLevelError, WBAdTypeNone, @"Invalid telelphone URL: %@.", url.absoluteString);
                 return nil;
             }
         }

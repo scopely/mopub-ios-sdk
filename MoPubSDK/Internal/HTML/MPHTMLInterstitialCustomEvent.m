@@ -8,6 +8,7 @@
 #import "MPHTMLInterstitialCustomEvent.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
+#import "WBAdLogging.h"
 
 @interface MPHTMLInterstitialCustomEvent ()
 
@@ -18,6 +19,7 @@
 
 @implementation MPHTMLInterstitialCustomEvent
 
+@dynamic delegate;
 @synthesize interstitial = _interstitial;
 
 - (BOOL)enableAutomaticImpressionAndClickTracking
@@ -32,11 +34,10 @@
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
     MPAdConfiguration *configuration = [self.delegate configuration];
-    CoreLogType(WBLogLevelTrace, WBLogTypeAdFullPage, @"Loading HTML interstitial with source: %@", [configuration adResponseHTMLString]);
+    AdLogType(WBAdLogLevelTrace, WBAdTypeInterstitial, @"Loading HTML interstitial with source: %@", [configuration adResponseHTMLString]);
 
     self.interstitial = [[MPInstanceProvider sharedProvider] buildMPHTMLInterstitialViewControllerWithDelegate:self
-                                                                                               orientationType:configuration.orientationType
-                                                                                          customMethodDelegate:[self.delegate interstitialDelegate]];
+                                                                                               orientationType:configuration.orientationType];
     [self.interstitial loadConfiguration:configuration];
 }
 

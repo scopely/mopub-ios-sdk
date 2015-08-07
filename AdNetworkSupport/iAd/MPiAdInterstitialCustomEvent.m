@@ -5,10 +5,11 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
+#import <WithBuddiesAds/WithBuddiesAds.h>
 #import <iAd/iAd.h>
 #import "MPiAdInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
-
+#import "MPLogging.h"
 #import "MPInterstitialViewController.h"
 
 @interface MPInstanceProvider (iAdInterstitials)
@@ -83,17 +84,6 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    if(NSFoundationVersionNumber <= NSFoundationVersionNumber_iOS_6_1)
-    {
-        NSError *error = [NSError errorWithDomain:WBAdSDKDomain code:0 userInfo:@{
-                                                                                  NSLocalizedDescriptionKey : @"iAd is only available on iOS 7+",
-                                                                                  NSLocalizedFailureReasonErrorKey : @"Os not supported"
-                                                                                  }];
-        [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
-        return;
-    }
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting iAd interstitial");
-
     self.iAdInterstitial = [[MPInstanceProvider sharedProvider] buildADInterstitialAd];
     self.iAdInterstitial.delegate = self;
 
@@ -105,6 +95,11 @@
 - (void)dealloc
 {
     self.iAdInterstitial.delegate = nil;
+}
+
+-(NSString *)description
+{
+    return @"iAd";
 }
 
 - (void)closeButtonPressed
@@ -127,21 +122,24 @@
 
 - (void)showInterstitialFromRootViewController:(UIViewController *)controller {
     if (self.willBeOnScreen || self.isOnScreen) {
-        CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"Cannot show an iAd interstitial that's already been shown or will be shown");
+        AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial,
+                  @"Cannot show an iAd interstitial that's already been shown or will be shown");
         return;
     }
-
+    
     // ADInterstitialAd throws an exception if we don't check the loaded flag prior to presenting.
     if (self.iAdInterstitial.loaded) {
         if ([self.iAdInterstitial presentInView:self.iAdInterstitialViewController.view]) {
             self.presentingRootViewController = controller;
             [self.iAdInterstitialViewController presentInterstitialFromViewController:self.presentingRootViewController];
         } else {
-            CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Failed to show iAd interstitial: presentInView: returned NO");
+            AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial,
+                      @"Failed to show iAd interstitial: presentInView: returned NO");
             [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
         }
     } else {
-        CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Failed to show iAd interstitial: a previously loaded iAd interstitial now claims not to be ready.");
+        AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial,
+                  @"Failed to show iAd interstitial: a previously loaded iAd interstitial now claims not to be ready.");
         [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
     }
 }
@@ -162,19 +160,18 @@
 #pragma mark - <ADInterstitialAdDelegate>
 
 - (void)interstitialAdDidLoad:(ADInterstitialAd *)interstitialAd {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"iAd interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:self.iAdInterstitial];
 }
 
 - (void)interstitialAd:(ADInterstitialAd *)interstitialAd didFailWithError:(NSError *)error {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"iAd interstitial failed with error: %@", error.localizedDescription);
+    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"iAd interstitial failed with error: %@", error.localizedDescription);
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)interstitialAdDidUnload:(ADInterstitialAd *)interstitialAd {
     // This method may be called whether the ad is on-screen or not. We only want to invoke the
     // "disappear" callbacks if the ad is on-screen.
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"iAd interstitial did unload");
+    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"iAd interstitial did unload");
 
     [self dismissInterstitialAdIfNecessary];
 
@@ -184,14 +181,14 @@
 
 - (BOOL)interstitialAdActionShouldBegin:(ADInterstitialAd *)interstitialAd
                    willLeaveApplication:(BOOL)willLeave {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"iAd interstitial will begin action");
+    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"iAd interstitial will begin action");
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
     return YES; // YES allows the action to execute (NO would instead cancel the action).
 }
 
 - (void)interstitialAdActionDidFinish:(ADInterstitialAd *)interstitialAd
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"iAd interstitial did finish");
+    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"iAd interstitial did finish");
 
     [self dismissInterstitialAdIfNecessary];
 }

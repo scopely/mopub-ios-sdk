@@ -16,6 +16,7 @@
 
 @implementation MPMRAIDInterstitialCustomEvent
 
+@dynamic delegate;
 @synthesize interstitial = _interstitial;
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info

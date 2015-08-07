@@ -10,8 +10,7 @@
 #import "FakeInterstitialAdapter.h"
 #import "FakeMPAnalyticsTracker.h"
 #import <iAd/iAd.h>
-#import "GADInterstitial.h"
-#import "GADBannerView.h"
+#import <GoogleMobileAds/GoogleMobileAds.h>
 #import "FakeMMInterstitial.h"
 #import "FakeInterstitialCustomEvent.h"
 #import <Chartboost/Chartboost.h>
@@ -19,7 +18,6 @@
 #import "IMInterstitial.h"
 #import "IMBanner.h"
 #import "MPInterstitialAdManager.h"
-#import "GADRequest.h"
 #import "FakeMMAdView.h"
 #import "FakeGSBannerAdView.h"
 #import "MPBaseBannerAdapter.h"
@@ -35,6 +33,9 @@
 #import "MPStreamAdPlacer.h"
 #import "FakeMPStreamAdPlacer.h"
 #import "MPClosableView.h"
+#import "MPRewardedVideoAdManager.h"
+#import "MPRewardedVideoAdapter.h"
+#import "MPRewardedVideoCustomEvent.h"
 
 @class MRCalendarManager;
 @class EKEventStore;
@@ -59,6 +60,11 @@
 @property (nonatomic, strong) FakeInterstitialCustomEvent *fakeInterstitialCustomEvent;
 @property (nonatomic, strong) MPHTMLInterstitialViewController *fakeMPHTMLInterstitialViewController;
 @property (nonatomic, strong) MPMRAIDInterstitialViewController *fakeMPMRAIDInterstitialViewController;
+
+#pragma mark - Rewarded Video
+@property (nonatomic, strong) MPRewardedVideoAdManager *fakeMPRewardedVideoAdManager;
+@property (nonatomic, strong) MPRewardedVideoAdapter *fakeMPRewardedVideoAdapter;
+@property (nonatomic, strong) MPRewardedVideoCustomEvent *fakeMPRewardedVideoCustomEvent;
 
 #pragma mark - HTML Ads
 @property (nonatomic, strong) MPAdWebView *fakeMPAdWebView;
@@ -89,6 +95,7 @@
 
 #pragma mark iAd
 @property (nonatomic, strong) ADBannerView *fakeADBannerView;
+@property (nonatomic, strong) ADBannerView *fakeADBannerViewMediumRectangle;
 @property (nonatomic, strong) ADInterstitialAd *fakeADInterstitialAd;
 
 #pragma mark Facebook

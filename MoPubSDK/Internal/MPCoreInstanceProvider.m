@@ -13,10 +13,12 @@
 #import "MPAdServerCommunicator.h"
 #import "MPURLResolver.h"
 #import "MPAdDestinationDisplayAgent.h"
+#import "MPReachability.h"
 #import "MPTimer.h"
 #import "MPAnalyticsTracker.h"
-#import <Twitter/Twitter.h>
 #import "MPGeolocationProvider.h"
+#import "MPLogEventRecorder.h"
+#import "MPNetworkManager.h"
 
 #define MOPUB_CARRIER_INFO_DEFAULTS_KEY @"com.mopub.carrierinfo"
 
@@ -151,9 +153,9 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 
 #pragma mark - URL Handling
 
-- (MPURLResolver *)buildMPURLResolver
+- (MPURLResolver *)buildMPURLResolverWithURL:(NSURL *)URL completion:(MPURLResolverCompletionBlock)completion;
 {
-    return [MPURLResolver resolver];
+    return [MPURLResolver resolverWithURL:URL completion:completion];
 }
 
 - (MPAdDestinationDisplayAgent *)buildMPAdDestinationDisplayAgentWithDelegate:(id<MPAdDestinationDisplayAgentDelegate>)delegate
@@ -162,6 +164,11 @@ static MPCoreInstanceProvider *sharedProvider = nil;
 }
 
 #pragma mark - Utilities
+
+- (UIDevice *)sharedCurrentDevice
+{
+    return [UIDevice currentDevice];
+}
 
 - (MPGeolocationProvider *)sharedMPGeolocationProvider
 {
@@ -219,53 +226,36 @@ static MPCoreInstanceProvider *sharedProvider = nil;
     }];
 }
 
+- (MPReachability *)sharedMPReachability
+{
+    return [self singletonForClass:[MPReachability class] provider:^id{
+        return [MPReachability reachabilityForLocalWiFi];
+    }];
+}
+
+- (MPLogEventRecorder *)sharedLogEventRecorder
+{
+    return [self singletonForClass:[MPLogEventRecorder class] provider:^id{
+        MPLogEventRecorder *recorder = [[MPLogEventRecorder alloc] init];
+        return recorder;
+    }];
+}
+
+- (MPNetworkManager *)sharedNetworkManager
+{
+    return [self singletonForClass:[MPNetworkManager class] provider:^id{
+        return [MPNetworkManager sharedNetworkManager];
+    }];
+}
+
 - (NSDictionary *)sharedCarrierInfo
 {
     return self.carrierInfo;
 }
 
-- (MPTimer *)buildMPTimerWithTimeInterval:(NSTimeInterval)seconds target:(id)target selector:(SEL)selector repeats:(BOOL)repeats logType:(WBLogType)logType
+- (MPTimer *)buildMPTimerWithTimeInterval:(NSTimeInterval)seconds target:(id)target selector:(SEL)selector repeats:(BOOL)repeats
 {
-    return [MPTimer timerWithTimeInterval:seconds target:target selector:selector repeats:repeats logType:logType];
+    return [MPTimer timerWithTimeInterval:seconds target:target selector:selector repeats:repeats];
 }
-
-#pragma mark - Twitter Availability
-
-- (void)resetTwitterAppInstallCheck
-{
-    self.twitterDeepLinkStatus = MPTwitterDeepLinkNotChecked;
-}
-
-- (BOOL)isTwitterInstalled
-{
-
-    if (self.twitterDeepLinkStatus == MPTwitterDeepLinkNotChecked) {
-        BOOL twitterDeepLinkEnabled = [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"twitter://timeline"]];
-        if (twitterDeepLinkEnabled) {
-            self.twitterDeepLinkStatus = MPTwitterDeepLinkEnabled;
-        } else {
-            self.twitterDeepLinkStatus = MPTwitterDeepLinkDisabled;
-        }
-    }
-
-    return (self.twitterDeepLinkStatus == MPTwitterDeepLinkEnabled);
-}
-
-- (MPTwitterAvailability)twitterAvailabilityOnDevice
-{
-    MPTwitterAvailability twitterAvailability = MPTwitterAvailabilityNone;
-
-    if ([self isTwitterInstalled]) {
-        twitterAvailability |= MPTwitterAvailabilityApp;
-    }
-    
-    if ([SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter])
-    {
-        twitterAvailability |= MPTwitterAvailabilityNative;
-    }
-
-    return twitterAvailability;
-}
-
 
 @end

@@ -89,9 +89,6 @@ describe(@"NSURL_MPAdditions", ^{
             URL = [NSURL URLWithString:@"mopub://failLoad"];
             [URL mp_mopubHostCommand] should equal(MPMoPubHostCommandFailLoad);
 
-            URL = [NSURL URLWithString:@"mopub://custom"];
-            [URL mp_mopubHostCommand] should equal(MPMoPubHostCommandCustom);
-
             URL = [NSURL URLWithString:@"mopub://precacheComplete"];
             [URL mp_mopubHostCommand] should equal(MPMoPubHostCommandPrecacheComplete);
         });
@@ -99,6 +96,33 @@ describe(@"NSURL_MPAdditions", ^{
         it(@"should return unrecognized for unknown commands", ^{
             NSURL *URL = [NSURL URLWithString:@"mopub://hargau"];
             [URL mp_mopubHostCommand] should equal(MPMoPubHostCommandUnrecognized);
+        });
+    });
+
+    describe(@"shareCommand", ^ {
+        it(@"should reject non-share schemes", ^{
+            NSURL *URL = [NSURL URLWithString:@"hargau://tweet"];
+            [URL mp_MoPubShareHostCommand] should equal(MPMoPubShareHostCommandUnrecognized);
+        });
+
+        it(@"should return correct enum for known commands", ^{
+            NSURL *URL = [NSURL URLWithString:@"mopubshare://tweet"];
+            [URL mp_MoPubShareHostCommand] should equal(MPMoPubShareHostCommandTweet);
+        });
+
+        it(@"should return unrecognized for unknown commands", ^{
+            NSURL *URL = [NSURL URLWithString:@"mopubshare://hargau"];
+            [URL mp_MoPubShareHostCommand] should equal(MPMoPubShareHostCommandUnrecognized);
+        });
+
+        it(@"should return NO for non-share schemes", ^{
+            NSURL *URL = [NSURL URLWithString:@"shared://hargau"];
+            [URL mp_isMoPubShareScheme] should equal(NO);
+        });
+
+        it(@"should return YES for share schemes", ^{
+            NSURL *URL = [NSURL URLWithString:@"mopubshare://hargau"];
+            [URL mp_isMoPubShareScheme] should equal(YES);
         });
     });
 });

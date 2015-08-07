@@ -83,7 +83,7 @@ static CGFloat const kBaseBackoffTimeMultiplier = 1.5;
 {
     NSTimeInterval adAge = [ad.creationDate timeIntervalSinceNow];
 
-    return abs(adAge) < maxAge;
+    return fabs(adAge) < maxAge;
 }
 
 #pragma mark - Ad Requests
@@ -121,7 +121,7 @@ static CGFloat const kBaseBackoffTimeMultiplier = 1.5;
                 [self.delegate adSourceQueueAdIsAvailable:self];
             }
         } else {
-            // MPLogDebug(@"%@", error);
+//            MPLogDebug(@"%@", error);
             //increment in this failure case to prevent retrying a request that wasn't bid on.
             //currently under discussion on whether we do this or not.
             if (error.code == MPNativeAdErrorNoInventory) {

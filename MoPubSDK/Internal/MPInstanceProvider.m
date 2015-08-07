@@ -13,12 +13,14 @@
 #import "MPLegacyInterstitialCustomEventAdapter.h"
 #import "MPHTMLInterstitialViewController.h"
 #import "MPMRAIDInterstitialViewController.h"
+#import "MPReachability.h"
 #import "MPInterstitialCustomEvent.h"
 #import "MPBaseBannerAdapter.h"
 #import "MPBannerCustomEventAdapter.h"
 #import "MPLegacyBannerCustomEventAdapter.h"
 #import "MPBannerCustomEvent.h"
 #import "MPBannerAdManager.h"
+#import "MPLogging.h"
 #import "MRImageDownloader.h"
 #import "MRBundleManager.h"
 #import "MRCalendarManager.h"
@@ -32,6 +34,7 @@
 #if (DEBUG || ADHOC)
 #import "WBAdService+Debugging.h"
 #endif
+#import <WithBuddiesAds/WithBuddiesAds.h>
 
 #import "MPNativeAdSource.h"
 #import "MPNativePositionSource.h"
@@ -41,9 +44,24 @@
 #import "MRBridge.h"
 #import "MRController.h"
 #import "MPClosableView.h"
+#import "MPRewardedVideoAdManager.h"
+#import "MPRewardedVideoAdapter.h"
+#import "MPRewardedVideoCustomEvent.h"
 
 @interface MPInstanceProvider ()
 
+// A nested dictionary. The top-level dictionary maps Class objects to second-level dictionaries.
+// The second level dictionaries map identifiers to singleton objects.
+//
+// An example:
+//  {
+//      SomeClass:
+//      {
+//          @"default": <singleton_a>
+//          @"other_context": <singleton_b>
+//      }
+//  }
+//
 @property (nonatomic, strong) NSMutableDictionary *singletons;
 
 @end
@@ -72,13 +90,23 @@ static MPInstanceProvider *sharedAdProvider = nil;
     return self;
 }
 
-
 - (id)singletonForClass:(Class)klass provider:(MPSingletonProviderBlock)provider
 {
-    id singleton = [self.singletons objectForKey:klass];
+    return [self singletonForClass:klass provider:provider context:@"default"];
+}
+
+- (id)singletonForClass:(Class)klass provider:(MPSingletonProviderBlock)provider context:(id)context
+{
+    id singleton = [[self.singletons objectForKey:klass] objectForKey:context];
     if (!singleton) {
         singleton = provider();
-        [self.singletons setObject:singleton forKey:(id<NSCopying>)klass];
+        NSMutableDictionary *singletonsForClass = [self.singletons objectForKey:klass];
+        if (!singletonsForClass) {
+            NSMutableDictionary *singletonsForContext = [NSMutableDictionary dictionaryWithObjectsAndKeys:singleton, context, nil];
+            [self.singletons setObject:singletonsForContext forKey:(id<NSCopying>)klass];
+        } else {
+            [singletonsForClass setObject:singleton forKey:context];
+        }
     }
     return singleton;
 }
@@ -109,14 +137,14 @@ static MPInstanceProvider *sharedAdProvider = nil;
     Class classOverride = [[WBAdService sharedAdService] forcedAdNetworkBannerClass];
     if(classOverride)
     {
-        CoreLogType(WBLogLevelWarn, WBLogTypeAdBanner, @"Override is on showing %@ instead of %@", classOverride, customClass);
+        AdLogType(WBAdLogLevelWarn, WBAdTypeBanner, @"Override is on showing %@ instead of %@", classOverride, customClass);
         customClass = classOverride;
     }
 #endif
 
     MPBannerCustomEvent *customEvent = [[customClass alloc] init];
     if ([customEvent isKindOfClass:[MPBannerCustomEvent class]] == NO) {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"**** Custom Event Class: %@ does not extend MPBannerCustomEvent ****", NSStringFromClass(customClass));
+        AdLogType(WBAdLogLevelFatal, WBAdTypeBanner, @"**** Custom Event Class: %@ does not extend MPBannerCustomEvent ****", NSStringFromClass(customClass));
         return nil;
     }
     customEvent.delegate = delegate;
@@ -150,15 +178,18 @@ static MPInstanceProvider *sharedAdProvider = nil;
     Class classOverride = [[WBAdService sharedAdService] forcedAdNetworkFullpageClass];
     if(classOverride)
     {
-        CoreLogType(WBLogLevelWarn, WBLogTypeAdFullPage, @"Override is on showing %@ instead of %@", classOverride, customClass);
+        AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"Override is on showing %@ instead of %@", classOverride, customClass);
         customClass = classOverride;
     }
 #endif
     
     MPInterstitialCustomEvent *customEvent = [[customClass alloc] init];
     if ([customEvent isKindOfClass:[MPInterstitialCustomEvent class]] == NO) {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdFullPage, @"**** Custom Event Class: %@ does not extend MPInterstitialCustomEvent ****", NSStringFromClass(customClass));
+        AdLogType(WBAdLogLevelFatal, WBAdTypeInterstitial, @"**** Custom Event Class: %@ does not extend MPInterstitialCustomEvent ****", NSStringFromClass(customClass));
         return nil;
+    }
+    if ([customEvent respondsToSelector:@selector(customEventDidUnload)]) {
+        AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"**** Custom Event Class: %@ implements the deprecated -customEventDidUnloadMethod. This is no longer called. Use -dealloc for cleanup instead ****", NSStringFromClass(customClass));
     }
     customEvent.delegate = delegate;
     return customEvent;
@@ -166,12 +197,10 @@ static MPInstanceProvider *sharedAdProvider = nil;
 
 - (MPHTMLInterstitialViewController *)buildMPHTMLInterstitialViewControllerWithDelegate:(id<MPInterstitialViewControllerDelegate>)delegate
                                                                         orientationType:(MPInterstitialOrientationType)type
-                                                                   customMethodDelegate:(id)customMethodDelegate
 {
     MPHTMLInterstitialViewController *controller = [[MPHTMLInterstitialViewController alloc] init];
     controller.delegate = delegate;
     controller.orientationType = type;
-    controller.customMethodDelegate = customMethodDelegate;
     return controller;
 }
 
@@ -183,6 +212,31 @@ static MPInstanceProvider *sharedAdProvider = nil;
     return controller;
 }
 
+#pragma mark - Rewarded Video
+
+- (MPRewardedVideoAdManager *)buildRewardedVideoAdManagerWithAdUnitID:(NSString *)adUnitID delegate:(id<MPRewardedVideoAdManagerDelegate>)delegate
+{
+    return [[MPRewardedVideoAdManager alloc] initWithAdUnitID:adUnitID delegate:delegate];
+}
+
+- (MPRewardedVideoAdapter *)buildRewardedVideoAdapterWithDelegate:(id<MPRewardedVideoAdapterDelegate>)delegate
+{
+    return [[MPRewardedVideoAdapter alloc] initWithDelegate:delegate];
+}
+
+- (MPRewardedVideoCustomEvent *)buildRewardedVideoCustomEventFromCustomClass:(Class)customClass delegate:(id<MPRewardedVideoCustomEventDelegate>)delegate
+{
+    MPRewardedVideoCustomEvent *customEvent = [[customClass alloc] init];
+
+    if (![customEvent isKindOfClass:[MPRewardedVideoCustomEvent class]]) {
+        MPLogError(@"**** Custom Event Class: %@ does not extend MPRewardedVideoCustomEvent ****", NSStringFromClass(customClass));
+        return nil;
+    }
+
+    customEvent.delegate = delegate;
+    return customEvent;
+}
+
 #pragma mark - HTML Ads
 
 - (MPAdWebView *)buildMPAdWebViewWithFrame:(CGRect)frame delegate:(id<UIWebViewDelegate>)delegate
@@ -192,9 +246,9 @@ static MPInstanceProvider *sharedAdProvider = nil;
     return webView;
 }
 
-- (MPAdWebViewAgent *)buildMPAdWebViewAgentWithAdWebViewFrame:(CGRect)frame delegate:(id<MPAdWebViewAgentDelegate>)delegate customMethodDelegate:(id)customMethodDelegate
+- (MPAdWebViewAgent *)buildMPAdWebViewAgentWithAdWebViewFrame:(CGRect)frame delegate:(id<MPAdWebViewAgentDelegate>)delegate
 {
-    return [[MPAdWebViewAgent alloc] initWithAdWebViewFrame:frame delegate:delegate customMethodDelegate:customMethodDelegate];
+    return [[MPAdWebViewAgent alloc] initWithAdWebViewFrame:frame delegate:delegate];
 }
 
 #pragma mark - MRAID

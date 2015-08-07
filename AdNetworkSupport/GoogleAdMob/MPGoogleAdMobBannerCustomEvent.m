@@ -5,10 +5,11 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
-#import "GADBannerView.h"
+#import <GoogleMobileAds/GoogleMobileAds.h>
 #import "MPGoogleAdMobBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "WBAdService+Internal.h"
+#import <WithBuddiesAds/WithBuddiesAds.h>
 
 #if (DEBUG || ADHOC)
 #import "WBAdService+Debugging.h"
@@ -98,12 +99,13 @@
                                 accuracy:location.horizontalAccuracy];
     }
 
-    // Here, you can specify a list of devices that will receive test ads.
-    // See: http://code.google.com/mobile/ads/docs/ios/intermediate.html#testdevices
+    // Here, you can specify a list of device IDs that will receive test ads.
+    // Running in the simulator will automatically show test ads.
     request.testDevices = [NSArray arrayWithObjects:
-                           GAD_SIMULATOR_ID,
                            // more UDIDs here,
                            nil];
+
+    request.requestAgent = @"MoPub";
 
     [self.adBannerView loadRequest:request];
 }
@@ -130,32 +132,32 @@
 
 - (void)adViewDidReceiveAd:(GADBannerView *)bannerView
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Google AdMob Banner did load");
+    AdLogType(WBAdLogLevelInfo, WBAdTypeBanner, @"Google AdMob Banner did load");
     [self.delegate bannerCustomEvent:self didLoadAd:self.adBannerView];
 }
 
 - (void)adView:(GADBannerView *)bannerView
 didFailToReceiveAdWithError:(GADRequestError *)error
 {
-    CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Google AdMob Banner failed to load with error: %@", error.localizedDescription);
+    AdLogType(WBAdLogLevelFatal, WBAdTypeBanner, @"Google AdMob Banner failed to load with error: %@", error.localizedDescription);
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)adViewWillPresentScreen:(GADBannerView *)bannerView
 {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Google AdMob Banner will present modal");
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"Google AdMob Banner will present modal");
     [self.delegate bannerCustomEventWillBeginAction:self];
 }
 
 - (void)adViewDidDismissScreen:(GADBannerView *)bannerView
 {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Google AdMob Banner did dismiss modal");
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"Google AdMob Banner did dismiss modal");
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 
 - (void)adViewWillLeaveApplication:(GADBannerView *)bannerView
 {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Google AdMob Banner will leave the application");
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"Google AdMob Banner will leave the application");
     [self.delegate bannerCustomEventWillLeaveApplication:self];
 }
 

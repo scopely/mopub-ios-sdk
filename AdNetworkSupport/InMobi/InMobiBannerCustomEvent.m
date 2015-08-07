@@ -64,17 +64,12 @@ static NSString *gAppId = nil;
 {
     int imAdSizeConstant = [self imAdSizeConstantForCGSize:size];
     if (imAdSizeConstant == INVALID_INMOBI_AD_SIZE) {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Failed to create an inMobi Banner with invalid size %@", NSStringFromCGSize(size));
+        AdLogType(WBAdLogLevelFatal, WBAdTypeBanner, @"Failed to create an inMobi Banner with invalid size %@", NSStringFromCGSize(size));
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
 
-    NSString *appId = gAppId;
-    if ([appId length] == 0) {
-        appId = [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdIM];
-    }
-
-    self.inMobiBanner = [[MPInstanceProvider sharedProvider] buildIMBannerWithFrame:CGRectMake(0, 0, size.width, size.height) appId:appId adSize:imAdSizeConstant];
+    self.inMobiBanner = [[MPInstanceProvider sharedProvider] buildIMBannerWithFrame:CGRectMake(0, 0, size.width, size.height) appId:[[WBAdService sharedAdService] bannerIdForAdId:WBAdIdIM] adSize:imAdSizeConstant];
     self.inMobiBanner.delegate = self;
     self.inMobiBanner.refreshInterval = REFRESH_INTERVAL_OFF;
     self.inMobiBanner.additionaParameters = @{ @"tp" : @"c_mopub",
@@ -123,37 +118,37 @@ static NSString *gAppId = nil;
 #pragma mark InMobiAdDelegate methods
 
 - (void)bannerDidReceiveAd:(IMBanner *)banner {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"InMobi banner did load");
+    MPLogInfo(@"InMobi banner did load");
     [self.delegate trackImpression];
     [self.delegate bannerCustomEvent:self didLoadAd:banner];
 }
 
 - (void)banner:(IMBanner *)banner didFailToReceiveAdWithError:(IMError *)error {
-    CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"InMobi banner did fail with error: %@", error.localizedDescription);
+    MPLogInfo(@"InMobi banner did fail with error: %@", error.localizedDescription);
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)bannerDidDismissScreen:(IMBanner *)banner {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"adViewDidDismissScreen");
+    MPLogInfo(@"adViewDidDismissScreen");
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 
 - (void)bannerWillDismissScreen:(IMBanner *)banner {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"adViewWillDismissScreen");
+    MPLogInfo(@"adViewWillDismissScreen");
 }
 
 - (void)bannerWillPresentScreen:(IMBanner *)banner {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"InMobi banner will present modal");
+    MPLogInfo(@"InMobi banner will present modal");
     [self.delegate bannerCustomEventWillBeginAction:self];
 }
 
 - (void)bannerWillLeaveApplication:(IMBanner *)banner {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"InMobi banner will leave application");
+    MPLogInfo(@"InMobi banner will leave application");
     [self.delegate bannerCustomEventWillLeaveApplication:self];
 }
 
 - (void)bannerDidInteract:(IMBanner *)banner withParams:(NSDictionary *)dictionary {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"InMobi banner was clicked");
+    MPLogInfo(@"InMobi banner was clicked");
     [self.delegate trackClick];
 }
 

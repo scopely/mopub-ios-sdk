@@ -6,6 +6,7 @@
 //
 
 #import "NSHTTPURLResponse+MPAdditions.h"
+#import "MPLogging.h"
 
 NSString * const kMoPubHTTPHeaderContentType = @"Content-Type";
 
@@ -16,7 +17,7 @@ NSString * const kMoPubHTTPHeaderContentType = @"Content-Type";
     NSStringEncoding encoding = NSUTF8StringEncoding;
 
     if (![contentType length]) {
-        CoreLogType(WBLogLevelWarn, WBLogTypeDownload, @"Attempting to set string encoding from nil %@", kMoPubHTTPHeaderContentType);
+        MPLogWarn(@"Attempting to set string encoding from nil %@", kMoPubHTTPHeaderContentType);
         return encoding;
     }
 

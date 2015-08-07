@@ -7,6 +7,7 @@
 
 #import "MRBridge.h"
 #import "MPConstants.h"
+#import "MPLogging.h"
 #import "NSURL+MPAdditions.h"
 #import "MPGlobal.h"
 #import "MRBundleManager.h"
@@ -76,12 +77,14 @@ static NSString * const kMraidURLScheme = @"mraid";
 {
     NSString *JSON = [NSString stringWithFormat:@"{%@}", property];
     [self executeJavascript:@"window.mraidbridge.fireChangeEvent(%@);", JSON];
+    MPLogTrace(@"JSON: %@", JSON);
 }
 
 - (void)fireChangeEventsForProperties:(NSArray *)properties
 {
     NSString *JSON = [NSString stringWithFormat:@"{%@}", [properties componentsJoinedByString:@", "]];
     [self executeJavascript:@"window.mraidbridge.fireChangeEvent(%@);", JSON];
+    MPLogTrace(@"JSON: %@", JSON);
 }
 
 - (void)fireErrorEventForAction:(NSString *)action withMessage:(NSString *)message
@@ -132,6 +135,7 @@ static NSString * const kMraidURLScheme = @"mraid";
     if ([scheme isEqualToString:kMraidURLScheme]) {
         // Some native commands such as useCustomClose should be allowed to run even if we're not handling requests.
         // The command handler will make sure we don't execute native commands that aren't allowed to execute while we're not handling requests.
+        MPLogDebug(@"Trying to process command: %@", urlString);
         NSString *command = url.host;
         NSDictionary *properties = MPDictionaryFromQueryString(url.query);
         [self.nativeCommandHandler handleNativeCommand:command withProperties:properties];
@@ -144,6 +148,7 @@ static NSString * const kMraidURLScheme = @"mraid";
                                    withString:@" "
                                       options:NSLiteralSearch
                                         range:NSMakeRange(0, [urlString length])];
+        MPLogDebug(@"Web console: %@", urlString);
         return NO;
     }
 
@@ -162,10 +167,14 @@ static NSString * const kMraidURLScheme = @"mraid";
 
     if (!isLoading && (navigationType == UIWebViewNavigationTypeOther || navigationType == UIWebViewNavigationTypeLinkClicked)) {
         BOOL iframe = ![request.URL isEqual:request.mainDocumentURL];
-        if (iframe) {
+
+        // If we load a URL from an iFrame that did not originate from a click or
+        // is a deep link, handle normally and return safeToAutoloadLink.
+        if (iframe && !((navigationType == UIWebViewNavigationTypeLinkClicked) && ([scheme isEqualToString:@"https"] || [scheme isEqualToString:@"http"]))) {
             return safeToAutoloadLink;
         }
 
+        // Otherwise, open the URL in a new web view.
         [self.delegate bridge:self handleDisplayForDestinationURL:url];
         return NO;
     }

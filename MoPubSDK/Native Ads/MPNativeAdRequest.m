@@ -74,9 +74,7 @@
         [self assignCompletionHandler:handler];
 
         [self loadAdWithURL:self.URL];
-    }
-    else
-    {
+    } else {
 //        MPLogWarn(@"Native Ad Request did not start - requires completion handler block.");
     }
 }
@@ -96,9 +94,7 @@
         [self assignCompletionHandler:handler];
 
         [self loadAdWithURL:self.URL];
-    }
-    else
-    {
+    } else {
 //        MPLogWarn(@"Native Ad Request did not start - requires completion handler block.");
     }
 }
@@ -139,7 +135,9 @@
     // Adserver doesn't return a customEventClass for MoPub native ads
     if ([configuration.networkType isEqualToString:kAdTypeNative] && configuration.customEventClass == nil) {
         configuration.customEventClass = [MPMoPubNativeCustomEvent class];
-        NSDictionary *classData = [NSJSONSerialization mp_JSONObjectWithData:configuration.adResponseData options:0 clearNullObjects:YES error:nil];
+        NSError *error;
+        NSDictionary *classData = [NSJSONSerialization mp_JSONObjectWithData:configuration.adResponseData options:0 clearNullObjects:YES error:&error];
+
         configuration.customEventClassData = classData;
     }
 
@@ -151,7 +149,7 @@
         self.loading = NO;
         [self loadAdWithURL:self.adConfiguration.failoverURL];
     } else {
-        [self completeAdRequestWithAdObject:nil error:[NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorInvalidServerResponse userInfo:nil]];
+        [self completeAdRequestWithAdObject:nil error:MPNativeAdNSErrorForInvalidAdServerResponse(nil)];
     }
 }
 
@@ -171,22 +169,27 @@
 {
     self.adConfiguration = configuration;
 
+    if (configuration.adUnitWarmingUp) {
+//        MPLogInfo(kMPWarmingUpErrorLogFormatWithAdUnitID, self.adUnitIdentifier);
+        [self completeAdRequestWithAdObject:nil error:MPNativeAdNSErrorForAdUnitWarmingUp()];
+        return;
+    }
+
     if ([configuration.networkType isEqualToString:kAdTypeClear]) {
 //        MPLogInfo(kMPClearErrorLogFormatWithAdUnitID, self.adUnitIdentifier);
+        [self completeAdRequestWithAdObject:nil error:MPNativeAdNSErrorForNoInventory()];
+        return;
+    }
 
-        [self completeAdRequestWithAdObject:nil error:[NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorNoInventory userInfo:nil]];
-    }
-    else {
-//        MPLogInfo(@"Received data from MoPub to construct native ad.\n");
-        [self getAdWithConfiguration:configuration];
-    }
+//    MPLogInfo(@"Received data from MoPub to construct native ad.\n");
+    [self getAdWithConfiguration:configuration];
 }
 
 - (void)communicatorDidFailWithError:(NSError *)error
 {
 //    MPLogDebug(@"Error: Couldn't retrieve an ad from MoPub. Message: %@", error);
 
-    [self completeAdRequestWithAdObject:nil error:[NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorHTTPError userInfo:nil]];
+    [self completeAdRequestWithAdObject:nil error:MPNativeAdNSErrorForNetworkConnectionError()];
 }
 
 #pragma mark - <MPNativeCustomEventDelegate>
@@ -203,7 +206,7 @@
 
     // Error if we don't have click tracker or impression trackers.
     if (!adObject.engagementTrackingURL || adObject.impressionTrackers.count < 1) {
-        [self completeAdRequestWithAdObject:nil error:[NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorInvalidServerResponse userInfo:nil]];
+        [self completeAdRequestWithAdObject:nil error:MPNativeAdNSErrorForInvalidAdServerResponse(@"Invalid ad trackers")];
     } else {
         [self completeAdRequestWithAdObject:adObject error:nil];
     }

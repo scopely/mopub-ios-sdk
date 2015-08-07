@@ -10,6 +10,12 @@ describe(@"MPAdView", ^{
     __block MPAdView *adView;
 
     beforeEach(^{
+        // XXX: The geolocation provider can cause these tests to be flaky, since it can potentially
+        // override the `location` property of MPAdView. For this reason, we substitute a fake
+        // geolocation provider that never establishes a known location.
+        FakeMPGeolocationProvider *fakeGeolocationProvider = [[FakeMPGeolocationProvider alloc] init];
+        fakeCoreProvider.fakeGeolocationProvider = fakeGeolocationProvider;
+
         adView = [[MPAdView alloc] initWithAdUnitId:@"foo" size:MOPUB_BANNER_SIZE];
     });
 

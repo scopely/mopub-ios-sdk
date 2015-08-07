@@ -76,7 +76,7 @@
 
                     if (!validImageDownloaded) {
                         if (error == nil) {
-                            error = [NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorImageDownloadFailed userInfo:nil];
+                            error = MPNativeAdNSErrorForImageDownloadFailure();
                         }
 
                         if (errors == nil) {

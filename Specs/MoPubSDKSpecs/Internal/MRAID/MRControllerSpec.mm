@@ -89,8 +89,16 @@ describe(@"MRController", ^{
     });
 
     describe(@"updateMRAIDProperties", ^{
-        beforeEach(^{
-            spy_on(controller);
+        subjectAction(^{
+            // XXX: We need to add the ad view to the view hierarchy; otherwise, any code that
+            // performs visibility checks will think that the ad is not visible.
+            [window addSubview:controller.mraidAdView];
+
+            // XXX: The act of placing the ad in a view hierarchy generates a lot of messages.
+            // To keep the tests clean, we'll ignore messages before the next updateMRAIDProperties.
+            [(id<CedarDouble>)controller reset_sent_messages];
+
+            [controller updateMRAIDProperties];
         });
 
         // Test that updateMRAIDProperties is called eventually.
@@ -101,38 +109,74 @@ describe(@"MRController", ^{
         context(@"when not animating the ad size", ^{
             beforeEach(^{
                 controller.isAnimatingAdSize = NO;
-                [controller updateMRAIDProperties];
             });
 
-            it(@"should attempt to update the visibility of the view", ^{
-                controller should have_received(@selector(checkViewability));
+            context(@"if the application is in the active state", ^{
+                beforeEach(^{
+                    controller.isViewable = NO;
+                    spy_on([UIApplication sharedApplication]);
+                    [UIApplication sharedApplication] stub_method("applicationState").and_return(UIApplicationStateActive);
+                });
+
+                it(@"should report that the ad is viewable", ^{
+                    controller.isViewable should equal(YES);
+                    [fakeMRBridge containsProperty:[MRViewableProperty propertyWithViewable:YES]] should equal(YES);
+                    [fakeMRBridge containsProperty:[MRViewableProperty propertyWithViewable:NO]] should equal(NO);
+                });
+
+                it(@"should call updateCurrentPosition", ^{
+                    controller should have_received(@selector(updateCurrentPosition));
+                });
+
+                it(@"should call updateDefaultPosition", ^{
+                    controller should have_received(@selector(updateDefaultPosition));
+                });
+
+                it(@"should call updateScreenSize", ^{
+                    controller should have_received(@selector(updateScreenSize));
+                });
+
+                it(@"should call updateMaxSize", ^{
+                    controller should have_received(@selector(updateMaxSize));
+                });
+
+                it(@"should call updateEventSizeChange", ^{
+                    controller should have_received(@selector(updateEventSizeChange));
+                });
             });
 
-            it(@"should call updateCurrentPosition", ^{
-                controller should have_received(@selector(updateCurrentPosition));
+            context(@"if the application is in the inactive state", ^{
+                beforeEach(^{
+                    controller.isViewable = YES;
+                    spy_on([UIApplication sharedApplication]);
+                    [UIApplication sharedApplication] stub_method("applicationState").and_return(UIApplicationStateInactive);
+                });
+
+                it(@"should report that the ad is not viewable", ^{
+                    controller.isViewable should equal(NO);
+                    [fakeMRBridge containsProperty:[MRViewableProperty propertyWithViewable:NO]] should equal(YES);
+                    [fakeMRBridge containsProperty:[MRViewableProperty propertyWithViewable:YES]] should equal(NO);
+                });
             });
 
-            it(@"should call updateDefaultPosition", ^{
-                controller should have_received(@selector(updateDefaultPosition));
-            });
+            context(@"if the application is in the background state", ^{
+                beforeEach(^{
+                    controller.isViewable = YES;
+                    spy_on([UIApplication sharedApplication]);
+                    [UIApplication sharedApplication] stub_method("applicationState").and_return(UIApplicationStateBackground);
+                });
 
-            it(@"should call updateScreenSize", ^{
-                controller should have_received(@selector(updateScreenSize));
-            });
-
-            it(@"should call updateMaxSize", ^{
-                controller should have_received(@selector(updateMaxSize));
-            });
-
-            it(@"should call updateEventSizeChange", ^{
-                controller should have_received(@selector(updateEventSizeChange));
+                it(@"should report that the ad is not viewable", ^{
+                    controller.isViewable should equal(NO);
+                    [fakeMRBridge containsProperty:[MRViewableProperty propertyWithViewable:NO]] should equal(YES);
+                    [fakeMRBridge containsProperty:[MRViewableProperty propertyWithViewable:YES]] should equal(NO);
+                });
             });
         });
 
         context(@"when animating the ad size", ^{
             beforeEach(^{
                 controller.isAnimatingAdSize = YES;
-                [controller updateMRAIDProperties];
             });
 
             it(@"should not attempt to update the visibility of the view", ^{
@@ -702,6 +746,22 @@ describe(@"MRController", ^{
         });
     });
 
+    context(@"when an ad finishes loading and appears on the screen", ^{
+        beforeEach(^{
+            NSString *HTMLString = @"Hello, world!";
+            configuration = [MPAdConfigurationFactory defaultBannerConfigurationWithHeaders:nil
+                                                                                 HTMLString:HTMLString];
+            [controller loadAdWithConfiguration:configuration];
+            [controller bridge:fakeMRBridge didFinishLoadingWebView:webView];
+            [window addSubview:controller.mraidAdView];
+        });
+
+        it(@"should configure the MRAID JS with the version of the SDK that is being used", ^{
+            NSString *expected = [NSString stringWithFormat:@"hostSDKVersion: '%@'", MP_SDK_VERSION];
+            fakeMRBridge.changedProperties should contain(expected);
+        });
+    });
+
     describe(@"Pre-caching", ^{
         __block NSString *HTMLString;
 
@@ -1192,27 +1252,168 @@ describe(@"MRController", ^{
             });
         });
 
-        context(@"when the command is 'forceOrientation' and the ad is interstitial and currently animating", ^{
+        context(@"when the command is 'setOrientationProperties", ^{
+            __block UIApplication *sharedApplication;
+            __block UIViewController *rootViewController;
 
             beforeEach(^{
-                controller.mraidBridge.shouldHandleRequests = NO;
-                controller.placementType = MRAdViewPlacementTypeInterstitial;
+                sharedApplication = [UIApplication sharedApplication];
+                spy_on(sharedApplication);
+
+                rootViewController = [[UIViewController alloc] init];
+                window.rootViewController = rootViewController;
+                [window makeKeyWindow];
+
                 URL = [NSURL URLWithString:@"mraid://setOrientationProperties?allowOrientationChange=false&forceOrientation=landscape"];
-                [fakeMRBridge webView:nil shouldStartLoadWithRequest:[NSURLRequest requestWithURL:URL] navigationType:UIWebViewNavigationTypeOther];
             });
 
-            it(@"should create a block to execute the force orientation", ^{
-                controller.forceOrientationAfterAnimationBlock should_not be_nil;
+            context(@"when our ad is an expanded banner", ^{
+                __block MRExpandModalViewController *expandViewController;
+
+                beforeEach(^{
+                    controller.placementType = MRAdViewPlacementTypeInline;
+                    controller.currentState = MRAdViewStateExpanded;
+                    controller.mraidBridge.shouldHandleRequests = YES;
+
+                    expandViewController = [[MRExpandModalViewController alloc] init];
+                    controller.expandModalViewController = expandViewController;
+
+                    [rootViewController presentViewController:expandViewController animated:NO completion:NULL];
+                });
+
+                context(@"when the app doesn't support the force orientation", ^{
+                    beforeEach(^{
+                        sharedApplication stub_method(@selector(mp_supportsOrientationMask:)).and_return(NO);
+
+                        [fakeMRBridge webView:nil shouldStartLoadWithRequest:[NSURLRequest requestWithURL:URL] navigationType:UIWebViewNavigationTypeOther];
+                    });
+
+                    it(@"should not attempt to force the orientation", ^{
+                        controller should_not have_received(@selector(presentExpandModalViewControllerWithView:animated:completion:));
+                    });
+                });
+
+                context(@"when the app supports the force orientation", ^{
+                    beforeEach(^{
+                        sharedApplication stub_method(@selector(mp_supportsOrientationMask:)).and_return(YES);
+                    });
+
+                    it(@"should not attempt to force the orientation", ^{
+                        [fakeMRBridge webView:nil shouldStartLoadWithRequest:[NSURLRequest requestWithURL:URL] navigationType:UIWebViewNavigationTypeOther];
+                        controller should have_received(@selector(presentExpandModalViewControllerWithView:animated:completion:));
+                    });
+
+                    it(@"should nil out the forceOrientationAfterAnimationBlock", ^{
+                        // Give the controller a random forceOrientationAfterAnimationBlock so we can determine if it gets set to nil when setOrientationProperties is called.
+                        controller.forceOrientationAfterAnimationBlock = ^{
+                            NSLog(@"hello");
+                        };
+
+                        [fakeMRBridge webView:nil shouldStartLoadWithRequest:[NSURLRequest requestWithURL:URL] navigationType:UIWebViewNavigationTypeOther];
+                        controller.forceOrientationAfterAnimationBlock should be_nil;
+                    });
+
+                    context(@"when the ad is currently animating", ^{
+                        beforeEach(^{
+                            controller.mraidBridge.shouldHandleRequests = NO;
+                            [fakeMRBridge webView:nil shouldStartLoadWithRequest:[NSURLRequest requestWithURL:URL] navigationType:UIWebViewNavigationTypeOther];
+                        });
+
+                        it(@"should create a block to execute the force orientation", ^{
+                            controller.forceOrientationAfterAnimationBlock should_not be_nil;
+                        });
+
+                        it(@"should execute the block after the animation completes", ^{
+                            [(id<CedarDouble>)controller reset_sent_messages];
+                            controller should_not have_received(@selector(bridge:handleNativeCommandSetOrientationPropertiesWithForceOrientationMask:));
+                            [controller enableRequestHandling];
+                            [controller handleMRAIDInterstitialDidPresentWithViewController:nil];
+                            controller should have_received(@selector(bridge:handleNativeCommandSetOrientationPropertiesWithForceOrientationMask:));
+                            controller.forceOrientationAfterAnimationBlock should be_nil;
+                        });
+                    });
+
+                });
             });
 
-            it(@"should execute the block after the animation completes", ^{
-                spy_on(controller);
-                [(id<CedarDouble>)controller reset_sent_messages];
-                controller should_not have_received(@selector(bridge:handleNativeCommandSetOrientationPropertiesWithForceOrientationMask:));
-                [controller enableRequestHandling];
-                [controller handleMRAIDInterstitialDidPresentWithViewController:nil];
-                controller should have_received(@selector(bridge:handleNativeCommandSetOrientationPropertiesWithForceOrientationMask:));
-                controller.forceOrientationAfterAnimationBlock should be_nil;
+            context(@"when our ad type is interstitial", ^{
+                __block UIViewController<CedarDouble> *presentingViewController;
+                __block MPMRAIDInterstitialViewController *interstitialViewController;
+
+                beforeEach(^{
+                    presentingViewController = nice_fake_for([UIViewController class]);
+                    interstitialViewController = [[MPMRAIDInterstitialViewController alloc] init];
+                    spy_on(interstitialViewController);
+                    interstitialViewController stub_method(@selector(presentingViewController)).and_return(presentingViewController);
+
+                    controller.interstitialViewController = interstitialViewController;
+                    controller.placementType = MRAdViewPlacementTypeInterstitial;
+
+                    [rootViewController presentViewController:interstitialViewController animated:NO completion:NULL];
+                });
+
+                context(@"when the app doesn't support the force orientation", ^{
+                    beforeEach(^{
+                        sharedApplication stub_method(@selector(mp_supportsOrientationMask:)).and_return(NO);
+
+                        controller.mraidBridge.shouldHandleRequests = YES;
+
+                        [fakeMRBridge webView:nil shouldStartLoadWithRequest:[NSURLRequest requestWithURL:URL] navigationType:UIWebViewNavigationTypeOther];
+                    });
+
+                    it(@"should not attempt to force the orientation", ^{
+                        // We dismiss and then present the same view controller to force orientation. So we make sure we don't observe
+                        // those methods after forcing the orientation.
+                        controller.interstitialViewController should_not have_received(@selector(dismissViewControllerAnimated:completion:));
+                        presentingViewController should_not have_received(@selector(presentViewController:animated:completion:));
+                    });
+                });
+
+                context(@"when the app supports the force orientation", ^{
+                    beforeEach(^{
+                        sharedApplication stub_method(@selector(mp_supportsOrientationMask:)).and_return(YES);
+
+                        controller.mraidBridge.shouldHandleRequests = YES;
+                    });
+
+                    it(@"should attempt to force the orientation", ^{
+                        [fakeMRBridge webView:nil shouldStartLoadWithRequest:[NSURLRequest requestWithURL:URL] navigationType:UIWebViewNavigationTypeOther];
+
+                        // We dismiss and then present the same view controller to force orientation. We make sure we observe these methods to verify that we have forced orientation.
+                        controller.interstitialViewController should have_received(@selector(dismissViewControllerAnimated:completion:));
+                        presentingViewController should have_received(@selector(presentViewController:animated:completion:));
+                    });
+
+                    it(@"should nil out the forceOrientationAfterAnimationBlock", ^{
+                        // Give the controller a random forceOrientationAfterAnimationBlock so we can determine if it gets set to nil when setOrientationProperties is called.
+                        controller.forceOrientationAfterAnimationBlock = ^{
+                            NSLog(@"hello");
+                        };
+
+                        [fakeMRBridge webView:nil shouldStartLoadWithRequest:[NSURLRequest requestWithURL:URL] navigationType:UIWebViewNavigationTypeOther];
+                        controller.forceOrientationAfterAnimationBlock should be_nil;
+                    });
+
+                    context(@"when the ad is currently animating", ^{
+                        beforeEach(^{
+                            controller.mraidBridge.shouldHandleRequests = NO;
+                            [fakeMRBridge webView:nil shouldStartLoadWithRequest:[NSURLRequest requestWithURL:URL] navigationType:UIWebViewNavigationTypeOther];
+                        });
+
+                        it(@"should create a block to execute the force orientation", ^{
+                            controller.forceOrientationAfterAnimationBlock should_not be_nil;
+                        });
+
+                        it(@"should execute the block after the animation completes", ^{
+                            [(id<CedarDouble>)controller reset_sent_messages];
+                            controller should_not have_received(@selector(bridge:handleNativeCommandSetOrientationPropertiesWithForceOrientationMask:));
+                            [controller enableRequestHandling];
+                            [controller handleMRAIDInterstitialDidPresentWithViewController:nil];
+                            controller should have_received(@selector(bridge:handleNativeCommandSetOrientationPropertiesWithForceOrientationMask:));
+                            controller.forceOrientationAfterAnimationBlock should be_nil;
+                        });
+                    });
+                });
             });
         });
     });

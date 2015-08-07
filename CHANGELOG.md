@@ -1,3 +1,37 @@
+## Version 3.9 (July 1st, 2015)
+
+- **Added VAST 3.0 standard support for video ads**.
+- **Improved video player UX**.
+- **Improved error messages**.
+- **Improved deep link handling**.
+- **Bug fixes**.
+	- Fixed clickthrough behavior for MRAID ads that use iframes.
+
+## Version 3.8 (June 1st, 2015)
+
+- **Minor improvements**.
+
+## Version 3.7 (April 30th, 2015)
+
+- **Added iAd medium rectangle ad support**.
+- **Certified Google AdMob SDK version 7.1.0**.
+- **Certified Greystripe SDK version 4.4.0**.
+- **Certified Vungle SDK version 3.0.13**.
+	- Added click callback support.
+- **Bug fixes**.
+	- Addressed a race condition when receiving location updates after calling -`[MPGeolocationProvider disableLocationUpdates:]`.
+    
+## Version 3.6 (April 3rd, 2015)
+
+  - **Bug fixes**.
+    - Fixed crash caused by some MRAID ads attempting to set an orientation that the app doesn't support.
+    
+## Version 3.5 (March 10th, 2015)
+
+  - **Deprecated custom event class methods and constants for setting ad network parameters**.
+  - **Changed banner minimum refresh time interval to 10 seconds**.
+  - **Greystripe custom events now accept parameters configured using app.mopub.com**.
+
 ## Version 3.4 (January 30th, 2015)
 
   - **Certified Facebook SDK Version 3.21.1**.

@@ -5,6 +5,7 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
+#import <WithBuddiesAds/WithBuddiesAds.h>
 #import "MPLegacyBannerCustomEventAdapter.h"
 #import "MPAdConfiguration.h"
 #import "MPInternalUtils.h"
@@ -13,7 +14,7 @@
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration containerSize:(CGSize)size
 {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Looking for custom event selector named %@.", configuration.customSelectorName);
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"Looking for custom event selector named %@.", configuration.customSelectorName);
 
     SEL customEventSelector = NSSelectorFromString(configuration.customSelectorName);
     if ([self.delegate.bannerDelegate respondsToSelector:customEventSelector]) {
@@ -26,7 +27,7 @@
     NSString *oneArgumentSelectorName = [configuration.customSelectorName
                                          stringByAppendingString:@":"];
 
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"Looking for custom event selector named %@.", oneArgumentSelectorName);
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"Looking for custom event selector named %@.", oneArgumentSelectorName);
 
     SEL customEventOneArgumentSelector = NSSelectorFromString(oneArgumentSelectorName);
     if ([self.delegate.bannerDelegate respondsToSelector:customEventOneArgumentSelector]) {

@@ -32,6 +32,8 @@
 
 static NSString *gGUID = nil;
 
+#define kGreystripeGUID @"YOUR_GREYSTRIPE_GUID"
+
 @interface GreystripeInterstitialCustomEvent () <GSAdDelegate>
 
 @property (nonatomic, strong) GSFullscreenAd *greystripeFullscreenAd;
@@ -44,6 +46,7 @@ static NSString *gGUID = nil;
 
 + (void)setGUID:(NSString *)GUID
 {
+    MPLogWarn(@"+setGUID for class GreystripeInterstitialCustomEvent is deprecated. Use the GUID parameter when configuring your network in the MoPub website.");
     gGUID = [GUID copy];
 }
 
@@ -51,11 +54,15 @@ static NSString *gGUID = nil;
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdFullPage, @"Requesting Greystripe interstitial");
+    MPLogInfo(@"Requesting Greystripe interstitial");
 
-    NSString *GUID = gGUID;
-    if ([GUID length] == 0) {
-        GUID = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdGS];
+    NSString *GUID = [info objectForKey:@"GUID"];
+    if (GUID == nil) {
+        GUID = gGUID;
+        if ([GUID length] == 0) {
+            MPLogWarn(@"Setting kGreystripeGUID in GreystripeBannerCustomEvent.m is deprecated. Use the GUID parameter when configuring your network in the MoPub website.");
+            GUID = kGreystripeGUID;
+        }
     }
 
     self.greystripeFullscreenAd = [[MPInstanceProvider sharedProvider] buildGSFullscreenAdWithDelegate:self GUID:GUID];
@@ -72,7 +79,7 @@ static NSString *gGUID = nil;
     if ([self.greystripeFullscreenAd isAdReady]) {
         [self.greystripeFullscreenAd displayFromViewController:rootViewController];
     } else {
-        CoreLogType(WBLogLevelError, WBLogTypeAdFullPage, @"Failed to show Greystripe interstitial: a previously loaded Greystripe interstitial now claims not to be ready.");
+        MPLogInfo(@"Failed to show Greystripe interstitial: a previously loaded Greystripe interstitial now claims not to be ready.");
         [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
     }
 }

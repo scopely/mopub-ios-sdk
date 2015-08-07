@@ -5,9 +5,12 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
+#import <WithBuddiesAds/WithBuddiesAds.h>
 #import "MPiAdBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import <iAd/iAd.h>
+
+static const CGFloat kMediumRectangleHeight = 250;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -29,8 +32,9 @@
 @property (nonatomic, assign) BOOL hasTrackedImpression;
 @property (nonatomic, assign) BOOL hasTrackedClick;
 
-+ (MPADBannerViewManager *)sharedManager;
++ (MPADBannerViewManager *)sharedManagerForAdType:(ADAdType)adType;
 
+- (instancetype)initWithAdType:(ADAdType)adType;
 - (void)registerObserver:(id<MPADBannerViewManagerObserver>)observer;
 - (void)unregisterObserver:(id<MPADBannerViewManagerObserver>)observer;
 - (BOOL)shouldTrackImpression;
@@ -45,34 +49,41 @@
 
 @interface MPInstanceProvider (iAdBanners)
 
-- (ADBannerView *)buildADBannerView;
-- (MPADBannerViewManager *)sharedMPAdBannerViewManager;
+- (ADBannerView *)buildADBannerViewWithAdType:(ADAdType)adType;
+- (MPADBannerViewManager *)sharedMPADBannerViewManagerForAdType:(ADAdType)adType;
 
 @end
 
 @implementation MPInstanceProvider (iAdBanners)
 
-- (ADBannerView *)buildADBannerView
+- (ADBannerView *)buildADBannerViewWithAdType:(ADAdType)adType
 {
-    return [[ADBannerView alloc] init];
+    if ([[ADBannerView class] instancesRespondToSelector:@selector(initWithAdType:)]) {
+        return [[ADBannerView alloc] initWithAdType:adType];
+    } else {
+        // On versions of iOS older than 6.0, we must avoid -initWithAdType:.
+        return [[ADBannerView alloc] init];
+    }
 }
 
-- (MPADBannerViewManager *)sharedMPAdBannerViewManager
+- (MPADBannerViewManager *)sharedMPADBannerViewManagerForAdType:(ADAdType)adType
 {
+    NSString *adTypeIdentifier = (adType == ADAdTypeBanner) ? @"banner" : @"medium-rectangle";
     return [self singletonForClass:[MPADBannerViewManager class]
-                          provider:^id{
-                              return [[MPADBannerViewManager alloc] init];
-                          }];
+                          provider:^id {
+                              return [[MPADBannerViewManager alloc] initWithAdType:adType];
+                          }
+                           context:adTypeIdentifier];
 }
 
 @end
-
 
 /////////////////////////////////////////////////////////////////////////////////////
 
 @interface MPiAdBannerCustomEvent () <MPADBannerViewManagerObserver>
 
 @property (nonatomic, assign) BOOL onScreen;
+@property (nonatomic, strong) MPADBannerViewManager *bannerViewManager;
 
 @end
 
@@ -87,12 +98,29 @@
 
 - (ADBannerView *)bannerView
 {
-    return [MPADBannerViewManager sharedManager].bannerView;
+    return self.bannerViewManager.bannerView;
+}
+
+- (ADAdType)closestADAdTypeFromCGSize:(CGSize)size
+{
+    UIUserInterfaceIdiom userInterfaceIdiom = [[[MPCoreInstanceProvider sharedProvider] sharedCurrentDevice] userInterfaceIdiom];
+
+    // On iPad, requests for ads with height beyond a certain threshold should result in medium
+    // rectangle ads.
+    if (userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return size.height >= kMediumRectangleHeight ? ADAdTypeMediumRectangle : ADAdTypeBanner;
+    } else {
+        return ADAdTypeBanner;
+    }
 }
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    [[MPADBannerViewManager sharedManager] registerObserver:self];
+    AdLogType(WBAdLogLevelInfo, WBAdTypeBanner, @"Requesting iAd banner");
+
+    ADAdType adType = [self closestADAdTypeFromCGSize:size];
+    self.bannerViewManager = [MPADBannerViewManager sharedManagerForAdType:adType];
+    [self.bannerViewManager registerObserver:self];
 
     if (self.bannerView.isBannerLoaded) {
         [self bannerDidLoad];
@@ -107,12 +135,12 @@
 - (void)invalidate
 {
     self.onScreen = NO;
-    [[MPADBannerViewManager sharedManager] unregisterObserver:self];
+    [self.bannerViewManager unregisterObserver:self];
 }
 
 - (void)rotateToOrientation:(UIInterfaceOrientation)orientation
 {
-//    self.bannerView.currentContentSizeIdentifier = UIInterfaceOrientationIsPortrait(orientation) ? ADBannerContentSizeIdentifierPortrait : ADBannerContentSizeIdentifierLandscape;
+    self.bannerView.currentContentSizeIdentifier = UIInterfaceOrientationIsPortrait(orientation) ? ADBannerContentSizeIdentifierPortrait : ADBannerContentSizeIdentifierLandscape;
 }
 
 - (void)didDisplayAd
@@ -123,17 +151,17 @@
 
 - (void)trackImpressionIfNecessary
 {
-    if (self.onScreen && [[MPADBannerViewManager sharedManager] shouldTrackImpression]) {
+    if (self.onScreen && [self.bannerViewManager shouldTrackImpression]) {
         [self.delegate trackImpression];
-        [[MPADBannerViewManager sharedManager] didTrackImpression];
+        [self.bannerViewManager didTrackImpression];
     }
 }
 
 - (void)trackClickIfNecessary
 {
-    if ([[MPADBannerViewManager sharedManager] shouldTrackClick]) {
+    if ([self.bannerViewManager shouldTrackClick]) {
         [self.delegate trackClick];
-        [[MPADBannerViewManager sharedManager] didTrackClick];
+        [self.bannerViewManager didTrackClick];
     }
 }
 
@@ -176,16 +204,16 @@
 @synthesize hasTrackedImpression = _hasTrackedImpression;
 @synthesize hasTrackedClick = _hasTrackedClick;
 
-+ (MPADBannerViewManager *)sharedManager
++ (MPADBannerViewManager *)sharedManagerForAdType:(ADAdType)adType
 {
-    return [[MPInstanceProvider sharedProvider] sharedMPAdBannerViewManager];
+    return [[MPInstanceProvider sharedProvider] sharedMPADBannerViewManagerForAdType:adType];
 }
 
-- (id)init
+- (id)initWithAdType:(ADAdType)adType
 {
     self = [super init];
     if (self) {
-        self.bannerView = [[MPInstanceProvider sharedProvider] buildADBannerView];
+        self.bannerView = [[MPInstanceProvider sharedProvider] buildADBannerViewWithAdType:adType];
         self.bannerView.delegate = self;
         self.observers = [NSMutableSet set];
     }
@@ -231,7 +259,7 @@
 
 - (void)bannerViewDidLoadAd:(ADBannerView *)banner
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"iAd banner did load");
+    AdLogType(WBAdLogLevelInfo, WBAdTypeBanner, @"iAd banner did load");
     self.hasTrackedImpression = NO;
     self.hasTrackedClick = NO;
 
@@ -242,7 +270,7 @@
 
 - (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
 {
-    CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"iAd banner did fail with error %@", error.localizedDescription);
+    AdLogType(WBAdLogLevelFatal, WBAdTypeBanner, @"iAd banner did fail with error %@", error.localizedDescription);
     for (id<MPADBannerViewManagerObserver> observer in [self.observers copy]) {
         [observer bannerDidFail];
     }
@@ -250,7 +278,7 @@
 
 - (BOOL)bannerViewActionShouldBegin:(ADBannerView *)banner willLeaveApplication:(BOOL)willLeave
 {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"iAd banner action will begin");
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"iAd banner action will begin");
     for (id<MPADBannerViewManagerObserver> observer in [self.observers copy]) {
         [observer bannerActionWillBeginAndWillLeaveApplication:willLeave];
     }
@@ -259,7 +287,7 @@
 
 - (void)bannerViewActionDidFinish:(ADBannerView *)banner
 {
-    CoreLogType(WBLogLevelDebug, WBLogTypeAdBanner, @"iAd banner action did finish");
+    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"iAd banner action did finish");
     for (id<MPADBannerViewManagerObserver> observer in [self.observers copy]) {
         [observer bannerActionDidFinish];
     }

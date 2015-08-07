@@ -19,6 +19,8 @@
 
 #import "WBAdEvent_Internal.h"
 #import "WBAdControllerEvent.h"
+#import "WBAdLogLevel.h"
+#import "WBAdLogging.h"
 
 @interface MPBaseBannerAdapter ()
 
@@ -93,10 +95,9 @@
 
     if (timeInterval > 0) {
         self.timeoutTimer = [[MPCoreInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
-                                                                                       target:self
-                                                                                     selector:@selector(timeout)
-                                                                                      repeats:NO
-                                                                                      logType:(self.configuration.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdFullPage)];
+                                                                                           target:self
+                                                                                         selector:@selector(timeout)
+                                                                                          repeats:NO];
         [self.timeoutTimer scheduleNow];
     }
 }
@@ -112,7 +113,7 @@
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation
 {
     // Do nothing by default. Subclasses can override.
-    CoreLogType(WBLogLevelTrace, WBLogTypeAdBanner, @"rotateToOrientation %d called for adapter %@ (%p)",
+    AdLogType(WBAdLogLevelTrace, WBAdTypeBanner, @"rotateToOrientation %d called for adapter %@ (%p)",
           (int)newOrientation, NSStringFromClass([self class]), self);
 }
 

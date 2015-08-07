@@ -5,7 +5,7 @@
 //  Copyright (c) 2014 MoPub. All rights reserved.
 //
 
-#import "FBAudienceNetwork.h"
+#import <FBAudienceNetwork/FBAudienceNetwork.h>
 #import "FacebookBannerCustomEvent.h"
 #import "MPInstanceProvider.h"
 #import "WBAdService+Internal.h"
@@ -73,7 +73,7 @@
     } else if (size.height == kFBAdSizeHeight50Banner.size.height) {
         fbAdSize = kFBAdSizeHeight50Banner;
     } else {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Invalid size for Facebook banner ad");
+        AdLogType(WBAdLogLevelError, WBAdTypeBanner, @"Invalid size for Facebook banner ad");
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
@@ -81,7 +81,7 @@
     NSString *placementId = [info objectForKey:@"placement_id"] ?: [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdFB];
     
     if (placementId == nil) {
-        CoreLogType(WBLogLevelFatal, WBLogTypeAdBanner, @"Placement ID is required for Facebook banner ad");
+        AdLogType(wBAdLogLevelFatal, WBAdTypeBanner, @"Placement ID is required for Facebook banner ad");
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
         return;
     }
@@ -135,7 +135,7 @@
 
 - (void)adViewDidFinishHandlingClick:(FBAdView *)adView
 {
-    CoreLogType(WBLogLevelInfo, WBLogTypeAdBanner, @"Facebook banner ad did finish handling click");
+    MPLogInfo(@"Facebook banner ad did finish handling click");
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 

@@ -17,6 +17,7 @@
 #import "MPClosableView.h"
 #import "MPGlobal.h"
 #import "MPInstanceProvider.h"
+#import "MPLogging.h"
 #import "MPTimer.h"
 #import "NSHTTPURLResponse+MPAdditions.h"
 #import "NSURL+MPAdditions.h"
@@ -90,8 +91,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
         _adPropertyUpdateTimer = [[MPCoreInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:kAdPropertyUpdateTimerInterval
                                                                                                 target:self
                                                                                               selector:@selector(updateMRAIDProperties)
-                                                                                               repeats:YES
-                                                                                               logType:(placementType == MRAdViewPlacementTypeInline ? WBLogTypeAdBanner : WBLogTypeAdFullPage)];
+                                                                                               repeats:YES];
         _adPropertyUpdateTimer.runLoopMode = NSRunLoopCommonModes;
 
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -310,7 +310,9 @@ static NSString *const kMRAIDCommandResize = @"resize";
 - (void)initializeLoadedAdForBridge:(MRBridge *)bridge
 {
     // Set up some initial properties so mraid can operate.
-    NSArray *startingMraidProperties = @[[MRPlacementTypeProperty propertyWithType:self.placementType],
+    MPLogDebug(@"Injecting initial JavaScript state.");
+    NSArray *startingMraidProperties = @[[MRHostSDKVersionProperty defaultProperty],
+                                         [MRPlacementTypeProperty propertyWithType:self.placementType],
                                          [MRSupportsProperty defaultProperty],
                                          [MRStateProperty propertyWithState:self.currentState]
                                          ];
@@ -653,12 +655,14 @@ static NSString *const kMRAIDCommandResize = @"resize";
 
 - (void)bridge:(MRBridge *)bridge performActionForMoPubSpecificURL:(NSURL *)url
 {
+    MPLogDebug(@"MRController - loading MoPub URL: %@", url);
     MPMoPubHostCommand command = [url mp_mopubHostCommand];
     if (command == MPMoPubHostCommandPrecacheComplete && self.adRequiresPrecaching) {
         [self adDidLoad];
     } else if (command == MPMoPubHostCommandFailLoad) {
         [self adDidFailToLoad];
     } else {
+        MPLogWarn(@"MRController - unsupported MoPub URL: %@", [url absoluteString]);
     }
 }
 
@@ -705,6 +709,11 @@ static NSString *const kMRAIDCommandResize = @"resize";
 
 - (void)bridge:(MRBridge *)bridge handleNativeCommandSetOrientationPropertiesWithForceOrientationMask:(UIInterfaceOrientationMask)forceOrientationMask
 {
+    // If the ad is trying to force an orientation that the app doesn't support, we shouldn't try to force the orientation.
+    if (![[UIApplication sharedApplication] mp_supportsOrientationMask:forceOrientationMask]) {
+        return;
+    }
+
     BOOL inExpandedState = self.currentState == MRAdViewStateExpanded;
 
     // If we aren't expanded or showing an interstitial ad, we don't have to force orientation on our ad.
@@ -722,9 +731,11 @@ static NSString *const kMRAIDCommandResize = @"resize";
         return;
     }
 
+    // By this point, we've committed to forcing the orientation so we don't need a forceOrientationAfterAnimationBlock.
+    self.forceOrientationAfterAnimationBlock = nil;
     self.forceOrientationMask = forceOrientationMask;
 
-    BOOL inSameOrientation = [[UIDevice currentDevice] doesOrientation:MPInterfaceOrientation() matchOrientationMask:forceOrientationMask];
+    BOOL inSameOrientation = [[UIApplication sharedApplication] mp_doesOrientation:MPInterfaceOrientation() matchOrientationMask:forceOrientationMask];
     UIViewController <MPForceableOrientationProtocol> *fullScreenAdViewController = inExpandedState ? self.expandModalViewController : self.interstitialViewController;
 
     // If we're currently in the force orientation, we don't need to do any rotation.  However, we still need to make sure
@@ -733,7 +744,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
         fullScreenAdViewController.supportedOrientationMask = forceOrientationMask;
     } else {
         // It doesn't seem possible to force orientation in iOS 7+. So we dismiss the current view controller and re-present it with the forced orientation.
-        //If it's an expanded ad, we need to restore the status bar visibility before we dismiss the current VC since we don't show the status bar in expanded state.
+        // If it's an expanded ad, we need to restore the status bar visibility before we dismiss the current VC since we don't show the status bar in expanded state.
         if (inExpandedState) {
             [self.expandModalViewController restoreStatusBarVisibility];
         }
@@ -747,7 +758,6 @@ static NSString *const kMRAIDCommandResize = @"resize";
             __typeof__(self) strongSelf = weakSelf;
 
             if (inExpandedState) {
-
                 [strongSelf didEndAnimatingAdSize];
 
                 // If expanded, we don't need to change the state of the ad once the modal is present here as the ad is technically
@@ -988,6 +998,8 @@ static NSString *const kMRAIDCommandResize = @"resize";
     // Only fire to the active ad view.
     MRBridge *activeBridge = [self bridgeForActiveAdView];
     [activeBridge fireSetCurrentPositionWithPositionRect:frame];
+
+    MPLogTrace(@"Current Position: %@", NSStringFromCGRect(frame));
 }
 
 - (void)updateDefaultPosition
@@ -997,6 +1009,8 @@ static NSString *const kMRAIDCommandResize = @"resize";
     // Not necessary to fire to both ad views, but it's better that the two-part expand knows the default position than not.
     [self.mraidBridge fireSetDefaultPositionWithPositionRect:defaultFrame];
     [self.mraidBridgeTwoPart fireSetDefaultPositionWithPositionRect:defaultFrame];
+
+    MPLogTrace(@"Default Position: %@", NSStringFromCGRect(defaultFrame));
 }
 
 - (void)updateScreenSize
@@ -1007,6 +1021,8 @@ static NSString *const kMRAIDCommandResize = @"resize";
     // Fire to both ad views as it pertains to both views.
     [self.mraidBridge fireSetScreenSize:screenSize];
     [self.mraidBridgeTwoPart fireSetScreenSize:screenSize];
+
+    MPLogTrace(@"Screen Size: %@", NSStringFromCGSize(screenSize));
 }
 
 - (void)updateMaxSize
@@ -1017,6 +1033,8 @@ static NSString *const kMRAIDCommandResize = @"resize";
     // Fire to both ad views as it pertains to both views.
     [self.mraidBridge fireSetMaxSize:maxSize];
     [self.mraidBridgeTwoPart fireSetMaxSize:maxSize];
+
+    MPLogTrace(@"Max Size: %@", NSStringFromCGSize(maxSize));
 }
 
 #pragma mark - MRAID events
@@ -1034,6 +1052,8 @@ static NSString *const kMRAIDCommandResize = @"resize";
     if (!CGSizeEqualToSize(adSize, self.currentAdSize)) {
         MRBridge *activeBridge = [self bridgeForActiveAdView];
         self.currentAdSize = adSize;
+
+        MPLogDebug(@"Ad Size (Size Event): %@", NSStringFromCGSize(self.currentAdSize));
         [activeBridge fireSizeChangeEvent:adSize];
     }
 }
@@ -1051,7 +1071,8 @@ static NSString *const kMRAIDCommandResize = @"resize";
 
 - (void)checkViewability
 {
-    BOOL viewable = MPViewIsVisible([self activeView]);
+    BOOL viewable = MPViewIsVisible([self activeView]) &&
+        ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive);
     [self updateViewabilityWithBool:viewable];
 }
 
@@ -1064,6 +1085,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
 {
     if (self.isViewable != currentViewability)
     {
+        MPLogDebug(@"Viewable changed to: %@", currentViewability ? @"YES" : @"NO");
         self.isViewable = currentViewability;
 
         // Both views in two-part expand need to report if they're viewable or not depending on the active one.

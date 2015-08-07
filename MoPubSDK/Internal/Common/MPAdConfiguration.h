@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import "MPGlobal.h"
+#import "WBAdType.h"
 
 enum {
     MPAdTypeUnknown = -1,
@@ -16,7 +17,9 @@ enum {
 typedef NSUInteger MPAdType;
 
 extern NSString * const kAdTypeHeaderKey;
+extern NSString * const kAdUnitWarmingUpHeaderKey;
 extern NSString * const kClickthroughHeaderKey;
+extern NSString * const kCreativeIdHeaderKey;
 extern NSString * const kCustomSelectorHeaderKey;
 extern NSString * const kCustomEventClassNameHeaderKey;
 extern NSString * const kCustomEventClassDataHeaderKey;
@@ -47,6 +50,7 @@ extern NSString * const kAdTypeNative;
 @interface MPAdConfiguration : NSObject
 
 @property (nonatomic, assign) MPAdType adType;
+@property (nonatomic, assign) BOOL adUnitWarmingUp;
 @property (nonatomic, copy) NSString *networkType;
 @property (nonatomic, assign) CGSize preferredSize;
 @property (nonatomic, strong) NSURL *clickTrackingURL;
@@ -68,11 +72,13 @@ extern NSString * const kAdTypeNative;
 @property (nonatomic, assign) BOOL precacheRequired;
 @property (nonatomic, assign) BOOL isVastVideoPlayer;
 @property (nonatomic, strong) NSDate *creationTimestamp;
+@property (nonatomic, copy) NSString *creativeId;
+@property (nonatomic, copy) NSString *headerAdType;
 
 - (id)initWithHeaders:(NSDictionary *)headers data:(NSData *)data;
 
 - (BOOL)hasPreferredSize;
 - (NSString *)adResponseHTMLString;
 - (NSString *)clickDetectionURLPrefix;
--(WBLogType)logType;
+- (WBAdType)logType;
 @end

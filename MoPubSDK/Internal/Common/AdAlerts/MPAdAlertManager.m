@@ -12,6 +12,9 @@
 #import "MPCoreInstanceProvider.h"
 #import "MPLastResortDelegate.h"
 #import "MPConstants.h"
+#import "WBAdLogging.h"
+
+#import "UIViewController+MPAdditions.h"
 
 #import <QuartzCore/QuartzCore.h>
 #import <CoreLocation/CoreLocation.h>
@@ -63,7 +66,7 @@
 {
     static NSDateFormatter *dateFormatter = nil;
     
-    CoreLogType(WBLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager processing ad alert");
+    AdLogType(WBAdLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager processing ad alert");
     
     // don't even try if this device can't send emails
     if (![MFMailComposeViewController canSendMail]) {
@@ -111,14 +114,14 @@
             [params setValue:[dateFormatter stringFromDate:self.adConfiguration.creationTimestamp] forKey:kTimestampParamKey];
 
             [self processAdParams:params andScreenshot:image];
-            CoreLogType(WBLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager finished processing ad alert");
+            AdLogType(WBAdLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager finished processing ad alert");
         });
     });
 }
 
 - (void)handleAdAlertGesture
 {
-    CoreLogType(WBLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager alert gesture recognized");
+    AdLogType(WBAdLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager alert gesture recognized");
     [self.delegate adAlertManagerDidTriggerAlert:self];
 }
 
@@ -146,10 +149,10 @@
     if (markupData != nil) {
         [self.currentOpenMailVC addAttachmentData:markupData mimeType:@"text/html" fileName:@"mp_adalert_markup.html"];
     }
-    
-    [[self.delegate viewControllerForPresentingMailVC] presentViewController:self.currentOpenMailVC animated:MP_ANIMATED completion:nil];
-    
-    if([self.delegate respondsToSelector:@selector(adAlertManagerDidProcessAlert:)]) {
+
+    [[self.delegate viewControllerForPresentingMailVC] mp_presentModalViewController:self.currentOpenMailVC animated:MP_ANIMATED];
+
+    if ([self.delegate respondsToSelector:@selector(adAlertManagerDidProcessAlert:)]) {
         [self.delegate adAlertManagerDidProcessAlert:self];
     }
 }
@@ -176,7 +179,8 @@
     if (result == MFMailComposeResultCancelled || result == MFMailComposeResultFailed) {
         self.processedAlert = NO;
     }
-    [[self.delegate viewControllerForPresentingMailVC] dismissViewControllerAnimated:MP_ANIMATED completion:nil];
+
+    [[self.delegate viewControllerForPresentingMailVC] mp_dismissModalViewControllerAnimated:MP_ANIMATED];
 }
 
 #pragma mark - Public

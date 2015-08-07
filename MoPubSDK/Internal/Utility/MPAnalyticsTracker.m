@@ -5,6 +5,7 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
+#import <WithBuddiesAds/WithBuddiesAds.h>
 #import "MPAnalyticsTracker.h"
 #import "MPAdConfiguration.h"
 #import "MPCoreInstanceProvider.h"
@@ -24,16 +25,24 @@
 
 - (void)trackImpressionForConfiguration:(MPAdConfiguration *)configuration
 {
-    CoreLogType(WBLogLevelTrace, (configuration.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdBanner), @"Tracking impression: %@", configuration.impressionTrackingURL);
+    AdLogType(WBAdLogLevelTrace, (configuration.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial), @"Tracking impression: %@", configuration.impressionTrackingURL);
     [NSURLConnection connectionWithRequest:[self requestForURL:configuration.impressionTrackingURL]
                                   delegate:nil];
 }
 
 - (void)trackClickForConfiguration:(MPAdConfiguration *)configuration
 {
-    CoreLogType(WBLogLevelTrace, (configuration.adType == MPAdTypeBanner ? WBLogTypeAdBanner : WBLogTypeAdBanner), @"Tracking click: %@", configuration.clickTrackingURL);
+    AdLogType(WBAdLogLevelTrace, (configuration.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial), @"Tracking click: %@", configuration.clickTrackingURL);
     [NSURLConnection connectionWithRequest:[self requestForURL:configuration.clickTrackingURL]
                                   delegate:nil];
+}
+
+- (void)sendTrackingRequestForURLs:(NSArray *)URLs
+{
+    for (NSURL *URL in URLs) {
+        NSURLRequest *trackingRequest = [self requestForURL:URL];
+        [NSURLConnection connectionWithRequest:trackingRequest delegate:nil];
+    }
 }
 
 - (NSURLRequest *)requestForURL:(NSURL *)URL

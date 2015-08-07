@@ -201,7 +201,7 @@ static const CGFloat kMoPubImpressionTimerInterval = 0.25;
 
     if (![self isThirdPartyHandlingImpressions]) {
         [self.associatedViewVisibilityTimer invalidate];
-        self.associatedViewVisibilityTimer = [MPTimer timerWithTimeInterval:kMoPubImpressionTimerInterval target:self selector:@selector(tick:) repeats:YES logType:WBLogTypeAdFullPage];
+        self.associatedViewVisibilityTimer = [MPTimer timerWithTimeInterval:kMoPubImpressionTimerInterval target:self selector:@selector(tick:) repeats:YES];
         self.associatedViewVisibilityTimer.runLoopMode = NSRunLoopCommonModes;
         [self.associatedViewVisibilityTimer scheduleNow];
     }

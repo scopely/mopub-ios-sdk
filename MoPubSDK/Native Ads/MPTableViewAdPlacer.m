@@ -104,7 +104,7 @@
 - (void)loadAdsForAdUnitID:(NSString *)adUnitID targeting:(MPNativeAdRequestTargeting *)targeting
 {
     if (!self.insertionTimer) {
-        self.insertionTimer = [MPTimer timerWithTimeInterval:kUpdateVisibleCellsInterval target:self selector:@selector(updateVisibleCells) repeats:YES logType:WBLogTypeAdFullPage];
+        self.insertionTimer = [MPTimer timerWithTimeInterval:kUpdateVisibleCellsInterval target:self selector:@selector(updateVisibleCells) repeats:YES];
         self.insertionTimer.runLoopMode = NSRunLoopCommonModes;
         [self.insertionTimer scheduleNow];
     }
