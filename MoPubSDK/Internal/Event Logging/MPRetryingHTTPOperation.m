@@ -33,8 +33,10 @@ static const NSUInteger kMaximumFailedRetryAttempts = 5;
     NSAssert(request != nil, @"-initWithRequest: cannot take a nil request.");
     NSAssert([request URL] != nil, @"-initWithRequest: cannot take a request whose URL is nil.");
     
+#ifdef DEBUG
     NSString *scheme = [[[request URL] scheme] lowercaseString];
     NSAssert([scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"], @"-initWithRequest: can only take a request whose URL has an HTTP/HTTPS scheme.");
+#endif
     
     self = [super init];
     if (self) {
