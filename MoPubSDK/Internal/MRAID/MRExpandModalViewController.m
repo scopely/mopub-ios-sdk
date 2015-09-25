@@ -78,7 +78,8 @@
 }
 
 // supportedInterfaceOrientations and shouldAutorotate are for ios 6, 7, and 8.
-- (NSUInteger)supportedInterfaceOrientations
+#pragma message "TEMPORARILY CHANGING RETURN TYPE FROM NSUINTEGER to build on Xcode 7.  Next ads SDK should bring this back; DONT RELEASE WITH THIS"
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
 {
     return ([[UIApplication sharedApplication] mp_supportsOrientationMask:self.supportedOrientationMask]) ? self.supportedOrientationMask : UIInterfaceOrientationMaskAll;
 }
