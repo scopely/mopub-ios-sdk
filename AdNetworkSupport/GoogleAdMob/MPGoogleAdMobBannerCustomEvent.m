@@ -101,7 +101,6 @@
 
     // Here, you can specify a list of device IDs that will receive test ads.
     // Running in the simulator will automatically show test ads.
-    #pragma message "TEMPORARILY COMMENTING to build on Xcode 7.  Next ads SDK should bring this back; DONT RELEASE WITH THIS"
     request.testDevices = @[];/*[NSArray arrayWithObjects:
                            // more UDIDs here,
                            nil];*/
