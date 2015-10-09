@@ -65,7 +65,7 @@ static NSString *gAppSignature = nil;
     NSString *location = [info objectForKey:@"location"];
     self.location = location ? location : @"Default";
 
-    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Requesting Chartboost interstitial.");
+    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Requesting Chartboost interstitial. key = %@ sig = %@",appId,appSignature);
     [[MPChartboostRouter sharedRouter] cacheInterstitialWithAppId:appId
                                                      appSignature:appSignature
                                                          location:self.location
