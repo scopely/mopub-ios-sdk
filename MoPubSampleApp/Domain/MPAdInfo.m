@@ -49,13 +49,22 @@
              ];
 }
 
++ (NSArray *)rewardedVideoAds
+{
+    return @[
+             [MPAdInfo infoWithTitle:@"Ad Colony" ID:@"16b039dc8c994ac89f0efe0a1bf77aa3" type:MPAdInfoRewardedVideo],
+             [MPAdInfo infoWithTitle:@"Chartboost" ID:@"8be0bb08fb4f4e90a86416c29c235d4a" type:MPAdInfoRewardedVideo],
+             [MPAdInfo infoWithTitle:@"Vungle" ID:@"48274e80f11b496bb3532c4f59f28d12" type:MPAdInfoRewardedVideo],
+             [MPAdInfo infoWithTitle:@"Unity" ID:@"091fb0bc95254e74a3f85753f589fdb7" type:MPAdInfoRewardedVideo]
+             ];
+}
+
 + (NSArray *)nativeAds
 {
     return @[
              [MPAdInfo infoWithTitle:@"Native Ad" ID:@"76a3fefaced247959582d2d2df6f4757" type:MPAdInfoNative],
-             [MPAdInfo infoWithTitle:@"Native Ad (TableView Manager)" ID:@"76a3fefaced247959582d2d2df6f4757" type:MPAdInfoNativeInTableView],
              [MPAdInfo infoWithTitle:@"Native Ad (CollectionView Placer)" ID:@"76a3fefaced247959582d2d2df6f4757" type:MPAdInfoNativeInCollectionView],
-             [MPAdInfo infoWithTitle:@"Native Ad (TableView Placer)" ID:@"76a3fefaced247959582d2d2df6f4757" type:MPAdInfoNativeTableViewPlacer]
+             [MPAdInfo infoWithTitle:@"Native Ad (TableView Placer)" ID:@"76a3fefaced247959582d2d2df6f4757" type:MPAdInfoNativeTableViewPlacer],
              ];
 }
 

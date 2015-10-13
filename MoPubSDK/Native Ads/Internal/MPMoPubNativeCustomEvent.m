@@ -19,7 +19,8 @@
 
     if (adAdapter.properties) {
         MPNativeAd *interfaceAd = [[MPNativeAd alloc] initWithAdAdapter:adAdapter];
-        [interfaceAd.impressionTrackers addObjectsFromArray:adAdapter.impressionTrackers];
+        [interfaceAd.impressionTrackerURLs addObjectsFromArray:adAdapter.impressionTrackerURLs];
+        [interfaceAd.clickTrackerURLs addObjectsFromArray:adAdapter.clickTrackerURLs];
 
         // Get the image urls so we can download them prior to returning the ad.
         NSMutableArray *imageURLs = [NSMutableArray array];
@@ -33,7 +34,7 @@
 
         [super precacheImagesWithURLs:imageURLs completionBlock:^(NSArray *errors) {
             if (errors) {
-//                MPLogDebug(@"%@", errors);
+                MPLogDebug(@"%@", errors);
                 [self.delegate nativeCustomEvent:self didFailToLoadAdWithError:MPNativeAdNSErrorForImageDownloadFailure()];
             } else {
                 [self.delegate nativeCustomEvent:self didLoadAd:interfaceAd];

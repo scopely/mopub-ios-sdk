@@ -73,7 +73,7 @@ static NSString *gAppId = nil;
 
     [super precacheImagesWithURLs:imageURLs completionBlock:^(NSArray *errors) {
         if (errors) {
-//            MPLogDebug(@"%@", errors);
+            MPLogDebug(@"%@", errors);
             [self.delegate nativeCustomEvent:self didFailToLoadAdWithError:MPNativeAdNSErrorForImageDownloadFailure()];
         } else {
             [self.delegate nativeCustomEvent:self didLoadAd:interfaceAd];

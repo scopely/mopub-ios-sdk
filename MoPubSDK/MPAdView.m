@@ -30,7 +30,6 @@
 @synthesize keywords = _keywords;
 @synthesize delegate = _delegate;
 @synthesize originalSize = _originalSize;
-@synthesize ignoresAutorefresh = _ignoresAutorefresh;
 @synthesize testing = _testing;
 @synthesize adContentView = _adContentView;
 @synthesize allowedNativeAdOrientation = _allowedNativeAdOrientation;
@@ -65,26 +64,6 @@
     [self.adContentView removeFromSuperview];
     _adContentView = view;
     [self addSubview:view];
-}
-
-- (BOOL)ignoresAutorefresh
-{
-    return _ignoresAutorefresh;
-}
-
-- (void)setIgnoresAutorefresh:(BOOL)ignoresAutorefresh
-{
-    if (_ignoresAutorefresh != ignoresAutorefresh) {
-        _ignoresAutorefresh = ignoresAutorefresh;
-    }
-
-    if (_ignoresAutorefresh) {
-        [self.adManager stopAutomaticallyRefreshingContents];
-        AdLogType(WBAdLogLevelWarn, self.logType, @"pauseBanners");
-    } else {
-        [self.adManager startAutomaticallyRefreshingContents];
-        AdLogType(WBAdLogLevelWarn, self.logType, @"unpauseBanners");
-    }
 }
 
 - (CGSize)adContentViewSize
@@ -215,28 +194,6 @@
     if ([self.delegate respondsToSelector:@selector(willLeaveApplicationFromAd:)]) {
         [self.delegate willLeaveApplicationFromAd:self];
     }
-}
-
-# pragma mark - Deprecated Custom Events Mechanism
-
-- (void)customEventDidLoadAd
-{
-    [self.adManager customEventDidLoadAd];
-}
-
-- (void)customEventDidFailToLoadAd
-{
-    [self.adManager customEventDidFailToLoadAd];
-}
-
-- (void)customEventActionWillBegin
-{
-    [self.adManager customEventActionWillBegin];
-}
-
-- (void)customEventActionDidEnd
-{
-    [self.adManager customEventActionDidEnd];
 }
 
 @end

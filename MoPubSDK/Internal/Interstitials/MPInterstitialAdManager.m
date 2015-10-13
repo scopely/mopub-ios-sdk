@@ -142,6 +142,13 @@
         return;
     }
 
+    if (self.configuration.adUnitWarmingUp) {
+        MPLogInfo(kMPWarmingUpErrorLogFormatWithAdUnitID, self.delegate.interstitialAdController.adUnitId);
+        self.loading = NO;
+        [self.delegate manager:self didFailToLoadInterstitialWithError:[MPError errorWithCode:MPErrorAdUnitWarmingUp]];
+        return;
+    }
+
     if ([self.configuration.networkType isEqualToString:kAdTypeClear]) {
         [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonNoFill adNetwork:nil adType:WBAdTypeInterstitial];
         AdLogType(WBAdLogLevelError, WBAdTypeInterstitial, @"Ad server response indicated no ad available.");
@@ -237,34 +244,6 @@
 - (void)interstitialWillLeaveApplicationForAdapter:(MPBaseInterstitialAdapter *)adapter
 {
     //noop
-}
-
-#pragma mark - Legacy Custom Events
-
-- (void)customEventDidLoadAd
-{
-    // XXX: The deprecated custom event behavior is to report an impression as soon as an ad loads,
-    // rather than when the ad is actually displayed. Because of this, you may see impression-
-    // reporting discrepancies between MoPub and your custom ad networks.
-    if ([self.adapter respondsToSelector:@selector(customEventDidLoadAd)]) {
-        self.loading = NO;
-        [self.adapter performSelector:@selector(customEventDidLoadAd)];
-    }
-}
-
-- (void)customEventDidFailToLoadAd
-{
-    if ([self.adapter respondsToSelector:@selector(customEventDidFailToLoadAd)]) {
-        self.loading = NO;
-        [self.adapter performSelector:@selector(customEventDidFailToLoadAd)];
-    }
-}
-
-- (void)customEventActionWillBegin
-{
-    if ([self.adapter respondsToSelector:@selector(customEventActionWillBegin)]) {
-        [self.adapter performSelector:@selector(customEventActionWillBegin)];
-    }
 }
 
 @end

@@ -11,7 +11,6 @@
 #import "MPGlobal.h"
 #import "MPIdentityProvider.h"
 #import "MPCoreInstanceProvider.h"
-#import "WBAdLogging.h"
 #import "MPAPIEndpoints.h"
 
 #define MOPUB_CONVERSION_DEFAULTS_KEY @"com.mopub.conversion"

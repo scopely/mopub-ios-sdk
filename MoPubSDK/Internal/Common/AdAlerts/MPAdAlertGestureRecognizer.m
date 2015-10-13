@@ -213,7 +213,7 @@ NSInteger const kMPAdAlertGestureMaxAllowedYAxisMovement = 50;
 - (BOOL)validYAxisMovementForTouches:(NSSet *)touches
 {
     CGPoint nowPoint = [touches.anyObject locationInView:self.view];
-    
+
     return fabs(nowPoint.y - self.startingPoint.y) <= kMPAdAlertGestureMaxAllowedYAxisMovement;
 }
 

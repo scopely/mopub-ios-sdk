@@ -10,14 +10,12 @@
 #import "MPAdWebViewAgent.h"
 #import "MPInterstitialAdManager.h"
 #import "MPInterstitialCustomEventAdapter.h"
-#import "MPLegacyInterstitialCustomEventAdapter.h"
 #import "MPHTMLInterstitialViewController.h"
 #import "MPMRAIDInterstitialViewController.h"
 #import "MPReachability.h"
 #import "MPInterstitialCustomEvent.h"
 #import "MPBaseBannerAdapter.h"
 #import "MPBannerCustomEventAdapter.h"
-#import "MPLegacyBannerCustomEventAdapter.h"
 #import "MPBannerCustomEvent.h"
 #import "MPBannerAdManager.h"
 #import "MPLogging.h"
@@ -123,8 +121,6 @@ static MPInstanceProvider *sharedAdProvider = nil;
 {
     if (configuration.customEventClass) {
         return [(MPBannerCustomEventAdapter *)[MPBannerCustomEventAdapter alloc] initWithDelegate:delegate];
-    } else if (configuration.customSelectorName) {
-        return [(MPLegacyBannerCustomEventAdapter *)[MPLegacyBannerCustomEventAdapter alloc] initWithDelegate:delegate];
     }
 
     return nil;
@@ -164,8 +160,6 @@ static MPInstanceProvider *sharedAdProvider = nil;
 {
     if (configuration.customEventClass) {
         return [(MPInterstitialCustomEventAdapter *)[MPInterstitialCustomEventAdapter alloc] initWithDelegate:delegate];
-    } else if (configuration.customSelectorName) {
-        return [(MPLegacyInterstitialCustomEventAdapter *)[MPLegacyInterstitialCustomEventAdapter alloc] initWithDelegate:delegate];
     }
 
     return nil;
@@ -379,9 +373,9 @@ static MPInstanceProvider *sharedAdProvider = nil;
     return placementData;
 }
 
-- (MPStreamAdPlacer *)buildStreamAdPlacerWithViewController:(UIViewController *)controller adPositioning:(MPAdPositioning *)positioning defaultAdRenderingClass:defaultAdRenderingClass
+- (MPStreamAdPlacer *)buildStreamAdPlacerWithViewController:(UIViewController *)controller adPositioning:(MPAdPositioning *)positioning rendererConfigurations:(NSArray *)rendererConfigurations
 {
-    return [MPStreamAdPlacer placerWithViewController:controller adPositioning:positioning defaultAdRenderingClass:defaultAdRenderingClass];
+    return [MPStreamAdPlacer placerWithViewController:controller adPositioning:positioning rendererConfigurations:rendererConfigurations];
 }
 
 @end

@@ -46,11 +46,6 @@
     self.bannerAgent.delegate = nil;
 }
 
--(NSString *)description
-{
-    return @"MPHTML";
-}
-
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation
 {
     [self.bannerAgent rotateToOrientation:newOrientation];
