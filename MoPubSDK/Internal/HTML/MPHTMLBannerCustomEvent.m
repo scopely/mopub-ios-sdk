@@ -45,7 +45,6 @@
 {
     self.bannerAgent.delegate = nil;
 }
-
 -(NSString *)description
 {
     return @"MPHTML";

@@ -1,0 +1,266 @@
+#import "MPMillennialBannerCustomEvent.h"
+#import "MPAdConfiguration.h"
+#import "MPInstanceProvider.h"
+<<<<<<< HEAD
+#import "WBAdService+Internal.h"
+#import "MMAdView.h"
+#import "MMRequest.h"
+
+#define MM_SIZE_320x50    CGSizeMake(320, 50)
+=======
+
+#define MM_SIZE_320x50  CGSizeMake(320, 50)
+>>>>>>> 3.13.0
+#define MM_SIZE_300x250 CGSizeMake(300, 250)
+#define MM_SIZE_728x90  CGSizeMake(728, 90)
+
+@interface MPInstanceProvider (MillennialBanners)
+
+- (MMInlineAd *)buildMMInlineAdWithSize:(CGSize)size placementId:(NSString *)placementId;
+
+@end
+
+@implementation MPInstanceProvider (MillennialBanners)
+
+- (MMInlineAd *)buildMMInlineAdWithSize:(CGSize)size placementId:(NSString *)placementId
+{
+    return [[MMInlineAd alloc] initWithPlacementId:placementId size:size];
+}
+
+@end
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+@interface MPMillennialBannerCustomEvent ()
+
+@property (nonatomic, assign) BOOL didTrackImpression;
+@property (nonatomic, assign) BOOL didTrackClick;
+@property (nonatomic, assign) BOOL didShowModal;
+
+@property (nonatomic, strong) MMInlineAd *mmInlineAds;
+
+- (CGRect)frameFromCustomEventInfo:(NSDictionary *)info;
+- (CGSize)sizeFromCustomEventInfo:(NSDictionary *)info;
+
+@end
+
+@implementation MPMillennialBannerCustomEvent
+
+@synthesize didTrackImpression = _didTrackImpression;
+@synthesize didTrackClick = _didTrackClick;
+@synthesize mmInlineAds = _mmInlineAds;
+
+
+- (BOOL)enableAutomaticImpressionAndClickTracking
+{
+    return NO;
+}
+
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        if ( ![[MMSDK sharedInstance] isInitialized] ) {
+            [[MMSDK sharedInstance] initializeWithSettings:[[MMAppSettings alloc] init] withUserSettings:[[MMUserSettings alloc] init]];
+        }
+    }
+    return self;
+}
+
+- (void)invalidate
+{
+    self.mmInlineAds = nil;
+    self.delegate = nil;
+}
+
+- (void)dealloc
+{
+    [self invalidate];
+}
+
+-(NSString *)description
+{
+    return @"Millennial";
+}
+
+- (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
+{
+    MPLogInfo(@"Requesting Millennial banner");
+    NSString *placementId = [info objectForKey:@"adUnitID"];
+
+<<<<<<< HEAD
+    CGRect frame = [self frameFromCustomEventInfo:info];
+    NSString *apid = [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdM];
+    self.mmAdView = [[MPInstanceProvider sharedProvider] buildMMAdViewWithFrame:frame
+                                                                           apid:apid
+                                                             rootViewController:self.delegate.viewControllerForPresentingModalView];
+
+    MMRequest *request = [MMRequest requestWithLocation:self.delegate.location];
+    [request setValue:@"mopubsdk" forKey:@"vendor"];
+
+    // MMAdView hangs onto its block even after the block is called.  Therefore, we cannot pass
+    // self in, as that will create a retain cycle (we hold self.mmAdView and mmAdView holds us through
+    // the block).
+    //
+    // We can't just use __block MPMillennialBannerCustomEvent *event = self to tell the block *not*
+    // to retain us.  As that might cause a crash when we are invalidated/dealloced *before* the block
+    // is called.
+    //
+    // The MPMMCompletionBlockProxy has a weak reference to us so we avoid the retain cycle issue.
+    // Of course, we must make sure to unregister from the proxy on dealloc to prevent a crash.
+
+    MPMMCompletionBlockProxy *proxy = self.mmCompletionBlockProxy;
+    [self.mmAdView getAdWithRequest:request onCompletion:^(BOOL success, NSError *error) {
+        // In Millennial 5.2, request errors invoke the completion block on a background thread. This causes us
+        // to initialize the failover NSURLConnection on the background thread, resulting in the inability to
+        // receive callbacks from the connection.
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [proxy onRequestCompletion:success];
+        });
+    }];
+}
+
+- (void)onRequestCompletion:(BOOL)success
+{
+    if (success) {
+        [self.delegate bannerCustomEvent:self didLoadAd:self.mmAdView];
+        if (!self.didTrackImpression) {
+            [self.delegate trackImpression];
+            self.didTrackImpression = YES;
+        }
+    } else {
+=======
+    // If Custom Event Class Data contains DCN / Position, let's use that instead.
+    // { "dcn": "...", "adUnitID": "..."  }
+    [[MMSDK sharedInstance] appSettings].mediator = @"MPMillennialBannerCustomEvent";
+    if ( [info objectForKey:@"dcn"] ) {
+        [[[MMSDK sharedInstance] appSettings] setSiteId:[info objectForKey:@"dcn"]];
+    } else {
+        [[[MMSDK sharedInstance] appSettings] setSiteId:nil];
+    }
+
+    if ( !placementId ) {
+        MPLogError(@"Millennial received invalid placement ID. Request failed.");
+>>>>>>> 3.13.0
+        [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
+        return;
+    }
+
+    [[MMSDK sharedInstance] setSendLocationIfAvailable:[[MoPub sharedInstance] locationUpdatesEnabled]];
+
+    self.mmInlineAds = [[MPInstanceProvider sharedProvider] buildMMInlineAdWithSize:size placementId:placementId];
+    self.mmInlineAds.delegate = self;
+    self.mmInlineAds.refreshInterval = -1;
+
+    [self.mmInlineAds.view setFrame:[self frameFromCustomEventInfo:info]];
+    [self.mmInlineAds request:nil];
+
+}
+
+- (CGSize)sizeFromCustomEventInfo:(NSDictionary *)info
+{
+    CGFloat width = [[info objectForKey:@"adWidth"] floatValue];
+    CGFloat height = [[info objectForKey:@"adHeight"] floatValue];
+    return CGSizeMake(width, height);
+}
+
+- (CGRect)frameFromCustomEventInfo:(NSDictionary *)info
+{
+    CGSize size = [self sizeFromCustomEventInfo:info];
+    if (!CGSizeEqualToSize(size, MM_SIZE_300x250) && !CGSizeEqualToSize(size, MM_SIZE_728x90)) {
+        size.width = MM_SIZE_320x50.width;
+        size.height = MM_SIZE_320x50.height;
+    }
+    return CGRectMake(0, 0, size.width, size.height);
+}
+
+<<<<<<< HEAD
+- (void)adWasTapped:(NSNotification *)notification
+{
+    if ([[notification.userInfo objectForKey:MillennialMediaAdObjectKey] isEqual:self.mmAdView]) {
+        if (!self.didTrackClick) {
+            [self.delegate trackClick];
+            self.didTrackClick = YES;
+        }
+=======
+
+#pragma mark - MMInlineAdDelegate methods
+>>>>>>> 3.13.0
+
+- (UIViewController *)viewControllerForPresentingModalView {
+    return [self.delegate viewControllerForPresentingModalView];
+}
+
+<<<<<<< HEAD
+- (void)applicationWillTerminateFromAd:(NSNotification *)notification
+{
+    // no userinfo available for this notification, so we do our best to ensure that this notification
+    // is from us
+    if (self.didTrackClick)
+    {
+        [self.delegate bannerCustomEventWillLeaveApplication:self];
+
+        // If this banner causes the user to leave the application without ever displaying a modal,
+        // we consider the banner action to be finished. We need to inform the delegate of this, to
+        // maintain the contract that every "begin action" is paired with an "end action".
+        if (!self.didShowModal) {
+            [self.delegate bannerCustomEventDidFinishAction:self];
+        }
+    }
+}
+
+- (void)modalWillAppear:(NSNotification *)notification
+{
+    if ([[notification.userInfo objectForKey:MillennialMediaAdObjectKey] isEqual:self.mmAdView])
+    {
+        MPLogInfo(@"Millennial banner will present modal");
+        self.didShowModal = YES;
+    }
+}
+
+- (void)modalDidDismiss:(NSNotification *)notification
+{
+    if ([[notification.userInfo objectForKey:MillennialMediaAdObjectKey] isEqual:self.mmAdView]) {
+        [self.delegate bannerCustomEventDidFinishAction:self];
+=======
+
+- (void)inlineAdContentTapped:(MMInlineAd *)ad {
+    if (!self.didTrackClick) {
+        MPLogInfo(@"Millennial banner was clicked.");
+        [self.delegate trackClick];
+        self.didTrackClick = YES;
+    } else {
+        MPLogInfo(@"Millennial banner ignoring duplicate click");
+    }
+}
+
+
+- (void)inlineAdWillPresentModal:(MMInlineAd *)ad {
+    MPLogInfo(@"Millennial banner will present modal");
+    self.didShowModal = YES;
+    [self.delegate bannerCustomEventWillBeginAction:self];
+}
+
+- (void)inlineAdDidCloseModal:(MMInlineAd *)ad {
+    MPLogInfo(@"Millennial banner did dismiss modal");
+    [self.delegate bannerCustomEventDidFinishAction:self];
+}
+
+- (void)inlineAdRequestDidSucceed:(MMInlineAd *)ad {
+    MPLogInfo(@"Millennial banner did load");
+    [self.delegate bannerCustomEvent:self didLoadAd:ad.view];
+    [self didDisplayAd];
+    if (!self.didTrackImpression) {
+        [self.delegate trackImpression];
+        self.didTrackImpression = YES;
+>>>>>>> 3.13.0
+    }
+}
+
+- (void)inlineAd:(MMInlineAd *)ad requestDidFailWithError:(NSError *)error {
+    MPLogError(@"Millennial interstitial ad failed with error (%d) %@", error.code, error.description);
+    [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
+}
+
+
+@end

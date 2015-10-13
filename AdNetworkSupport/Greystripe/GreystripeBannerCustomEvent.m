@@ -66,11 +66,13 @@ static NSString *gGUID = nil;
 {
 //    MPLogInfo(@"Requesting Greystripe banner");
     NSString *GUID = [info objectForKey:@"GUID"] ?: [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdGS];
+    NSString *GUID = [info objectForKey:@"GUID"];
     if (GUID == nil) {
         GUID = gGUID;
         if ([GUID length] == 0) {
 //            MPLogWarn(@"Setting kGreystripeGUID in GreystripeBannerCustomEvent.m is deprecated. Use the GUID parameter when configuring your network in the MoPub website.");
             GUID = kGreystripeGUID;
+        }
         }
     }
 

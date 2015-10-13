@@ -6,7 +6,6 @@
 //
 
 #import "MPAdDestinationDisplayAgent.h"
-#import "UIViewController+MPAdditions.h"
 #import "MPCoreInstanceProvider.h"
 #import "MPLastResortDelegate.h"
 #import "MPLogging.h"
@@ -89,12 +88,9 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
     [self.resolver cancel];
     [self.enhancedDeeplinkFallbackResolver cancel];
 
-    __typeof__(self) __weak weakSelf = self;
-// https://twittercommunity.com/t/arc-errors/24809/4
-//    __weak typeof(self) weakSelf = self;
+    __weak typeof(self) weakSelf = self;
     self.resolver = [[MPCoreInstanceProvider sharedProvider] buildMPURLResolverWithURL:URL completion:^(MPURLActionInfo *suggestedAction, NSError *error) {
-//        typeof(self) strongSelf = weakSelf;
-        __typeof__(self) strongSelf = weakSelf;
+        typeof(self) strongSelf = weakSelf;
         if (strongSelf) {
             if (error) {
                 [strongSelf failedToResolveURLWithError:error];
@@ -102,6 +98,9 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
                 [strongSelf handleSuggestedURLAction:suggestedAction isResolvingEnhancedDeeplink:NO];
             }
         }
+    }];
+
+    [self.resolver start];
     }];
 
     [self.resolver start];
@@ -181,13 +180,10 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 
 - (void)handleEnhancedDeeplinkFallbackForRequest:(MPEnhancedDeeplinkRequest *)request;
 {
-// https://twittercommunity.com/t/arc-errors/24809/4
-//    __weak typeof(self) weakSelf = self;
-    __typeof__(self) __weak weakSelf = self;
+    __weak typeof(self) weakSelf = self;
     [self.enhancedDeeplinkFallbackResolver cancel];
     self.enhancedDeeplinkFallbackResolver = [[MPCoreInstanceProvider sharedProvider] buildMPURLResolverWithURL:request.fallbackURL completion:^(MPURLActionInfo *actionInfo, NSError *error) {
-//        typeof(self) strongSelf = weakSelf;
-        __typeof__(self) strongSelf = weakSelf;
+        typeof(self) strongSelf = weakSelf;
         if (strongSelf) {
             if (error) {
                 // If the resolver fails, just treat the entire original URL as a regular deeplink.
@@ -204,6 +200,9 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
     }];
     [self.enhancedDeeplinkFallbackResolver start];
 }
+    }];
+    [self.enhancedDeeplinkFallbackResolver start];
+}
 
 - (void)showWebViewWithHTMLString:(NSString *)HTMLString baseURL:(NSURL *)URL
 {
@@ -213,8 +212,7 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
                                                               HTMLString:HTMLString
                                                                 delegate:self];
     self.browserController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    [[self.delegate viewControllerForPresentingModalView] mp_presentModalViewController:self.browserController
-                                                                               animated:MP_ANIMATED];
+    [[self.delegate viewControllerForPresentingModalView] presentViewController:self.browserController animated:MP_ANIMATED completion:nil];
 }
 
 - (void)showStoreKitProductWithParameter:(NSString *)parameter fallbackURL:(NSURL *)URL
@@ -292,8 +290,7 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
     [self.storeKitController loadProductWithParameters:parameters completionBlock:nil];
 
     [self hideOverlay];
-    [[self.delegate viewControllerForPresentingModalView] mp_presentModalViewController:self.storeKitController
-                                                                               animated:MP_ANIMATED];
+    [[self.delegate viewControllerForPresentingModalView] presentViewController:self.storeKitController animated:MP_ANIMATED completion:nil];
 #endif
 }
 
@@ -324,8 +321,9 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 
 - (void)hideModalAndNotifyDelegate
 {
-    [[self.delegate viewControllerForPresentingModalView] mp_dismissModalViewControllerAnimated:MP_ANIMATED];
-    [self.delegate displayAgentDidDismissModal];
+    [[self.delegate viewControllerForPresentingModalView] dismissViewControllerAnimated:MP_ANIMATED completion:^{
+        [self.delegate displayAgentDidDismissModal];
+    }];
 }
 
 - (void)hideOverlay

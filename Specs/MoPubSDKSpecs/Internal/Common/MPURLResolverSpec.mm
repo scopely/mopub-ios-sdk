@@ -132,6 +132,17 @@ describe(@"MPURLResolver", ^{
                 resolverError should equal(error);
             });
         });
+            });
+
+    describe(@"when the URL should be handled by an installed app", ^{
+            it(@"should resolve with an error", ^{
+                NSError *error = [NSError errorWithDomain:@"com.mopub" code:500 userInfo:nil];
+                [[NSURLConnection lastConnection] failWithError:error];
+
+                resolvedActionInfo should be_nil;
+                resolverError should equal(error);
+            });
+        });
     });
 
     describe(@"when the URL should be handled by an installed app", ^{
@@ -140,12 +151,10 @@ describe(@"MPURLResolver", ^{
                 url = [NSURL URLWithString:@"tel:5555555555"];
             });
 
-            context(@"when the device supports telephone schemes", ^{
-                beforeEach(^{
-                    [[UIApplication sharedApplication] mp_setCanOpenTelephoneSchemes:YES];
-                });
-
-                it(@"should resolve to an info object indicating a deeplink", ^{
+            it(@"should resolve to an info object indicating a deeplink", ^{
+                resolvedActionInfo.actionType should equal(MPURLActionTypeGenericDeeplink);
+                resolvedActionInfo.originalURL should equal(url);
+                resolvedActionInfo.deeplinkURL should equal(url);
                     resolvedActionInfo.actionType should equal(MPURLActionTypeGenericDeeplink);
                     resolvedActionInfo.originalURL should equal(url);
                     resolvedActionInfo.deeplinkURL should equal(url);
@@ -154,11 +163,6 @@ describe(@"MPURLResolver", ^{
 
             context(@"when the device does not support telephone schemes", ^{
                 beforeEach(^{
-                    [[UIApplication sharedApplication] mp_setCanOpenTelephoneSchemes:NO];
-                });
-
-                it(@"should call the completion block with an error", ^{
-                    [NSURLConnection lastConnection] should be_nil;
 
                     resolvedActionInfo should be_nil;
                     resolverError should_not be_nil;
@@ -171,12 +175,10 @@ describe(@"MPURLResolver", ^{
                 url = [NSURL URLWithString:@"telprompt:5555555555"];
             });
 
-            context(@"when the device supports telephone schemes", ^{
-                beforeEach(^{
-                    [[UIApplication sharedApplication] mp_setCanOpenTelephoneSchemes:YES];
-                });
-
-                it(@"should resolve to an info object indicating a deeplink", ^{
+            it(@"should resolve to an info object indicating a deeplink", ^{
+                resolvedActionInfo.actionType should equal(MPURLActionTypeGenericDeeplink);
+                resolvedActionInfo.originalURL should equal(url);
+                resolvedActionInfo.deeplinkURL should equal(url);
                     resolvedActionInfo.actionType should equal(MPURLActionTypeGenericDeeplink);
                     resolvedActionInfo.originalURL should equal(url);
                     resolvedActionInfo.deeplinkURL should equal(url);
@@ -185,11 +187,6 @@ describe(@"MPURLResolver", ^{
 
             context(@"when the device does not support telephone schemes", ^{
                 beforeEach(^{
-                    [[UIApplication sharedApplication] mp_setCanOpenTelephoneSchemes:NO];
-                });
-
-                it(@"should call the completion block with an error", ^{
-                    [NSURLConnection lastConnection] should be_nil;
 
                     resolvedActionInfo should be_nil;
                     resolverError should_not be_nil;
@@ -224,35 +221,6 @@ describe(@"MPURLResolver", ^{
                         resolvedActionInfo should be_nil;
                         resolverError should_not be_nil;
                     });
-                });
-            });
-
-            context(@"when the URL is something else that the application can open", ^{
-                beforeEach(^{
-                    url = [NSURL URLWithString:@"ftp://www.google.com"];
-                    [[UIApplication sharedApplication] canOpenURL:url] should be_truthy;
-                });
-
-                it(@"should resolve to an info object indicating a deeplink", ^{
-                    [NSURLConnection lastConnection] should be_nil;
-
-                    resolvedActionInfo.actionType should equal(MPURLActionTypeGenericDeeplink);
-                    resolvedActionInfo.originalURL should equal(url);
-                    resolvedActionInfo.deeplinkURL should equal(url);
-                });
-            });
-
-            context(@"when the URL cannot be opened by the application", ^{
-                beforeEach(^{
-                    url = [NSURL URLWithString:@"asdf://www.google.com"];
-                    [[UIApplication sharedApplication] canOpenURL:url] should_not be_truthy;
-                });
-
-                it(@"should call the completion block with an error", ^{
-                    [NSURLConnection lastConnection] should be_nil;
-
-                    resolvedActionInfo should be_nil;
-                    resolverError should_not be_nil;
                 });
             });
         });
@@ -291,11 +259,136 @@ describe(@"MPURLResolver", ^{
                     beforeEach(^{
                         url = [NSURL URLWithString:@"deeplink+://navigate?primaryUrl=maps%3A%2F%2F"];
                     });
-
                     it(@"should resolve to an info object indicating an enhanced deeplink", ^{
                         resolvedActionInfo.actionType should equal(MPURLActionTypeEnhancedDeeplink);
                         resolvedActionInfo.originalURL should equal(url);
                         resolvedActionInfo.enhancedDeeplinkRequest.primaryURL should equal([NSURL URLWithString:@"maps://"]);
+                    });
+                });
+
+                context(@"if the query has a primaryTrackingUrl", ^{
+                    beforeEach(^{
+                        url = [NSURL URLWithString:@"deeplink+://navigate?primaryUrl=maps%3A%2F%2F&primaryTrackingUrl=http%3A%2F%2Fwww.mopub.com"];
+                    });
+
+                    it(@"should resolve to an info object indicating an enhanced deeplink with a tracking URL", ^{
+                        resolvedActionInfo.actionType should equal(MPURLActionTypeEnhancedDeeplink);
+                        resolvedActionInfo.originalURL should equal(url);
+                        resolvedActionInfo.enhancedDeeplinkRequest.primaryURL should equal([NSURL URLWithString:@"maps://"]);
+                        resolvedActionInfo.enhancedDeeplinkRequest.primaryTrackingURLs.count should equal(1);
+                        resolvedActionInfo.enhancedDeeplinkRequest.primaryTrackingURLs should contain([NSURL URLWithString:@"http://www.mopub.com"]);
+                    });
+                });
+
+                context(@"if the query has multiple primaryTrackingUrls", ^{
+                    beforeEach(^{
+                        url = [NSURL URLWithString:@"deeplink+://navigate?primaryUrl=maps%3A%2F%2F&primaryTrackingUrl=http%3A%2F%2Fwww.mopub.com&primaryTrackingUrl=http%3A%2F%2Fwww.twitter.com"];
+                    });
+                    it(@"should resolve to an info object indicating an enhanced deeplink with multiple tracking URLs", ^{
+                        resolvedActionInfo.actionType should equal(MPURLActionTypeEnhancedDeeplink);
+                        resolvedActionInfo.originalURL should equal(url);
+                        resolvedActionInfo.enhancedDeeplinkRequest.primaryURL should equal([NSURL URLWithString:@"maps://"]);
+                        resolvedActionInfo.enhancedDeeplinkRequest.primaryTrackingURLs.count should equal(2);
+                        resolvedActionInfo.enhancedDeeplinkRequest.primaryTrackingURLs should contain([NSURL URLWithString:@"http://www.mopub.com"]);
+                        resolvedActionInfo.enhancedDeeplinkRequest.primaryTrackingURLs should contain([NSURL URLWithString:@"http://www.twitter.com"]);
+                    });
+                });
+
+                context(@"if the query has a fallbackUrl", ^{
+                    beforeEach(^{
+                        url = [NSURL URLWithString:@"deeplink+://navigate?primaryUrl=maps%3A%2F%2F&fallbackUrl=http%3A%2F%2Fwww.mopub.com"];
+                    resolvedActionInfo should be_nil;
+                    resolverError should_not be_nil;
+                    });
+
+                    it(@"should resolve to an info object indicating an enhanced deeplink with a fallback URL", ^{
+                        resolvedActionInfo.actionType should equal(MPURLActionTypeEnhancedDeeplink);
+                        resolvedActionInfo.originalURL should equal(url);
+                        resolvedActionInfo.enhancedDeeplinkRequest.primaryURL should equal([NSURL URLWithString:@"maps://"]);
+                        resolvedActionInfo.enhancedDeeplinkRequest.fallbackURL should equal([NSURL URLWithString:@"http://www.mopub.com"]);
+                    });
+                });
+
+                context(@"if the query has a fallbackTrackingUrl", ^{
+                    beforeEach(^{
+                        url = [NSURL URLWithString:@"deeplink+://navigate?primaryUrl=maps%3A%2F%2F&fallbackTrackingUrl=http%3A%2F%2Fwww.mopub.com"];
+                    });
+
+                    it(@"should resolve to an info object indicating an enhanced deeplink with a tracking URL", ^{
+                        resolvedActionInfo.actionType should equal(MPURLActionTypeEnhancedDeeplink);
+                        resolvedActionInfo.originalURL should equal(url);
+                        resolvedActionInfo.enhancedDeeplinkRequest.primaryURL should equal([NSURL URLWithString:@"maps://"]);
+                        resolvedActionInfo.enhancedDeeplinkRequest.fallbackTrackingURLs.count should equal(1);
+                        resolvedActionInfo.enhancedDeeplinkRequest.fallbackTrackingURLs should contain([NSURL URLWithString:@"http://www.mopub.com"]);
+                    });
+                });
+
+                context(@"if the query has multiple fallbackTrackingUrls", ^{
+                    beforeEach(^{
+                        url = [NSURL URLWithString:@"deeplink+://navigate?primaryUrl=maps%3A%2F%2F&fallbackTrackingUrl=http%3A%2F%2Fwww.mopub.com&fallbackTrackingUrl=http%3A%2F%2Fwww.twitter.com"];
+                    });
+
+                    it(@"should resolve to an info object indicating an enhanced deeplink with multiple tracking URLs", ^{
+                        resolvedActionInfo.actionType should equal(MPURLActionTypeEnhancedDeeplink);
+                        resolvedActionInfo.originalURL should equal(url);
+                        resolvedActionInfo.enhancedDeeplinkRequest.primaryURL should equal([NSURL URLWithString:@"maps://"]);
+                        resolvedActionInfo.enhancedDeeplinkRequest.fallbackTrackingURLs.count should equal(2);
+                        resolvedActionInfo.enhancedDeeplinkRequest.fallbackTrackingURLs should contain([NSURL URLWithString:@"http://www.mopub.com"]);
+                        resolvedActionInfo.enhancedDeeplinkRequest.fallbackTrackingURLs should contain([NSURL URLWithString:@"http://www.twitter.com"]);
+                    });
+                });
+            });
+
+            context(@"if the query does not have a primaryUrl parameter", ^{
+                beforeEach(^{
+                    url = [NSURL URLWithString:@"deeplink+://navigate?something=invalid"];
+                });
+
+                it(@"should resolve to an info object indicating a regular deeplink", ^{
+                    resolvedActionInfo.actionType should equal(MPURLActionTypeGenericDeeplink);
+                    resolvedActionInfo.originalURL should equal(url);
+                    resolvedActionInfo.deeplinkURL should equal(url);
+                });
+            });
+        });
+
+        context(@"if the URL host is not 'navigate'", ^{
+            beforeEach(^{
+                url = [NSURL URLWithString:@"deeplink+://not-navigating.com?primaryUrl=maps%3A%2F%2F"];
+            });
+
+            it(@"should resolve to an info object indicating a regular deeplink", ^{
+                resolvedActionInfo.actionType should equal(MPURLActionTypeGenericDeeplink);
+                resolvedActionInfo.originalURL should equal(url);
+                resolvedActionInfo.deeplinkURL should equal(url);
+            });
+        });
+
+        describe(@"URL scheme and host matching", ^{
+            beforeEach(^{
+                url = [NSURL URLWithString:@"deepLINK+://NAVIgate?primaryUrl=maps%3A%2F%2F"];
+            });
+
+            it(@"should be case-insensitive", ^{
+                resolvedActionInfo.actionType should equal(MPURLActionTypeEnhancedDeeplink);
+                resolvedActionInfo.originalURL should equal(url);
+                resolvedActionInfo.enhancedDeeplinkRequest.primaryURL should equal([NSURL URLWithString:@"maps://"]);
+            });
+        });
+    });
+
+    describe(@"when the URL has a mopubshare:// scheme", ^{
+        beforeEach(^{
+            url = [NSURL URLWithString:@"mopubshare://tweet"];
+        });
+
+        it(@"should resolve to an info object with a share URL", ^{
+            resolvedActionInfo.actionType should equal(MPURLActionTypeShare);
+            resolvedActionInfo.originalURL should equal(url);
+            resolvedActionInfo.shareURL should equal(url);
+        });
+    });
+
                     });
                 });
 

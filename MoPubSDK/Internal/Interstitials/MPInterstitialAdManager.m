@@ -142,6 +142,13 @@
         return;
     }
 
+    if (self.configuration.adUnitWarmingUp) {
+        MPLogInfo(kMPWarmingUpErrorLogFormatWithAdUnitID, self.delegate.interstitialAdController.adUnitId);
+        self.loading = NO;
+        [self.delegate manager:self didFailToLoadInterstitialWithError:[MPError errorWithCode:MPErrorAdUnitWarmingUp]];
+        return;
+    }
+
     if ([self.configuration.networkType isEqualToString:kAdTypeClear]) {
         [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonNoFill adNetwork:nil adType:WBAdTypeInterstitial];
         AdLogType(WBAdLogLevelError, WBAdTypeInterstitial, @"Ad server response indicated no ad available.");
