@@ -10,6 +10,9 @@
 #import "MPChartboostRouter.h"
 #import "MPInstanceProvider+Chartboost.h"
 #import <Chartboost/Chartboost.h>
+#import "MPChartboostRouter.h"
+#import "MPInstanceProvider+Chartboost.h"
+#import <Chartboost/Chartboost.h>
 
 static NSString *gAppId = nil;
 static NSString *gAppSignature = nil;

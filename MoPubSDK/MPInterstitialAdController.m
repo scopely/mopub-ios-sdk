@@ -202,8 +202,6 @@
     }
 }
 
-#pragma mark - Deprecated
-
 + (NSMutableArray *)sharedInterstitialAdControllers
 {
     return [[self class] sharedInterstitials];
@@ -212,21 +210,6 @@
 + (void)removeSharedInterstitialAdController:(MPInterstitialAdController *)controller
 {
     [[[self class] sharedInterstitials] removeObject:controller];
-}
-
-- (void)customEventDidLoadAd
-{
-    [self.manager customEventDidLoadAd];
-}
-
-- (void)customEventDidFailToLoadAd
-{
-    [self.manager customEventDidFailToLoadAd];
-}
-
-- (void)customEventActionWillBegin
-{
-    [self.manager customEventActionWillBegin];
 }
 
 @end

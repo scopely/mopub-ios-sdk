@@ -13,10 +13,10 @@ typedef NS_ENUM(NSInteger, MPAdInfoType) {
     MPAdInfoMRectBanner,
     MPAdInfoLeaderboardBanner,
     MPAdInfoNative,
-    MPAdInfoNativeInTableView,
     MPAdInfoNativeTableViewPlacer,
     MPAdInfoNativePageViewControllerPlacer,
-    MPAdInfoNativeInCollectionView
+    MPAdInfoNativeInCollectionView,
+    MPAdInfoRewardedVideo
 };
 
 @interface MPAdInfo : NSObject <NSCoding>
@@ -28,6 +28,7 @@ typedef NS_ENUM(NSInteger, MPAdInfoType) {
 
 + (NSArray *)bannerAds;
 + (NSArray *)interstitialAds;
++ (NSArray *)rewardedVideoAds;
 + (NSArray *)nativeAds;
 + (MPAdInfo *)infoWithTitle:(NSString *)title ID:(NSString *)ID type:(MPAdInfoType)type;
 + (NSArray *)supportedAdTypeNames;

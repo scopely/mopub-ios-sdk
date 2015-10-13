@@ -157,8 +157,8 @@
 #pragma mark - Orientation Handling
 
 // supportedInterfaceOrientations and shouldAutorotate are for ios 6, 7, and 8.
-#if __IPHONE_OS_VERSION_MAX_ALLOWED < 90000
-- (NSUInteger)supportedInterfaceOrientations {
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_9_0
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
 #else
     - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
 #endif

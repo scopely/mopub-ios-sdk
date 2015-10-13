@@ -44,7 +44,6 @@
 - (void)dealloc
 {
     self.bannerAgent.delegate = nil;
-}
 
 -(NSString *)description
 {

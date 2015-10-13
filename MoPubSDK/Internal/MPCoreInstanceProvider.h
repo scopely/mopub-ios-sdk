@@ -8,10 +8,9 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "MPGlobal.h"
-#import "WBAdType.h"
-
 #import "MPURLResolver.h"
 
+#import "MPURLResolver.h"
 @class MPAdConfiguration;
 
 // Fetching Ads

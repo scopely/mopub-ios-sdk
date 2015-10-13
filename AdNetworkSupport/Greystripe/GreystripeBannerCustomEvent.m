@@ -72,6 +72,7 @@ static NSString *gGUID = nil;
 //            MPLogWarn(@"Setting kGreystripeGUID in GreystripeBannerCustomEvent.m is deprecated. Use the GUID parameter when configuring your network in the MoPub website.");
             GUID = kGreystripeGUID;
         }
+        }
     }
 
     self.greystripeBanner = [[MPInstanceProvider sharedProvider] buildGreystripeBannerAdViewWithDelegate:self GUID:GUID size:size];
