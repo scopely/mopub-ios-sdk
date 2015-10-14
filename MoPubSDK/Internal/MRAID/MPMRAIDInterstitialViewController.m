@@ -160,7 +160,7 @@
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_9_0
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
 #else
-    - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+- (NSUInteger)supportedInterfaceOrientations {
 #endif
     return ([[UIApplication sharedApplication] mp_supportsOrientationMask:self.supportedOrientationMask]) ? self.supportedOrientationMask : UIInterfaceOrientationMaskAll;
 }
