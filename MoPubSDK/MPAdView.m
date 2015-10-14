@@ -114,11 +114,6 @@
     [self loadAd];
 }
 
--(void)cancelAd
-{
-    [self.adManager cancelAd];
-}
-
 - (void)forceRefreshAd
 {
     [self.adManager forceRefreshAd];
