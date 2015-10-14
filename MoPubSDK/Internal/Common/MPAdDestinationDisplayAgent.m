@@ -88,20 +88,20 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
     [self.resolver cancel];
     [self.enhancedDeeplinkFallbackResolver cancel];
 
-    __weak typeof(self) weakSelf = self;
-    self.resolver = [[MPCoreInstanceProvider sharedProvider] buildMPURLResolverWithURL:URL completion:^(MPURLActionInfo *suggestedAction, NSError *error) {
-        typeof(self) strongSelf = weakSelf;
-        if (strongSelf) {
-            if (error) {
-                [strongSelf failedToResolveURLWithError:error];
-            } else {
-                [strongSelf handleSuggestedURLAction:suggestedAction isResolvingEnhancedDeeplink:NO];
-            }
-        }
-    }];
-
-    [self.resolver start];
-    }];
+//    __weak typeof(self) weakSelf = self;
+//    self.resolver = [[MPCoreInstanceProvider sharedProvider] buildMPURLResolverWithURL:URL completion:^(MPURLActionInfo *suggestedAction, NSError *error) {
+//        typeof(self) strongSelf = weakSelf;
+//        if (strongSelf) {
+//            if (error) {
+//                [strongSelf failedToResolveURLWithError:error];
+//            } else {
+//                [strongSelf handleSuggestedURLAction:suggestedAction isResolvingEnhancedDeeplink:NO];
+//            }
+//        }
+//    }];
+//
+//    [self.resolver start];
+//    }];
 
     [self.resolver start];
 }
@@ -180,27 +180,27 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 
 - (void)handleEnhancedDeeplinkFallbackForRequest:(MPEnhancedDeeplinkRequest *)request;
 {
-    __weak typeof(self) weakSelf = self;
-    [self.enhancedDeeplinkFallbackResolver cancel];
-    self.enhancedDeeplinkFallbackResolver = [[MPCoreInstanceProvider sharedProvider] buildMPURLResolverWithURL:request.fallbackURL completion:^(MPURLActionInfo *actionInfo, NSError *error) {
-        typeof(self) strongSelf = weakSelf;
-        if (strongSelf) {
-            if (error) {
-                // If the resolver fails, just treat the entire original URL as a regular deeplink.
-                [strongSelf openURLInApplication:request.originalURL];
-            } else {
-                // Otherwise, the resolver will return us a URL action. We process that action
-                // normally with one exception: we don't follow any nested enhanced deeplinks.
-                BOOL success = [strongSelf handleSuggestedURLAction:actionInfo isResolvingEnhancedDeeplink:YES];
-                if (success) {
-                    [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] sendTrackingRequestForURLs:request.fallbackTrackingURLs];
-                }
-            }
-        }
-    }];
-    [self.enhancedDeeplinkFallbackResolver start];
-}
-    }];
+//    __weak typeof(self) weakSelf = self;
+//    [self.enhancedDeeplinkFallbackResolver cancel];
+//    self.enhancedDeeplinkFallbackResolver = [[MPCoreInstanceProvider sharedProvider] buildMPURLResolverWithURL:request.fallbackURL completion:^(MPURLActionInfo *actionInfo, NSError *error) {
+//        typeof(self) strongSelf = weakSelf;
+//        if (strongSelf) {
+//            if (error) {
+//                // If the resolver fails, just treat the entire original URL as a regular deeplink.
+//                [strongSelf openURLInApplication:request.originalURL];
+//            } else {
+//                // Otherwise, the resolver will return us a URL action. We process that action
+//                // normally with one exception: we don't follow any nested enhanced deeplinks.
+//                BOOL success = [strongSelf handleSuggestedURLAction:actionInfo isResolvingEnhancedDeeplink:YES];
+//                if (success) {
+//                    [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] sendTrackingRequestForURLs:request.fallbackTrackingURLs];
+//                }
+//            }
+//        }
+//    }];
+//    [self.enhancedDeeplinkFallbackResolver start];
+//}
+//    }];
     [self.enhancedDeeplinkFallbackResolver start];
 }
 

@@ -121,13 +121,6 @@ static NSString * const kResolverErrorDomain = @"com.mopub.resolver";
         } else {
             actionInfo = [MPURLActionInfo infoWithURL:self.originalURL deeplinkURL:URL];
         }
-    } else if ([self safariURLForURL:URL]) {
-        actionInfo = [MPURLActionInfo infoWithURL:self.originalURL safariDestinationURL:[NSURL URLWithString:[self safariURLForURL:URL]]];
-    } else if ([URL mp_isMoPubShareScheme]) {
-        actionInfo = [MPURLActionInfo infoWithURL:self.originalURL shareURL:URL];
-    } else if ([self URLShouldOpenInApplication:URL]) {
-        actionInfo = [MPURLActionInfo infoWithURL:self.originalURL deeplinkURL:URL];
-    }
 
     return actionInfo;
 }

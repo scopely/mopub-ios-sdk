@@ -45,26 +45,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-@implementation MRHostSDKVersionProperty : MRProperty
-
-@synthesize version = _version;
-
-+ (instancetype)defaultProperty
-{
-    MRHostSDKVersionProperty *property = [[self alloc] init];
-    property.version = MP_SDK_VERSION;
-    return property;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"hostSDKVersion: '%@'", self.version];
-}
-
-@end
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 @implementation MRPlacementTypeProperty : MRProperty
 
 @synthesize placementType = _placementType;
