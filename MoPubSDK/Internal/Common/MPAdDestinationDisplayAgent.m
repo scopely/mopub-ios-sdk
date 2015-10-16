@@ -6,7 +6,6 @@
 //
 
 #import "MPAdDestinationDisplayAgent.h"
-#import "UIViewController+MPAdditions.h"
 #import "MPCoreInstanceProvider.h"
 #import "MPLastResortDelegate.h"
 #import "MPLogging.h"
@@ -60,7 +59,7 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 - (void)dealloc
 {
     [self dismissAllModalContent];
-
+    
     self.overlayView.delegate = nil;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_6_0
     // XXX: If this display agent is deallocated while a StoreKit controller is still on-screen,
@@ -70,7 +69,7 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
     self.storeKitController.delegate = [MPLastResortDelegate sharedDelegate];
 #endif
     self.browserController.delegate = nil;
-
+    
 }
 
 - (void)dismissAllModalContent
@@ -82,18 +81,15 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 {
     if (self.isLoadingDestination) return;
     self.isLoadingDestination = YES;
-
+    
     [self.delegate displayAgentWillPresentModal];
     [self.overlayView show];
-
+    
     [self.resolver cancel];
     [self.enhancedDeeplinkFallbackResolver cancel];
-
-    __typeof__(self) __weak weakSelf = self;
-// https://twittercommunity.com/t/arc-errors/24809/4
-//    __weak typeof(self) weakSelf = self;
+    
+    __typeof(self) __weak weakSelf = self;
     self.resolver = [[MPCoreInstanceProvider sharedProvider] buildMPURLResolverWithURL:URL completion:^(MPURLActionInfo *suggestedAction, NSError *error) {
-//        typeof(self) strongSelf = weakSelf;
         __typeof__(self) strongSelf = weakSelf;
         if (strongSelf) {
             if (error) {
@@ -103,7 +99,7 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
             }
         }
     }];
-
+    
     [self.resolver start];
 }
 
@@ -124,9 +120,9 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
         [self failedToResolveURLWithError:[NSError errorWithDomain:kDisplayAgentErrorDomain code:-1 userInfo:@{NSLocalizedDescriptionKey: @"Invalid URL action"}]];
         return NO;
     }
-
+    
     BOOL success = YES;
-
+    
     switch (actionInfo.actionType) {
         case MPURLActionTypeStoreKit:
             [self showStoreKitProductWithParameter:actionInfo.iTunesItemIdentifier
@@ -160,7 +156,7 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
             success = NO;
             break;
     }
-
+    
     return success;
 }
 
@@ -181,12 +177,9 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 
 - (void)handleEnhancedDeeplinkFallbackForRequest:(MPEnhancedDeeplinkRequest *)request;
 {
-// https://twittercommunity.com/t/arc-errors/24809/4
-//    __weak typeof(self) weakSelf = self;
-    __typeof__(self) __weak weakSelf = self;
+    __typeof(self) __weak weakSelf = self;
     [self.enhancedDeeplinkFallbackResolver cancel];
     self.enhancedDeeplinkFallbackResolver = [[MPCoreInstanceProvider sharedProvider] buildMPURLResolverWithURL:request.fallbackURL completion:^(MPURLActionInfo *actionInfo, NSError *error) {
-//        typeof(self) strongSelf = weakSelf;
         __typeof__(self) strongSelf = weakSelf;
         if (strongSelf) {
             if (error) {
@@ -208,13 +201,12 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 - (void)showWebViewWithHTMLString:(NSString *)HTMLString baseURL:(NSURL *)URL
 {
     [self hideOverlay];
-
+    
     self.browserController = [[MPAdBrowserController alloc] initWithURL:URL
-                                                              HTMLString:HTMLString
-                                                                delegate:self];
+                                                             HTMLString:HTMLString
+                                                               delegate:self];
     self.browserController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    [[self.delegate viewControllerForPresentingModalView] mp_presentModalViewController:self.browserController
-                                                                               animated:MP_ANIMATED];
+    [[self.delegate viewControllerForPresentingModalView] presentViewController:self.browserController animated:MP_ANIMATED completion:nil];
 }
 
 - (void)showStoreKitProductWithParameter:(NSString *)parameter fallbackURL:(NSURL *)URL
@@ -229,7 +221,7 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 - (void)openURLInApplication:(NSURL *)URL
 {
     [self hideOverlay];
-
+    
     if ([URL mp_hasTelephoneScheme] || [URL mp_hasTelephonePromptScheme]) {
         [self interceptTelephoneURL:URL];
     } else {
@@ -270,7 +262,7 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
             [strongSelf.delegate displayAgentDidDismissModal];
         }
     }];
-
+    
     [self.telephoneConfirmationController show];
 }
 
@@ -286,14 +278,13 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_6_0
     self.storeKitController = [MPStoreKitProvider buildController];
     self.storeKitController.delegate = self;
-
+    
     NSDictionary *parameters = [NSDictionary dictionaryWithObject:identifier
                                                            forKey:SKStoreProductParameterITunesItemIdentifier];
     [self.storeKitController loadProductWithParameters:parameters completionBlock:nil];
-
+    
     [self hideOverlay];
-    [[self.delegate viewControllerForPresentingModalView] mp_presentModalViewController:self.storeKitController
-                                                                               animated:MP_ANIMATED];
+    [[self.delegate viewControllerForPresentingModalView] presentViewController:self.storeKitController animated:MP_ANIMATED completion:nil];
 #endif
 }
 
@@ -324,8 +315,9 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 
 - (void)hideModalAndNotifyDelegate
 {
-    [[self.delegate viewControllerForPresentingModalView] mp_dismissModalViewControllerAnimated:MP_ANIMATED];
-    [self.delegate displayAgentDidDismissModal];
+    [[self.delegate viewControllerForPresentingModalView] dismissViewControllerAnimated:MP_ANIMATED completion:^{
+        [self.delegate displayAgentDidDismissModal];
+    }];
 }
 
 - (void)hideOverlay

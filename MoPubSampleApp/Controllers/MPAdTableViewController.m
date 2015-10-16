@@ -22,6 +22,7 @@
 #import "MPNativeAdPlacerCollectionViewController.h"
 #import "MPNativeAdPlacerPageViewController.h"
 #import "MPSampleAppLogReader.h"
+#import "MPRewardedVideoAdDetailViewController.h"
 
 typedef enum
 {
@@ -83,6 +84,8 @@ typedef enum
     UIButton* myInfoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     [myInfoButton addTarget:self action:@selector(infoButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:myInfoButton];
+
+    [[MPSampleAppLogReader sharedLogReader] beginReadingLogMessages];
 
     [[MPSampleAppLogReader sharedLogReader] beginReadingLogMessages];
 
@@ -172,6 +175,9 @@ typedef enum
             break;
         case MPAdInfoInterstitial:
             detailViewController = [[MPInterstitialAdDetailViewController alloc] initWithAdInfo:info];
+            break;
+        case MPAdInfoRewardedVideo:
+            detailViewController = [[MPRewardedVideoAdDetailViewController alloc] initWithAdInfo:info];
             break;
         case MPAdInfoNative:
             detailViewController = [[MPNativeAdDetailViewController alloc] initWithAdInfo:info];

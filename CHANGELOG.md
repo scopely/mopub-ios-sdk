@@ -1,3 +1,23 @@
+## Version 3.13 (September 17th, 2015)
+
+- **Added iOS 9 support**.
+
+## Version 3.12 (August 31st, 2015)
+
+- **Added Privacy Information icon support for MoPub native ads**.
+- **GA of rewarded video ad mediation**.
+	- Added mediation support for AdColony, Chartboost, Vungle, and Unity rewarded video ads.
+
+## Version 3.11 (August 20th, 2015)
+
+- **Updated Millennial Media custom events (Millennial Media SDK 6.0+ only)**.
+
+## Version 3.10 (August 3rd, 2015)
+
+- **Minor improvements**.
+- **Bug fixes**.
+	- didDismissInterstitial is now called when the dismiss animation has completed.
+	
 ## Version 3.9 (July 1st, 2015)
 
 - **Added VAST 3.0 standard support for video ads**.
