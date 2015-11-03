@@ -87,10 +87,10 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
     
     [self.resolver cancel];
     [self.enhancedDeeplinkFallbackResolver cancel];
-    
-    __typeof(self) __weak weakSelf = self;
+
+    __typeof__(self) __weak weakSelf = self;
     self.resolver = [[MPCoreInstanceProvider sharedProvider] buildMPURLResolverWithURL:URL completion:^(MPURLActionInfo *suggestedAction, NSError *error) {
-        __typeof__(self) strongSelf = weakSelf;
+    __typeof__(self) strongSelf = weakSelf;
         if (strongSelf) {
             if (error) {
                 [strongSelf failedToResolveURLWithError:error];
@@ -177,7 +177,7 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 
 - (void)handleEnhancedDeeplinkFallbackForRequest:(MPEnhancedDeeplinkRequest *)request;
 {
-    __typeof(self) __weak weakSelf = self;
+    __typeof__(self) __weak weakSelf = self;
     [self.enhancedDeeplinkFallbackResolver cancel];
     self.enhancedDeeplinkFallbackResolver = [[MPCoreInstanceProvider sharedProvider] buildMPURLResolverWithURL:request.fallbackURL completion:^(MPURLActionInfo *actionInfo, NSError *error) {
         __typeof__(self) strongSelf = weakSelf;
