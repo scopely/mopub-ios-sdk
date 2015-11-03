@@ -14,6 +14,9 @@
 #import "MPInterstitialCustomEvent.h"
 #import "WBAdLogging.h"
 
+#import "MPInterstitialCustomEventAdapter.h"
+#import "MPInterstitialCustomEvent.h"
+
 @interface MPInterstitialAdController () <MPInterstitialAdManagerDelegate>
 
 @property (nonatomic, strong) MPInterstitialAdManager *manager;
@@ -75,11 +78,6 @@
 - (BOOL)ready
 {
     return self.manager.ready;
-}
-
--(BOOL)loading
-{
-    return self.manager.loading;
 }
 
 -(MPInterstitialCustomEvent *)currentInterstitialCustomEvent
