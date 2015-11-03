@@ -9,6 +9,8 @@
 #import <CoreLocation/CoreLocation.h>
 
 @protocol MPInterstitialAdControllerDelegate;
+@class MPInterstitialCustomEvent;
+@class MPInterstitialCustomEventAdapter;
 
 /**
  * The `MPInterstitialAdController` class provides a full-screen advertisement that can be
@@ -106,6 +108,9 @@
  * third-party ad networks. See `MPInterstitialAdControllerDelegate` for more details.
  */
 @property (nonatomic, assign, readonly) BOOL ready;
+
+-(MPInterstitialCustomEvent *)currentInterstitialCustomEvent;
+-(MPInterstitialCustomEventAdapter *)adapter;
 
 /** @name Presenting an Interstitial Ad */
 

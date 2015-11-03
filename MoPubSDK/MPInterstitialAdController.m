@@ -12,6 +12,9 @@
 #import "MPInterstitialAdManager.h"
 #import "MPInterstitialAdManagerDelegate.h"
 
+#import "MPInterstitialCustomEventAdapter.h"
+#import "MPInterstitialCustomEvent.h"
+
 @interface MPInterstitialAdController () <MPInterstitialAdManagerDelegate>
 
 @property (nonatomic, strong) MPInterstitialAdManager *manager;
@@ -73,6 +76,16 @@
 - (BOOL)ready
 {
     return self.manager.ready;
+}
+
+-(MPInterstitialCustomEvent *)currentInterstitialCustomEvent
+{
+    return [self adapter].interstitialCustomEvent;
+}
+
+-(MPInterstitialCustomEventAdapter *)adapter
+{
+    return ((MPInterstitialCustomEventAdapter *)self.manager.adapter);
 }
 
 - (void)loadAd
