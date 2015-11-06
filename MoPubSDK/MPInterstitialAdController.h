@@ -117,9 +117,6 @@
  */
 -(BOOL)loading;
 
--(MPInterstitialCustomEvent *)currentInterstitialCustomEvent;
--(MPInterstitialCustomEventAdapter *)adapter;
-
 /** @name Presenting an Interstitial Ad */
 
 /**
