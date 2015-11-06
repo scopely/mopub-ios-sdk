@@ -103,6 +103,11 @@
                                        testing:self.testing];
 }
 
+-(BOOL)loading
+{
+    return self.manager.loading;
+}
+
 - (void)showFromViewController:(UIViewController *)controller
 {
     if (!controller) {
