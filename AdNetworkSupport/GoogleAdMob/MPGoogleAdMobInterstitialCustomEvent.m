@@ -94,7 +94,7 @@
 -(NSString *)description
 {
     // provide this for analytics
-    return @"Google";
+    return @"AdMob";
 }
 
 #pragma mark - IMAdInterstitialDelegate
