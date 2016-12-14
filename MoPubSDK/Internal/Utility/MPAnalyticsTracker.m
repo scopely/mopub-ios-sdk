@@ -5,10 +5,10 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
-#import <WithBuddiesAds/WithBuddiesAds.h>
 #import "MPAnalyticsTracker.h"
 #import "MPAdConfiguration.h"
 #import "MPCoreInstanceProvider.h"
+#import "MPLogging.h"
 
 @interface MPAnalyticsTracker ()
 
@@ -25,14 +25,14 @@
 
 - (void)trackImpressionForConfiguration:(MPAdConfiguration *)configuration
 {
-    AdLogType(WBAdLogLevelTrace, (configuration.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial), @"Tracking impression: %@", configuration.impressionTrackingURL);
+    MPLogDebug(@"Tracking impression: %@", configuration.impressionTrackingURL);
     [NSURLConnection connectionWithRequest:[self requestForURL:configuration.impressionTrackingURL]
                                   delegate:nil];
 }
 
 - (void)trackClickForConfiguration:(MPAdConfiguration *)configuration
 {
-    AdLogType(WBAdLogLevelTrace, (configuration.adType == MPAdTypeBanner ? WBAdTypeBanner : WBAdTypeInterstitial), @"Tracking click: %@", configuration.clickTrackingURL);
+    MPLogDebug(@"Tracking click: %@", configuration.clickTrackingURL);
     [NSURLConnection connectionWithRequest:[self requestForURL:configuration.clickTrackingURL]
                                   delegate:nil];
 }

@@ -80,21 +80,6 @@
  *
  */
 
--(void)loadInterstitialWithCustomEventInfo:(NSDictionary *)info;
-
-/**
- * API to Allow us to detach the custom event from (shared instance) routers synchronously
- * See the chartboost interstitial custom event for an example use case.
- */
--(void)invalidate;
-
-/*!
- *  check to see if the custom event has an ad ready to go
- *
- *  @return YES if there is an ad ready to go
- */
--(BOOL)ready;
-
 @property (nonatomic, weak) id<MPInterstitialCustomEventDelegate> delegate;
 
 @end

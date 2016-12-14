@@ -8,14 +8,10 @@
 #import <GoogleMobileAds/GoogleMobileAds.h>
 #import "MPGoogleAdMobInterstitialCustomEvent.h"
 #import "MPInterstitialAdController.h"
+#import "MPLogging.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
-#import "WBAdService+Internal.h"
 #import <CoreLocation/CoreLocation.h>
-
-#if (DEBUG || ADHOC)
-#import "WBAdService+Debugging.h"
-#endif
 
 @interface MPInstanceProvider (AdMobInterstitials)
 
@@ -43,7 +39,6 @@
 @interface MPGoogleAdMobInterstitialCustomEvent () <GADInterstitialDelegate>
 
 @property (nonatomic, strong) GADInterstitial *interstitial;
-@property (nonatomic) BOOL ready;
 
 @end
 
@@ -55,19 +50,10 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
+    MPLogInfo(@"Requesting Google AdMob interstitial");
     self.interstitial = [[MPInstanceProvider sharedProvider] buildGADInterstitialAd];
 
-    NSString *adUnitID = info[WBAdUnitID];
-#if (DEBUG || ADHOC)
-    
-    if([[WBAdService sharedAdService] forcedAdNetwork] == WBAdNetworkAM)
-    {
-        adUnitID = [[WBAdService sharedAdService] fullpageIdForAdId:WBAdIdAM];
-    }
-    
-#endif
-
-    self.interstitial.adUnitID = adUnitID;
+    self.interstitial.adUnitID = [info objectForKey:@"adUnitID"];
     self.interstitial.delegate = self;
 
     GADRequest *request = [[MPInstanceProvider sharedProvider] buildGADInterstitialRequest];
@@ -85,8 +71,6 @@
 
     request.requestAgent = @"MoPub";
 
-    request.requestAgent = @"MoPub";
-
     [self.interstitial loadRequest:request];
 }
 
@@ -100,42 +84,42 @@
     self.interstitial.delegate = nil;
 }
 
--(NSString *)description
-{
-    return @"AdMob";
-}
-
 #pragma mark - IMAdInterstitialDelegate
 
 - (void)interstitialDidReceiveAd:(GADInterstitial *)interstitial
 {
-    self.ready = YES;
+    MPLogInfo(@"Google AdMob Interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:self];
 }
 
 - (void)interstitial:(GADInterstitial *)interstitial didFailToReceiveAdWithError:(GADRequestError *)error
 {
+    MPLogInfo(@"Google AdMob Interstitial failed to load with error: %@", error.localizedDescription);
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)interstitialWillPresentScreen:(GADInterstitial *)interstitial
 {
+    MPLogInfo(@"Google AdMob Interstitial will present");
     [self.delegate interstitialCustomEventWillAppear:self];
     [self.delegate interstitialCustomEventDidAppear:self];
 }
 
 - (void)interstitialWillDismissScreen:(GADInterstitial *)ad
 {
+    MPLogInfo(@"Google AdMob Interstitial will dismiss");
     [self.delegate interstitialCustomEventWillDisappear:self];
 }
 
 - (void)interstitialDidDismissScreen:(GADInterstitial *)ad
 {
+    MPLogInfo(@"Google AdMob Interstitial did dismiss");
     [self.delegate interstitialCustomEventDidDisappear:self];
 }
 
 - (void)interstitialWillLeaveApplication:(GADInterstitial *)ad
 {
+    MPLogInfo(@"Google AdMob Interstitial will leave application");
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
 }
 

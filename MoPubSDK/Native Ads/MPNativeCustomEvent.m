@@ -6,6 +6,7 @@
 #import "MPNativeCustomEvent.h"
 #import "MPNativeAdError.h"
 #import "MPImageDownloadQueue.h"
+#import "MPLogging.h"
 
 @interface MPNativeCustomEvent ()
 

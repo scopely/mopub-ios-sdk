@@ -12,6 +12,9 @@
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+
 @interface MPTimer (Specs)
 
 @property (nonatomic, assign) BOOL isPaused;
@@ -54,7 +57,7 @@ describe(@"MPBannerAdManager", ^{
             URL should contain(@"id=panther");
             URL should contain(@"q=liono");
             URL should contain(@"ll=30,20");
-            URL should contain(@"http://testing.ads.mopub.com");
+            URL should contain(@"https://testing.ads.mopub.com");
         });
     });
 
@@ -330,3 +333,5 @@ describe(@"MPBannerAdManager", ^{
 });
 
 SPEC_END
+
+#pragma clang diagnostic pop

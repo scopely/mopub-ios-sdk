@@ -3,6 +3,10 @@
 #import "NSOperationQueue+MPSpecs.h"
 #import "MPMoPubNativeCustomEvent.h"
 #import "CedarAsync.h"
+#import "MPNativeAdRendererConfiguration.h"
+#import "MPStaticNativeAdRenderer.h"
+#import "MPStaticNativeAdRendererSettings.h"
+#import <Cedar/Cedar.h>
 
 #define kImpressionTrackerURLsKey   @"imptracker"
 #define kDefaultActionURLKey        @"clk"

@@ -38,14 +38,14 @@
 
 + (BOOL)deviceHasStoreKit
 {
-    return NSClassFromString(@"SKStoreProductViewController") != nil;
+    return !!NSClassFromString(@"SKStoreProductViewController");
 }
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_6_0
 + (SKStoreProductViewController *)buildController
 {
     // use our safe subclass on iOS 7
-    if ([[UIDevice currentDevice].systemVersion compare:@"7.0"] != NSOrderedAscending) {
+    if ([[UIDevice currentDevice].systemVersion compare:@"7.0" options:NSNumericSearch] != NSOrderedAscending) {
         return [[MPiOS7SafeStoreProductViewController alloc] init];
     } else {
         return [[SKStoreProductViewController alloc] init];

@@ -1,3 +1,105 @@
+## Version 4.11.1 (November 28th, 2016)
+- **App Transport Security Updates**
+	- Checks for "NSAllowsArbitraryLoadsInMedia" were changed to "NSAllowsArbitraryLoadsForMedia", per updated Apple documentation
+	- Resolves issue in which explicitly using NSAllowsArbitraryLoadsForMedia or NSAllowsArbitraryLoadsInWebContent causes HTTP clickthroughs not to resolve on iOS 10.1 or higher
+
+## Version 4.11.0 (November 10th, 2016)
+- **The MoPub SDK now uses WKWebView to display ads when possible. Backwards compatibility for old OS versions is retained using UIWebView.**
+- **Native video start tracker now fires immediately upon successful video playback.**
+- **Bug fixes**
+  - Native ads and native video ads now correctly fire impression trackers while scrolling.
+
+## Version 4.10.1 (October 28th, 2016)
+- **Bug fixes**
+  - Fixed iOS 10 bug that causes SKStoreProductViewController to crash if the app does not list portrait as a supported orientation.
+
+## Version 4.10.0 (October 18th, 2016)
+- **Certified FAN 4.15.1**
+- **Certified Chartboost 6.5.2**
+- **Certified Yahoo 7.6.4**
+- **Certified TapJoy support for 11.8.2**
+- **Certified Millennial support for 6.3.1**
+- **Certified Vungle 4.0.6**
+- **Bug fixes**
+  - Added support for the CocoaPods use_frameworks! directive
+
+## Version 4.9.1 (September 14th, 2016)
+- **iOS 10 compatibility updates**
+	- Fixed an issue related to screen bounds calculation
+- **Removed EventKit, EventKitUI frameworks and a few files related to EventKit and MRAID image downloader**
+	- Please completely remove the MoPub SDK from your project and re-integrate this version to ensure that files are properly removed from your project
+
+## Version 4.9.0 (September 1st, 2016)
+- **Modular SDK - publishers can download the base or base excluding native SDK package**
+- **Removed the full SDK bundle**
+- **iOS 10 compatibility updates**
+	- Rotating frequency capping ID for non-targeted ads under 'Limit Ad Tracking' setting
+	- Removed save picture and save to calendar MRAID functionality
+- **Removed iAd and InMobi adapters**
+- **Added Cocoapods module name: "MoPub"**
+- **Bug fixes**
+  - Fixed an issue when multiple rewarded videos are loaded at the same time
+
+## Version 4.8.0 (August 1st, 2016)
+- **renamed MPError enums to avoid possible naming conflict with MediaPlayer framework errors**.
+
+## Version 4.7.0 (June 2nd, 2016)
+- **Rewarded video server-side currency rewarding (Beta)**.
+	
+## Version 4.6.0 (April 21th, 2016)
+- **Certified Chartboost version 6.4.0**
+- **Certified Tapjoy version 11.5.1**
+- **Bug fixes**
+	- Fixed resource loading issues when using cocoapods and frameworks
+
+## Version 4.5.1 (April 4th, 2016)
+
+- **bitcode support for MoPub Fabric Kit**
+	
+## Version 4.5 (March 24th, 2016)
+
+- **Rewarded video support from the MoPub Marketplace (Beta)**
+- **Bug fixes**
+	- The SDK now correctly sends matched modal presented/dismissed callbacks on clickthrough
+
+## Version 4.4 (February 17th, 2016)
+
+- **Enabled SSL ad requests by default**
+- **Bug fixes**
+	- Fixed native video impression tracking
+	- Made closeable hot spot consistent across all full-screen creative types
+
+
+## Version 4.3 (December 15th, 2015)
+
+- **Minor SDK improvements**.
+	
+## Version 4.2 (November 30th, 2015)
+
+- **Upgraded Facebook SDK support to 4.8.0**.
+	- Facebook Audience Network custom events for native and native video automatically display Facebook's AdChoices icon.
+- **Added mediation support for Facebook video**.
+- **Bug fixes**
+    - Added mp prefix to common constants.
+    - Fixed minor issue with video resuming during background to foreground transitions.
+    - Fixed minor issue generating the 'mute' video status event.
+
+## Version 4.1 (November 12th, 2015)
+
+- **Added MoPub prefixes to constants and category methods**.
+- **Certified Tapjoy 11.2.2**.
+- **Certified Vungle 3.2.0**.
+
+## Version 4.0 (October 6th, 2015)
+
+- **Minimum supported iOS version is now 6.0**.
+- **Updated native ad integration APIs**.
+- **Improved native ad placer caching and request logic**.
+- **Clicks are now automatically tracked for native ads that use the manual integration**.
+- **Removed deprecated classes**.
+  - Removed legacy custom event classes deprecated in 1.10.
+  - Removed MPTableViewAdManager class deprecated in 3.0.
+
 ## Version 3.13 (September 17th, 2015)
 
 - **Added iOS 9 support**.

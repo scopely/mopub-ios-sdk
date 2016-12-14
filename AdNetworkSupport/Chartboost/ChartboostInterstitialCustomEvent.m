@@ -6,9 +6,7 @@
 //
 
 #import "ChartboostInterstitialCustomEvent.h"
-#import "WBAdLogging.h"
-#import "MPChartboostRouter.h"
-#import "MPInstanceProvider+Chartboost.h"
+#import "MPLogging.h"
 #import "MPChartboostRouter.h"
 #import "MPInstanceProvider+Chartboost.h"
 #import <Chartboost/Chartboost.h>
@@ -26,13 +24,13 @@ static NSString *gAppSignature = nil;
 
 + (void)setAppId:(NSString *)appId
 {
-    AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"+setAppId for class ChartboostInterstitialCustomEvent is deprecated. Use the appId parameter when configuring your network in the MoPub UI.");
+    MPLogWarn(@"+setAppId for class ChartboostInterstitialCustomEvent is deprecated. Use the appId parameter when configuring your network in the MoPub UI.");
     gAppId = [appId copy];
 }
 
 + (void)setAppSignature:(NSString *)appSignature
 {
-    AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"+setAppSignature for class ChartboostInterstitialCustomEvent is deprecated. Use the appSignature parameter when configuring your network in the MoPub UI.");
+    MPLogWarn(@"+setAppSignature for class ChartboostInterstitialCustomEvent is deprecated. Use the appSignature parameter when configuring your network in the MoPub UI.");
     gAppSignature = [appSignature copy];
 }
 
@@ -51,7 +49,7 @@ static NSString *gAppSignature = nil;
         appId = gAppId;
 
         if ([appId length] == 0) {
-            AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"Setting kChartboostAppId in ChartboostInterstitialCustomEvent.m is deprecated. Use the appId parameter when configuring your network in the MoPub UI.");
+            MPLogWarn(@"Setting kChartboostAppId in ChartboostInterstitialCustomEvent.m is deprecated. Use the appId parameter when configuring your network in the MoPub UI.");
             appId = kChartboostAppID;
         }
     }
@@ -60,14 +58,14 @@ static NSString *gAppSignature = nil;
         appSignature = gAppSignature;
 
         if ([appSignature length] == 0) {
-            AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"Setting kChartboostAppSignature in ChartboostInterstitialCustomEvent.m is deprecated. Use the appSignature parameter when configuring your network in the MoPub UI.");
+            MPLogWarn(@"Setting kChartboostAppSignature in ChartboostInterstitialCustomEvent.m is deprecated. Use the appSignature parameter when configuring your network in the MoPub UI.");
             appSignature = kChartboostAppSignature;
         }
     }
     NSString *location = [info objectForKey:@"location"];
     self.location = location ? location : @"Default";
 
-    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Requesting Chartboost interstitial. key = %@ sig = %@",appId,appSignature);
+    MPLogInfo(@"Requesting Chartboost interstitial.");
     [[MPChartboostRouter sharedRouter] cacheInterstitialWithAppId:appId
                                                      appSignature:appSignature
                                                          location:self.location
@@ -77,11 +75,11 @@ static NSString *gAppSignature = nil;
 - (void)showInterstitialFromRootViewController:(UIViewController *)rootViewController
 {
     if ([[MPChartboostRouter sharedRouter] hasCachedInterstitialForLocation:self.location]) {
-        AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Chartboost interstitial will be shown.");
+        MPLogInfo(@"Chartboost interstitial will be shown.");
 
         [[MPChartboostRouter sharedRouter] showInterstitialForLocation:self.location];
     } else {
-        AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Failed to show Chartboost interstitial.");
+        MPLogInfo(@"Failed to show Chartboost interstitial.");
 
         [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
     }
@@ -91,21 +89,21 @@ static NSString *gAppSignature = nil;
 
 - (void)didCacheInterstitial:(CBLocation)location
 {
-    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Successfully loaded Chartboost interstitial. Location: %@", location);
+    MPLogInfo(@"Successfully loaded Chartboost interstitial. Location: %@", location);
 
     [self.delegate interstitialCustomEvent:self didLoadAd:nil];
 }
 
 - (void)didFailToLoadInterstitial:(CBLocation)location withError:(CBLoadError)error
 {
-    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Failed to load Chartboost interstitial. Location: %@", location);
+    MPLogInfo(@"Failed to load Chartboost interstitial. Location: %@", location);
 
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
 - (void)didDismissInterstitial:(CBLocation)location
 {
-    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Chartboost interstitial was dismissed. Location: %@", location);
+    MPLogInfo(@"Chartboost interstitial was dismissed. Location: %@", location);
 
     // Chartboost doesn't seem to have a separate callback for the "will disappear" event, so we
     // signal "will disappear" manually.
@@ -116,7 +114,7 @@ static NSString *gAppSignature = nil;
 
 - (void)didDisplayInterstitial:(CBLocation)location
 {
-    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Chartboost interstitial was displayed. Location: %@", location);
+    MPLogInfo(@"Chartboost interstitial was displayed. Location: %@", location);
 
     // Chartboost doesn't seem to have a separate callback for the "will appear" event, so we
     // signal "will appear" manually.
@@ -127,7 +125,7 @@ static NSString *gAppSignature = nil;
 
 - (void)didClickInterstitial:(CBLocation)location
 {
-    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Chartboost interstitial was clicked. Location: %@", location);
+    MPLogInfo(@"Chartboost interstitial was clicked. Location: %@", location);
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
 }
 

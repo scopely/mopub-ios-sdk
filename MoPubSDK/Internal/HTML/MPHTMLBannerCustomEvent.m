@@ -6,22 +6,19 @@
 //
 
 #import "MPHTMLBannerCustomEvent.h"
-#import "MPAdWebView.h"
+#import "MPWebView.h"
+#import "MPLogging.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
-#import "MPConstants.h"
-#import "WBAdLogging.h"
 
 @interface MPHTMLBannerCustomEvent ()
 
-@property (nonatomic, assign) WBAdType logType;
 @property (nonatomic, strong) MPAdWebViewAgent *bannerAgent;
 
 @end
 
 @implementation MPHTMLBannerCustomEvent
 
-@dynamic delegate;
 @synthesize bannerAgent = _bannerAgent;
 
 - (BOOL)enableAutomaticImpressionAndClickTracking
@@ -31,9 +28,8 @@
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    self.logType = (size.height == MOPUB_MEDIUM_RECT_SIZE.height ? WBAdTypeInterstitial : WBAdTypeBanner);
-    AdLogType(WBAdLogLevelInfo, self.logType, @"Loading MoPub HTML %@", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"));
-    AdLogType(WBAdLogLevelTrace, self.logType, @"Loading banner with HTML source: %@", [[self.delegate configuration] adResponseHTMLString]);
+    MPLogInfo(@"Loading MoPub HTML banner");
+    MPLogTrace(@"Loading banner with HTML source: %@", [[self.delegate configuration] adResponseHTMLString]);
 
     CGRect adWebViewFrame = CGRectMake(0, 0, size.width, size.height);
     self.bannerAgent = [[MPInstanceProvider sharedProvider] buildMPAdWebViewAgentWithAdWebViewFrame:adWebViewFrame
@@ -44,10 +40,6 @@
 - (void)dealloc
 {
     self.bannerAgent.delegate = nil;
-}
--(NSString *)description
-{
-    return @"MPHTML";
 }
 
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation
@@ -72,38 +64,38 @@
     return [self.delegate viewControllerForPresentingModalView];
 }
 
-- (void)adDidFinishLoadingAd:(MPAdWebView *)ad
+- (void)adDidFinishLoadingAd:(MPWebView *)ad
 {
-    AdLogType(WBAdLogLevelInfo, self.logType, @"MoPub HTML %@ did load", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"));
+    MPLogInfo(@"MoPub HTML banner did load");
     [self.delegate bannerCustomEvent:self didLoadAd:ad];
 }
 
-- (void)adDidFailToLoadAd:(MPAdWebView *)ad
+- (void)adDidFailToLoadAd:(MPWebView *)ad
 {
-    AdLogType(WBAdLogLevelFatal, self.logType, @"MoPub HTML %@ did fail", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"));
+    MPLogInfo(@"MoPub HTML banner did fail");
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
-- (void)adDidClose:(MPAdWebView *)ad
+- (void)adDidClose:(MPWebView *)ad
 {
     //don't care
 }
 
-- (void)adActionWillBegin:(MPAdWebView *)ad
+- (void)adActionWillBegin:(MPWebView *)ad
 {
-    AdLogType(WBAdLogLevelDebug, self.logType, @"MoPub HTML %@ will begin action", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"));
+    MPLogInfo(@"MoPub HTML banner will begin action");
     [self.delegate bannerCustomEventWillBeginAction:self];
 }
 
-- (void)adActionDidFinish:(MPAdWebView *)ad
+- (void)adActionDidFinish:(MPWebView *)ad
 {
-    AdLogType(WBAdLogLevelDebug, self.logType, @"MoPub HTML %@ did finish action", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"));
+    MPLogInfo(@"MoPub HTML banner did finish action");
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 
-- (void)adActionWillLeaveApplication:(MPAdWebView *)ad
+- (void)adActionWillLeaveApplication:(MPWebView *)ad
 {
-    AdLogType(WBAdLogLevelDebug, self.logType, @"MoPub HTML %@ will leave application", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"));
+    MPLogInfo(@"MoPub HTML banner will leave application");
     [self.delegate bannerCustomEventWillLeaveApplication:self];
 }
 

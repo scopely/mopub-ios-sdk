@@ -7,7 +7,6 @@
 
 #import "MRCommand.h"
 #import "MPGlobal.h"
-#import "WBAdLogging.h"
 #import "MPLogging.h"
 #import "MRConstants.h"
 

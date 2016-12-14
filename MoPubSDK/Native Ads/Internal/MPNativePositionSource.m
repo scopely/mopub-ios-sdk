@@ -10,6 +10,7 @@
 #import "MPIdentityProvider.h"
 #import "MPAdPositioning.h"
 #import "MPClientAdPositioning.h"
+#import "MPLogging.h"
 #import "MPNativePositionResponseDeserializer.h"
 #import "MPAPIEndpoints.h"
 
@@ -72,7 +73,7 @@ static const CGFloat kRetryIntervalBackoffMultiplier = 2.0;
     self.retryCount = 0;
     self.retryInterval = self.minimumRetryInterval;
 
-//    MPLogInfo(@"Requesting ad positions for native ad unit (%@).", identifier);
+    MPLogInfo(@"Requesting ad positions for native ad unit (%@).", identifier);
 
     NSURLRequest *request = [NSURLRequest requestWithURL:[self serverURLWithAdUnitIdentifier:identifier]];
     [self.connection cancel];
@@ -106,7 +107,7 @@ static const CGFloat kRetryIntervalBackoffMultiplier = 2.0;
 {
     self.retryCount++;
 
-//    MPLogInfo(@"Retrying positions (retry attempt #%lu).", (unsigned long)self.retryCount);
+    MPLogInfo(@"Retrying positions (retry attempt #%lu).", (unsigned long)self.retryCount);
 
     NSURLRequest *request = [NSURLRequest requestWithURL:[self serverURLWithAdUnitIdentifier:self.adUnitIdentifier]];
     [self.connection cancel];
@@ -142,7 +143,7 @@ static const CGFloat kRetryIntervalBackoffMultiplier = 2.0;
     MPClientAdPositioning *positioning = [[MPNativePositionResponseDeserializer deserializer] clientPositioningForData:self.data error:&deserializationError];
 
     if (deserializationError) {
-//        MPLogDebug(@"Position deserialization failed with error: %@", deserializationError);
+        MPLogDebug(@"Position deserialization failed with error: %@", deserializationError);
 
         NSError *underlyingError = [[deserializationError userInfo] objectForKey:NSUnderlyingErrorKey];
         if ([underlyingError code] == MPNativePositionResponseDataIsEmpty) {

@@ -13,12 +13,7 @@
 #import "MPError.h"
 #import "MPTimer.h"
 #import "MPConstants.h"
-#import "MPLegacyBannerCustomEventAdapter.h"
-
-#import "WBAdEvent_Internal.h"
-#import "WBAdControllerEvent.h"
 #import "MPLogging.h"
-#import "WBAdLogging.h"
 
 @interface MPBannerAdManager ()
 
@@ -32,7 +27,6 @@
 @property (nonatomic, assign) BOOL automaticallyRefreshesContents;
 @property (nonatomic, assign) BOOL hasRequestedAtLeastOneAd;
 @property (nonatomic, assign) UIInterfaceOrientation currentOrientation;
-@property (nonatomic, assign) WBAdType logType;
 
 - (void)loadAdWithURL:(NSURL *)URL;
 - (void)applicationWillEnterForeground;
@@ -71,7 +65,6 @@
 
         self.automaticallyRefreshesContents = YES;
         self.currentOrientation = MPInterfaceOrientation();
-        self.logType = (delegate.containerSize.height == MOPUB_MEDIUM_RECT_SIZE.height ? WBAdTypeInterstitial : WBAdTypeBanner);
     }
     return self;
 }
@@ -103,7 +96,7 @@
     }
 
     if (self.loading) {
-        AdLogType(WBAdLogLevelWarn, self.logType, @"%@ view (%@) is already loading an ad. Wait for previous load to finish.", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"), [self.delegate adUnitId]);
+        MPLogWarn(@"Banner view (%@) is already loading an ad. Wait for previous load to finish.", [self.delegate adUnitId]);
         return;
     }
 
@@ -113,11 +106,6 @@
 - (void)forceRefreshAd
 {
     [self loadAdWithURL:nil];
-}
-
-- (void)cancelAd
-{
-    [self.communicator cancel];
 }
 
 - (void)applicationWillEnterForeground
@@ -172,13 +160,8 @@
                                                      keywords:[self.delegate keywords]
                                                      location:[self.delegate location]
                                                       testing:[self.delegate isTesting]];
-    AdLogType(WBAdLogLevelTrace, self.logType, @"%@ view (%@) loading ad with MoPub server URL: %@", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"),[self.delegate adUnitId], URL);
-    
-    if(self.logType == WBAdTypeBanner)
-    {
-        WBAdControllerEvent *controllerEvent = [[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:nil adType:WBAdTypeBanner];
-        [WBAdControllerEvent postNotification:controllerEvent];
-    }
+
+    MPLogInfo(@"Banner view (%@) loading ad with MoPub server URL: %@", [self.delegate adUnitId], URL);
 
     [self.communicator loadURL:URL];
 }
@@ -203,7 +186,7 @@
                                                                                      selector:@selector(refreshTimerDidFire)
                                                                                       repeats:NO];
         [self.refreshTimer scheduleNow];
-        AdLogType(WBAdLogLevelDebug, self.logType, @"Scheduled the autorefresh timer to fire in %.1f seconds (%p).", timeInterval, self.refreshTimer);
+        MPLogDebug(@"Scheduled the autorefresh timer to fire in %.1f seconds (%p).", timeInterval, self.refreshTimer);
     }
 }
 
@@ -220,35 +203,34 @@
 {
     self.requestingConfiguration = configuration;
 
-    AdLogType(WBAdLogLevelDebug, self.logType, @"Banner ad view is fetching ad network type: %@", self.requestingConfiguration.networkType);
+    MPLogInfo(@"Banner ad view is fetching ad network type: %@", self.requestingConfiguration.networkType);
 
     if (configuration.adType == MPAdTypeUnknown) {
-        [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorServerError]];
+        [self didFailToLoadAdapterWithError:[MOPUBError errorWithCode:MOPUBErrorServerError]];
         return;
     }
 
     if (configuration.adType == MPAdTypeInterstitial) {
-        AdLogType(WBAdLogLevelWarn, self.logType, @"Could not load ad: banner object received an interstitial ad unit ID.");
-        [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorAdapterInvalid]];
+        MPLogWarn(@"Could not load ad: banner object received an interstitial ad unit ID.");
+        [self didFailToLoadAdapterWithError:[MOPUBError errorWithCode:MOPUBErrorAdapterInvalid]];
         return;
     }
 
     if (configuration.adUnitWarmingUp) {
-        AdLogType(WBAdLogLevelInfo, self.logType, kMPWarmingUpErrorLogFormatWithAdUnitID, self.delegate.adUnitId);
-        [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorAdUnitWarmingUp]];
+        MPLogInfo(kMPWarmingUpErrorLogFormatWithAdUnitID, self.delegate.adUnitId);
+        [self didFailToLoadAdapterWithError:[MOPUBError errorWithCode:MOPUBErrorAdUnitWarmingUp]];
         return;
     }
 
     if ([configuration.networkType isEqualToString:kAdTypeClear]) {
-        AdLogType(WBAdLogLevelInfo, self.logType, kMPClearErrorLogFormatWithAdUnitID, self.delegate.adUnitId);
-        [self didFailToLoadAdapterWithError:[MPError errorWithCode:MPErrorNoInventory]];
+        MPLogInfo(kMPClearErrorLogFormatWithAdUnitID, self.delegate.adUnitId);
+        [self didFailToLoadAdapterWithError:[MOPUBError errorWithCode:MOPUBErrorNoInventory]];
         return;
     }
 
     self.requestingAdapter = [[MPInstanceProvider sharedProvider] buildBannerAdapterForConfiguration:configuration
                                                                                             delegate:self];
     if (!self.requestingAdapter) {
-        [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonMalformedData adNetwork:nil adType:WBAdTypeBanner];
         [self loadAdWithURL:self.requestingConfiguration.failoverURL];
         return;
     }
@@ -263,32 +245,10 @@
 
 - (void)didFailToLoadAdapterWithError:(NSError *)error
 {
-    
-    if(self.logType == WBAdTypeBanner)
-    {
-        WBAdFailureReason failureReason = WBAdFailureReasonNetworkError;
-        
-        switch (error.code) {
-            case MPErrorServerError:
-                failureReason = WBAdFailureReasonMalformedData;
-                break;
-            case MPErrorAdapterInvalid:
-                failureReason = WBAdFailureReasonMalformedData;
-                break;
-            case MPErrorNoInventory:
-                failureReason = WBAdFailureReasonNoFill;
-                break;
-            default:
-                break;
-        }
-        
-        [WBAdControllerEvent postAdFailedWithReason:failureReason adNetwork:nil adType:WBAdTypeBanner];
-    }
-
     [self.delegate managerDidFailToLoadAd];
     [self scheduleRefreshTimer];
 
-    AdLogType(WBAdLogLevelError, self.logType, @"%@ view (%@) failed. Error: %@", (self.logType == WBAdTypeBanner ? @"Banner" : @"MedRect"), [self.delegate adUnitId], error);
+    MPLogError(@"Banner view (%@) failed. Error: %@", [self.delegate adUnitId], error);
 }
 
 #pragma mark - <MPBannerAdapterDelegate>
@@ -320,7 +280,7 @@
 
 - (BOOL)requestingAdapterIsReadyToBePresented
 {
-    return self.requestingAdapterAdContentView != nil;
+    return !!self.requestingAdapterAdContentView;
 }
 
 - (void)presentRequestingAdapter
@@ -396,61 +356,6 @@
     if (self.onscreenAdapter == adapter) {
         [self.delegate userWillLeaveApplication];
     }
-}
-
-#pragma mark - Deprecated Public Interface
-
-- (void)customEventDidLoadAd
-{
-    if (![self.requestingAdapter isKindOfClass:[MPLegacyBannerCustomEventAdapter class]]) {
-        AdLogType(WBAdLogLevelWarn, self.logType, @"-customEventDidLoadAd should not be called unless a custom event is in "
-                  @"progress.");
-        return;
-    }
-
-    //NOTE: this will immediately deallocate the onscreen adapter, even if there is a modal onscreen.
-
-    [self.onscreenAdapter unregisterDelegate];
-    self.onscreenAdapter = self.requestingAdapter;
-    self.requestingAdapter = nil;
-
-    [self.onscreenAdapter didDisplayAd];
-
-    [self scheduleRefreshTimer];
-}
-
-- (void)customEventDidFailToLoadAd
-{
-    if (![self.requestingAdapter isKindOfClass:[MPLegacyBannerCustomEventAdapter class]]) {
-        AdLogType(WBAdLogLevelWarn, self.logType, @"-customEventDidFailToLoadAd should not be called unless a custom event is in "
-                  @"progress.");
-        return;
-    }
-
-    [self loadAdWithURL:self.requestingConfiguration.failoverURL];
-}
-
-- (void)customEventActionWillBegin
-{
-    if (![self.onscreenAdapter isKindOfClass:[MPLegacyBannerCustomEventAdapter class]]) {
-        AdLogType(WBAdLogLevelWarn, self.logType, @"-customEventActionWillBegin should not be called unless a custom event is in "
-                  @"progress.");
-        return;
-    }
-
-    [self.onscreenAdapter trackClick];
-    [self userActionWillBeginForAdapter:self.onscreenAdapter];
-}
-
-- (void)customEventActionDidEnd
-{
-    if (![self.onscreenAdapter isKindOfClass:[MPLegacyBannerCustomEventAdapter class]]) {
-        AdLogType(WBAdLogLevelWarn, self.logType, @"-customEventActionDidEnd should not be called unless a custom event is in "
-                  @"progress.");
-        return;
-    }
-
-    [self userActionDidFinishForAdapter:self.onscreenAdapter];
 }
 
 @end

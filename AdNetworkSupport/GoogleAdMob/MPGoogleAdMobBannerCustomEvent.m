@@ -7,13 +7,8 @@
 
 #import <GoogleMobileAds/GoogleMobileAds.h>
 #import "MPGoogleAdMobBannerCustomEvent.h"
+#import "MPLogging.h"
 #import "MPInstanceProvider.h"
-#import "WBAdService+Internal.h"
-#import <WithBuddiesAds/WithBuddiesAds.h>
-
-#if (DEBUG || ADHOC)
-#import "WBAdService+Debugging.h"
-#endif
 
 @interface MPInstanceProvider (AdMobBanners)
 
@@ -63,31 +58,11 @@
     self.adBannerView.delegate = nil;
 }
 
--(NSString *)description
-{
-    return @"AdMob";
-}
-
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-    NSString *adUnitID = info[WBAdUnitID];
-#if (DEBUG || ADHOC)
-    
-    if([[WBAdService sharedAdService] forcedAdNetwork] == WBAdNetworkAM)
-    {
-        adUnitID = [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdAM];
-    }
-
-#endif
-    
-    self.adBannerView.adUnitID = adUnitID;
-    
-    CGRect frame = [self frameForCustomEventInfo:info];
-    if(CGSizeEqualToSize(size, CGSizeZero) == NO)
-    {
-        frame.size = size;
-    }
-    self.adBannerView.frame = frame;
+    MPLogInfo(@"Requesting Google AdMob banner");
+    self.adBannerView.frame = [self frameForCustomEventInfo:info];
+    self.adBannerView.adUnitID = [info objectForKey:@"adUnitID"];
     self.adBannerView.rootViewController = [self.delegate viewControllerForPresentingModalView];
 
     GADRequest *request = [[MPInstanceProvider sharedProvider] buildGADBannerRequest];
@@ -102,8 +77,6 @@
     // Here, you can specify a list of device IDs that will receive test ads.
     // Running in the simulator will automatically show test ads.
     request.testDevices = @[/*more UDIDs here*/];
-
-    request.requestAgent = @"MoPub";
 
     request.requestAgent = @"MoPub";
 
@@ -122,42 +95,37 @@
     return CGRectMake(0, 0, width, height);
 }
 
--(void)removeFromSuperview
-{
-    [self.adBannerView removeFromSuperview];
-}
-
 #pragma mark -
 #pragma mark GADBannerViewDelegate methods
 
 - (void)adViewDidReceiveAd:(GADBannerView *)bannerView
 {
-    AdLogType(WBAdLogLevelInfo, WBAdTypeBanner, @"Google AdMob Banner did load");
+    MPLogInfo(@"Google AdMob Banner did load");
     [self.delegate bannerCustomEvent:self didLoadAd:self.adBannerView];
 }
 
 - (void)adView:(GADBannerView *)bannerView
 didFailToReceiveAdWithError:(GADRequestError *)error
 {
-    AdLogType(WBAdLogLevelFatal, WBAdTypeBanner, @"Google AdMob Banner failed to load with error: %@", error.localizedDescription);
+    MPLogInfo(@"Google AdMob Banner failed to load with error: %@", error.localizedDescription);
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:error];
 }
 
 - (void)adViewWillPresentScreen:(GADBannerView *)bannerView
 {
-    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"Google AdMob Banner will present modal");
+    MPLogInfo(@"Google AdMob Banner will present modal");
     [self.delegate bannerCustomEventWillBeginAction:self];
 }
 
 - (void)adViewDidDismissScreen:(GADBannerView *)bannerView
 {
-    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"Google AdMob Banner did dismiss modal");
+    MPLogInfo(@"Google AdMob Banner did dismiss modal");
     [self.delegate bannerCustomEventDidFinishAction:self];
 }
 
 - (void)adViewWillLeaveApplication:(GADBannerView *)bannerView
 {
-    AdLogType(WBAdLogLevelDebug, WBAdTypeBanner, @"Google AdMob Banner will leave the application");
+    MPLogInfo(@"Google AdMob Banner will leave the application");
     [self.delegate bannerCustomEventWillLeaveApplication:self];
 }
 

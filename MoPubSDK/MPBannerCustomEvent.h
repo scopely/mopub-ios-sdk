@@ -79,18 +79,6 @@
  */
 - (BOOL)enableAutomaticImpressionAndClickTracking;
 
-/**
-* API to allow us to detach the custom event from (shared instance) routers synchronously
-* See the iAd banner custom event for an example use case.
-*/
--(void)invalidate;
-
-/*!
- *  @abstract
- *  Removes the banner from the superview
- */
--(void)removeFromSuperview;
-
 /** @name Communicating with the MoPub SDK */
 
 /**

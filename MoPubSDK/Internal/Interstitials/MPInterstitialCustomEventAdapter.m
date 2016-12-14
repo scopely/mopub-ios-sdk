@@ -5,16 +5,13 @@
 //  Copyright (c) 2012 MoPub, Inc. All rights reserved.
 //
 
-#import <WithBuddiesAds/WithBuddiesAds.h>
 #import "MPInterstitialCustomEventAdapter.h"
 
 #import "MPAdConfiguration.h"
+#import "MPLogging.h"
 #import "MPInstanceProvider.h"
 #import "MPInterstitialCustomEvent.h"
 #import "MPInterstitialAdController.h"
-
-#import "WBAdEvent_Internal.h"
-#import "WBAdControllerEvent.h"
 
 @interface MPInterstitialCustomEventAdapter ()
 
@@ -47,24 +44,14 @@
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration
 {
-    AdLogType(WBAdLogLevelDebug, WBAdTypeInterstitial, @"Looking for custom event class named %@.", configuration.customEventClass);
+    MPLogInfo(@"Looking for custom event class named %@.", configuration.customEventClass);
     self.configuration = configuration;
 
     self.interstitialCustomEvent = [[MPInstanceProvider sharedProvider] buildInterstitialCustomEventFromCustomClass:configuration.customEventClass delegate:self];
 
     if (self.interstitialCustomEvent) {
-        AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Requesting %@ interstitial", self.interstitialCustomEvent);
-        WBAdControllerEvent *controllerEvent = [[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[self.interstitialCustomEvent description] adType:WBAdTypeInterstitial];
-        [WBAdControllerEvent postNotification:controllerEvent];
-        
-        self.configuration.customAdNetwork = [self.interstitialCustomEvent description];
-        
-        WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:[self.interstitialCustomEvent description] adType:WBAdTypeInterstitial];
-        [WBAdEvent postNotification:adEvent];
-        
         [self.interstitialCustomEvent requestInterstitialWithCustomEventInfo:configuration.customEventClassData];
     } else {
-        [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonMalformedData adNetwork:NSStringFromClass(configuration.customEventClass) adType:WBAdTypeInterstitial];
         [self.delegate adapter:self didFailToLoadAdWithError:nil];
     }
 }
@@ -94,10 +81,6 @@
 - (void)interstitialCustomEvent:(MPInterstitialCustomEvent *)customEvent
                       didLoadAd:(id)ad
 {
-    WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLoaded adNetwork:[customEvent description] adType:WBAdTypeInterstitial];
-    [WBAdEvent postNotification:adEvent];
-    
-    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"%@ interstitial did load", customEvent);
     [self didStopLoading];
     [self.delegate adapterDidFinishLoadingAd:self];
 }
@@ -105,23 +88,17 @@
 - (void)interstitialCustomEvent:(MPInterstitialCustomEvent *)customEvent
        didFailToLoadAdWithError:(NSError *)error
 {
-    [WBAdEvent postAdFailedWithReason:WBAdFailureReasonUnknown adNetwork:[customEvent description] adType:WBAdTypeInterstitial];
-    AdLogType(WBAdLogLevelFatal, WBAdTypeInterstitial, @"%@ interstitial did Fail To Load Ad error: %@", customEvent, error);
     [self didStopLoading];
     [self.delegate adapter:self didFailToLoadAdWithError:error];
 }
 
 - (void)interstitialCustomEventWillAppear:(MPInterstitialCustomEvent *)customEvent
 {
-    AdLogType(WBAdLogLevelDebug, WBAdTypeInterstitial, @"%@ interstitial will appear", customEvent);
     [self.delegate interstitialWillAppearForAdapter:self];
 }
 
 - (void)interstitialCustomEventDidAppear:(MPInterstitialCustomEvent *)customEvent
 {
-    WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeShow adNetwork:[customEvent description] adType:WBAdTypeInterstitial];
-    [WBAdEvent postNotification:adEvent];
-    AdLogType(WBAdLogLevelDebug, WBAdTypeInterstitial, @"%@ interstitial did appear", customEvent);
     if ([self.interstitialCustomEvent enableAutomaticImpressionAndClickTracking] && !self.hasTrackedImpression) {
         self.hasTrackedImpression = YES;
         [self trackImpression];
@@ -131,26 +108,21 @@
 
 - (void)interstitialCustomEventWillDisappear:(MPInterstitialCustomEvent *)customEvent
 {
-    AdLogType(WBAdLogLevelDebug, WBAdTypeInterstitial, @"%@ interstitial will disappear", customEvent);
     [self.delegate interstitialWillDisappearForAdapter:self];
 }
 
 - (void)interstitialCustomEventDidDisappear:(MPInterstitialCustomEvent *)customEvent
 {
-    AdLogType(WBAdLogLevelDebug, WBAdTypeInterstitial, @"%@ interstitial did disappear", customEvent);
     [self.delegate interstitialDidDisappearForAdapter:self];
 }
 
 - (void)interstitialCustomEventDidExpire:(MPInterstitialCustomEvent *)customEvent
 {
-    [WBAdEvent postAdFailedWithReason:WBAdFailureReasonExpired adNetwork:[customEvent description] adType:WBAdTypeInterstitial];
-    AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"%@ interstitial did expire", customEvent);
     [self.delegate interstitialDidExpireForAdapter:self];
 }
 
 - (void)interstitialCustomEventDidReceiveTapEvent:(MPInterstitialCustomEvent *)customEvent
 {
-    AdLogType(WBAdLogLevelDebug, WBAdTypeInterstitial, @"%@ interstitial received tap", customEvent);
     if ([self.interstitialCustomEvent enableAutomaticImpressionAndClickTracking] && !self.hasTrackedClick) {
         self.hasTrackedClick = YES;
         [self trackClick];
@@ -161,10 +133,6 @@
 
 - (void)interstitialCustomEventWillLeaveApplication:(MPInterstitialCustomEvent *)customEvent
 {
-    WBAdEvent *event = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLeaveApp adNetwork:[customEvent description] adType:WBAdTypeInterstitial];
-    [WBAdEvent postNotification:event];
-
-    AdLogType(WBAdLogLevelDebug, WBAdTypeInterstitial, @"%@ interstitial will leave application", customEvent);
     [self.delegate interstitialWillLeaveApplicationForAdapter:self];
 }
 

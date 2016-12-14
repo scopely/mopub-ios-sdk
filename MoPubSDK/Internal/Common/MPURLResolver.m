@@ -5,10 +5,12 @@
 //  Copyright (c) 2013 MoPub. All rights reserved.
 //
 
+#import <WebKit/WebKit.h>
 #import "MPURLResolver.h"
 #import "NSURL+MPAdditions.h"
 #import "NSHTTPURLResponse+MPAdditions.h"
 #import "MPInstanceProvider.h"
+#import "MPLogging.h"
 #import "MPCoreInstanceProvider.h"
 
 static NSString * const kMoPubSafariScheme = @"mopubnativebrowser";
@@ -103,7 +105,9 @@ static NSString * const kResolverErrorDomain = @"com.mopub.resolver";
     MPURLActionInfo *actionInfo = nil;
 
     if (URL == nil) {
-        *error = [NSError errorWithDomain:kResolverErrorDomain code:-1 userInfo:@{NSLocalizedDescriptionKey: @"URL is nil"}];
+        if (error) {
+            *error = [NSError errorWithDomain:kResolverErrorDomain code:-1 userInfo:@{NSLocalizedDescriptionKey: @"URL is nil"}];
+        }
         return nil;
     }
 
@@ -116,11 +120,29 @@ static NSString * const kResolverErrorDomain = @"com.mopub.resolver";
         } else {
             actionInfo = [MPURLActionInfo infoWithURL:self.originalURL deeplinkURL:URL];
         }
+    } else if ([self safariURLForURL:URL]) {
+        actionInfo = [MPURLActionInfo infoWithURL:self.originalURL safariDestinationURL:[NSURL URLWithString:[self safariURLForURL:URL]]];
+    } else if ([URL mp_isMoPubShareScheme]) {
         actionInfo = [MPURLActionInfo infoWithURL:self.originalURL shareURL:URL];
-        // TODO: in iOS 9, this check will most likely fail. Let's get rid of it.
-        } else {
-            actionInfo = [MPURLActionInfo infoWithURL:self.originalURL deeplinkURL:URL];
+    } else if ([self URLShouldOpenInApplication:URL]) {
+        actionInfo = [MPURLActionInfo infoWithURL:self.originalURL deeplinkURL:URL];
+    } else if ([URL.scheme isEqualToString:@"http"]) { // handle HTTP requests in particular to get around ATS settings
+        // As a note: `appTransportSecuritySettings` returns what makes sense for the iOS version. I.e., if the device
+        // is running iOS 8, this method will always return `MPATSSettingAllowsArbitraryLoads`. If the device is running
+        // iOS 9, this method will never give us `MPATSSettingAllowsArbitraryLoadsInWebContent`. As a result, we don't
+        // have to do OS checks here; we can just trust these settings.
+        MPATSSetting settings = [[MPCoreInstanceProvider sharedProvider] appTransportSecuritySettings];
+
+        if ((settings & MPATSSettingAllowsArbitraryLoads) != 0) { // opens as normal if ATS is disabled
+            // don't do anything
+        } else if ((settings & MPATSSettingAllowsArbitraryLoadsInWebContent) != 0) { // opens in WKWebView if ATS is disabled for arbitrary web content
+            actionInfo = [MPURLActionInfo infoWithURL:self.originalURL
+                                       webViewBaseURL:self.currentURL];
+        } else { // opens in Mobile Safari if no other option is available
+            actionInfo = [MPURLActionInfo infoWithURL:self.originalURL
+                                 safariDestinationURL:self.currentURL];
         }
+    }
 
     return actionInfo;
 }
@@ -192,7 +214,7 @@ static NSString * const kResolverErrorDomain = @"com.mopub.resolver";
     NSStringEncoding encoding = NSUTF8StringEncoding;
 
     if (![contentType length]) {
-//        MPLogWarn(@"Attempting to set string encoding from nil %@", kMoPubHTTPHeaderContentType);
+        MPLogWarn(@"Attempting to set string encoding from nil %@", kMoPubHTTPHeaderContentType);
         return encoding;
     }
 

@@ -4,6 +4,9 @@
 #import "MPRewardedVideoAdapter+MPSpecs.h"
 #import "MPRewardedVideoReward.h"
 #import "MPTimer.h"
+#import "MPCoreInstanceProvider.h"
+#import "MPRewardedVideoConnection.h"
+#import <Cedar/Cedar.h>
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
@@ -36,8 +39,16 @@ using namespace Cedar::Doubles;
 
 - (void)handleCustomEventInvalidated
 {
-    
+
 }
+@end
+
+@interface MPRewardedVideoAdapter()
+
+- (NSTimeInterval)backoffTime:(NSUInteger)retryCount;
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error;
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response;
+
 @end
 
 SPEC_BEGIN(MPRewardedVideoAdapterSpec)
@@ -339,18 +350,70 @@ describe(@"MPRewardedVideoAdapter", ^{
         describe(@"rewardedVideoShouldRewardUserForCustomEvent:", ^{
             __block MPRewardedVideoReward *reward;
 
-            beforeEach(^{
-                reward = [[MPRewardedVideoReward alloc] initWithCurrencyAmount:@99];
+            context(@"when configuration doesn't have reward", ^{
+                beforeEach(^{
+                    reward = [[MPRewardedVideoReward alloc] initWithCurrencyAmount:@99];
+                });
+
+                it(@"should forward the message to its delegate", ^{
+                    [adapter rewardedVideoShouldRewardUserForCustomEvent:sampleCE reward:reward];
+                    delegate should have_received(@selector(rewardedVideoShouldRewardUserForAdapter:reward:)).with(adapter).and_with(reward);
+                });
+
+                it(@"should not forward the message to its delegate if the reward is nil", ^{
+                    [adapter rewardedVideoShouldRewardUserForCustomEvent:sampleCE reward:nil];
+                    delegate should_not have_received(@selector(rewardedVideoShouldRewardUserForAdapter:reward:)).with(adapter).and_with(reward);
+                });
             });
 
-            it(@"should forward the message to its delegate", ^{
-                [adapter rewardedVideoShouldRewardUserForCustomEvent:sampleCE reward:reward];
-                delegate should have_received(@selector(rewardedVideoShouldRewardUserForAdapter:reward:)).with(adapter).and_with(reward);
+            context(@"when configuration have reward", ^{
+                beforeEach(^{
+                    adConfiguration = [MPAdConfigurationFactory defaultRewardedVideoConfigurationWithReward];
+                    adConfiguration.customEventClass = NSClassFromString(@"DontExist");
+                    [adapter getAdWithConfiguration:adConfiguration];
+                    reward = [[MPRewardedVideoReward alloc] initWithCurrencyAmount:@99];
+                });
+
+                it(@"should not get reward from adNetwork", ^{
+                    [adapter rewardedVideoShouldRewardUserForCustomEvent:sampleCE reward:reward];
+                    delegate should_not have_received(@selector(rewardedVideoShouldRewardUserForAdapter:reward:)).with(adapter).and_with(reward);
+                });
+
+                it(@"should get reward from configuration", ^{
+                    [adapter rewardedVideoShouldRewardUserForCustomEvent:sampleCE reward:reward];
+                    delegate should have_received(@selector(rewardedVideoShouldRewardUserForAdapter:reward:)).with(adapter).and_with(adConfiguration.rewardedVideoReward);
+                });
             });
 
-            it(@"should not forward the message to its delegate if the reward is nil", ^{
-                [adapter rewardedVideoShouldRewardUserForCustomEvent:sampleCE reward:nil];
-                delegate should_not have_received(@selector(rewardedVideoShouldRewardUserForAdapter:reward:)).with(adapter).and_with(reward);
+            context(@"when reward is server to server", ^{
+                beforeEach(^{
+                    spy_on(adapter.delegate);
+                    adConfiguration = [MPAdConfigurationFactory defaultRewardedVideoConfigurationServerToServer];
+                    [adapter getAdWithConfiguration:adConfiguration];
+                    reward = [[MPRewardedVideoReward alloc] initWithCurrencyAmount:@99];
+                    [adapter rewardedVideoShouldRewardUserForCustomEvent:sampleCE reward:reward];
+                });
+
+                context(@"when rewardedVideoShouldRewardUserForCustomEvent is called", ^{
+                    it(@"should not call rewardedVideoShouldRewardUserForAdapter", ^{
+                        adapter.delegate should_not have_received(@selector(rewardedVideoShouldRewardUserForAdapter:reward:));
+                    });
+                });
+            });
+
+            context(@"when reward is client side", ^{
+                beforeEach(^{
+                    spy_on(adapter.delegate);
+                    adConfiguration = [MPAdConfigurationFactory defaultRewardedVideoConfiguration];
+                    [adapter getAdWithConfiguration:adConfiguration];
+                    reward = [[MPRewardedVideoReward alloc] initWithCurrencyAmount:@99];
+                    [adapter rewardedVideoShouldRewardUserForCustomEvent:sampleCE reward:reward];
+                });
+
+                it(@"should not call addRewardedVideoConnectionWithUrl", ^{
+                    adapter.delegate should have_received(@selector(rewardedVideoShouldRewardUserForAdapter:reward:));
+                });
+
             });
         });
     });

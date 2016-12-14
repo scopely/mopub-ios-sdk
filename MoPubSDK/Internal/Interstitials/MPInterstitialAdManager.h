@@ -14,10 +14,8 @@
 @interface MPInterstitialAdManager : NSObject <MPAdServerCommunicatorDelegate,
     MPInterstitialAdapterDelegate>
 
-@property (nonatomic, strong, readonly) MPBaseInterstitialAdapter *adapter;
 @property (nonatomic, weak) id<MPInterstitialAdManagerDelegate> delegate;
-@property (nonatomic, readonly) BOOL ready;
-@property (nonatomic, readonly) BOOL loading;
+@property (nonatomic, assign, readonly) BOOL ready;
 
 - (id)initWithDelegate:(id<MPInterstitialAdManagerDelegate>)delegate;
 
@@ -26,10 +24,5 @@
                             location:(CLLocation *)location
                              testing:(BOOL)testing;
 - (void)presentInterstitialFromViewController:(UIViewController *)controller;
-
-// Deprecated
-- (void)customEventDidLoadAd;
-- (void)customEventDidFailToLoadAd;
-- (void)customEventActionWillBegin;
 
 @end

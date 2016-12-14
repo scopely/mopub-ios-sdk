@@ -6,9 +6,9 @@
 //
 
 #import "MPHTMLInterstitialCustomEvent.h"
+#import "MPLogging.h"
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
-#import "WBAdLogging.h"
 
 @interface MPHTMLInterstitialCustomEvent ()
 
@@ -19,7 +19,6 @@
 
 @implementation MPHTMLInterstitialCustomEvent
 
-@dynamic delegate;
 @synthesize interstitial = _interstitial;
 
 - (BOOL)enableAutomaticImpressionAndClickTracking
@@ -33,8 +32,9 @@
 
 - (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
+    MPLogInfo(@"Loading MoPub HTML interstitial");
     MPAdConfiguration *configuration = [self.delegate configuration];
-    AdLogType(WBAdLogLevelTrace, WBAdTypeInterstitial, @"Loading HTML interstitial with source: %@", [configuration adResponseHTMLString]);
+    MPLogTrace(@"Loading HTML interstitial with source: %@", [configuration adResponseHTMLString]);
 
     self.interstitial = [[MPInstanceProvider sharedProvider] buildMPHTMLInterstitialViewControllerWithDelegate:self
                                                                                                orientationType:configuration.orientationType];
@@ -44,11 +44,6 @@
 - (void)showInterstitialFromRootViewController:(UIViewController *)rootViewController
 {
     [self.interstitial presentInterstitialFromViewController:rootViewController];
-}
-
--(NSString *)description
-{
-    return @"MoPub HTML";
 }
 
 #pragma mark - MPInterstitialViewControllerDelegate
@@ -65,21 +60,25 @@
 
 - (void)interstitialDidLoadAd:(MPInterstitialViewController *)interstitial
 {
+    MPLogInfo(@"MoPub HTML interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:self.interstitial];
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialViewController *)interstitial
 {
+    MPLogInfo(@"MoPub HTML interstitial did fail");
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
 - (void)interstitialWillAppear:(MPInterstitialViewController *)interstitial
 {
+    MPLogInfo(@"MoPub HTML interstitial will appear");
     [self.delegate interstitialCustomEventWillAppear:self];
 }
 
 - (void)interstitialDidAppear:(MPInterstitialViewController *)interstitial
 {
+    MPLogInfo(@"MoPub HTML interstitial did appear");
     [self.delegate interstitialCustomEventDidAppear:self];
 
     if (!self.trackedImpression) {
@@ -90,11 +89,13 @@
 
 - (void)interstitialWillDisappear:(MPInterstitialViewController *)interstitial
 {
+    MPLogInfo(@"MoPub HTML interstitial will disappear");
     [self.delegate interstitialCustomEventWillDisappear:self];
 }
 
 - (void)interstitialDidDisappear:(MPInterstitialViewController *)interstitial
 {
+    MPLogInfo(@"MoPub HTML interstitial did disappear");
     [self.delegate interstitialCustomEventDidDisappear:self];
 
     // Deallocate the interstitial as we don't need it anymore. If we don't deallocate the interstitial after dismissal,
@@ -105,11 +106,13 @@
 
 - (void)interstitialDidReceiveTapEvent:(MPInterstitialViewController *)interstitial
 {
+    MPLogInfo(@"MoPub HTML interstitial did receive tap event");
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
 }
 
 - (void)interstitialWillLeaveApplication:(MPInterstitialViewController *)interstitial
 {
+    MPLogInfo(@"MoPub HTML interstitial will leave application");
     [self.delegate interstitialCustomEventWillLeaveApplication:self];
 }
 

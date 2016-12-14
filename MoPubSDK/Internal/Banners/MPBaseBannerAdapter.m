@@ -10,17 +10,10 @@
 #import "MPConstants.h"
 
 #import "MPAdConfiguration.h"
+#import "MPLogging.h"
 #import "MPCoreInstanceProvider.h"
 #import "MPAnalyticsTracker.h"
 #import "MPTimer.h"
-
-#import "WBAdEvent_Internal.h"
-#import "WBAdControllerEvent.h"
-
-#import "WBAdEvent_Internal.h"
-#import "WBAdControllerEvent.h"
-#import "WBAdLogLevel.h"
-#import "WBAdLogging.h"
 
 @interface MPBaseBannerAdapter ()
 
@@ -83,8 +76,6 @@
 
 - (void)didDisplayAd
 {
-    WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeShow adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner];
-    [WBAdEvent postNotification:adEvent];
     [self trackImpression];
 }
 
@@ -95,16 +86,16 @@
 
     if (timeInterval > 0) {
         self.timeoutTimer = [[MPCoreInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
-                                                                                           target:self
-                                                                                         selector:@selector(timeout)
-                                                                                          repeats:NO];
+                                                                                       target:self
+                                                                                     selector:@selector(timeout)
+                                                                                      repeats:NO];
+
         [self.timeoutTimer scheduleNow];
     }
 }
 
 - (void)timeout
 {
-    [WBAdEvent postAdFailedWithReason:WBAdFailureReasonTimeout adNetwork:[self.configuration.customEventClass description] adType:WBAdTypeBanner];
     [self.delegate adapter:self didFailToLoadAdWithError:nil];
 }
 
@@ -113,23 +104,19 @@
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation
 {
     // Do nothing by default. Subclasses can override.
-    AdLogType(WBAdLogLevelTrace, WBAdTypeBanner, @"rotateToOrientation %d called for adapter %@ (%p)",
-          (int)newOrientation, NSStringFromClass([self class]), self);
+    MPLogDebug(@"rotateToOrientation %d called for adapter %@ (%p)",
+          newOrientation, NSStringFromClass([self class]), self);
 }
 
 #pragma mark - Metrics
 
 - (void)trackImpression
 {
-    WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeImpression adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner];
-    [WBAdEvent postNotification:adEvent];
     [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackImpressionForConfiguration:self.configuration];
 }
 
 - (void)trackClick
 {
-    WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeClick adNetwork:self.configuration.customAdNetwork adType:WBAdTypeBanner];
-    [WBAdEvent postNotification:adEvent];
     [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackClickForConfiguration:self.configuration];
 }
 

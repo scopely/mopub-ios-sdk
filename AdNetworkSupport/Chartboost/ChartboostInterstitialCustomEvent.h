@@ -2,7 +2,7 @@
 //  ChartboostInterstitialCustomEvent.h
 //  MoPubSDK
 //
-//  Copyright (c) 2014 Scopely, Inc. All rights reserved.
+//  Copyright (c) 2012 MoPub, Inc. All rights reserved.
 //
 
 #if __has_include(<MoPub/MoPub.h>)
@@ -13,7 +13,7 @@
 
 
 /*
- * Certified with version 5.0.1 of the Chartboost SDK.
+ * Certified with version 6.5.2 of the Chartboost SDK.
  */
 
 @interface ChartboostInterstitialCustomEvent : MPInterstitialCustomEvent

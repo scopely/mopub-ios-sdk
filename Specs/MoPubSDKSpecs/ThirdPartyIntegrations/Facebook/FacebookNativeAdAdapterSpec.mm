@@ -84,16 +84,8 @@ describe(@"FacebookNativeAdAdapter", ^{
             [testAd.properties objectForKey:kAdStarRatingKey] should be_nil;
         });
 
-        it(@"should have 0.0 for requiredSecondsForImpression", ^{
-            adAdapter.requiredSecondsForImpression should equal(0.0);
-        });
-
         it(@"should have a nil defaultActionURL", ^{
             adAdapter.defaultActionURL should be_nil;
-        });
-
-        it(@"should return YES for enableThirdPartyImpressionTracking", ^{
-            adAdapter.enableThirdPartyImpressionTracking should be_truthy;
         });
 
         it(@"should return YES for enableThirdPartyClickTracking", ^{
@@ -110,6 +102,24 @@ describe(@"FacebookNativeAdAdapter", ^{
             adAdapter.delegate should have_received(@selector(nativeAdDidClick:));
 
         });
+
+        it(@"should notify the delegate that a modal will present when the ad is clicked", ^{
+            [adAdapter nativeAdDidClick:mockFBAd];
+            adAdapter.delegate should have_received(@selector(nativeAdWillPresentModalForAdapter:)).with(adAdapter);
+        });
+
+        it(@"should notify the delegate that the modal dismissed when FB has reported the click was handled", ^{
+            [adAdapter nativeAdDidFinishHandlingClick:mockFBAd];
+            adAdapter.delegate should have_received(@selector(nativeAdDidDismissModalForAdapter:)).with(adAdapter);
+        });
+
+        it(@"should provide an ad choices icon view", ^{
+            [adAdapter respondsToSelector:@selector(privacyInformationIconView)] should be_truthy;
+        });
+
+        it(@"should provide a main media view", ^{
+            [adAdapter respondsToSelector:@selector(mainMediaView)] should be_truthy;
+        })
     });
 });
 

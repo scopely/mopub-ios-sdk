@@ -20,7 +20,7 @@
 /*
  * Creates an adapter with a reference to an MPInterstitialAdManager.
  */
-- (instancetype)initWithDelegate:(id<MPInterstitialAdapterDelegate>)delegate;
+- (id)initWithDelegate:(id<MPInterstitialAdapterDelegate>)delegate;
 
 /*
  * Sets the adapter's delegate to nil.

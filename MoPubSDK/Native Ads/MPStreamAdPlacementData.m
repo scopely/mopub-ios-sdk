@@ -7,6 +7,7 @@
 
 #import "MPStreamAdPlacementData.h"
 #import "MPAdPositioning.h"
+#import "MPLogging.h"
 
 static const NSUInteger kMaximumNumberOfAdsPerStream = 255;
 
@@ -168,7 +169,7 @@ static const NSUInteger kMaximumNumberOfAdsPerStream = 255;
     NSUInteger indexInDesiredArrays = [self indexOfIndexPath:adjustedIndexPath inSortedArray:desiredInsertionPositions options:NSBinarySearchingFirstEqual];
 
     if (indexInDesiredArrays == NSNotFound) {
-//        MPLogWarn(@"Attempted to insert an ad at position %@, which is not in the desired array.", adjustedIndexPath);
+        MPLogWarn(@"Attempted to insert an ad at position %@, which is not in the desired array.", adjustedIndexPath);
         return;
     }
 

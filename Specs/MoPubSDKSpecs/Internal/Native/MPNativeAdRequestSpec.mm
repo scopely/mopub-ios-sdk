@@ -7,16 +7,27 @@
 #import "FakeMPLogEventRecorder.h"
 #import "MPLogEvent.h"
 #import "MPIdentityProvider.h"
+#import "MPNativeAdRendererConfiguration.h"
+#import "FakeNativeAdRenderingClass.h"
+#import "MPStaticNativeAdRenderer.h"
+#import "MPStaticNativeAdRendererSettings.h"
+#import "MPMoPubNativeAdAdapter.h"
+#import <Cedar/Cedar.h>
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+
 @interface MPNativeAdRequest (Specs) <MPNativeCustomEventDelegate, MPAdServerCommunicatorDelegate>
 
+@property (nonatomic) MPAdConfiguration *adConfiguration;
 @property (nonatomic, assign) BOOL loading;
 @property (nonatomic, copy) MPNativeAdRequestHandler completionHandler;
 
 - (void)getAdWithConfiguration:(MPAdConfiguration *)configuration;
+- (void)completeAdRequestWithAdObject:(MPNativeAd *)adObject error:(NSError *)error;
 
 @end
 
@@ -28,8 +39,22 @@ describe(@"MPNativeAdRequest", ^{
     __block FakeMPAdServerCommunicator *communicator;
     __block FakeMPLogEventRecorder *eventRecorder;
     __block BOOL successfullyLoadedNativeAd;
+    __block MPStaticNativeAdRenderer *renderer;
+    __block NSArray *nativeAdRendererConfigurations;
 
     beforeEach(^{
+        MPStaticNativeAdRendererSettings *settings = [[MPStaticNativeAdRendererSettings alloc] init];
+
+        settings.renderingViewClass = [FakeNativeAdRenderingClass class];
+        settings.viewSizeHandler = ^(CGFloat maxWidth) {
+            return CGSizeMake(70, 113);
+        };
+
+        renderer = [[MPStaticNativeAdRenderer alloc] initWithRendererSettings:settings];
+
+        MPNativeAdRendererConfiguration *config = [MPStaticNativeAdRenderer rendererConfigurationWithRendererSettings:settings];
+        nativeAdRendererConfigurations = @[config];
+
         eventRecorder = [[FakeMPLogEventRecorder alloc] init];
         spy_on(eventRecorder);
         fakeCoreProvider.fakeLogEventRecorder = eventRecorder;
@@ -38,7 +63,7 @@ describe(@"MPNativeAdRequest", ^{
 
         successfullyLoadedNativeAd = NO;
 
-        request = [MPNativeAdRequest requestWithAdUnitIdentifier:@"native_identifier"];
+        request = [MPNativeAdRequest requestWithAdUnitIdentifier:@"native_identifier" rendererConfigurations:nativeAdRendererConfigurations];
         request.targeting = targeting;
         [request startWithCompletionHandler:^(MPNativeAdRequest *request, MPNativeAd *response, NSError *error) {
             NSLog(@"completed");
@@ -84,6 +109,11 @@ describe(@"MPNativeAdRequest", ^{
 
         });
 
+        // TODO: Add tests for this. For both failure and success.
+        xcontext(@"choosing renderers for custom events", ^{
+
+        });
+
         context(@"when the load succeeds", ^{
             it(@"should log a latency successful event with the data filled out correctly", ^{
                 [communicator connectionDidFinishLoading:nil];
@@ -98,6 +128,32 @@ describe(@"MPNativeAdRequest", ^{
                 // The MPAdConfiguration implementation has not been updated since Native/Rewarded
                 // ad types were introduced.
                 event.adType should equal(@"native");
+            });
+
+            context(@"when the adapter has an adConfiguration property", ^{
+                it(@"should set the adapter's adConfiguration to the request's adConfiguration", ^{
+                    MPMoPubNativeAdAdapter *adapter = [[MPMoPubNativeAdAdapter alloc] init];
+                    MPNativeAd *nativeAd = [[MPNativeAd alloc] initWithAdAdapter:adapter];
+                    request.adConfiguration = [[MPAdConfiguration alloc] init];
+
+                    [request completeAdRequestWithAdObject:nativeAd error:nil];
+
+                    adapter.adConfiguration should equal(request.adConfiguration);
+                });
+            });
+
+            context(@"when the adapter doesn't have an adConfiguration property", ^{
+                it(@"should not attempt to set the adapter's adConfiguration to the request's adConfiguration", ^{
+                    ^{
+                        // We don't include adConfiguration in the base class (MPNativeAdAdapter), so it is not implemented by default.
+                        id<CedarDouble,MPNativeAdAdapter> adapter = nice_fake_for(@protocol(MPNativeAdAdapter));
+
+                        MPNativeAd *nativeAd = [[MPNativeAd alloc] initWithAdAdapter:adapter];
+                        request.adConfiguration = [[MPAdConfiguration alloc] init];
+
+                        [request completeAdRequestWithAdObject:nativeAd error:nil];
+                    } should_not raise_exception;
+                });
             });
         });
 
@@ -205,3 +261,4 @@ describe(@"MPNativeAdRequest", ^{
 });
 
 SPEC_END
+#pragma clang diagnostic pop

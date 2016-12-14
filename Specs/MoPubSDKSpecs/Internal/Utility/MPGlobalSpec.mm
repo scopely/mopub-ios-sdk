@@ -1,6 +1,7 @@
 #import "MPGlobal.h"
 #import "UIView+MPSpecs.h"
 #import "MPGlobalSpecHelper.h"
+#import <Cedar/Cedar.h>
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
@@ -223,6 +224,27 @@ describe(@"MPGlobal", ^{
                 testView.frame = CGRectMake(30, 30, 100, 100);
                 [testView mp_viewIntersectsParentWindowWithPercent:0.5f] should equal(NO);
             });
+        });
+    });
+
+    describe(@"MPConvertStringArrayToURLArray", ^{
+        it(@"should only process array elements that are valid URL strings", ^{
+            NSArray *arrayOfDifferentStuff = @[@"http://www.google.com",
+                                               @1,
+                                              [NSNull null],
+                                              @(9.9f),
+                                               @[@"http://www.google.com"],
+                                               @{ @"lol" : @"http://www.twitter.com" },
+                                               @"http://www.twitter.com",
+                                               @"+_{}||@$%"];
+            NSArray *processedArray = [MPGlobalSpecHelper convertStrArrayToURLArray:arrayOfDifferentStuff];
+
+            NSURL *url1 = (NSURL *)processedArray[0];
+            NSURL *url2 = (NSURL *)processedArray[1];
+
+            url1.absoluteString should equal(@"http://www.google.com");
+            url2.absoluteString should equal(@"http://www.twitter.com");
+            processedArray.count should equal(2);
         });
     });
 

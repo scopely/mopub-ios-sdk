@@ -36,15 +36,4 @@
     // to be notified when the parent MPAdView receives -rotateToOrientation: calls.
 }
 
--(void)removeFromSuperview
-{
-    // API to allow removal of the ad banner from the screen
-}
-
--(void)invalidate
-{
-    // API to allow us to detach the custom event from (shared instance) routers synchronously
-    // See the iAd banner custom event for an example use case.
-}
-
 @end

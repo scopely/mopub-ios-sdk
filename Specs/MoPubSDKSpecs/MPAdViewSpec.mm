@@ -1,8 +1,15 @@
 #import "MPAdView.h"
 #import "MPClosableView.h"
+#import <Cedar/Cedar.h>
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
+
+@interface MPAdView (Specs)
+
+- (void)setAdContentView:(UIView *)view;
+
+@end
 
 SPEC_BEGIN(MPAdViewSpec)
 
@@ -35,7 +42,7 @@ describe(@"MPAdView", ^{
             requestedPath should contain(@"&q=hi=4");
             requestedPath should contain(@"&ll=20,20");
             requestedPath should contain(@"&lla=100");
-            requestedPath should contain(@"http://testing.ads.mopub.com");
+            requestedPath should contain(@"https://testing.ads.mopub.com");
         });
     });
 

@@ -5,18 +5,30 @@
 //  Copyright (c) 2014 MoPub. All rights reserved.
 //
 
-#if __has_include("MPNativeAdSampleTableViewCell.h")
-    #import "MPNativeAdSampleTableViewCell.h"
+#import "MPConstants.h"
+
+#if __has_include("MPStaticNativeAdView.h")
+#import "MPStaticNativeAdView.h"
+#endif
+
+#if __has_include("MPVideoNativeAdView.h")
+#import "MPVideoNativeAdView.h"
 #endif
 
 #import "MPAdConversionTracker.h"
 #import "MPAdView.h"
 #import "MPBannerCustomEvent.h"
 #import "MPBannerCustomEventDelegate.h"
-#import "MPConstants.h"
 #import "MPInterstitialAdController.h"
 #import "MPInterstitialCustomEvent.h"
 #import "MPInterstitialCustomEventDelegate.h"
+#import "MPMediationSettingsProtocol.h"
+#import "MPRewardedVideo.h"
+#import "MPRewardedVideoReward.h"
+#import "MPRewardedVideoCustomEvent.h"
+#import "MPRewardedVideoError.h"
+
+#if MP_HAS_NATIVE_PACKAGE
 #import "MPNativeAd.h"
 #import "MPNativeAdAdapter.h"
 #import "MPNativeAdConstants.h"
@@ -26,25 +38,27 @@
 #import "MPNativeAdRendering.h"
 #import "MPNativeAdRequest.h"
 #import "MPNativeAdRequestTargeting.h"
-#import "MPTableViewAdManager.h"
 #import "MPCollectionViewAdPlacer.h"
 #import "MPTableViewAdPlacer.h"
 #import "MPClientAdPositioning.h"
 #import "MPServerAdPositioning.h"
 #import "MPNativeAdDelegate.h"
-#import "MPMediationSettingsProtocol.h"
-#import "MPRewardedVideo.h"
-#import "MPRewardedVideoReward.h"
-#import "MPRewardedVideoCustomEvent.h"
-#import "MPRewardedVideoError.h"
+#import "MPStaticNativeAdRendererSettings.h"
+#import "MPNativeAdRendererConfiguration.h"
+#import "MPNativeAdRendererSettings.h"
+#import "MPNativeAdRenderer.h"
+#import "MPStaticNativeAdRenderer.h"
+#import "MOPUBNativeVideoAdRendererSettings.h"
+#import "MOPUBNativeVideoAdRenderer.h"
+#import "MPNativeAdRenderingImageLoader.h"
+#endif
 
 // Import these frameworks for module support.
 #import <AdSupport/AdSupport.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <CoreLocation/CoreLocation.h>
+#import <CoreMedia/CoreMedia.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
-#import <EventKit/EventKit.h>
-#import <EventKitUI/EventKitUI.h>
 #import <Foundation/Foundation.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import <MessageUI/MessageUI.h>
@@ -76,6 +90,18 @@
  * @param enabled A Boolean value indicating whether the SDK should listen for location updates.
  */
 @property (nonatomic, assign) BOOL locationUpdatesEnabled;
+
+
+/**
+ * A Boolean value indicating whether the MoPub SDK should create a MoPub ID that can be used
+ * for frequency capping when Limit ad tracking is on & the IDFA we get is
+ * 00000000-0000-0000-0000-000000000000.
+ *
+ * When set to NO, the SDK will not create a MoPub ID in the above case. When set to YES, the
+ * SDK will generate a MoPub ID. The default value is YES.
+ *
+ */
+@property (nonatomic) BOOL frequencyCappingIdUsageEnabled;
 
 /** @name Rewarded Video */
 /**

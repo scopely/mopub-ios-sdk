@@ -9,18 +9,22 @@
 #import "MPNativeAd+Internal.h"
 #import "MPNativeAdRequestTargeting.h"
 #import "MPNativeAdRequest+MPNativeAdSource.h"
+#import "MPLogging.h"
 #import "MPNativeAdError.h"
 
-static NSUInteger const kCacheSizeLimit = 3;
-static NSTimeInterval const kMaxBackoffTimeInterval = 300;
-static CGFloat const kBaseBackoffTimeMultiplier = 1.5;
+static NSUInteger const kCacheSizeLimit = 1;
+static NSTimeInterval const kAdFetchRetryTimes[] = {1, 3, 5, 25, 60, 300};
+// Calculate the number of elements inside the array by taking the size divided by the size of one element.
+static NSUInteger const kMaxRetries = sizeof(kAdFetchRetryTimes)/sizeof(kAdFetchRetryTimes[0]);
 
 @interface MPNativeAdSourceQueue ()
 
-@property (nonatomic, strong) NSMutableArray *adQueue;
-@property (nonatomic, assign) NSUInteger backoffCounter;
+@property (nonatomic) NSMutableArray *adQueue;
+@property (nonatomic, assign) NSUInteger adFetchRetryCounter;
+@property (nonatomic, assign) NSUInteger currentSequence;
 @property (nonatomic, copy) NSString *adUnitIdentifier;
-@property (nonatomic, strong) MPNativeAdRequestTargeting *targeting;
+@property (nonatomic) MPNativeAdRequestTargeting *targeting;
+@property (nonatomic) NSArray *rendererConfigurations;
 @property (nonatomic, assign) BOOL isAdLoading;
 
 @end
@@ -29,11 +33,12 @@ static CGFloat const kBaseBackoffTimeMultiplier = 1.5;
 
 #pragma mark - Object Lifecycle
 
-- (instancetype)initWithAdUnitIdentifier:(NSString *)identifier andTargeting:(MPNativeAdRequestTargeting *)targeting
+- (instancetype)initWithAdUnitIdentifier:(NSString *)identifier rendererConfigurations:(NSArray *)rendererConfigurations andTargeting:(MPNativeAdRequestTargeting *)targeting
 {
     self = [super init];
     if (self) {
         _adUnitIdentifier = [identifier copy];
+        _rendererConfigurations = rendererConfigurations;
         _targeting = targeting;
         _adQueue = [[NSMutableArray alloc] init];
     }
@@ -91,12 +96,12 @@ static CGFloat const kBaseBackoffTimeMultiplier = 1.5;
 - (void)resetBackoff
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    self.backoffCounter = 0;
+    self.adFetchRetryCounter = 0;
 }
 
 - (void)loadAds
 {
-    if (self.backoffCounter == 0) {
+    if (self.adFetchRetryCounter == 0) {
         [self replenishCache];
     }
 }
@@ -108,12 +113,13 @@ static CGFloat const kBaseBackoffTimeMultiplier = 1.5;
     }
 
     self.isAdLoading = YES;
-    MPNativeAdRequest *adRequest = [MPNativeAdRequest requestWithAdUnitIdentifier:self.adUnitIdentifier];
+
+    MPNativeAdRequest *adRequest = [MPNativeAdRequest requestWithAdUnitIdentifier:self.adUnitIdentifier rendererConfigurations:self.rendererConfigurations];
     adRequest.targeting = self.targeting;
 
     [adRequest startForAdSequence:self.currentSequence withCompletionHandler:^(MPNativeAdRequest *request, MPNativeAd *response, NSError *error) {
         if (response && !error) {
-            self.backoffCounter = 0;
+            self.adFetchRetryCounter = 0;
 
             [self addNativeAd:response];
             self.currentSequence++;
@@ -121,37 +127,26 @@ static CGFloat const kBaseBackoffTimeMultiplier = 1.5;
                 [self.delegate adSourceQueueAdIsAvailable:self];
             }
         } else {
-//            MPLogDebug(@"%@", error);
+            MPLogDebug(@"%@", error);
             //increment in this failure case to prevent retrying a request that wasn't bid on.
             //currently under discussion on whether we do this or not.
             if (error.code == MPNativeAdErrorNoInventory) {
                 self.currentSequence++;
             }
 
-            NSTimeInterval backoffTime = [self backoffTime];
-            self.backoffCounter++;
-            if (backoffTime < kMaxBackoffTimeInterval) {
-                [self performSelector:@selector(replenishCache) withObject:nil afterDelay:backoffTime];
-//                MPLogDebug(@"Scheduled the backoff to try again in %.1f seconds.", backoffTime);
+            if (self.adFetchRetryCounter < kMaxRetries) {
+                NSTimeInterval retryTime = kAdFetchRetryTimes[self.adFetchRetryCounter];
+                self.adFetchRetryCounter++;
+                [self performSelector:@selector(replenishCache) withObject:nil afterDelay:retryTime];
+                MPLogDebug(@"Will re-attempt to replenish the ad cache in %.1f seconds.", retryTime);
             } else {
-//                MPLogDebug(@"Backoff has timed out", backoffTime);
-                self.backoffCounter = 0;
+                // Don't try to fetch anymore ads after we have tried kMaxRetries times.
+                MPLogDebug(@"Replenishing the cache has timed out.");
             }
         }
         self.isAdLoading = NO;
         [self loadAds];
     }];
 }
-
-- (NSTimeInterval)backoffTime
-{
-    NSTimeInterval timeInterval = 0;
-    if (self.backoffCounter > 0) {
-        timeInterval = powf(kBaseBackoffTimeMultiplier, self.backoffCounter - 1);
-    }
-    return timeInterval;
-}
-
-
 
 @end

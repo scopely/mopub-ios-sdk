@@ -5,6 +5,7 @@
 #import "MPRewardedVideoAdapter.h"
 #import "MoPub.h"
 #import "MPMediationSettingsProtocol+MPSpecs.h"
+#import <Cedar/Cedar.h>
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
@@ -62,7 +63,7 @@ describe(@"MPRewardedVideoAdManager", ^{
                 [adManager communicatorDidReceiveAdConfiguration:adConfiguration];
             });
 
-            [adManager loadRewardedVideoAd];
+            [adManager loadRewardedVideoAdWithKeywords:nil location:nil customerId:@"customerId"];
         });
 
         it(@"should be loading", ^{
@@ -116,7 +117,7 @@ describe(@"MPRewardedVideoAdManager", ^{
                 [adManager communicatorDidFailWithError:nil];
             });
 
-            [adManager loadRewardedVideoAd];
+            [adManager loadRewardedVideoAdWithKeywords:nil location:nil customerId:nil];
         });
 
         it(@"should not be loading", ^{
@@ -145,7 +146,7 @@ describe(@"MPRewardedVideoAdManager", ^{
             beforeEach(^{
                 adConfiguration = [MPAdConfigurationFactory defaultRewardedVideoConfiguration];
                 adConfiguration.networkType = kAdTypeClear;
-                [adManager loadRewardedVideoAd];
+                [adManager loadRewardedVideoAdWithKeywords:nil location:nil customerId:@"customerId"];
             });
 
             it(@"should not forward the downloaded ad configuration to its adapter", ^{
@@ -170,7 +171,7 @@ describe(@"MPRewardedVideoAdManager", ^{
                 NSMutableDictionary *headers = [MPAdConfigurationFactory defaultRewardedVideoHeaders];
                 [headers setObject:@"1" forKey:@"X-Warmup"];
                 adConfiguration = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
-                [adManager loadRewardedVideoAd];
+                [adManager loadRewardedVideoAdWithKeywords:nil location:nil customerId:@"customerId"];
             });
 
             it(@"should not forward the downloaded ad configuration to its adapter", ^{

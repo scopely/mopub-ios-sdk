@@ -15,19 +15,13 @@
 #import "MPInstanceProvider.h"
 #import "MPCoreInstanceProvider.h"
 #import "MPInterstitialAdManagerDelegate.h"
-
-#import "WBAdEvent_Internal.h"
-#import "WBAdControllerEvent.h"
-#import "WBAdLogLevel.h"
-#import "WBAdLogging.h"
-
 #import "MPLogging.h"
 #import "MPError.h"
 
 @interface MPInterstitialAdManager ()
 
-@property (nonatomic) BOOL loading;
-@property (nonatomic) BOOL ready;
+@property (nonatomic, assign) BOOL loading;
+@property (nonatomic, assign, readwrite) BOOL ready;
 @property (nonatomic, strong) MPBaseInterstitialAdapter *adapter;
 @property (nonatomic, strong) MPAdServerCommunicator *communicator;
 @property (nonatomic, strong) MPAdConfiguration *configuration;
@@ -78,16 +72,13 @@
 - (void)loadAdWithURL:(NSURL *)URL
 {
     if (self.loading) {
-        AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"Interstitial controller is already loading an ad. "
+        MPLogWarn(@"Interstitial controller is already loading an ad. "
                   @"Wait for previous load to finish.");
         return;
     }
 
-    AdLogType(WBAdLogLevelTrace, WBAdTypeInterstitial, @"Interstitial controller is loading ad with MoPub server URL: %@", URL);
+    MPLogInfo(@"Interstitial controller is loading ad with MoPub server URL: %@", URL);
 
-    WBAdControllerEvent *controllerEvent = [[WBAdControllerEvent alloc] initWithEventType:WBAdEventTypeRequest adNetwork:nil adType:WBAdTypeInterstitial];
-    [WBAdControllerEvent postNotification:controllerEvent];
-    
     self.loading = YES;
     [self.communicator loadURL:URL];
 }
@@ -133,35 +124,26 @@
 {
     self.configuration = configuration;
 
-    AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, @"Interstatial Ad view is fetching ad network type: %@", self.configuration.networkType);
-
-    if (self.configuration.adUnitWarmingUp) {
-        AdLogType(WBAdLogLevelInfo, WBAdTypeInterstitial, kMPWarmingUpErrorLogFormatWithAdUnitID, self.delegate.interstitialAdController.adUnitId);
-        self.loading = NO;
-        [self.delegate manager:self didFailToLoadInterstitialWithError:[MPError errorWithCode:MPErrorAdUnitWarmingUp]];
-        return;
-    }
+    MPLogInfo(@"Interstitial ad view is fetching ad network type: %@", self.configuration.networkType);
 
     if (self.configuration.adUnitWarmingUp) {
         MPLogInfo(kMPWarmingUpErrorLogFormatWithAdUnitID, self.delegate.interstitialAdController.adUnitId);
         self.loading = NO;
-        [self.delegate manager:self didFailToLoadInterstitialWithError:[MPError errorWithCode:MPErrorAdUnitWarmingUp]];
+        [self.delegate manager:self didFailToLoadInterstitialWithError:[MOPUBError errorWithCode:MOPUBErrorAdUnitWarmingUp]];
         return;
     }
 
     if ([self.configuration.networkType isEqualToString:kAdTypeClear]) {
-        [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonNoFill adNetwork:nil adType:WBAdTypeInterstitial];
-        AdLogType(WBAdLogLevelError, WBAdTypeInterstitial, @"Ad server response indicated no ad available.");
+        MPLogInfo(kMPClearErrorLogFormatWithAdUnitID, self.delegate.interstitialAdController.adUnitId);
         self.loading = NO;
-        [self.delegate manager:self didFailToLoadInterstitialWithError:[MPError errorWithCode:MPErrorNoInventory]];
+        [self.delegate manager:self didFailToLoadInterstitialWithError:[MOPUBError errorWithCode:MOPUBErrorNoInventory]];
         return;
     }
 
     if (self.configuration.adType != MPAdTypeInterstitial) {
-        [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonMalformedData adNetwork:nil adType:WBAdTypeInterstitial];
-        AdLogType(WBAdLogLevelFatal, WBAdTypeInterstitial, @"Could not load ad: interstitial object received a non-interstitial ad unit ID.");
+        MPLogWarn(@"Could not load ad: interstitial object received a non-interstitial ad unit ID.");
         self.loading = NO;
-        [self.delegate manager:self didFailToLoadInterstitialWithError:[MPError errorWithCode:MPErrorAdapterInvalid]];
+        [self.delegate manager:self didFailToLoadInterstitialWithError:[MOPUBError errorWithCode:MOPUBErrorAdapterInvalid]];
         return;
     }
 
@@ -172,9 +154,6 @@
 {
     self.ready = NO;
     self.loading = NO;
-    
-    WBAdFailureReason failureReason = ([error.domain isEqualToString:@"mopub.com"] ? WBAdFailureReasonMopubServer : WBAdFailureReasonNetworkError);
-    [WBAdControllerEvent postAdFailedWithReason:failureReason adNetwork:nil adType:WBAdTypeInterstitial];
 
     [self.delegate manager:self didFailToLoadInterstitialWithError:error];
 }
@@ -184,7 +163,6 @@
     MPBaseInterstitialAdapter *adapter = [[MPInstanceProvider sharedProvider] buildInterstitialAdapterForConfiguration:configuration
                                                                                                               delegate:self];
     if (!adapter) {
-        [WBAdControllerEvent postAdFailedWithReason:WBAdFailureReasonMalformedData adNetwork:nil adType:WBAdTypeInterstitial];
         [self adapter:nil didFailToLoadAdWithError:nil];
         return;
     }
@@ -244,34 +222,6 @@
 - (void)interstitialWillLeaveApplicationForAdapter:(MPBaseInterstitialAdapter *)adapter
 {
     //noop
-}
-
-#pragma mark - Legacy Custom Events
-
-- (void)customEventDidLoadAd
-{
-    // XXX: The deprecated custom event behavior is to report an impression as soon as an ad loads,
-    // rather than when the ad is actually displayed. Because of this, you may see impression-
-    // reporting discrepancies between MoPub and your custom ad networks.
-    if ([self.adapter respondsToSelector:@selector(customEventDidLoadAd)]) {
-        self.loading = NO;
-        [self.adapter performSelector:@selector(customEventDidLoadAd)];
-    }
-}
-
-- (void)customEventDidFailToLoadAd
-{
-    if ([self.adapter respondsToSelector:@selector(customEventDidFailToLoadAd)]) {
-        self.loading = NO;
-        [self.adapter performSelector:@selector(customEventDidFailToLoadAd)];
-    }
-}
-
-- (void)customEventActionWillBegin
-{
-    if ([self.adapter respondsToSelector:@selector(customEventActionWillBegin)]) {
-        [self.adapter performSelector:@selector(customEventActionWillBegin)];
-    }
 }
 
 @end

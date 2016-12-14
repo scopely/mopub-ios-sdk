@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MPWebView.h"
 
 #ifndef CF_RETURNS_RETAINED
 #if __has_feature(attribute_cf_returns_retained)
@@ -16,11 +17,13 @@
 #endif
 #endif
 
+@class MPAdConfiguration;
+
 @protocol MPAdBrowserControllerDelegate;
 
-@interface MPAdBrowserController : UIViewController <UIWebViewDelegate, UIActionSheetDelegate>
+@interface MPAdBrowserController : UIViewController <MPWebViewDelegate, UIActionSheetDelegate>
 
-@property (nonatomic, strong) IBOutlet UIWebView *webView;
+@property (nonatomic, strong) IBOutlet MPWebView *webView;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem *backButton;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem *forwardButton;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem *refreshButton;
@@ -32,7 +35,8 @@
 @property (nonatomic, weak) id<MPAdBrowserControllerDelegate> delegate;
 @property (nonatomic, copy) NSURL *URL;
 
-- (id)initWithURL:(NSURL *)URL HTMLString:(NSString *)HTMLString delegate:(id<MPAdBrowserControllerDelegate>)delegate;
+- (instancetype)initWithURL:(NSURL *)URL HTMLString:(NSString *)HTMLString delegate:(id<MPAdBrowserControllerDelegate>)delegate;
+- (instancetype)initWithURL:(NSURL *)URL delegate:(id<MPAdBrowserControllerDelegate>)delegate;
 
 // Navigation methods.
 - (IBAction)back;
@@ -53,5 +57,9 @@
 @protocol MPAdBrowserControllerDelegate <NSObject>
 
 - (void)dismissBrowserController:(MPAdBrowserController *)browserController animated:(BOOL)animated;
+
+@optional
+
+- (MPAdConfiguration *)adConfiguration;
 
 @end

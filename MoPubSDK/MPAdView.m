@@ -11,11 +11,10 @@
 #import "MPBannerAdManager.h"
 #import "MPInstanceProvider.h"
 #import "MPBannerAdManagerDelegate.h"
-#import "WBAdLogging.h"
+#import "MPLogging.h"
 
 @interface MPAdView () <MPBannerAdManagerDelegate>
 
-@property (nonatomic) BOOL calledLoadedOnce;
 @property (nonatomic, strong) MPBannerAdManager *adManager;
 @property (nonatomic, weak) UIView *adContentView;
 @property (nonatomic, assign) CGSize originalSize;
@@ -30,7 +29,6 @@
 @synthesize keywords = _keywords;
 @synthesize delegate = _delegate;
 @synthesize originalSize = _originalSize;
-@synthesize ignoresAutorefresh = _ignoresAutorefresh;
 @synthesize testing = _testing;
 @synthesize adContentView = _adContentView;
 @synthesize allowedNativeAdOrientation = _allowedNativeAdOrientation;
@@ -67,26 +65,6 @@
     [self addSubview:view];
 }
 
-- (BOOL)ignoresAutorefresh
-{
-    return _ignoresAutorefresh;
-}
-
-- (void)setIgnoresAutorefresh:(BOOL)ignoresAutorefresh
-{
-    if (_ignoresAutorefresh != ignoresAutorefresh) {
-        _ignoresAutorefresh = ignoresAutorefresh;
-    }
-
-    if (_ignoresAutorefresh) {
-        [self.adManager stopAutomaticallyRefreshingContents];
-        AdLogType(WBAdLogLevelWarn, self.logType, @"pauseBanners");
-    } else {
-        [self.adManager startAutomaticallyRefreshingContents];
-        AdLogType(WBAdLogLevelWarn, self.logType, @"unpauseBanners");
-    }
-}
-
 - (CGSize)adContentViewSize
 {
     // MPClosableView represents an MRAID ad.
@@ -104,9 +82,7 @@
 
 - (void)loadAd
 {
-    self.calledLoadedOnce = YES;
     [self.adManager loadAd];
-    AdLogType(WBAdLogLevelWarn, self.logType, @"banner loadAd");
 }
 
 - (void)refreshAd
@@ -117,7 +93,6 @@
 - (void)forceRefreshAd
 {
     [self.adManager forceRefreshAd];
-    AdLogType(WBAdLogLevelWarn, self.logType, @"forceRefresh");
 }
 
 - (void)stopAutomaticallyRefreshingContents
@@ -210,28 +185,6 @@
     if ([self.delegate respondsToSelector:@selector(willLeaveApplicationFromAd:)]) {
         [self.delegate willLeaveApplicationFromAd:self];
     }
-}
-
-# pragma mark - Deprecated Custom Events Mechanism
-
-- (void)customEventDidLoadAd
-{
-    [self.adManager customEventDidLoadAd];
-}
-
-- (void)customEventDidFailToLoadAd
-{
-    [self.adManager customEventDidFailToLoadAd];
-}
-
-- (void)customEventActionWillBegin
-{
-    [self.adManager customEventActionWillBegin];
-}
-
-- (void)customEventActionDidEnd
-{
-    [self.adManager customEventActionDidEnd];
 }
 
 @end

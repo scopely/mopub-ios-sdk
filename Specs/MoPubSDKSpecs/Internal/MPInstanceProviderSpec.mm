@@ -2,12 +2,11 @@
 #import "MPAdConfigurationFactory.h"
 #import "FakeInterstitialCustomEvent.h"
 #import "MPInterstitialCustomEventAdapter.h"
-#import "MPLegacyInterstitialCustomEventAdapter.h"
 #import "MPReachability.h"
 #import "MPBannerCustomEventAdapter.h"
-#import "MPLegacyBannerCustomEventAdapter.h"
 #import "MPAnalyticsTracker.h"
 #import "MPHTMLInterstitialViewController.h"
+#import <Cedar/Cedar.h>
 
 
 using namespace Cedar::Matchers;
@@ -45,11 +44,11 @@ describe(@"MPInstanceProvider", ^{
             });
 
             context(@"when the configuration has a custom selector name", ^{
-                it(@"should return an MPLegacyInterstitialCustomEventAdapter", ^{
+                it(@"should return nil", ^{
                     configuration = [MPAdConfigurationFactory defaultInterstitialConfigurationWithNetworkType:@"custom"];
                     configuration.customSelectorName = @"buildTheThing";
                     [provider buildInterstitialAdapterForConfiguration:configuration
-                                                              delegate:nil] should be_instance_of([MPLegacyInterstitialCustomEventAdapter class]);
+                                                              delegate:nil] should be_nil;
                 });
             });
 
@@ -92,11 +91,11 @@ describe(@"MPInstanceProvider", ^{
             });
 
             context(@"when the configuration has a custom selector name", ^{
-                it(@"should return an MPLegacyInterstitialCustomEventAdapter", ^{
+                it(@"should return nil", ^{
                     configuration = [MPAdConfigurationFactory defaultBannerConfigurationWithNetworkType:@"custom"];
                     configuration.customSelectorName = @"buildTheThing";
                     [provider buildBannerAdapterForConfiguration:configuration
-                                                        delegate:nil] should be_instance_of([MPLegacyBannerCustomEventAdapter class]);
+                                                        delegate:nil] should be_nil;
                 });
             });
 

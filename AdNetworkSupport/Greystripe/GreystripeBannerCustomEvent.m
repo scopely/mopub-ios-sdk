@@ -11,9 +11,9 @@
 #import "GSMediumRectangleAdView.h"
 #import "GSLeaderboardAdView.h"
 #import "MPConstants.h"
+#import "MPLogging.h"
 #import "MPInstanceProvider.h"
 #import "GSSDKInfo.h"
-#import "WBAdService+Internal.h"
 
 static NSString *gGUID = nil;
 
@@ -36,7 +36,7 @@ static NSString *gGUID = nil;
     } else if (CGSizeEqualToSize(size, MOPUB_LEADERBOARD_SIZE)) {
         return [[GSLeaderboardAdView alloc] initWithDelegate:delegate GUID:GUID autoload:NO];
     } else {
-        MPLogWarn(@"Failed to create a Greystripe Banner with invalid size %@", NSStringFromCGSize(size));
+        MPLogInfo(@"Failed to create a Greystripe Banner with invalid size %@", NSStringFromCGSize(size));
         return nil;
     }
 }
@@ -64,15 +64,14 @@ static NSString *gGUID = nil;
 
 - (void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info
 {
-//    MPLogInfo(@"Requesting Greystripe banner");
-    NSString *GUID = [info objectForKey:@"GUID"] ?: [[WBAdService sharedAdService] bannerIdForAdId:WBAdIdGS];
+    MPLogInfo(@"Requesting Greystripe banner");
+
     NSString *GUID = [info objectForKey:@"GUID"];
     if (GUID == nil) {
         GUID = gGUID;
         if ([GUID length] == 0) {
-//            MPLogWarn(@"Setting kGreystripeGUID in GreystripeBannerCustomEvent.m is deprecated. Use the GUID parameter when configuring your network in the MoPub website.");
+            MPLogWarn(@"Setting kGreystripeGUID in GreystripeBannerCustomEvent.m is deprecated. Use the GUID parameter when configuring your network in the MoPub website.");
             GUID = kGreystripeGUID;
-        }
         }
     }
 
@@ -97,11 +96,6 @@ static NSString *gGUID = nil;
 - (void)dealloc
 {
     self.greystripeBanner.delegate = nil;
-}
-
--(NSString *)description
-{
-    return @"GreyStripe";
 }
 
 #pragma mark - GSAdDelegate

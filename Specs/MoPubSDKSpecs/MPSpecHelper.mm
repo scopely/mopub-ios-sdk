@@ -12,6 +12,7 @@
 #import "CedarAsync.h"
 #import "FakeMPInstanceProvider.h"
 #import "FakeMPCoreInstanceProvider.h"
+#import <Cedar/Cedar.h>
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
@@ -49,6 +50,11 @@ void log_sent_messages(id<CedarDouble> fake)
     for (NSInvocation *invocation in fake.sent_messages) {
         NSLog(@"================> %@", NSStringFromSelector(invocation.selector));
     }
+}
+
+NSData *dataFromXMLFileNamed(NSString *name) {
+    NSString *file = [[NSBundle mainBundle] pathForResource:name ofType:@"xml"];
+    return [NSData dataWithContentsOfFile:file];
 }
 
 @implementation MPSpecHelper

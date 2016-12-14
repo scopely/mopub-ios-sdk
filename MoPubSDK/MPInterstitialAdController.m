@@ -7,15 +7,10 @@
 
 #import "MPInterstitialAdController.h"
 
+#import "MPLogging.h"
 #import "MPInstanceProvider.h"
 #import "MPInterstitialAdManager.h"
 #import "MPInterstitialAdManagerDelegate.h"
-#import "MPInterstitialCustomEventAdapter.h"
-#import "MPInterstitialCustomEvent.h"
-#import "WBAdLogging.h"
-
-#import "MPInterstitialCustomEventAdapter.h"
-#import "MPInterstitialCustomEvent.h"
 
 @interface MPInterstitialAdController () <MPInterstitialAdManagerDelegate>
 
@@ -80,21 +75,6 @@
     return self.manager.ready;
 }
 
--(MPInterstitialCustomEvent *)currentInterstitialCustomEvent
-{
-    return [self adapter].interstitialCustomEvent;
-}
-
--(MPInterstitialCustomEventAdapter *)adapter
-{
-    return ((MPInterstitialCustomEventAdapter *)self.manager.adapter);
-}
-
--(NSString *)description
-{
-    return [[self currentInterstitialCustomEvent] description];
-}
-
 - (void)loadAd
 {
     [self.manager loadInterstitialWithAdUnitID:self.adUnitId
@@ -103,22 +83,16 @@
                                        testing:self.testing];
 }
 
--(BOOL)loading
-{
-    return self.manager.loading;
-}
-
 - (void)showFromViewController:(UIViewController *)controller
 {
     if (!controller) {
-        AdLogType(WBAdLogLevelFatal, WBAdTypeInterstitial, @"The interstitial could not be shown: "
+        MPLogWarn(@"The interstitial could not be shown: "
                   @"a nil view controller was passed to -showFromViewController:.");
         return;
     }
 
     if (![controller.view.window isKeyWindow]) {
-        AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"The interstitial could not be shown: "
-                    @"a nil view controller was passed to -showFromViewController:.");
+        MPLogWarn(@"Attempted to present an interstitial ad in non-key window. The ad may not render properly");
     }
 
     [self.manager presentInterstitialFromViewController:controller];
@@ -129,10 +103,13 @@
 + (NSMutableArray *)sharedInterstitials
 {
     static NSMutableArray *sharedInterstitials;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        sharedInterstitials = [NSMutableArray array];
-    });
+
+    @synchronized(self) {
+        if (!sharedInterstitials) {
+            sharedInterstitials = [NSMutableArray array];
+        }
+    }
+
     return sharedInterstitials;
 }
 
@@ -205,8 +182,6 @@
     }
 }
 
-#pragma mark - Deprecated
-
 + (NSMutableArray *)sharedInterstitialAdControllers
 {
     return [[self class] sharedInterstitials];
@@ -215,21 +190,6 @@
 + (void)removeSharedInterstitialAdController:(MPInterstitialAdController *)controller
 {
     [[[self class] sharedInterstitials] removeObject:controller];
-}
-
-- (void)customEventDidLoadAd
-{
-    [self.manager customEventDidLoadAd];
-}
-
-- (void)customEventDidFailToLoadAd
-{
-    [self.manager customEventDidFailToLoadAd];
-}
-
-- (void)customEventActionWillBegin
-{
-    [self.manager customEventActionWillBegin];
 }
 
 @end

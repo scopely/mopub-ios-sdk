@@ -17,20 +17,11 @@
 #import "MPGlobal.h"
 #import "MPAdPersistenceManager.h"
 #import "MPAdEntryViewController.h"
-#import "MPNativeAdTableViewController.h"
 #import "MPNativeAdPlacerTableViewController.h"
 #import "MPNativeAdPlacerCollectionViewController.h"
 #import "MPNativeAdPlacerPageViewController.h"
 #import "MPSampleAppLogReader.h"
 #import "MPRewardedVideoAdDetailViewController.h"
-
-typedef enum
-{
-    MPAdTableSection_Banner,
-    MPAdTableSection_Interstitital,
-    MPAdTableSection_Native,
-    MPAdTableSection_Saved
-} MPAdTableSection;
 
 @interface MPAdTableViewController () <UIAlertViewDelegate, UIActionSheetDelegate>
 
@@ -84,8 +75,6 @@ typedef enum
     UIButton* myInfoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     [myInfoButton addTarget:self action:@selector(infoButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:myInfoButton];
-
-    [[MPSampleAppLogReader sharedLogReader] beginReadingLogMessages];
 
     [[MPSampleAppLogReader sharedLogReader] beginReadingLogMessages];
 
@@ -146,7 +135,8 @@ typedef enum
     cell.textLabel.textColor = [UIColor colorWithRed:0.42 green:0.66 blue:0.85 alpha:1];
     cell.detailTextLabel.textColor = [UIColor colorWithRed:0.86 green:0.86 blue:0.86 alpha:1];
 
-    cell.accessoryType = indexPath.section == MPAdTableSection_Saved ? UITableViewCellAccessoryDetailDisclosureButton : UITableViewCellAccessoryNone;
+    MPAdSection *section = self.sections[indexPath.section];
+    cell.accessoryType = [section.title isEqualToString:@"Saved Ads"] ? UITableViewCellAccessoryDetailDisclosureButton : UITableViewCellAccessoryNone;
 
     return cell;
 }
@@ -181,9 +171,6 @@ typedef enum
             break;
         case MPAdInfoNative:
             detailViewController = [[MPNativeAdDetailViewController alloc] initWithAdInfo:info];
-            break;
-        case MPAdInfoNativeInTableView:
-            detailViewController = [[MPNativeAdTableViewController alloc] initWithAdInfo:info];
             break;
         case MPAdInfoNativeInCollectionView:
             detailViewController = [[MPNativeAdPlacerCollectionViewController alloc] initWithAdInfo:info];

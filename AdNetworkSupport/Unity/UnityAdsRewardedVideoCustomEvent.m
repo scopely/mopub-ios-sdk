@@ -44,8 +44,9 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 {
     if ([self hasAdAvailable]) {
         UnityAdsInstanceMediationSettings *settings = [self.delegate instanceMediationSettingsForClass:[UnityAdsInstanceMediationSettings class]];
-        
-        [[MPUnityRouter sharedRouter] presentRewardedVideoAdFromViewController:viewController zoneId:self.zoneId settings:settings delegate:self];
+
+        NSString *customerId = [self.delegate customerIdForRewardedVideoCustomEvent:self];
+        [[MPUnityRouter sharedRouter] presentRewardedVideoAdFromViewController:viewController customerId:customerId zoneId:self.zoneId settings:settings delegate:self];
     } else {
         MPLogInfo(@"Failed to show Unity rewarded video: Unity now claims that there is no available video ad.");
         NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorNoAdsAvailable userInfo:nil];
@@ -71,8 +72,13 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)unityAdsVideoCompleted:(NSString *)rewardItemKey skipped:(BOOL)skipped
 {
-    if ([rewardItemKey length] > 0 && !skipped) {
-        [self.delegate rewardedVideoShouldRewardUserForCustomEvent:self reward:[[MPRewardedVideoReward alloc] initWithCurrencyType:rewardItemKey amount:@(kMPRewardedVideoRewardCurrencyAmountUnspecified)]];
+    if (!skipped) {
+        NSString *currencyType = kMPRewardedVideoRewardCurrencyTypeUnspecified;
+        if (rewardItemKey) {
+            currencyType = rewardItemKey;
+        }
+        MPRewardedVideoReward *reward = [[MPRewardedVideoReward alloc] initWithCurrencyType:currencyType amount:@(kMPRewardedVideoRewardCurrencyAmountUnspecified)];
+        [self.delegate rewardedVideoShouldRewardUserForCustomEvent:self reward:reward];
     }
 }
 

@@ -7,9 +7,10 @@
 
 #import "MPGlobal.h"
 #import "MPConstants.h"
+#import "MPLogging.h"
 #import "NSURL+MPAdditions.h"
+#import "MoPub.h"
 #import <CommonCrypto/CommonDigest.h>
-#import <WithBuddiesAds/WithBuddiesAds.h>
 
 #import <sys/types.h>
 #import <sys/sysctl.h>
@@ -50,9 +51,17 @@ CGRect MPApplicationFrame()
 
 CGRect MPScreenBounds()
 {
+    // Prior to iOS 8, window and screen coordinates were fixed and always specified relative to the
+    // device’s screen in a portrait orientation. Starting with iOS8, the `fixedCoordinateSpace`
+    // property was introduced which specifies bounds that always reflect the screen dimensions of
+    // the device in a portrait-up orientation.
     CGRect bounds = [UIScreen mainScreen].bounds;
+    if ([[UIScreen mainScreen] respondsToSelector:@selector(fixedCoordinateSpace)]) {
+        bounds = [UIScreen mainScreen].fixedCoordinateSpace.bounds;
+    }
 
-    if (UIInterfaceOrientationIsLandscape(MPInterfaceOrientation()) && [[UIDevice currentDevice].systemVersion compare:@"8.0"] == NSOrderedAscending) {
+    // Rotate the portrait-up bounds if the orientation of the device is in landscape.
+    if (UIInterfaceOrientationIsLandscape(MPInterfaceOrientation())) {
         CGFloat width = bounds.size.width;
         bounds.size.width = bounds.size.height;
         bounds.size.height = width;
@@ -180,8 +189,47 @@ NSString *MPResourcePathForResource(NSString *resourceName)
     // We store all assets inside a bundle for Fabric.
     return [@"MoPub.bundle" stringByAppendingPathComponent:resourceName];
 #else
-    // When using open source, the resources just live in the main bundle.
-    return resourceName;
+    if ([[UIDevice currentDevice].systemVersion compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending) {
+        // When using open source or cocoapods (on ios 8 and above), we can rely on the MoPub class
+        // living in the same bundle/framework as the assets.
+        // We can use pathForResource on ios 8 and above to succesfully load resources.
+        NSBundle *resourceBundle = [NSBundle bundleForClass:[MoPub class]];
+        NSString *resourcePath = [resourceBundle pathForResource:resourceName ofType:nil];
+        return resourcePath;
+    } else {
+        // We can just return the resource name because:
+        // 1. This is being used as an open source release so the resource will be
+        // in the main bundle.
+        // 2. This is cocoapods but CAN'T be using frameworks since that is only allowed
+        // on ios 8 and above.
+        return resourceName;
+    }
+#endif
+}
+
+NSArray *MPConvertStringArrayToURLArray(NSArray *strArray)
+{
+    NSMutableArray *urls = [NSMutableArray array];
+
+    for (NSObject *str in strArray) {
+        if ([str isKindOfClass:[NSString class]]) {
+            NSURL *url = [NSURL URLWithString:(NSString *)str];
+            if (url) {
+                [urls addObject:url];
+            }
+        }
+    }
+
+    return urls;
+}
+
+NSBundle *MPResourceBundleForClass(Class aClass)
+{
+#ifdef MP_FABRIC
+    NSString *fabricBundlePath = [[NSBundle mainBundle] pathForResource:@"MoPub" ofType:@"bundle"];
+    return [NSBundle bundleWithPath:fabricBundlePath];
+#else
+    return [NSBundle bundleForClass:aClass];
 #endif
 }
 
@@ -189,7 +237,7 @@ NSString *MPResourcePathForResource(NSString *resourceName)
 
 @implementation NSString (MPAdditions)
 
-- (NSString *)URLEncodedString
+- (NSString *)mp_URLEncodedString
 {
     NSString *result = (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL,
                                                                            (CFStringRef)self,
@@ -205,7 +253,7 @@ NSString *MPResourcePathForResource(NSString *resourceName)
 
 @implementation UIDevice (MPAdditions)
 
-- (NSString *)hardwareDeviceName
+- (NSString *)mp_hardwareDeviceName
 {
     size_t size;
     sysctlbyname("hw.machine", NULL, &size, NULL, 0);
@@ -303,7 +351,7 @@ NSString *MPResourcePathForResource(NSString *resourceName)
 {
     if (![url mp_hasTelephoneScheme] && ![url mp_hasTelephonePromptScheme]) {
         // Shouldn't be here as the url must have a tel or telPrompt scheme.
-        AdLogType(WBAdLogLevelError, WBAdTypeNone, @"Processing URL as a telephone URL when %@ doesn't follow the tel:// or telprompt:// schemes", url.absoluteString);
+        MPLogError(@"Processing URL as a telephone URL when %@ doesn't follow the tel:// or telprompt:// schemes", url.absoluteString);
         return nil;
     }
 
@@ -314,7 +362,7 @@ NSString *MPResourcePathForResource(NSString *resourceName)
         if (!phoneNumber) {
             phoneNumber = [url resourceSpecifier];
             if ([phoneNumber length] == 0) {
-                AdLogType(WBAdLogLevelError, WBAdTypeNone, @"Invalid telelphone URL: %@.", url.absoluteString);
+                MPLogError(@"Invalid telelphone URL: %@.", url.absoluteString);
                 return nil;
             }
         }

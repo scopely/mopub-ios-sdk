@@ -37,6 +37,7 @@ mopub-sdk-common/
 AdColonyCustomEvent/
 ChartboostCustomEvent/
 FacebookCustomEvent/
+FlurryCustomEvent/
 GoogleAdMobCustomEvent/
 GreystripeCustomEvent/
 InMobiCustomEvent/
@@ -46,5 +47,8 @@ MoPubResources/
 VungleCustomEvent/
 iAdCustomEvent/
 UnityCustomEvent/
-Fabric/
+TapJoyCustomEvent/
+/Fabric/
 MoPubSwiftSampleApp/
+/Pods
+AdNetworkSupport/InMobi/

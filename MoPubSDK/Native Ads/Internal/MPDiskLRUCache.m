@@ -6,6 +6,7 @@
 
 #import "MPDiskLRUCache.h"
 #import "MPGlobal.h"
+#import "MPLogging.h"
 
 #import <CommonCrypto/CommonDigest.h>
 
@@ -158,6 +159,8 @@
 - (void)ensureCacheSizeLimit
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        MPLogDebug(@"Checking cache size...");
+
         NSFileManager *fileManager = [NSFileManager defaultManager];
 
         NSMutableArray *cacheFilesSortedByModDate = [self cacheFilesSortedByModDate];
@@ -167,6 +170,8 @@
                 // verify age
                 NSArray *expiredFiles = [self expiredCachedFilesInArray:cacheFilesSortedByModDate];
                 for (MPDiskLRUCacheFile *file in expiredFiles) {
+                    MPLogDebug(@"Trying to remove %@ from cache due to expiration", file.filePath);
+
                     [fileManager removeItemAtPath:file.filePath error:nil];
                     [cacheFilesSortedByModDate removeObject:file];
                 }
@@ -174,6 +179,9 @@
                 // verify size
                 while ([self sizeOfCacheFilesInArray:cacheFilesSortedByModDate] >= kCacheSoftMaxSize && cacheFilesSortedByModDate.count > 0) {
                     NSString *oldestFilePath = ((MPDiskLRUCacheFile *)[cacheFilesSortedByModDate objectAtIndex:0]).filePath;
+
+                    MPLogDebug(@"Trying to remove %@ from cache due to size", oldestFilePath);
+
                     [fileManager removeItemAtPath:oldestFilePath error:nil];
                     [cacheFilesSortedByModDate removeObjectAtIndex:0];
                 }
@@ -242,6 +250,9 @@
     for (MPDiskLRUCacheFile *file in files) {
         currentSize += file.fileSize;
     }
+
+    MPLogDebug(@"Current cache size %qu bytes", currentSize);
+
     return currentSize;
 }
 

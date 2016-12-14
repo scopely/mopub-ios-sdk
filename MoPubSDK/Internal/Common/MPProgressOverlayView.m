@@ -8,6 +8,7 @@
 
 #import "MPProgressOverlayView.h"
 #import "MPGlobal.h"
+#import "MPLogging.h"
 #import <QuartzCore/QuartzCore.h>
 
 static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";

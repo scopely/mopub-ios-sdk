@@ -3,6 +3,7 @@
 #import "MPAdConfigurationFactory.h"
 #import "FakeMPAdServerCommunicator.h"
 #import "NSErrorFactory.h"
+#import <Cedar/Cedar.h>
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
@@ -718,45 +719,6 @@ describe(@"MPAdViewIntegrationSuite", ^{
                 [communicator resetLoadedURL];
                 [fakeCoreProvider advanceMPTimers:FAR_FUTURE_TIME_INTERVAL];
                 communicator.loadedURL.absoluteString should be_nil;
-            });
-        });
-    });
-
-    describe(@"setting ignoresAutorefresh to YES", ^{
-        beforeEach(^{
-            banner.ignoresAutorefresh = YES;
-
-            [banner loadAd];
-
-            communicator = fakeCoreProvider.lastFakeMPAdServerCommunicator;
-            communicator.loadedURL.absoluteString should contain(@"custom_event");
-        });
-
-        context(@"when the ad successfully loads", ^{
-            beforeEach(^{
-                requestingEvent = [[FakeBannerCustomEvent alloc] initWithFrame:CGRectMake(0, 0, 20, 30)];
-                fakeProvider.fakeBannerCustomEvent = requestingEvent;
-
-                requestingConfiguration = [MPAdConfigurationFactory defaultBannerConfigurationWithCustomEventClassName:@"FakeBannerCustomEvent"];
-                requestingConfiguration.refreshInterval = 36;
-
-                [communicator receiveConfiguration:requestingConfiguration];
-
-                [requestingEvent simulateLoadingAd];
-            });
-
-            it(@"should not schedule a refresh timer", ^{
-                [communicator resetLoadedURL];
-                [fakeCoreProvider advanceMPTimers:36];
-                communicator.loadedURL should be_nil;
-            });
-
-            it(@"should schedule a refresh timer upon setting ignoresAutorefresh back to NO", ^{
-                banner.ignoresAutorefresh = NO;
-
-                [communicator resetLoadedURL];
-                [fakeCoreProvider advanceMPTimers:36];
-                communicator.loadedURL.absoluteString should contain(@"custom_event");
             });
         });
     });

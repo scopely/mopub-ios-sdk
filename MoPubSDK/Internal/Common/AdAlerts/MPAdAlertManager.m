@@ -8,11 +8,10 @@
 #import "MPAdAlertManager.h"
 #import "MPAdConfiguration.h"
 #import "MPAdAlertGestureRecognizer.h"
+#import "MPLogging.h"
 #import "MPIdentityProvider.h"
 #import "MPCoreInstanceProvider.h"
 #import "MPLastResortDelegate.h"
-#import "MPConstants.h"
-#import "WBAdLogging.h"
 
 #import <QuartzCore/QuartzCore.h>
 #import <CoreLocation/CoreLocation.h>
@@ -63,9 +62,9 @@
 - (void)processAdAlert
 {
     static NSDateFormatter *dateFormatter = nil;
-    
-    AdLogType(WBAdLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager processing ad alert");
-    
+
+    MPLogInfo(@"MPAdAlertManager processing ad alert");
+
     // don't even try if this device can't send emails
     if (![MFMailComposeViewController canSendMail]) {
         if ([self.delegate respondsToSelector:@selector(adAlertManagerDidProcessAlert:)]) {
@@ -112,14 +111,16 @@
             [params setValue:[dateFormatter stringFromDate:self.adConfiguration.creationTimestamp] forKey:kTimestampParamKey];
 
             [self processAdParams:params andScreenshot:image];
-            AdLogType(WBAdLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager finished processing ad alert");
+
+            MPLogInfo(@"MPAdAlertManager finished processing ad alert");
         });
     });
 }
 
 - (void)handleAdAlertGesture
 {
-    AdLogType(WBAdLogLevelDebug, self.adConfiguration.logType, @"MPAdAlertManager alert gesture recognized");
+    MPLogInfo(@"MPAdAlertManager alert gesture recognized");
+
     [self.delegate adAlertManagerDidTriggerAlert:self];
 }
 

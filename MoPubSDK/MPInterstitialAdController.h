@@ -9,15 +9,12 @@
 #import <CoreLocation/CoreLocation.h>
 
 @protocol MPInterstitialAdControllerDelegate;
-@class MPInterstitialCustomEvent;
-@class MPInterstitialCustomEventAdapter;
 
 /**
  * The `MPInterstitialAdController` class provides a full-screen advertisement that can be
  * displayed during natural transition points in your application.
  */
-@class MPInterstitialCustomEvent;
-@class MPInterstitialCustomEventAdapter;
+
 @interface MPInterstitialAdController : UIViewController
 
 /** @name Obtaining an Interstitial Ad */
@@ -108,14 +105,7 @@
  * been presented, or has expired. The expiration condition only applies for ads from certain
  * third-party ad networks. See `MPInterstitialAdControllerDelegate` for more details.
  */
--(BOOL)ready;
-
--(MPInterstitialCustomEvent *)currentInterstitialCustomEvent;
--(MPInterstitialCustomEventAdapter *)adapter;
-/**
- *  A Boolean value that represents whether the interstitial is loading an advertisement
- */
--(BOOL)loading;
+@property (nonatomic, assign, readonly) BOOL ready;
 
 /** @name Presenting an Interstitial Ad */
 
@@ -154,34 +144,6 @@
  * Returns the shared pool of interstitial objects for your application.
  */
 + (NSMutableArray *)sharedInterstitialAdControllers;
-
-#pragma mark - Deprecated
-
-/** @name Handling Custom Event Methods (Deprecated) */
-
-/**
- * Notifies MoPub that a custom event has successfully loaded an interstitial.
- *
- * @bug **Warning**: This method has been deprecated. You should instead implement interstitial
- * custom events using a subclass of `MPInterstitialCustomEvent`.
- */
-- (void)customEventDidLoadAd __attribute__((deprecated));
-
-/**
- * Notifies MoPub that a custom event has failed to load an interstitial.
- *
- * @bug **Warning**: This method has been deprecated. You should instead implement interstitial
- * custom events using a subclass of `MPInterstitialCustomEvent`.
- */
-- (void)customEventDidFailToLoadAd __attribute__((deprecated));
-
-/**
- * Notifies MoPub that a user has tapped on a custom event interstitial.
- *
- * @bug **Warning**: This method has been deprecated. You should instead implement interstitial
- * custom events using a subclass of `MPInterstitialCustomEvent`.
- */
-- (void)customEventActionWillBegin __attribute__((deprecated));
 
 @end
 
@@ -260,7 +222,7 @@
 /**
  * Sent when a loaded interstitial ad is no longer eligible to be displayed.
  *
- * Interstitial ads from certain networks (such as iAd) may expire their content at any time,
+ * Interstitial ads from certain networks may expire their content at any time,
  * even if the content is currently on-screen. This method notifies you when the currently-
  * loaded interstitial has expired and is no longer eligible for display.
  *
@@ -283,16 +245,5 @@
  * @param interstitial The interstitial ad object sending the message.
  */
 - (void)interstitialDidReceiveTapEvent:(MPInterstitialAdController *)interstitial;
-
-/*
- * DEPRECATED: This callback notifies you to dismiss the interstitial, and allows you to implement
- * any pre-dismissal behavior (e.g. unpausing a game). This method is being deprecated as it is no
- * longer necessary to dismiss an interstitial manually (i.e. via calling
- * -dismissModalViewControllerAnimated:).
- *
- * Any pre-dismissal behavior should be implemented using -interstitialWillDisappear: or
- * -interstitialDidDisappear: instead.
- */
-- (void)dismissInterstitial:(MPInterstitialAdController *)interstitial __attribute__((deprecated));
 
 @end

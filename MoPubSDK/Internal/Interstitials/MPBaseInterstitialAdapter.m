@@ -14,15 +14,12 @@
 #import "MPTimer.h"
 #import "MPConstants.h"
 
-#import <WithBuddiesAds/WithBuddiesAds.h>
-#import "WBAdEvent_Internal.h"
-
 @interface MPBaseInterstitialAdapter ()
 
 @property (nonatomic, strong) MPAdConfiguration *configuration;
 @property (nonatomic, strong) MPTimer *timeoutTimer;
 
-- (void)startTimeoutTimerWithConfiguration:(MPAdConfiguration *)configuration;
+- (void)startTimeoutTimer;
 
 @end
 
@@ -32,7 +29,7 @@
 @synthesize configuration = _configuration;
 @synthesize timeoutTimer = _timeoutTimer;
 
-- (instancetype)initWithDelegate:(id<MPInterstitialAdapterDelegate>)delegate
+- (id)initWithDelegate:(id<MPInterstitialAdapterDelegate>)delegate
 {
     self = [super init];
     if (self) {
@@ -46,6 +43,7 @@
     [self unregisterDelegate];
 
     [self.timeoutTimer invalidate];
+
 }
 
 - (void)unregisterDelegate
@@ -63,30 +61,23 @@
 {
     self.configuration = configuration;
 
-    [self startTimeoutTimerWithConfiguration:configuration];
+    [self startTimeoutTimer];
 
     MPBaseInterstitialAdapter *strongSelf = self;
     [strongSelf getAdWithConfiguration:configuration];
 }
 
-- (void)startTimeoutTimerWithConfiguration:(MPAdConfiguration *)configuration
+- (void)startTimeoutTimer
 {
     NSTimeInterval timeInterval = (self.configuration && self.configuration.adTimeoutInterval >= 0) ?
-    self.configuration.adTimeoutInterval : INTERSTITIAL_TIMEOUT_INTERVAL;
+            self.configuration.adTimeoutInterval : INTERSTITIAL_TIMEOUT_INTERVAL;
 
-    id t = configuration.customEventClassData[@"Timeout"];
-    if([t isKindOfClass:[NSString class]] == YES)
-    {
-        timeInterval = [t intValue];
-        AdLogType(WBAdLogLevelTrace, WBAdTypeInterstitial, @"%@ Override timeout available timeout set to %f", NSStringFromClass(configuration.customEventClass), timeInterval);
-    }
-    
-    if(timeInterval > 0)
-    {
+    if (timeInterval > 0) {
         self.timeoutTimer = [[MPCoreInstanceProvider sharedProvider] buildMPTimerWithTimeInterval:timeInterval
-                                                                                           target:self
-                                                                                         selector:@selector(timeout)
-                                                                                          repeats:NO];
+                                                                                       target:self
+                                                                                     selector:@selector(timeout)
+                                                                                      repeats:NO];
+
         [self.timeoutTimer scheduleNow];
     }
 }
@@ -98,8 +89,6 @@
 
 - (void)timeout
 {
-    AdLogType(WBAdLogLevelWarn, WBAdTypeInterstitial, @"%@ custom event did time out", NSStringFromClass(self.configuration.customEventClass));
-    [WBAdEvent postAdFailedWithReason:WBAdFailureReasonTimeout adNetwork:[self.configuration.customEventClass description] adType:WBAdTypeInterstitial];
     [self.delegate adapter:self didFailToLoadAdWithError:nil];
 }
 
@@ -114,15 +103,11 @@
 
 - (void)trackImpression
 {
-    WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeImpression adNetwork:self.configuration.customAdNetwork adType:WBAdTypeInterstitial];
-    [WBAdEvent postNotification:adEvent];
     [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackImpressionForConfiguration:self.configuration];
 }
 
 - (void)trackClick
 {
-    WBAdEvent *adEvent = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeClick adNetwork:self.configuration.customAdNetwork adType:WBAdTypeInterstitial];
-    [WBAdEvent postNotification:adEvent];
     [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackClickForConfiguration:self.configuration];
 }
 

@@ -5,24 +5,31 @@
 //  Copyright (c) 2014 MoPub. All rights reserved.
 //
 
-#import "MPStreamAdPlacer.h"
-#import "MPInstanceProvider.h"
-#import "MPNativeAdSource.h"
-#import "MPStreamAdPlacementData.h"
 #import "MPAdPositioning.h"
-#import "MPNativeAd.h"
+#import "MPInstanceProvider.h"
+#import "MPLogging.h"
+#import "MPNativeAd+Internal.h"
 #import "MPNativeAdData.h"
-#import "MPNativeAdRendering.h"
-#import "MPServerAdPositioning.h"
-#import "MPNativePositionSource.h"
 #import "MPNativeAdDelegate.h"
+#import "MPNativeAdRendererConfiguration.h"
+#import "MPNativeAdRendererConstants.h"
+#import "MPNativeAdRendering.h"
+#import "MPNativeAdSource.h"
+#import "MPNativePositionSource.h"
+#import "MPNativeView.h"
+#import "MPServerAdPositioning.h"
+#import "MPStaticNativeAdRenderer.h"
+#import "MPStreamAdPlacementData.h"
+#import "MPStreamAdPlacer.h"
 
-static NSString * const kReuseIdentifierPrefix = @"MoPub";
 static NSInteger const kAdInsertionLookAheadAmount = 3;
 static const NSUInteger kIndexPathItemIndex = 1;
 
+@protocol MPNativeAdRenderer;
+
 @interface MPStreamAdPlacer () <MPNativeAdSourceDelegate, MPNativeAdDelegate>
 
+@property (nonatomic, strong) NSArray *rendererConfigurations;
 @property (nonatomic, strong) MPNativeAdSource *adSource;
 @property (nonatomic, strong) MPNativePositionSource *positioningSource;
 @property (nonatomic, copy) MPAdPositioning *adPositioning;
@@ -38,17 +45,20 @@ static const NSUInteger kIndexPathItemIndex = 1;
 
 @implementation MPStreamAdPlacer
 
-+ (instancetype)placerWithViewController:(UIViewController *)controller adPositioning:(MPAdPositioning *)positioning defaultAdRenderingClass:(Class)defaultAdRenderingClass
++ (instancetype)placerWithViewController:(UIViewController *)controller adPositioning:(MPAdPositioning *)positioning rendererConfigurations:(NSArray *)rendererConfigurations
 {
-    MPStreamAdPlacer *placer = [[self alloc] initWithViewController:controller adPositioning:positioning defaultAdRenderingClass:defaultAdRenderingClass];
+    MPStreamAdPlacer *placer = [[self alloc] initWithViewController:controller adPositioning:positioning rendererConfigurations:rendererConfigurations];
     return placer;
 }
 
-- (instancetype)initWithViewController:(UIViewController *)controller adPositioning:(MPAdPositioning *)positioning defaultAdRenderingClass:(Class)defaultAdRenderingClass
+- (instancetype)initWithViewController:(UIViewController *)controller adPositioning:(MPAdPositioning *)positioning rendererConfigurations:(NSArray *)rendererConfigurations
 {
     NSAssert(controller != nil, @"A stream ad placer cannot be instantiated with a nil view controller.");
     NSAssert(positioning != nil, @"A stream ad placer cannot be instantiated with a nil positioning object.");
-    NSAssert([defaultAdRenderingClass conformsToProtocol:@protocol(MPNativeAdRendering)] && [defaultAdRenderingClass isSubclassOfClass:[UIView class]], @"A stream ad placer must be instantiated with a class that implements MPNativeAdRendering and is a view.");
+
+    for (id rendererConfiguration in rendererConfigurations) {
+        NSAssert([rendererConfiguration isKindOfClass:[MPNativeAdRendererConfiguration class]], @"A stream ad placer must be instantiated with rendererConfigurations that are of type MPNativeAdRendererConfiguration.");
+    }
 
     self = [super init];
     if (self) {
@@ -56,7 +66,7 @@ static const NSUInteger kIndexPathItemIndex = 1;
         _adPositioning = [positioning copy];
         _adSource = [[MPInstanceProvider sharedProvider] buildNativeAdSourceWithDelegate:self];
         _adPlacementData = [[MPInstanceProvider sharedProvider] buildStreamAdPlacementDataWithPositioning:_adPositioning];
-        _defaultAdRenderingClass = defaultAdRenderingClass;
+        _rendererConfigurations = rendererConfigurations;
         _sectionCounts = [[NSMutableDictionary alloc] init];
     }
     return self;
@@ -88,41 +98,37 @@ static const NSUInteger kIndexPathItemIndex = 1;
     self.sectionCounts[@(section)] = @(count);
 }
 
-- (void)displayContentForAdAtAdjustedIndexPath:(NSIndexPath *)indexPath
-{
-    MPNativeAdData *adData = [self.adPlacementData adDataAtAdjustedIndexPath:indexPath];
-
-    [adData.ad displayContentWithCompletion:nil];
-}
-
-- (NSString *)reuseIdentifierForRenderingClassAtIndexPath:(NSIndexPath *)indexPath
-{
-    return [kReuseIdentifierPrefix stringByAppendingString:NSStringFromClass(self.defaultAdRenderingClass)];
-}
-
-- (void)renderAdAtIndexPath:(NSIndexPath *)indexPath inView:(UIView<MPNativeAdRendering> *)view
+- (void)renderAdAtIndexPath:(NSIndexPath *)indexPath inView:(UIView *)view
 {
     MPNativeAdData *adData = [self.adPlacementData adDataAtAdjustedIndexPath:indexPath];
 
     if (!adData) {
-//        MPLogError(@"-renderAdAtIndexPath: An ad does not exist at indexPath");
+        MPLogError(@"-renderAdAtIndexPath: An ad does not exist at indexPath");
         return;
     }
 
-    [adData.ad prepareForDisplayInView:view];
+    // Remove any old native ad views from the view prior to adding the new ad view as a sub view.
+    for (UIView *subview in view.subviews) {
+        if ([subview isKindOfClass:[MPNativeView class]]) {
+            [subview removeFromSuperview];
+        }
+    }
+
+    [view addSubview:[adData.ad retrieveAdViewWithError:nil]];
+
+    CGSize adSize = [self sizeForAd:adData.ad withMaximumWidth:view.bounds.size.width andIndexPath:indexPath];
+    [adData.ad updateAdViewSize:adSize];
 }
 
 - (CGSize)sizeForAdAtIndexPath:(NSIndexPath *)indexPath withMaximumWidth:(CGFloat)maxWidth
 {
     MPNativeAdData *adData = [self.adPlacementData adDataAtAdjustedIndexPath:indexPath];
 
-    if ([adData.renderingClass respondsToSelector:@selector(sizeWithMaximumWidth:)]) {
-        return [adData.renderingClass sizeWithMaximumWidth:maxWidth];
-    }
+    // Tell the ad that it should resize the native ad view.
+    CGSize adSize = [self sizeForAd:adData.ad withMaximumWidth:maxWidth andIndexPath:indexPath];
+    [adData.ad updateAdViewSize:adSize];
 
-    CGSize defaultSize = CGSizeMake(maxWidth, 44.0f);
-//    MPLogWarn(@"WARNING: + (CGSize)sizeWithMaximumWidth:(CGFloat)maximumWidth is NOT implemented for native ad rendering class %@ at index path %@. You MUST implement this method to ensure that ad placer native ad cells are correctly sized. Returning a default size of %@ for now.", NSStringFromClass(adData.renderingClass), indexPath, NSStringFromCGSize(defaultSize));
-    return defaultSize;
+    return adSize;
 }
 
 - (void)loadAdsForAdUnitID:(NSString *)adUnitID
@@ -163,13 +169,13 @@ static const NSUInteger kIndexPathItemIndex = 1;
 
             if (error) {
                 if ([error code] == MPNativePositionSourceEmptyResponse) {
-//                    MPLogError(@"ERROR: Ad placer cannot show any ads because ad positions have "
-//                               @"not been configured for your ad unit %@. You must assign positions "
-//                               @"by editing the ad unit's settings on the MoPub website.",
-//                               strongSelf.adUnitID);
+                    MPLogError(@"ERROR: Ad placer cannot show any ads because ad positions have "
+                               @"not been configured for your ad unit %@. You must assign positions "
+                               @"by editing the ad unit's settings on the MoPub website.",
+                               strongSelf.adUnitID);
                 } else {
-//                    MPLogError(@"ERROR: Ad placer failed to get positions from the ad server for "
-//                               @"ad unit ID %@. Error: %@", strongSelf.adUnitID, error);
+                    MPLogError(@"ERROR: Ad placer failed to get positions from the ad server for "
+                               @"ad unit ID %@. Error: %@", strongSelf.adUnitID, error);
                 }
             } else {
                 strongSelf.adPlacementData = [[MPInstanceProvider sharedProvider] buildStreamAdPlacementDataWithPositioning:positioning];
@@ -182,11 +188,11 @@ static const NSUInteger kIndexPathItemIndex = 1;
     }
 
     if (!adUnitID) {
-//        MPLogError(@"Ad placer cannot load ads with a nil ad unit ID.");
+        MPLogError(@"Ad placer cannot load ads with a nil ad unit ID.");
         return;
     }
 
-    [self.adSource loadAdsWithAdUnitIdentifier:adUnitID andTargeting:targeting];
+    [self.adSource loadAdsWithAdUnitIdentifier:adUnitID rendererConfigurations:self.rendererConfigurations andTargeting:targeting];
 }
 
 - (BOOL)isAdAtIndexPath:(NSIndexPath *)indexPath
@@ -484,7 +490,6 @@ static const NSUInteger kIndexPathItemIndex = 1;
     MPNativeAdData *adData = [[MPNativeAdData alloc] init];
     adData.adUnitID = self.adUnitID;
     adData.ad = adObject;
-    adData.renderingClass = self.defaultAdRenderingClass;
 
     return adData;
 }
@@ -527,4 +532,50 @@ static const NSUInteger kIndexPathItemIndex = 1;
     return self.viewController;
 }
 
+- (void)willPresentModalForNativeAd:(MPNativeAd *)nativeAd
+{
+    if ([self.delegate respondsToSelector:@selector(nativeAdWillPresentModalForStreamAdPlacer:)]) {
+        [self.delegate nativeAdWillPresentModalForStreamAdPlacer:self];
+    }
+}
+
+- (void)didDismissModalForNativeAd:(MPNativeAd *)nativeAd
+{
+    if ([self.delegate respondsToSelector:@selector(nativeAdDidDismissModalForStreamAdPlacer:)]) {
+        [self.delegate nativeAdDidDismissModalForStreamAdPlacer:self];
+    }
+}
+
+- (void)willLeaveApplicationFromNativeAd:(MPNativeAd *)nativeAd
+{
+    if ([self.delegate respondsToSelector:@selector(nativeAdWillLeaveApplicationFromStreamAdPlacer:)]) {
+        [self.delegate nativeAdWillLeaveApplicationFromStreamAdPlacer:self];
+    }
+}
+
+#pragma mark - Internal
+
+- (CGSize)sizeForAd:(MPNativeAd *)ad withMaximumWidth:(CGFloat)maxWidth andIndexPath:(NSIndexPath *)indexPath
+{
+    id<MPNativeAdRenderer> renderer = ad.renderer;
+
+    CGSize adSize;
+
+    if ([renderer respondsToSelector:@selector(viewSizeHandler)] && renderer.viewSizeHandler) {
+        adSize = [renderer viewSizeHandler](maxWidth);
+        if (adSize.height == MPNativeViewDynamicDimension) {
+            UIView *adView = [ad retrieveAdViewForSizeCalculationWithError:nil];
+            if (adView) {
+                CGSize hydratedAdViewSize = [adView sizeThatFits:CGSizeMake(adSize.width, CGFLOAT_MAX)];
+                return hydratedAdViewSize;
+            }
+        }
+        return adSize;
+    }
+
+    adSize = CGSizeMake(maxWidth, 44.0f);
+    MPLogWarn(@"WARNING: + (CGSize)viewSizeHandler is NOT implemented for native ad renderer %@ at index path %@. You MUST implement this method to ensure that ad placer native ad cells are correctly sized. Returning a default size of %@ for now.", NSStringFromClass([(id)renderer class]), indexPath, NSStringFromCGSize(adSize));
+
+    return adSize;
+}
 @end

@@ -1,4 +1,5 @@
 #import "MPTimer.h"
+#import <Cedar/Cedar.h>
 
 using namespace Cedar::Matchers;
 using namespace Cedar::Doubles;
@@ -112,10 +113,10 @@ describe(@"MPTimer", ^{
                     });
 
                     it(@"should fire at the right time", ^{
-                        runFor((interval - timeBeforePause) - threshold);
+                        runFor(interval / 2.0);
                         fakeTarget should_not have_received(@selector(doAnything));
 
-                        runFor(2 * threshold);
+                        runFor(2 * interval);
                         fakeTarget should have_received(@selector(doAnything));
 
                         [timer isValid] should equal(NO);

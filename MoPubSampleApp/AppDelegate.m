@@ -13,6 +13,7 @@
 #import "MPLogEvent.h"
 #import "MPLogEventRecorder.h"
 #import "MPLogging.h"
+#import <UIKit/UIKit.h>
 
 @implementation AppDelegate
 
@@ -30,7 +31,7 @@
 
     [[UITableViewHeaderFooterView appearance] setTintColor:[UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1]];
     navController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-    navController.navigationBar.titleTextAttributes = @{UITextAttributeTextColor: [UIColor colorWithRed:0.86 green:0.86 blue:0.86 alpha:1]};
+    navController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.86 green:0.86 blue:0.86 alpha:1]};
 
     return YES;
 }

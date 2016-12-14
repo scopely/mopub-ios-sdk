@@ -9,9 +9,8 @@
 #import "GSAdDelegate.h"
 #import "GreystripeInterstitialCustomEvent.h"
 #import "MPInstanceProvider.h"
+#import "MPLogging.h"
 #import "GSSDKInfo.h"
-#import "MPConstants.h"
-#import "WBAdService+Internal.h"
 
 @interface MPInstanceProvider (GreystripeInterstitials)
 
@@ -89,33 +88,30 @@ static NSString *gGUID = nil;
     [self.greystripeFullscreenAd setDelegate:nil];
 }
 
--(NSString *)description
-{
-    return @"GreyStripe";
-}
-
 #pragma mark - GSAdDelegate
 
 - (void)greystripeAdFetchSucceeded:(id<GSAd>)a_ad
 {
+    MPLogInfo(@"Greystripe interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:a_ad];
 }
 
 - (void)greystripeAdFetchFailed:(id<GSAd>)a_ad withError:(GSAdError)a_error
 {
-    NSError *error = [NSError errorWithDomain:MP_DOMAIN
-                                         code:a_error
-                                     userInfo:@{ NSLocalizedDescriptionKey : [NSString stringWithFormat:@"GSAdError: %d", a_error] }];
-    [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
+    MPLogInfo(@"Greystripe banner failed to load with GSAdError: %d", a_error);
+    [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
 - (void)greystripeAdClickedThrough:(id<GSAd>)a_ad
 {
+    MPLogInfo(@"Greystripe interstitial was clicked");
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
 }
 
 - (void)greystripeWillPresentModalViewController
 {
+    MPLogInfo(@"Greystripe interstitial will present");
+
     [self.delegate interstitialCustomEventWillAppear:self];
 
     // Greystripe doesn't seem to have a separate callback for the "did appear" event, so we
@@ -125,11 +121,13 @@ static NSString *gGUID = nil;
 
 - (void)greystripeWillDismissModalViewController
 {
+    MPLogInfo(@"Greystripe interstitial will dismiss");
     [self.delegate interstitialCustomEventWillDisappear:self];
 }
 
 - (void)greystripeDidDismissModalViewController
 {
+    MPLogInfo(@"Greystripe interstitial did dismiss");
     [self.delegate interstitialCustomEventDidDisappear:self];
 }
 
