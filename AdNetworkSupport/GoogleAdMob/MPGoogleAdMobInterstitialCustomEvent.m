@@ -12,7 +12,6 @@
 #import "MPAdConfiguration.h"
 #import "MPInstanceProvider.h"
 #import <CoreLocation/CoreLocation.h>
-#import "WBAdEvent_Internal.h"
 
 @interface MPInstanceProvider (AdMobInterstitials)
 
@@ -73,12 +72,6 @@
     request.requestAgent = @"MoPub";
 
     [self.interstitial loadRequest:request];
-    
-    WBAdEvent *event = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeRequest
-                                              failureReason:WBAdFailureReasonNone
-                                                  adNetwork:[self description]
-                                                     adType:WBAdTypeInterstitial backfill:NO];
-    [WBAdEvent postNotification:event];
 }
 
 - (void)showInterstitialFromRootViewController:(UIViewController *)rootViewController
@@ -103,22 +96,12 @@
 {
     MPLogInfo(@"Google AdMob Interstitial did load");
     [self.delegate interstitialCustomEvent:self didLoadAd:self];
-    WBAdEvent *event = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeLoaded
-                                              failureReason:WBAdFailureReasonNone
-                                                  adNetwork:[self description]
-                                                     adType:WBAdTypeInterstitial backfill:NO];
-    [WBAdEvent postNotification:event];
 }
 
 - (void)interstitial:(GADInterstitial *)interstitial didFailToReceiveAdWithError:(GADRequestError *)error
 {
     MPLogInfo(@"Google AdMob Interstitial failed to load with error: %@", error.localizedDescription);
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
-    WBAdEvent *event = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeFailure
-                                              failureReason:WBAdFailureReasonNoFill
-                                                  adNetwork:[self description]
-                                                     adType:WBAdTypeInterstitial backfill:NO];
-    [WBAdEvent postNotification:event];
 }
 
 - (void)interstitialWillPresentScreen:(GADInterstitial *)interstitial
@@ -126,28 +109,12 @@
     MPLogInfo(@"Google AdMob Interstitial will present");
     [self.delegate interstitialCustomEventWillAppear:self];
     [self.delegate interstitialCustomEventDidAppear:self];
-    WBAdEvent *event = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeShow
-                                              failureReason:WBAdFailureReasonNone
-                                                  adNetwork:[self description]
-                                                     adType:WBAdTypeInterstitial backfill:NO];
-    [WBAdEvent postNotification:event];
-    event = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeImpression
-                                   failureReason:WBAdFailureReasonNone
-                                       adNetwork:[self description]
-                                          adType:WBAdTypeInterstitial backfill:NO];
-    [WBAdEvent postNotification:event];
 }
 
 - (void)interstitialWillDismissScreen:(GADInterstitial *)ad
 {
     MPLogInfo(@"Google AdMob Interstitial will dismiss");
     [self.delegate interstitialCustomEventWillDisappear:self];
-    WBAdEvent *event = [[WBAdEvent alloc] initWithEventType:WBAdEventTypeDismissed
-                                              failureReason:WBAdFailureReasonNone
-                                                  adNetwork:[self description]
-                                                     adType:WBAdTypeInterstitial backfill:NO];
-    [WBAdEvent postNotification:event];
-
 }
 
 - (void)interstitialDidDismissScreen:(GADInterstitial *)ad
