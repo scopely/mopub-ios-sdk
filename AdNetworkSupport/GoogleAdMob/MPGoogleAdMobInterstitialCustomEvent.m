@@ -127,6 +127,7 @@
 {
     MPLogInfo(@"Google AdMob Interstitial will leave application");
     [self.delegate interstitialCustomEventDidReceiveTapEvent:self];
+    [self.delegate interstitialCustomEventWillLeaveApplication:self];
 }
 
 @end
