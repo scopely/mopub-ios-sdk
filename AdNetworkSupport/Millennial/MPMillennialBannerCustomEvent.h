@@ -10,7 +10,7 @@
     #import "MoPub.h"
 #endif
 
-#import <MMAdSDK/MMAdSDK.h>
+#import "MMAdSDK.h"
 
 /*
  * Please reference the Supported Mediation Partner page at http://bit.ly/2mqsuFH for the

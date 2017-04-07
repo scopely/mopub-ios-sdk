@@ -1,7 +1,7 @@
 
 #import "TapjoyRewardedVideoCustomEvent.h"
-#import <Tapjoy/Tapjoy.h>
-#import <Tapjoy/TJPlacement.h>
+#import "Tapjoy.h"
+#import "TJPlacement.h"
 #import "MPRewardedVideoError.h"
 #import "MPLogging.h"
 #import "MPRewardedVideoReward.h"

@@ -10,7 +10,7 @@
 #import "MPInstanceProvider+Chartboost.h"
 #import "MPLogging.h"
 #import "MPRewardedVideoReward.h"
-#import <Chartboost/Chartboost.h>
+#import "Chartboost.h"
 #import "MPRewardedVideoError.h"
 
 @interface ChartboostRewardedVideoCustomEvent () <ChartboostDelegate>

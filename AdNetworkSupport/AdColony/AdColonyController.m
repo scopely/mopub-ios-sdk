@@ -6,7 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AdColony/AdColony.h>
+#import "AdColony.h"
 #import "AdColonyController.h"
 #import "AdColonyGlobalMediationSettings.h"
 #import "MoPub.h"

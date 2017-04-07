@@ -4,7 +4,7 @@
 //  Copyright (c) 2015 Millennial Media, Inc. All rights reserved.
 //
 
-#import <MMAdSDK/MMNativeAd.h>
+#import "MMNativeAd.h"
 
 extern NSString* const MMNativeImageInfoURLKey;
 extern NSString* const MMNativeImageInfoWidthKey;

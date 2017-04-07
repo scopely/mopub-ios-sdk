@@ -7,7 +7,7 @@
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
-#import <Chartboost/Chartboost.h>
+#import "Chartboost.h"
 
 @class ChartboostInterstitialCustomEvent;
 @class ChartboostRewardedVideoCustomEvent;

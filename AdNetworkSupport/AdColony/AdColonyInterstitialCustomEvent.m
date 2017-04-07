@@ -5,7 +5,7 @@
 //  Copyright (c) 2016 MoPub. All rights reserved.
 //
 
-#import <AdColony/AdColony.h>
+#import "AdColony.h"
 #import "AdColonyInterstitialCustomEvent.h"
 #import "MPLogging.h"
 #import "AdColonyController.h"

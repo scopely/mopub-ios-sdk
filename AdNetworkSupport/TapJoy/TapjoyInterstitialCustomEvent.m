@@ -1,7 +1,7 @@
 
 #import "TapjoyInterstitialCustomEvent.h"
-#import <Tapjoy/TJPlacement.h>
-#import <Tapjoy/Tapjoy.h>
+#import "TJPlacement.h"
+#import "Tapjoy.h"
 #import "MPLogging.h"
 #import "MoPub.h"
 
