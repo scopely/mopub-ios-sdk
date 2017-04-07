@@ -10,7 +10,7 @@
 #import "MoPub.h"
 #endif
 
-#import <MMAdSDK/MMAdSDK.h>
+#import "MMAdSDK.h"
 #import <Foundation/Foundation.h>
 
 @interface MillennialNativeAdAdapter : NSObject <MPNativeAdAdapter>

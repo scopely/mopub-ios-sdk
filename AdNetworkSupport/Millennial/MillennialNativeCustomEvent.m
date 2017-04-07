@@ -9,7 +9,7 @@
 #import "MPNativeAdError.h"
 #import "MPLogging.h"
 
-#import <MMAdSDK/MMAdSDK.h>
+#import "MMAdSDK.h"
 #import "MMNativeAd+ClientMediation.h"
 
 static NSString *const kMoPubMMAdapterAdUnit = @"adUnitID";
