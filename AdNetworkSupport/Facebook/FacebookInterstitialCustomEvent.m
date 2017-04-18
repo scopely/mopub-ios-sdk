@@ -5,7 +5,7 @@
 //  Copyright (c) 2014 MoPub. All rights reserved.
 //
 
-#import <FBAudienceNetwork/FBAudienceNetwork.h>
+#import <FBAudienceNetwork.h>
 #import "FacebookInterstitialCustomEvent.h"
 
 #import "MPInstanceProvider.h"
