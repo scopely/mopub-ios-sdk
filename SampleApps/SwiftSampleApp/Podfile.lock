@@ -1,5 +1,5 @@
 PODS:
-  - AdColony (3.1.0)
+  - AdColony (3.1.1)
   - ChartboostSDK (6.6.2)
   - FBAudienceNetwork (4.15.1)
   - Flurry-iOS-SDK/FlurryAds (7.6.6):
@@ -49,7 +49,7 @@ EXTERNAL SOURCES:
     :path: "../../"
 
 SPEC CHECKSUMS:
-  AdColony: a33e712eea3e7c344038532af55827a0cdf85afb
+  AdColony: 27bcddd3d79b24f61765dd799fcc666975f90daa
   ChartboostSDK: 9248a129d363432b43eee0a18454dcf6f46f8d9d
   FBAudienceNetwork: 4e3859a04314972e6b3ab401784379fa8dfd56a6
   Flurry-iOS-SDK: 97bbeec09cca666c2f1772f6e161c4f8ccff611e

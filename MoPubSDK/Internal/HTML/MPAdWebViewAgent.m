@@ -36,6 +36,7 @@
 @property (nonatomic, assign) BOOL userInteractedWithWebView;
 @property (nonatomic, strong) MPUserInteractionGestureRecognizer *userInteractionRecognizer;
 @property (nonatomic, assign) CGRect frame;
+@property (nonatomic, assign) BOOL hasPerformedInitialLoad;
 
 - (void)performActionForMoPubSpecificURL:(NSURL *)URL;
 - (BOOL)shouldIntercept:(NSURL *)URL navigationType:(UIWebViewNavigationType)navigationType;
@@ -119,7 +120,7 @@
         [self.view removeFromSuperview];
         self.view = nil;
     }
-    self.view = [[MPWebView alloc] initWithFrame:self.frame forceUIWebView:self.configuration.forceUIWebView];
+    self.view = [[MPWebView alloc] initWithFrame:self.frame];
     self.view.delegate = self;
     [self.view addGestureRecognizer:self.userInteractionRecognizer];
 
@@ -133,12 +134,6 @@
             frame.size.height = configuration.preferredSize.height;
             self.view.frame = frame;
         }
-    }
-
-    // excuse interstitials from user tapped check since it's already a takeover experience
-    // and certain videos may delay tap gesture recognition
-    if (configuration.adType == MPAdTypeInterstitial) {
-        self.userInteractedWithWebView = YES;
     }
 
     [self.view mp_setScrollable:configuration.scrollable];
@@ -237,6 +232,19 @@
     [self.view disableJavaScriptDialogs];
 }
 
+- (void)webViewDidFinishLoad:(MPWebView *)webView
+{
+    if (!self.hasPerformedInitialLoad) {
+        // excuse interstitials from user tapped check since it's already a takeover experience
+        // and certain videos may delay tap gesture recognition
+        if (self.configuration.adType == MPAdTypeInterstitial) {
+            self.userInteractedWithWebView = YES;
+        }
+
+        self.hasPerformedInitialLoad = YES;
+    }
+}
+
 
 #pragma mark - MoPub-specific URL handlers
 - (void)performActionForMoPubSpecificURL:(NSURL *)URL
@@ -268,8 +276,8 @@
         return NO;
     } else if (navigationType == UIWebViewNavigationTypeLinkClicked) {
         return YES;
-    } else if (navigationType == UIWebViewNavigationTypeOther) {
-        return [[URL absoluteString] hasPrefix:[self.configuration clickDetectionURLPrefix]];
+    } else if (navigationType == UIWebViewNavigationTypeOther && self.userInteractedWithWebView) {
+        return YES;
     } else {
         return NO;
     }

@@ -24,7 +24,7 @@ The MoPub SDK is distributed as source code that you can include in your applica
 
   Includes everything you need to serve HTML and MRAID advertisements.  Third party ad networks and Native MoPub advertisements are not included.
 
-The current version of the SDK is 4.13.0
+The current version of the SDK is 4.14.0
 
 ## Integrate
 
@@ -37,12 +37,15 @@ More detailed class documentation is available in the repo under the `ClassDocum
 Please view the [changelog](https://github.com/mopub/mopub-ios-sdk/blob/master/CHANGELOG.md) for details.
 
 - **Features**
-	- Added support for mediation of Google AdMob rewarded video demand (Google Mobile Ads SDK v7.19.0).
-	- Google AdMob native ads mediation is now generally available (Google Mobile Ads SDK v7.19.0).
-	- Updated the Tapjoy network mediation adapter to support Tapjoy SDK v11.10.0
+    - For Rewarded ads, the client-side callback will now be invoked when using server-side rewarding.
+    - Non-mediated interstitial, rewarded, and native ad placer ads will expire within 4 hours.
 
 - **Bug Fixes**
-    - Introduced additional preventative measures to improve creative quality.
+    - Fix old custom events that use the wrong native renderer.
+    - Replace usage of typeof with __typeof__ for C99 and C11 compliance.
+    - Fix CFBridgingRetain casting bug.
+    - Native ad impression tracker will now fire while scrolling.
+    - Fix HTML click tracker to fire when using window.location and window.open.
 
 See the [Getting Started Guide](https://github.com/mopub/mopub-ios-sdk/wiki/Getting-Started#app-transport-security-settings) for instructions on setting up ATS in your app.  
 
