@@ -97,6 +97,7 @@
 {
     MPLogInfo(@"Facebook interstitial ad was closed");
     [self.delegate interstitialCustomEventDidDisappear:self];
+     self.fbInterstitialAd = nil;
 }
 
 - (void)interstitialAdWillClose:(FBInterstitialAd *)interstitialAd
