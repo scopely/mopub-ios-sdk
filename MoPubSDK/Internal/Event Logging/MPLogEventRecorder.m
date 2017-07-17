@@ -112,6 +112,7 @@ static const NSInteger MAX_REQUEST_ID_CACHE_SIZE = 100;
             MPLogDebug([NSString stringWithFormat:@"RECORDER: Event added. There are now %lu events in the queue.", (unsigned long)[self.events count]]);
         });
     }
+    [[NSNotificationCenter defaultCenter] postNotificationName:MPLogEventNotifName object:event];
 }
 
 #pragma mark - Private methods
