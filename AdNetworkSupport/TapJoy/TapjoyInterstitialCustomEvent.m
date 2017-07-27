@@ -81,7 +81,7 @@
 
 - (void)showInterstitialFromRootViewController:(UIViewController *)rootViewController {
     MPLogInfo(@"Tapjoy interstitial will be shown");
-    [self.placement showContentWithViewController:nil];
+    [self.placement showContentWithViewController:rootViewController];
 }
 
 - (void)dealloc {
