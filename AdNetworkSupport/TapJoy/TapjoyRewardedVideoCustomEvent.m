@@ -97,7 +97,7 @@
 - (void)presentRewardedVideoFromViewController:(UIViewController *)viewController {
     if ([self hasAdAvailable]) {
         MPLogInfo(@"Tapjoy rewarded video will be shown");
-        [self.placement showContentWithViewController:nil];
+        [self.placement showContentWithViewController:viewController];
     }
     else {
         MPLogInfo(@"Failed to show Tapjoy rewarded video");
