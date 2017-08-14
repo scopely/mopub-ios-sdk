@@ -35,6 +35,14 @@
 #import "MPNativePositionSource.h"
 #import "MPStreamAdPlacementData.h"
 #import "MPStreamAdPlacer.h"
+#import "WBBannerDelegateInterceptor.h"
+#import "WBBannerProxy.h"
+#import "WBFunnelManager.h"
+#import "WBFunnelKeys.h"
+#import "WBFunnel.h"
+#import "WBInterstitialProxy.h"
+#import "WBIncentivizedProxy.h"
+
 #endif
 
 @interface MPInstanceProvider ()
@@ -58,6 +66,7 @@
 
 @implementation MPInstanceProvider
 
+WBBannerProxy *bannerProxy;
 static MPInstanceProvider *sharedAdProvider = nil;
 
 + (instancetype)sharedProvider
@@ -118,16 +127,33 @@ static MPInstanceProvider *sharedAdProvider = nil;
 }
 
 - (MPBannerCustomEvent *)buildBannerCustomEventFromCustomClass:(Class)customClass
-                                                      delegate:(id<MPBannerCustomEventDelegate>)delegate
-{
+                                                      delegate:(id <MPBannerCustomEventDelegate>)delegate {
     MPBannerCustomEvent *customEvent = [[customClass alloc] init];
     if (![customEvent isKindOfClass:[MPBannerCustomEvent class]]) {
         MPLogError(@"**** Custom Event Class: %@ does not extend MPBannerCustomEvent ****", NSStringFromClass(customClass));
         return nil;
     }
-    customEvent.delegate = delegate;
+
+    bannerProxy = [WBBannerProxy alloc];
+    bannerProxy.delegate = delegate;
+    customEvent.delegate = bannerProxy;
+    bannerProxy.className = NSStringFromClass(customClass);
+    bannerProxy.attemptStart = [NSDate date];
+
+    if ([[WBFunnelManager sharedManager] getFunnelForKey:NewBannerKey]) {
+        [[WBFunnelManager sharedManager] setFunnelForKey:ExistingBannerKey funnel:[[WBFunnelManager sharedManager] getFunnelForKey:NewBannerKey]];
+        [[WBFunnelManager sharedManager] removeFunnelForKey:NewBannerKey];
+    } else {
+        NSString *placement = [[[WBFunnelManager sharedManager] getFunnelForKey:ExistingBannerKey] placement];
+        [[WBFunnelManager sharedManager] removeFunnelForKey:ExistingBannerKey];
+        [[WBFunnelManager sharedManager] createFunnelForKey:ExistingBannerKey withPlacement:placement];
+    }
+
+    bannerProxy.funnel = [[WBFunnelManager sharedManager] getFunnelForKey:ExistingBannerKey];
+
     return customEvent;
 }
+
 
 #pragma mark - Interstitials
 
@@ -148,8 +174,7 @@ static MPInstanceProvider *sharedAdProvider = nil;
 }
 
 - (MPInterstitialCustomEvent *)buildInterstitialCustomEventFromCustomClass:(Class)customClass
-                                                                  delegate:(id<MPInterstitialCustomEventDelegate>)delegate
-{
+                                                                  delegate:(id <MPInterstitialCustomEventDelegate>)delegate {
     MPInterstitialCustomEvent *customEvent = [[customClass alloc] init];
     if (![customEvent isKindOfClass:[MPInterstitialCustomEvent class]]) {
         MPLogError(@"**** Custom Event Class: %@ does not extend MPInterstitialCustomEvent ****", NSStringFromClass(customClass));
@@ -158,7 +183,14 @@ static MPInstanceProvider *sharedAdProvider = nil;
     if ([customEvent respondsToSelector:@selector(customEventDidUnload)]) {
         MPLogWarn(@"**** Custom Event Class: %@ implements the deprecated -customEventDidUnload method.  This is no longer called.  Use -dealloc for cleanup instead ****", NSStringFromClass(customClass));
     }
-    customEvent.delegate = delegate;
+
+    WBInterstitialProxy *interstitialProxy = [WBInterstitialProxy alloc];
+    interstitialProxy.delegate = delegate;
+    customEvent.delegate = interstitialProxy;
+    interstitialProxy.className = NSStringFromClass(customClass);
+    interstitialProxy.attemptStart = [NSDate date];
+    interstitialProxy.funnel = [[WBFunnelManager sharedManager] getFunnelForKey:LoadInterstitialKey];
+
     return customEvent;
 }
 

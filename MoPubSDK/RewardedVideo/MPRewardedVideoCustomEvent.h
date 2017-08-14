@@ -28,7 +28,7 @@
 
 @interface MPRewardedVideoCustomEvent : NSObject
 
-@property (nonatomic, weak) id<MPRewardedVideoCustomEventDelegate> delegate;
+@property (nonatomic, strong) id<MPRewardedVideoCustomEventDelegate> delegate;
 
 /** @name Requesting and Displaying a Rewarded Video Ad */
 

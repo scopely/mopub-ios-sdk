@@ -21,6 +21,9 @@
 #import "MPMoPubRewardedVideoCustomEvent.h"
 #import "MPMoPubRewardedPlayableCustomEvent.h"
 #import "MPRealTimeTimer.h"
+#import "WBFunnelKeys.h"
+#import "WBFunnelManager.h"
+#import "WBIncentivizedProxy.h"
 
 static const NSString *kRewardedVideoApiVersion = @"1";
 
@@ -70,6 +73,13 @@ static const NSString *kRewardedVideoApiVersion = @"1";
     self.configuration = configuration;
 
     self.rewardedVideoCustomEvent = [[MPInstanceProvider sharedProvider] buildRewardedVideoCustomEventFromCustomClass:configuration.customEventClass delegate:self];
+
+    WBIncentivizedProxy *incentivizedProxy = [WBIncentivizedProxy alloc];
+    incentivizedProxy.delegate = self;
+    self.rewardedVideoCustomEvent.delegate = incentivizedProxy;
+    incentivizedProxy.className = NSStringFromClass(configuration.customEventClass);
+    incentivizedProxy.attemptStart = [NSDate date];
+    incentivizedProxy.funnel = [[WBFunnelManager sharedManager] getFunnelForKey:[LoadIncentivizedKey stringByAppendingString:[self adUnitId]]];
 
     if (self.rewardedVideoCustomEvent) {
         [self startTimeoutTimer];
