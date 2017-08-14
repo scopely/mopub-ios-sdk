@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
+static NSString *const MPLogEventNotifName = @"MPLogEvent";
 @class MPLogEvent;
 
 void MPAddLogEvent(MPLogEvent *event);
