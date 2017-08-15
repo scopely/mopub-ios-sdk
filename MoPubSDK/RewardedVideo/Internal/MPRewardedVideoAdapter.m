@@ -24,6 +24,7 @@
 #import "WBFunnelKeys.h"
 #import "WBFunnelManager.h"
 #import "WBIncentivizedProxy.h"
+#import "WBFunnel.h"
 
 static const NSString *kRewardedVideoApiVersion = @"1";
 
@@ -76,9 +77,10 @@ static const NSString *kRewardedVideoApiVersion = @"1";
 
     WBIncentivizedProxy *incentivizedProxy = [WBIncentivizedProxy alloc];
     incentivizedProxy.delegate = self;
-    self.rewardedVideoCustomEvent.delegate = incentivizedProxy;
-    incentivizedProxy.className = NSStringFromClass(configuration.customEventClass);
+    self.rewardedVideoCustomEvent.delegate = incentivizedProxy;    
     incentivizedProxy.attemptStart = [NSDate date];
+    [[[WBFunnelManager sharedManager] getFunnelForKey:[LoadIncentivizedKey stringByAppendingString:[self adUnitId]]]
+            setFunnelAdNetworkName:NSStringFromClass(configuration.customEventClass)];
     incentivizedProxy.funnel = [[WBFunnelManager sharedManager] getFunnelForKey:[LoadIncentivizedKey stringByAppendingString:[self adUnitId]]];
 
     if (self.rewardedVideoCustomEvent) {
