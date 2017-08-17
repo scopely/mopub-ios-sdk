@@ -5,7 +5,7 @@
 //  Copyright (c) 2014 MoPub. All rights reserved.
 //
 
-#import <FBAudienceNetwork.h>
+#import "FBAudienceNetwork.h"
 #import "FacebookInterstitialCustomEvent.h"
 
 #import "MPInstanceProvider.h"
@@ -49,8 +49,8 @@
     MPLogInfo(@"Requesting Facebook interstitial ad");
 
     self.fbInterstitialAd =
-    [[MPInstanceProvider sharedProvider] buildFBInterstitialAdWithPlacementID:[info objectForKey:@"placement_id"]
-                                                                     delegate:self];
+            [[MPInstanceProvider sharedProvider] buildFBInterstitialAdWithPlacementID:[info objectForKey:@"placement_id"]
+                                                                             delegate:self];
 
     [self.fbInterstitialAd loadAd];
 }
@@ -81,6 +81,11 @@
     [self.delegate interstitialCustomEvent:self didLoadAd:interstitialAd];
 }
 
+- (void)interstitialAdWillLogImpression:(FBInterstitialAd *)interstitialAd
+{
+    MPLogInfo(@"Facebook intersitital ad is logging impressions for interstitials");
+}
+
 - (void)interstitialAd:(FBInterstitialAd *)interstitialAd didFailWithError:(NSError *)error
 {
     MPLogInfo(@"Facebook intersitital ad failed to load with error: %@", error.description);
@@ -97,7 +102,6 @@
 {
     MPLogInfo(@"Facebook interstitial ad was closed");
     [self.delegate interstitialCustomEventDidDisappear:self];
-     self.fbInterstitialAd = nil;
 }
 
 - (void)interstitialAdWillClose:(FBInterstitialAd *)interstitialAd

@@ -5,7 +5,7 @@
 //  Copyright (c) 2014 MoPub. All rights reserved.
 //
 
-#import <FBAudienceNetwork/FBAudienceNetwork.h>
+#import "FBAudienceNetwork.h"
 #import "FacebookNativeAdAdapter.h"
 #import "MPNativeAdConstants.h"
 #import "MPNativeAdError.h"
