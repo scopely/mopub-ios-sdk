@@ -139,14 +139,8 @@ static MPInstanceProvider *sharedAdProvider = nil;
     customEvent.delegate = bannerProxy;
     bannerProxy.attemptStart = [NSDate date];
 
-    if ([[WBFunnelManager sharedManager] getFunnelForKey:NewBannerKey]) {
-        [[WBFunnelManager sharedManager] setFunnelForKey:ExistingBannerKey funnel:[[WBFunnelManager sharedManager] getFunnelForKey:NewBannerKey]];
-        [[WBFunnelManager sharedManager] removeFunnelForKey:NewBannerKey];
-    } else {
-        NSString *placement = [[[WBFunnelManager sharedManager] getFunnelForKey:ExistingBannerKey] placement];
-        [[WBFunnelManager sharedManager] removeFunnelForKey:ExistingBannerKey];
-        [[WBFunnelManager sharedManager] createFunnelForKey:ExistingBannerKey withPlacement:placement];
-    }
+    [[WBFunnelManager sharedManager] setFunnelForKey:ExistingBannerKey
+                                              funnel:[[WBFunnelManager sharedManager] getFunnelForKey:NewBannerKey]];
 
     [[[WBFunnelManager sharedManager] getFunnelForKey:ExistingBannerKey] setFunnelAdNetworkName:NSStringFromClass(customClass)];
     bannerProxy.funnel = [[WBFunnelManager sharedManager] getFunnelForKey:ExistingBannerKey];
