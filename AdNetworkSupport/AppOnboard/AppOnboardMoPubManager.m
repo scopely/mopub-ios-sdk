@@ -9,7 +9,7 @@
 #import "AppOnboardMoPubManager.h"
 #import "MPLogging.h"
 
-#ifdef APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH
+#if defined(APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH) || defined(APPONBOARD_MOPUB_INIT_THROUGH_MOPUB)
 #define kAppOnboardStoredAppIdKey @"kAppOnboardStoredAppIdKey"
 #define kAppOnboardStoredZoneIdsKey @"kAppOnboardStoredZoneIdsKey"
 #endif
@@ -18,7 +18,7 @@
 
 }
 
-#ifdef APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH
+#if defined(APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH) || defined(APPONBOARD_MOPUB_INIT_THROUGH_MOPUB)
 @property (nonatomic, assign) BOOL isInitialized;
 @property (nonatomic, strong) NSString *appId;
 @property (nonatomic, strong) NSArray<NSString *> *zoneIds;
@@ -62,11 +62,12 @@
         [[AppOnboardMoPubManager sharedManager] initWithAppId:appId zoneIds:zoneIds];
     }
 }
+#endif
 
+#if defined(APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH) || defined(APPONBOARD_MOPUB_INIT_THROUGH_MOPUB)
 -(void)initWithAppId:(NSString *)appId zoneIds:(NSArray<NSString *> *)zoneIds
 {
     if(self.isInitialized) {
-        //NSLog(@"App Onboard already init");
         return;
     }
     
