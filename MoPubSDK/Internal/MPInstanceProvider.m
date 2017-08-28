@@ -67,6 +67,7 @@
 @implementation MPInstanceProvider
 
 WBBannerProxy *bannerProxy;
+WBInterstitialProxy *interstitialProxy;
 static MPInstanceProvider *sharedAdProvider = nil;
 
 + (instancetype)sharedProvider
@@ -74,6 +75,8 @@ static MPInstanceProvider *sharedAdProvider = nil;
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         sharedAdProvider = [[self alloc] init];
+        interstitialProxy = [WBInterstitialProxy alloc];
+        bannerProxy = [WBBannerProxy alloc];
     });
 
     return sharedAdProvider;
@@ -134,7 +137,6 @@ static MPInstanceProvider *sharedAdProvider = nil;
         return nil;
     }
 
-    bannerProxy = [WBBannerProxy alloc];
     bannerProxy.delegate = delegate;
     customEvent.delegate = bannerProxy;
     bannerProxy.attemptStart = [NSDate date];
@@ -178,13 +180,11 @@ static MPInstanceProvider *sharedAdProvider = nil;
         MPLogWarn(@"**** Custom Event Class: %@ implements the deprecated -customEventDidUnload method.  This is no longer called.  Use -dealloc for cleanup instead ****", NSStringFromClass(customClass));
     }
 
-    WBInterstitialProxy *interstitialProxy = [WBInterstitialProxy alloc];
     interstitialProxy.delegate = delegate;
-    customEvent.delegate = interstitialProxy;    
+    customEvent.delegate = interstitialProxy;
     interstitialProxy.attemptStart = [NSDate date];
     [[[WBFunnelManager sharedManager] getFunnelForKey:LoadInterstitialKey] setFunnelAdNetworkName:NSStringFromClass(customClass)];
     interstitialProxy.funnel = [[WBFunnelManager sharedManager] getFunnelForKey:LoadInterstitialKey];
-
     return customEvent;
 }
 
