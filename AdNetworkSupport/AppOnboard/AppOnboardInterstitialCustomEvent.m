@@ -44,7 +44,7 @@
         }
     }
     
-#ifdef APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH
+#if defined(APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH) || defined(APPONBOARD_MOPUB_INIT_THROUGH_MOPUB)
     AppOnboardMoPubManager *mopubManager = [AppOnboardMoPubManager sharedManager];
     
     if(![mopubManager isInitialized]) {
@@ -87,17 +87,6 @@
     [AppOnboardSDK setManagementDelegate:[AppOnboardMoPubManager sharedManager]];
 #endif
     
-#warning disabled
-    /*
-    // check if we want to show a presentation
-    if(![AppOnboardSDK nextPresentationIdToShowInZoneId:self.zoneId]) {
-        if([self.delegate respondsToSelector:@selector(interstitialCustomEvent:didFailToLoadAdWithError:)]) {
-            NSError *error = [NSError errorWithDomain:kAppOnboardMoPubErrorDomain code:kAppOnboardErrorNoPresentationAvailable userInfo:@{NSLocalizedDescriptionKey: @"No fill"}];
-            [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
-        }
-    }
-     */
-    
     // check if we have a presentation already ready to go
     if([AppOnboardSDK shouldShowPresentationForZoneId:self.zoneId]) {
         self.isReady = YES;
@@ -126,10 +115,13 @@
         return;
     }
     
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     self.isReady = YES;
     if([self.delegate respondsToSelector:@selector(interstitialCustomEvent:didLoadAd:)]) {
         [self.delegate interstitialCustomEvent:self didLoadAd:zoneId];
     }
+    
 }
 
 -(void)presentationPreparationFailedNotification:(NSNotification *)notif
@@ -140,6 +132,8 @@
         MPLogError(@"Invalid error given for presentation preparation failure in App Onboard. This is an App Onboard error, please report to adam@apponboard.com");
         error = [NSError errorWithDomain:kAppOnboardMoPubErrorDomain code:kAppOnboardErrorUnknown userInfo:@{NSLocalizedDescriptionKey: @"unknown error"}];
     }
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     if([self.delegate respondsToSelector:@selector(interstitialCustomEvent:didFailToLoadAdWithError:)]) {
         [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];

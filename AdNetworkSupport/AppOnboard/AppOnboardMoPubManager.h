@@ -11,8 +11,13 @@
 
 
 // Uncomment this to use automatic init instead of the usual integration process
-// not currently recommended!
-#define APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH
+//#define APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH
+
+// Uncomment this to use MoPub for prompting init instead of the usual integration process
+#define APPONBOARD_MOPUB_INIT_THROUGH_MOPUB
+
+// allow native ads a timeout like video ads get, or set to 0 to disable
+#define kAppOnboardNativeAdFetchTimeLimitSeconds 0
 
 // keys for the MoPub json that gets passed to custom events
 #define kAppOnboardMoPubCustomEventInfoAllZoneIds @"zoneIds"
@@ -39,7 +44,7 @@
 
 +(instancetype)sharedManager;
 
-#ifdef APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH
+#if defined(APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH) || defined(APPONBOARD_MOPUB_INIT_THROUGH_MOPUB)
 -(void)initWithAppId:(NSString *)appId zoneIds:(NSArray<NSString *> *)zoneIds;
 
 @property (nonatomic, assign, readonly) BOOL isInitialized;

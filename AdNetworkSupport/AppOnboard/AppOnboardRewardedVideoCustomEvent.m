@@ -31,7 +31,7 @@
 
 -(void)requestRewardedVideoWithCustomEventInfo:(NSDictionary *)info
 {
-    MPLogInfo(@"AppOnboardInterstitialCustomEvent request interstitial with %@", info);
+    MPLogInfo(@"AppOnboardRewardedVideoCustomEvent request rewarded video with %@", info);
     
     
     NSString *zoneId = [info objectForKey:kAppOnboardMoPubCustomEventInfoRequestedZoneId];
@@ -58,7 +58,7 @@
         }
     }
     
-#ifdef APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH
+#if defined(APPONBOARD_MOPUB_AUTOINIT_ON_LAUNCH) || defined(APPONBOARD_MOPUB_INIT_THROUGH_MOPUB)
     AppOnboardMoPubManager *mopubManager = [AppOnboardMoPubManager sharedManager];
     
     if(![mopubManager isInitialized]) {
@@ -129,6 +129,8 @@
         return;
     }
     
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     self.isReady = YES;
     if([self.delegate respondsToSelector:@selector(rewardedVideoDidLoadAdForCustomEvent:)]) {
         [self.delegate rewardedVideoDidLoadAdForCustomEvent:self];
@@ -143,6 +145,8 @@
         MPLogError(@"Invalid error given for presentation preparation failure in App Onboard. This is an App Onboard error, please report to adam@apponboard.com");
         error = [NSError errorWithDomain:kAppOnboardMoPubErrorDomain code:kAppOnboardErrorUnknown userInfo:@{NSLocalizedDescriptionKey: @"unknown error"}];
     }
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     if([self.delegate respondsToSelector:@selector(rewardedVideoDidFailToLoadAdForCustomEvent:error:)]) {
         [self.delegate rewardedVideoDidFailToLoadAdForCustomEvent:self error:error];
