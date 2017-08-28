@@ -44,11 +44,12 @@ static const NSString *kRewardedVideoApiVersion = @"1";
 @end
 
 @implementation MPRewardedVideoAdapter
-
+WBIncentivizedProxy *incentivizedProxy;
 - (instancetype)initWithDelegate:(id<MPRewardedVideoAdapterDelegate>)delegate
 {
     if (self = [super init]) {
         _delegate = delegate;
+        incentivizedProxy = [WBIncentivizedProxy alloc];
     }
 
     return self;
@@ -75,9 +76,8 @@ static const NSString *kRewardedVideoApiVersion = @"1";
 
     self.rewardedVideoCustomEvent = [[MPInstanceProvider sharedProvider] buildRewardedVideoCustomEventFromCustomClass:configuration.customEventClass delegate:self];
 
-    WBIncentivizedProxy *incentivizedProxy = [WBIncentivizedProxy alloc];
     incentivizedProxy.delegate = self;
-    self.rewardedVideoCustomEvent.delegate = incentivizedProxy;    
+    self.rewardedVideoCustomEvent.delegate = incentivizedProxy;
     incentivizedProxy.attemptStart = [NSDate date];
     [[[WBFunnelManager sharedManager] getFunnelForKey:[LoadIncentivizedKey stringByAppendingString:[self adUnitId]]]
             setFunnelAdNetworkName:NSStringFromClass(configuration.customEventClass)];

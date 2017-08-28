@@ -80,6 +80,6 @@
  *
  */
 
-@property (nonatomic, strong) id<MPInterstitialCustomEventDelegate> delegate;
+@property (nonatomic, weak) id<MPInterstitialCustomEventDelegate> delegate;
 
 @end

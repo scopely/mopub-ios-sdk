@@ -88,6 +88,6 @@
  * and your `MPAdView`'s delegate of the progress of your custom event.
  *
  */
-@property (nonatomic, strong) id<MPBannerCustomEventDelegate> delegate;
+@property (nonatomic, weak) id<MPBannerCustomEventDelegate> delegate;
 
 @end
