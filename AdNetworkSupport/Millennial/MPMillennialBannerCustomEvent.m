@@ -118,6 +118,7 @@ static NSString *const kMoPubMMAdapterDCN = @"dcn";
     if (!self.didTrackClick) {
         MPLogInfo(@"Millennial banner %@ was clicked.", ad);
         [self.delegate trackClick];
+        [self.delegate bannerCustomEventWillLeaveApplication: self];
         self.didTrackClick = YES;
     } else {
         MPLogInfo(@"Millennial banner %@ ignoring duplicate click.", ad);

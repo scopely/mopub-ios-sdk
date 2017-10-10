@@ -130,6 +130,7 @@
     MPLogInfo(@"Facebook banner ad was clicked");
     [self.delegate trackClick];
     [self.delegate bannerCustomEventWillBeginAction:self];
+    [self.delegate bannerCustomEventWillLeaveApplication: self];
 }
 
 - (void)adViewDidFinishHandlingClick:(FBAdView *)adView
