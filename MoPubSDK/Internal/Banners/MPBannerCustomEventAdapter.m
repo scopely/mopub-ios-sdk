@@ -13,6 +13,10 @@
 #import "MPLogging.h"
 #import "MPAdImpressionTimer.h"
 #import "MPBannerCustomEvent+Internal.h"
+#import "WBBannerProxy.h"
+#import "WBFunnelManager.h"
+#import "WBFunnelKeys.h"
+#import "WBFunnel.h"
 
 @interface MPBannerCustomEventAdapter () <MPAdImpressionTimerDelegate>
 
@@ -29,12 +33,19 @@
 
 @implementation MPBannerCustomEventAdapter
 
+WBBannerProxy *bannerProxy;
+
 - (instancetype)initWithConfiguration:(MPAdConfiguration *)configuration delegate:(id<MPBannerAdapterDelegate>)delegate
 {
     if (!configuration.customEventClass) {
         return nil;
     }
-    return [self initWithDelegate:delegate];
+    return [[self initWithDelegate:delegate] withBannerProxy:[WBBannerProxy alloc]];
+}
+
+- (instancetype)withBannerProxy:(WBBannerProxy *)proxy {
+    bannerProxy = proxy;
+    return self;
 }
 
 - (void)unregisterDelegate
@@ -67,7 +78,16 @@
     }
 
     self.bannerCustomEvent = customEvent;
-    self.bannerCustomEvent.delegate = self;
+    bannerProxy.delegate = self;
+    customEvent.delegate = bannerProxy;
+    bannerProxy.attemptStart = [NSDate date];
+
+    [[WBFunnelManager sharedManager] setFunnelForKey:ExistingBannerKey
+                                              funnel:[[WBFunnelManager sharedManager] getFunnelForKey:NewBannerKey]];
+
+    [[[WBFunnelManager sharedManager] getFunnelForKey:ExistingBannerKey] setFunnelAdNetworkName:NSStringFromClass(configuration.customEventClass)];
+    [bannerProxy setFunnel];
+    [bannerProxy setAttemptIdAndPostAttemptedEvent];
     [self.bannerCustomEvent requestAdWithSize:size customEventInfo:configuration.customEventClassData];
 }
 

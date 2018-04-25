@@ -10,9 +10,11 @@
 #import "MPPrivateBannerCustomEventDelegate.h"
 
 @class MPBannerCustomEvent;
+@class WBBannerProxy;
 
 @interface MPBannerCustomEventAdapter : MPBaseBannerAdapter <MPPrivateBannerCustomEventDelegate>
 
 - (instancetype)initWithConfiguration:(MPAdConfiguration *)configuration delegate:(id<MPBannerAdapterDelegate>)delegate;
 
+- (instancetype)withBannerProxy:(WBBannerProxy *)proxy;
 @end

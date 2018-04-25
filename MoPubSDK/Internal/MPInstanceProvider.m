@@ -14,9 +14,6 @@
 #import "MPMRAIDInterstitialViewController.h"
 #import "MPInterstitialCustomEvent.h"
 #import "MPBaseBannerAdapter.h"
-#import "MPBannerCustomEventAdapter.h"
-#import "MPBannerCustomEvent.h"
-#import "MPBannerAdManager.h"
 #import "MPLogging.h"
 #import "MRBundleManager.h"
 #import "MRVideoPlayerManager.h"
@@ -27,7 +24,6 @@
 #import "MPClosableView.h"
 #import "MPRewardedVideoAdManager.h"
 #import "MPRewardedVideoAdapter.h"
-#import "MPRewardedVideoCustomEvent.h"
 
 #if MP_HAS_NATIVE_PACKAGE
 #import "MPNativeCustomEvent.h"
@@ -35,6 +31,11 @@
 #import "MPNativePositionSource.h"
 #import "MPStreamAdPlacementData.h"
 #import "MPStreamAdPlacer.h"
+#import "WBFunnelManager.h"
+#import "WBFunnelKeys.h"
+#import "WBFunnel.h"
+#import "WBInterstitialProxy.h"
+
 #endif
 
 @interface MPInstanceProvider ()
@@ -58,6 +59,7 @@
 
 @implementation MPInstanceProvider
 
+WBInterstitialProxy *interstitialProxy;
 static MPInstanceProvider *sharedAdProvider = nil;
 
 + (instancetype)sharedProvider
@@ -65,6 +67,7 @@ static MPInstanceProvider *sharedAdProvider = nil;
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         sharedAdProvider = [[self alloc] init];
+        interstitialProxy = [WBInterstitialProxy alloc];
     });
 
     return sharedAdProvider;
@@ -133,7 +136,13 @@ static MPInstanceProvider *sharedAdProvider = nil;
         MPLogWarn(@"**** Custom Event Class: %@ implements the deprecated -customEventDidUnload method.  This is no longer called.  Use -dealloc for cleanup instead ****", NSStringFromClass(customClass));
     }
 #pragma clang diagnostic pop
-    customEvent.delegate = delegate;
+
+    interstitialProxy.delegate = delegate;
+    customEvent.delegate = interstitialProxy;
+    interstitialProxy.attemptStart = [NSDate date];
+    [[[WBFunnelManager sharedManager] getFunnelForKey:LoadInterstitialKey] setFunnelAdNetworkName:NSStringFromClass(customClass)];
+    [interstitialProxy setFunnel];
+    [interstitialProxy setAttemptIdAndPostAttemptedEvent];
     return customEvent;
 }
 

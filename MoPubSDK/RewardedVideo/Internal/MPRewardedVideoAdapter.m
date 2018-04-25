@@ -22,6 +22,10 @@
 #import "MPMoPubRewardedPlayableCustomEvent.h"
 #import "MPRealTimeTimer.h"
 #import "NSString+MPAdditions.h"
+#import "WBFunnelKeys.h"
+#import "WBFunnelManager.h"
+#import "WBIncentivizedProxy.h"
+#import "WBFunnel.h"
 
 static const NSString *kRewardedVideoApiVersion = @"1";
 static const NSUInteger kExcessiveCustomDataLength = 8196;
@@ -43,11 +47,12 @@ static const NSUInteger kExcessiveCustomDataLength = 8196;
 @end
 
 @implementation MPRewardedVideoAdapter
-
+WBIncentivizedProxy *incentivizedProxy;
 - (instancetype)initWithDelegate:(id<MPRewardedVideoAdapterDelegate>)delegate
 {
     if (self = [super init]) {
         _delegate = delegate;
+        incentivizedProxy = [WBIncentivizedProxy alloc];
     }
 
     return self;
@@ -73,6 +78,14 @@ static const NSUInteger kExcessiveCustomDataLength = 8196;
     self.configuration = configuration;
 
     self.rewardedVideoCustomEvent = [[MPInstanceProvider sharedProvider] buildRewardedVideoCustomEventFromCustomClass:configuration.customEventClass delegate:self];
+
+    incentivizedProxy.delegate = self;
+    self.rewardedVideoCustomEvent.delegate = incentivizedProxy;
+    incentivizedProxy.attemptStart = [NSDate date];
+    [[[WBFunnelManager sharedManager] getFunnelForKey:[LoadIncentivizedKey stringByAppendingString:[self adUnitId]]]
+            setFunnelAdNetworkName:NSStringFromClass(configuration.customEventClass)];
+    [incentivizedProxy setFunnel:[self adUnitId]];
+    [incentivizedProxy setAttemptIdAndPostAttemptedEvent];
 
     if (self.rewardedVideoCustomEvent) {
         [self startTimeoutTimer];
