@@ -187,4 +187,11 @@
     }
 }
 
+- (void)managerRefreshAd:(UIView *)ad
+{
+    if ([self.delegate respondsToSelector:@selector(adViewRefreshAd:)]) {
+        [self.delegate adViewRefreshAd:self];
+    }
+}
+
 @end
