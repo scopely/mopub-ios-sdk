@@ -29,5 +29,6 @@
 - (void)userActionWillBegin;
 - (void)userActionDidFinish;
 - (void)userWillLeaveApplication;
+- (void)managerRefreshAd:(UIView *)ad;
 
 @end
