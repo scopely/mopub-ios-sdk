@@ -359,6 +359,9 @@
     }
 }
 
+- (NSString *)getDspCreativeId {
+    return [_requestingConfiguration dspCreativeId];
+}
 @end
 
 

@@ -183,4 +183,7 @@
     }
 }
 
+- (NSString *)getCreativeId {
+    return [_adManager getDspCreativeId];
+}
 @end

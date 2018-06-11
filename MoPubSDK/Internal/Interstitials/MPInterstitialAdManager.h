@@ -25,4 +25,5 @@
                              testing:(BOOL)testing;
 - (void)presentInterstitialFromViewController:(UIViewController *)controller;
 
+- (NSString *)getDspCreativeId;
 @end

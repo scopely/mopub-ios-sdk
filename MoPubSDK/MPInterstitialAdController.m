@@ -187,6 +187,10 @@
     return [[self class] sharedInterstitials];
 }
 
+- (NSString *)getCreativeId {
+    return [_manager getDspCreativeId];
+}
+
 + (void)removeSharedInterstitialAdController:(MPInterstitialAdController *)controller
 {
     [[[self class] sharedInterstitials] removeObject:controller];
