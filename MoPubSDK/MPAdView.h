@@ -293,4 +293,10 @@ typedef enum
  */
 - (void)willLeaveApplicationFromAd:(MPAdView *)view;
 
+/**
+ * Sent when ad is refreshed
+ * @param view
+ */
+- (void)adViewRefreshAd:(MPAdView *)view;
+
 @end

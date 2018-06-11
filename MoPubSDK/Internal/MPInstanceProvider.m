@@ -140,8 +140,9 @@ static MPInstanceProvider *sharedAdProvider = nil;
     interstitialProxy.delegate = delegate;
     customEvent.delegate = interstitialProxy;
     interstitialProxy.attemptStart = [NSDate date];
+    
     WBFunnel *funnel = [[WBFunnelManager sharedManager] getFunnelForKey:LoadInterstitialKey];
-    [funnel setFunnelAdNetworkName:NSStringFromClass(customClass)];
+    funnel.adNetworkName = NSStringFromClass(customClass);
     [funnel setCreativeId:interstitialProxy.];
     [interstitialProxy setFunnel];
     [interstitialProxy setAttemptIdAndPostAttemptedEvent];

@@ -193,6 +193,7 @@
 
 - (void)refreshTimerDidFire
 {
+    [self.delegate managerRefreshAd:self.requestingAdapterAdContentView];
     if (!self.loading && self.automaticallyRefreshesContents) {
         [self loadAd];
     }
