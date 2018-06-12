@@ -225,4 +225,6 @@
  */
 - (void)rewardedVideoAdShouldRewardForAdUnitID:(NSString *)adUnitID reward:(MPRewardedVideoReward *)reward;
 
+- (NSString*) creativeIdForAdUnitId:(NSString *)adUnitId;
+
 @end

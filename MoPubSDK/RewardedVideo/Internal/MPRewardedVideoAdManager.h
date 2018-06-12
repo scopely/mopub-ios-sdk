@@ -80,6 +80,8 @@
  */
 - (void)handleAdPlayedForCustomEventNetwork;
 
+- (NSString *) getCreativeId;
+
 @end
 
 @protocol MPRewardedVideoAdManagerDelegate <NSObject>

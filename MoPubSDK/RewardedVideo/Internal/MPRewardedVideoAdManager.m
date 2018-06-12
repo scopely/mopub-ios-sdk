@@ -300,4 +300,10 @@
     return self.customerId;
 }
 
+- (NSString *) getCreativeId
+{
+    return self.configuration.dspCreativeId;
+}
+
+
 @end
