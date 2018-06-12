@@ -139,6 +139,8 @@
  */
 + (void)presentRewardedVideoAdForAdUnitID:(NSString *)adUnitID fromViewController:(UIViewController *)viewController __deprecated_msg("use presentRewardedVideoAdForAdUnitID:fromViewController:withReward: instead.");
 
++ (NSString*) creativeIdForAdUnitID:(NSString *)adUnitID;
+
 @end
 
 @protocol MPRewardedVideoDelegate <NSObject>
@@ -224,7 +226,5 @@
  * @param reward The object that contains all the information regarding how much you should reward the user.
  */
 - (void)rewardedVideoAdShouldRewardForAdUnitID:(NSString *)adUnitID reward:(MPRewardedVideoReward *)reward;
-
-- (NSString*) creativeIdForAdUnitId:(NSString *)adUnitId;
 
 @end

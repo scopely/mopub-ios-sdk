@@ -302,8 +302,10 @@ static MPRewardedVideo *gSharedInstance = nil;
     [self.rewardedVideoConnections removeObject:connection];
 }
 
-- (NSString*) creativeIdForAdUnitId:(NSString *)adUnitId {
++ (NSString*) creativeIdForAdUnitID:(NSString *)adUnitID {
+    MPRewardedVideo *sharedInstance = [[self class] sharedInstance];
     MPRewardedVideoAdManager *adManager = sharedInstance.rewardedVideoAdManagers[adUnitID];
+
     return [adManager getCreativeId];
 }
 
