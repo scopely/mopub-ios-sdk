@@ -82,10 +82,7 @@ WBBannerProxy *bannerProxy;
     customEvent.delegate = bannerProxy;
     bannerProxy.attemptStart = [NSDate date];
 
-    [[WBFunnelManager sharedManager] setFunnelForKey:ExistingBannerKey
-                                              funnel:[[WBFunnelManager sharedManager] getFunnelForKey:NewBannerKey]];
-
-    [[[WBFunnelManager sharedManager] getFunnelForKey:ExistingBannerKey] setFunnelAdNetworkName:NSStringFromClass(configuration.customEventClass)];
+    [[[WBFunnelManager sharedManager] getFunnelForKey:ExistingBannerKey] adNetworkResolver: NSStringFromClass(configuration.customEventClass)];
     [bannerProxy setFunnel];
     [bannerProxy setAttemptIdAndPostAttemptedEvent];
     [self.bannerCustomEvent requestAdWithSize:size customEventInfo:configuration.customEventClassData];
