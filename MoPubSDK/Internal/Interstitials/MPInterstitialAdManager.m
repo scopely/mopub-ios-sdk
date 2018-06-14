@@ -230,4 +230,7 @@
     //noop
 }
 
+- (NSString *)getDspCreativeId {
+    return [_configuration dspCreativeId];
+}
 @end

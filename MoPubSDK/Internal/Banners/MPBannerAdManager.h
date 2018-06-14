@@ -23,4 +23,5 @@
 - (void)startAutomaticallyRefreshingContents;
 - (void)rotateToOrientation:(UIInterfaceOrientation)orientation;
 
+- (NSString *)getDspCreativeId;
 @end

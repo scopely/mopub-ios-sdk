@@ -133,12 +133,11 @@ typedef enum
  *          MPNativeAdOrientationPortrait,
  *          MPNativeAdOrientationLandscape
  *      } MPNativeAdOrientation;
- * </pre></code>
+ * </code></pre>
  *
  * @see unlockNativeAdsOrientation
  * @see allowedNativeAdsOrientation
  */
-
 - (void)lockNativeAdsToOrientation:(MPNativeAdOrientation)orientation;
 
 /**
@@ -207,6 +206,7 @@ typedef enum
  */
 - (void)startAutomaticallyRefreshingContents;
 
+- (NSString *)getCreativeId;
 @end
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

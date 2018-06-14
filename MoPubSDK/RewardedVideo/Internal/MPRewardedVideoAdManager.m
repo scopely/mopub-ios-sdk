@@ -62,6 +62,11 @@
 
 - (BOOL)hasAdAvailable
 {
+    //An Ad is not ready or has expired.
+    if (!self.ready) {
+        return NO;
+    }
+
     // If we've already played an ad, return NO since we allow one play per load.
     if (self.playedAd) {
         return NO;
@@ -89,18 +94,16 @@
     }
 }
 
-- (void)presentRewardedVideoAdFromViewController:(UIViewController *)viewController
-{
-    [self presentRewardedVideoAdFromViewController:viewController withReward:nil];
-}
-
-- (void)presentRewardedVideoAdFromViewController:(UIViewController *)viewController withReward:(MPRewardedVideoReward *)reward
+- (void)presentRewardedVideoAdFromViewController:(UIViewController *)viewController withReward:(MPRewardedVideoReward *)reward customData:(NSString *)customData
 {
     // Don't allow the ad to be shown if it isn't ready.
     if (!self.ready) {
+        NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorNoAdReady userInfo:@{ NSLocalizedDescriptionKey: @"Rewarded video ad view is not ready to be shown"}];
+
         // We don't want to remotely log this event -- it's simply for publisher troubleshooting -- so use NSLog
         // rather than MPLog.
-        NSLog(@"Rewarded video ad view is not ready to be shown");
+        NSLog(@"%@", error.localizedDescription);
+        [self.delegate rewardedVideoDidFailToPlayForAdManager:self error:error];
         return;
     }
 
@@ -139,7 +142,7 @@
         }
     }
 
-    [self.adapter presentRewardedVideoFromViewController:viewController];
+    [self.adapter presentRewardedVideoFromViewController:viewController customData:customData];
 }
 
 - (void)handleAdPlayedForCustomEventNetwork
@@ -296,5 +299,11 @@
 {
     return self.customerId;
 }
+
+- (NSString *) getCreativeId
+{
+    return self.configuration.dspCreativeId;
+}
+
 
 @end
