@@ -83,7 +83,7 @@ WBIncentivizedProxy *incentivizedProxy;
     self.rewardedVideoCustomEvent.delegate = incentivizedProxy;
     incentivizedProxy.attemptStart = [NSDate date];
     [[[WBFunnelManager sharedManager] getFunnelForKey:[LoadIncentivizedKey stringByAppendingString:self.adUnitId]]
-            setAdNetworkName:NSStringFromClass(configuration.customEventClass)];
+            adNetworkResolver:NSStringFromClass(configuration.customEventClass)];
     [incentivizedProxy setFunnelForAdUnit:self.adUnitId];
     [incentivizedProxy setAttemptIdAndPostAttemptedEvent];
 
