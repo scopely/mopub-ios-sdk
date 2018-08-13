@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'mopub-ios-sdk'
-  s.version          = '0.1.0'
+  s.version          = '5.2.0'
   s.summary          = 'A short description of mopub-ios-sdk.'
 
 # This description is used to generate tags and improve search results.
