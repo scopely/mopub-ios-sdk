@@ -21,16 +21,16 @@ Pod::Spec.new do |s|
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/mdiazjusticia/mopub-ios-sdk'
+  s.homepage         = 'https://github.com/scopely/mopub-ios-sdk'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'mdiazjusticia' => 'mdiazjusticia@gmail.com' }
-  s.source           = { :git => 'https://github.com/mdiazjusticia/mopub-ios-sdk.git', :tag => s.version.to_s }
+  s.author           = { 'mario' => 'mario@scopely.com' }
+  s.source           = { :git => 'https://github.com/scopely/mopub-ios-sdk.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '8.0'
 
-  s.source_files = 'mopub-ios-sdk/Classes/**/*'
+  s.source_files = 'mopub-ios-sdk/MoPubSDK/**/*.{h,m}'
   
   # s.resource_bundles = {
   #   'mopub-ios-sdk' => ['mopub-ios-sdk/Assets/*.png']
