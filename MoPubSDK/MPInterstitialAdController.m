@@ -117,6 +117,20 @@
     return self.delegate;
 }
 
+- (void)manager:(MPInterstitialAdManager *)manager willStartInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass creativeId:(NSString *)creativeId
+{
+    if ([self.delegate respondsToSelector:@selector(manager:willStartInterstitialAttemptWithCustomEventClass:creativeId:)]) {
+        [self.delegate interstitialWillStartAttemptForAdUnitId:self.adUnitId withCustomEventClass:customEventClass creativeId:creativeId];
+    }
+}
+
+- (void)manager:(MPInterstitialAdManager *)manager didFailInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass creativeId:(NSString *)creativeId
+{
+    if ([self.delegate respondsToSelector:@selector(manager:didFailInterstitialAttemptWithCustomEventClass:creativeId:)]) {
+        [self.delegate interstitialDidFailAttemptForAdUnitID:self.adUnitId withCustomEventClass:customEventClass creativeId:creativeId];
+    }
+}
+
 - (void)managerDidLoadInterstitial:(MPInterstitialAdManager *)manager
 {
     if ([self.delegate respondsToSelector:@selector(interstitialDidLoadAd:)]) {

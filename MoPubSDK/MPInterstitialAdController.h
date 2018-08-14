@@ -164,6 +164,24 @@
 /** @name Detecting When an Interstitial Ad is Loaded */
 
 /**
+ * This method is called before an ad attempts to load.
+ *
+ * @param adUnitID The ad unit ID of the ad associated with the event.
+ * @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
+ * @param creativeId The creativeId of the Ad being loaded.
+ */
+- (void)interstitialWillStartAttemptForAdUnitId:(NSString *)adUnitID withCustomEventClass:(NSString*)customEventClass creativeId:(NSString *)creativeId;
+
+/**
+ * This method is called after an ad attempt fails to load.
+ *
+ * @param adUnitID The ad unit ID of the ad associated with the event.
+ * @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
+ * @param creativeId The creativeId of the Ad being loaded.
+ */
+- (void)interstitialDidFailAttemptForAdUnitID:(NSString *)adUnitID withCustomEventClass:(NSString*)customEventClass creativeId:(NSString *)creativeId;
+
+/**
  * Sent when an interstitial ad object successfully loads an ad.
  *
  * @param interstitial The interstitial ad object sending the message.
