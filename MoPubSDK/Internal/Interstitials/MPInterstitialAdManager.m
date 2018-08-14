@@ -189,7 +189,7 @@
 
 - (void)adapter:(MPBaseInterstitialAdapter *)adapter didFailToLoadAdWithError:(NSError *)error
 {
-    [self.delegate manager:self didFailInterstitialAttemptWithCustomEventClass:NSStringFromClass(self.configuration.customEventClass)];
+    [self.delegate manager:self didFailInterstitialAttemptWithCustomEventClass:NSStringFromClass(self.configuration.customEventClass) error:error];
     self.ready = NO;
     self.loading = NO;
     [self loadAdWithURL:self.configuration.failoverURL];

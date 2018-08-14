@@ -242,7 +242,6 @@ typedef enum
  *
  * @param adUnitID The ad unit ID of the ad associated with the event.
  * @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
- * @param creativeId The creativeId of the Ad being loaded.
  */
 - (void)bannerWillStartAttemptForAdUnitId:(NSString *)adUnitID withCustomEventClass:(NSString*)customEventClass;
 
@@ -251,9 +250,9 @@ typedef enum
  *
  * @param adUnitID The ad unit ID of the ad associated with the event.
  * @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
- * @param creativeId The creativeId of the Ad being loaded.
+ * @param error The error that occurred during the load.
  */
-- (void)bannerDidFailAttemptForAdUnitId:(NSString *)adUnitID withCustomEventClass:(NSString*)customEventClass;
+- (void)bannerDidFailAttemptForAdUnitId:(NSString *)adUnitID withCustomEventClass:(NSString*)customEventClass error:(NSError*)error;
 
 /** @name Detecting When a Banner Ad is Loaded */
 

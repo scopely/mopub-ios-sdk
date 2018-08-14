@@ -240,7 +240,8 @@
 - (void)rewardedVideoDidFailToLoadForAdapter:(MPRewardedVideoAdapter *)adapter error:(NSError *)error
 {
     [self.delegate rewardedVideoDidFailAttemptForAdManager:self
-                                      withCustomEventClass:NSStringFromClass(self.configuration.customEventClass)];
+                                      withCustomEventClass:NSStringFromClass(self.configuration.customEventClass)
+                                                     error:error];
     self.ready = NO;
     self.loading = NO;
     [self loadAdWithURL:self.configuration.failoverURL];

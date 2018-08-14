@@ -87,7 +87,7 @@
 
 @protocol MPRewardedVideoAdManagerDelegate <NSObject>
 - (void)rewardedVideoWillStartAttemptForAdManager:(MPRewardedVideoAdManager *)manager withCustomEventClass:(NSString *)customEventClass;
-- (void)rewardedVideoDidFailAttemptForAdManager:(MPRewardedVideoAdManager *)manager withCustomEventClass:(NSString *)customEventClass;
+- (void)rewardedVideoDidFailAttemptForAdManager:(MPRewardedVideoAdManager *)manager withCustomEventClass:(NSString *)customEventClass error:(NSError*)error;
 - (void)rewardedVideoDidLoadForAdManager:(MPRewardedVideoAdManager *)manager;
 - (void)rewardedVideoDidFailToLoadForAdManager:(MPRewardedVideoAdManager *)manager error:(NSError *)error;
 - (void)rewardedVideoDidExpireForAdManager:(MPRewardedVideoAdManager *)manager;

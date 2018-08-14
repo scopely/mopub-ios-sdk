@@ -320,7 +320,7 @@
 
 - (void)adapter:(MPBaseBannerAdapter *)adapter didFailToLoadAdWithError:(NSError *)error
 {
-    [self.delegate bannerDidFailAttemptForAdManager:self withCustomEventClass:NSStringFromClass(self.requestingConfiguration.customEventClass)];
+    [self.delegate bannerDidFailAttemptForAdManager:self withCustomEventClass:NSStringFromClass(self.requestingConfiguration.customEventClass) error:error];
     
     if (self.requestingAdapter == adapter) {
         [self loadAdWithURL:self.requestingConfiguration.failoverURL];
