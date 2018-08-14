@@ -203,6 +203,8 @@
     }
 
     self.adapter = adapter;
+    
+    [self.delegate rewardedVideoWillStartAttemptForAdapter:self];
     [self.adapter getAdWithConfiguration:self.configuration];
 }
 
@@ -236,6 +238,7 @@
 
 - (void)rewardedVideoDidFailToLoadForAdapter:(MPRewardedVideoAdapter *)adapter error:(NSError *)error
 {
+    [self.delegate rewardedVideoDidFailAttemptForAdapter:self];
     self.ready = NO;
     self.loading = NO;
     [self loadAdWithURL:self.configuration.failoverURL];

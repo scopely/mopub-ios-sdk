@@ -87,6 +87,8 @@
 
 @protocol MPRewardedVideoAdManagerDelegate <NSObject>
 
+- (void)rewardedVideoWillStartAttemptForAdapter:(MPRewardedVideoAdManager *)manager;
+- (void)rewardedVideoDidFailAttemptForAdapter:(MPRewardedVideoAdManager *)manager;
 - (void)rewardedVideoDidLoadForAdManager:(MPRewardedVideoAdManager *)manager;
 - (void)rewardedVideoDidFailToLoadForAdManager:(MPRewardedVideoAdManager *)manager error:(NSError *)error;
 - (void)rewardedVideoDidExpireForAdManager:(MPRewardedVideoAdManager *)manager;
