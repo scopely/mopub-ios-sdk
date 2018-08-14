@@ -17,8 +17,8 @@
 - (CLLocation *)location;
 - (id)interstitialDelegate;
 
-- (void)manager:(MPInterstitialAdManager *)manager willStartInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass creativeId:(NSString *)creativeId;
-- (void)manager:(MPInterstitialAdManager *)manager didFailInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass creativeId:(NSString *)creativeId;
+- (void)manager:(MPInterstitialAdManager *)manager willStartInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass;
+- (void)manager:(MPInterstitialAdManager *)manager didFailInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass;
 
 - (void)managerDidLoadInterstitial:(MPInterstitialAdManager *)manager;
 - (void)manager:(MPInterstitialAdManager *)manager

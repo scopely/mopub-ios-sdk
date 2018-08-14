@@ -241,6 +241,8 @@
         return;
     }
 
+    [self.delegate bannerWillStartAttemptForAdManager:self withCustomEventClass:NSStringFromClass(self.requestingConfiguration.customEventClass)];
+    
     [self.requestingAdapter _getAdWithConfiguration:self.requestingConfiguration containerSize:self.delegate.containerSize];
 }
 
@@ -318,6 +320,8 @@
 
 - (void)adapter:(MPBaseBannerAdapter *)adapter didFailToLoadAdWithError:(NSError *)error
 {
+    [self.delegate bannerDidFailAttemptForAdManager:self withCustomEventClass:NSStringFromClass(self.requestingConfiguration.customEventClass)];
+    
     if (self.requestingAdapter == adapter) {
         [self loadAdWithURL:self.requestingConfiguration.failoverURL];
     }

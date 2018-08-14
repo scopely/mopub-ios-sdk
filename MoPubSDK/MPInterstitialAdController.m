@@ -117,17 +117,17 @@
     return self.delegate;
 }
 
-- (void)manager:(MPInterstitialAdManager *)manager willStartInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass creativeId:(NSString *)creativeId
+- (void)manager:(MPInterstitialAdManager *)manager willStartInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass
 {
-    if ([self.delegate respondsToSelector:@selector(manager:willStartInterstitialAttemptWithCustomEventClass:creativeId:)]) {
-        [self.delegate interstitialWillStartAttemptForAdUnitId:self.adUnitId withCustomEventClass:customEventClass creativeId:creativeId];
+    if ([self.delegate respondsToSelector:@selector(manager:willStartInterstitialAttemptWithCustomEventClass:)]) {
+        [self.delegate interstitialWillStartAttemptForAdUnitId:self.adUnitId withCustomEventClass:customEventClass];
     }
 }
 
-- (void)manager:(MPInterstitialAdManager *)manager didFailInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass creativeId:(NSString *)creativeId
+- (void)manager:(MPInterstitialAdManager *)manager didFailInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass
 {
-    if ([self.delegate respondsToSelector:@selector(manager:didFailInterstitialAttemptWithCustomEventClass:creativeId:)]) {
-        [self.delegate interstitialDidFailAttemptForAdUnitID:self.adUnitId withCustomEventClass:customEventClass creativeId:creativeId];
+    if ([self.delegate respondsToSelector:@selector(manager:didFailInterstitialAttemptWithCustomEventClass:)]) {
+        [self.delegate interstitialDidFailAttemptForAdUnitID:self.adUnitId withCustomEventClass:customEventClass];
     }
 }
 

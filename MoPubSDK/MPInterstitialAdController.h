@@ -170,7 +170,7 @@
  * @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
  * @param creativeId The creativeId of the Ad being loaded.
  */
-- (void)interstitialWillStartAttemptForAdUnitId:(NSString *)adUnitID withCustomEventClass:(NSString*)customEventClass creativeId:(NSString *)creativeId;
+- (void)interstitialWillStartAttemptForAdUnitId:(NSString *)adUnitID withCustomEventClass:(NSString*)customEventClass;
 
 /**
  * This method is called after an ad attempt fails to load.
@@ -179,7 +179,7 @@
  * @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
  * @param creativeId The creativeId of the Ad being loaded.
  */
-- (void)interstitialDidFailAttemptForAdUnitID:(NSString *)adUnitID withCustomEventClass:(NSString*)customEventClass creativeId:(NSString *)creativeId;
+- (void)interstitialDidFailAttemptForAdUnitID:(NSString *)adUnitID withCustomEventClass:(NSString*)customEventClass;
 
 /**
  * Sent when an interstitial ad object successfully loads an ad.
