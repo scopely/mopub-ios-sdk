@@ -183,19 +183,19 @@ static MPRewardedVideo *gSharedInstance = nil;
 
 #pragma mark - MPRewardedVideoAdManagerDelegate
 
-- (void)rewardedVideoWillStartAttemptForAdManager:(MPRewardedVideoAdManager *)manager withCustomEventClass:(NSString *)customEventClass
+- (void)rewardedVideoWillStartAttemptForAdManager:(MPRewardedVideoAdManager *)manager withCustomEventClass:(NSString *)customEventClass creativeId:(NSString *)creativeId
 {
     id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
-    if ([delegate respondsToSelector:@selector(rewardedVideoWillStartAttemptForAdUnitId:withCustomEventClass:)]) {
-        [delegate rewardedVideoWillStartAttemptForAdUnitId:manager.adUnitID withCustomEventClass:customEventClass];
+    if ([delegate respondsToSelector:@selector(rewardedVideoWillStartAttemptForAdUnitId:withCustomEventClass:creativeId:)]) {
+        [delegate rewardedVideoWillStartAttemptForAdUnitId:manager.adUnitID withCustomEventClass:customEventClass creativeId:creativeId];
     }
 }
 
-- (void)rewardedVideoDidFailAttemptForAdManager:(MPRewardedVideoAdManager *)manager withCustomEventClass:(NSString *)customEventClass
+- (void)rewardedVideoDidFailAttemptForAdManager:(MPRewardedVideoAdManager *)manager withCustomEventClass:(NSString *)customEventClass creativeId:(NSString *)creativeId
 {
     id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
-    if ([delegate respondsToSelector:@selector(rewardedVideoDidFailAttemptForAdUnitID:withCustomEventClass:)]) {
-        [delegate rewardedVideoDidFailAttemptForAdUnitID:manager.adUnitID withCustomEventClass:customEventClass];
+    if ([delegate respondsToSelector:@selector(rewardedVideoDidFailAttemptForAdUnitID:withCustomEventClass:creativeId:)]) {
+        [delegate rewardedVideoDidFailAttemptForAdUnitID:manager.adUnitID withCustomEventClass:customEventClass creativeId:creativeId];
     }
 }
 

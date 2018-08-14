@@ -204,7 +204,9 @@
 
     self.adapter = adapter;
     
-    [self.delegate rewardedVideoWillStartAttemptForAdapter:self];
+    [self.delegate rewardedVideoWillStartAttemptForAdManager:self
+                                        withCustomEventClass:NSStringFromClass(self.configuration.customEventClass)
+                                               creativeId:self.configuration.creativeId];
     [self.adapter getAdWithConfiguration:self.configuration];
 }
 
@@ -238,7 +240,9 @@
 
 - (void)rewardedVideoDidFailToLoadForAdapter:(MPRewardedVideoAdapter *)adapter error:(NSError *)error
 {
-    [self.delegate rewardedVideoDidFailAttemptForAdapter:self];
+    [self.delegate rewardedVideoDidFailAttemptForAdManager:self
+                                      withCustomEventClass:NSStringFromClass(self.configuration.customEventClass)
+                                             creativeId:self.configuration.creativeId];
     self.ready = NO;
     self.loading = NO;
     [self loadAdWithURL:self.configuration.failoverURL];
