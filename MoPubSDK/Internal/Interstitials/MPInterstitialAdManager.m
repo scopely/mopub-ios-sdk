@@ -170,6 +170,8 @@
         return;
     }
 
+    [self.delegate manager:self willStartInterstitialAttemptWithCustomEventClass:NSStringFromClass(configuration.customEventClass)];
+    
     MPBaseInterstitialAdapter *adapter = [[MPInterstitialCustomEventAdapter alloc] initWithDelegate:self];
 
     self.adapter = adapter;
@@ -187,6 +189,7 @@
 
 - (void)adapter:(MPBaseInterstitialAdapter *)adapter didFailToLoadAdWithError:(NSError *)error
 {
+    [self.delegate manager:self didFailInterstitialAttemptWithCustomEventClass:NSStringFromClass(self.configuration.customEventClass) error:error];
     self.ready = NO;
     self.loading = NO;
     [self loadAdWithURL:self.configuration.failoverURL];

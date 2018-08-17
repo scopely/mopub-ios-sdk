@@ -143,6 +143,20 @@
     [self setAdContentView:nil];
 }
 
+- (void)bannerWillStartAttemptForAdManager:(MPBannerAdManager *)manager withCustomEventClass:(NSString *)customEventClass
+{
+    if ([self.delegate respondsToSelector:@selector(bannerWillStartAttemptForAdUnitId:withCustomEventClass:)]) {
+        [self.delegate bannerWillStartAttemptForAdUnitId:self.adUnitId withCustomEventClass:customEventClass];
+    }
+}
+
+- (void)bannerDidFailAttemptForAdManager:(MPBannerAdManager *)manager withCustomEventClass:(NSString *)customEventClass error:(NSError *)error
+{
+    if ([self.delegate respondsToSelector:@selector(bannerDidFailAttemptForAdUnitId:withCustomEventClass:error:)]) {
+        [self.delegate bannerDidFailAttemptForAdUnitId:self.adUnitId withCustomEventClass:customEventClass error:error];
+    }
+}
+
 - (void)managerDidFailToLoadAd
 {
     if ([self.delegate respondsToSelector:@selector(adViewDidFailToLoadAd:)]) {

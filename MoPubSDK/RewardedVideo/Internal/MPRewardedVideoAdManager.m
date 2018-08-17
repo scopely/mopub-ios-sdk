@@ -140,7 +140,7 @@
             self.configuration.selectedReward = reward;
         }
     }
-
+    
     [self.adapter presentRewardedVideoFromViewController:viewController customData:customData];
 }
 
@@ -203,6 +203,9 @@
     }
 
     self.adapter = adapter;
+    
+    [self.delegate rewardedVideoWillStartAttemptForAdManager:self
+                                        withCustomEventClass:NSStringFromClass(self.configuration.customEventClass)];
     [self.adapter getAdWithConfiguration:self.configuration];
 }
 
@@ -236,6 +239,9 @@
 
 - (void)rewardedVideoDidFailToLoadForAdapter:(MPRewardedVideoAdapter *)adapter error:(NSError *)error
 {
+    [self.delegate rewardedVideoDidFailAttemptForAdManager:self
+                                      withCustomEventClass:NSStringFromClass(self.configuration.customEventClass)
+                                                     error:error];
     self.ready = NO;
     self.loading = NO;
     [self loadAdWithURL:self.configuration.failoverURL];
