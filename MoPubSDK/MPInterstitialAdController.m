@@ -119,15 +119,15 @@
 
 - (void)manager:(MPInterstitialAdManager *)manager willStartInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass
 {
-    if ([self.delegate respondsToSelector:@selector(interstitialWillStartAttemptForAdUnitId:withCustomEventClass:)]) {
-        [self.delegate interstitialWillStartAttemptForAdUnitId:self.adUnitId withCustomEventClass:customEventClass];
+    if ([self.delegate respondsToSelector:@selector(interstitialWillStartAttemptToLoadAd:withCustomEventClass:)]) {
+        [self.delegate interstitialWillStartAttemptToLoadAd:self withCustomEventClass:customEventClass];
     }
 }
 
 - (void)manager:(MPInterstitialAdManager *)manager didFailInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass error:(NSError*)error
 {
-    if ([self.delegate respondsToSelector:@selector(interstitialDidFailAttemptForAdUnitID:withCustomEventClass:error:)]) {
-        [self.delegate interstitialDidFailAttemptForAdUnitID:self.adUnitId withCustomEventClass:customEventClass error:error];
+    if ([self.delegate respondsToSelector:@selector(interstitialDidFailAttemptToLoadAd:withCustomEventClass:error:)]) {
+        [self.delegate interstitialDidFailAttemptToLoadAd:self withCustomEventClass:customEventClass error:error];
     }
 }
 
