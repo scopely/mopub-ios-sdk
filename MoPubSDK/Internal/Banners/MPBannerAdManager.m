@@ -312,6 +312,8 @@
 
 - (void)adapter:(MPBaseBannerAdapter *)adapter didFinishLoadingAd:(UIView *)ad
 {
+    [self.delegate bannerDidSucceedAttemptForAdManager:self withCreativeId:self.requestingConfiguration.dspCreativeId];
+    
     if (self.requestingAdapter == adapter) {
         self.requestingAdapterAdContentView = ad;
         [self presentRequestingAdapter];
@@ -320,7 +322,7 @@
 
 - (void)adapter:(MPBaseBannerAdapter *)adapter didFailToLoadAdWithError:(NSError *)error
 {
-    [self.delegate bannerDidFailAttemptForAdManager:self withCustomEventClass:NSStringFromClass(self.requestingConfiguration.customEventClass) error:error];
+    [self.delegate bannerDidFailAttemptForAdManager:self error:error];
     
     if (self.requestingAdapter == adapter) {
         [self loadAdWithURL:self.requestingConfiguration.failoverURL];

@@ -145,15 +145,22 @@
 
 - (void)bannerWillStartAttemptForAdManager:(MPBannerAdManager *)manager withCustomEventClass:(NSString *)customEventClass
 {
-    if ([self.delegate respondsToSelector:@selector(bannerWillStartAttemptForAdUnitId:withCustomEventClass:)]) {
-        [self.delegate bannerWillStartAttemptForAdUnitId:self.adUnitId withCustomEventClass:customEventClass];
+    if ([self.delegate respondsToSelector:@selector(bannerWillStartAttemptForAd:withCustomEventClass:)]) {
+        [self.delegate bannerWillStartAttemptForAd:self withCustomEventClass:customEventClass];
     }
 }
 
-- (void)bannerDidFailAttemptForAdManager:(MPBannerAdManager *)manager withCustomEventClass:(NSString *)customEventClass error:(NSError *)error
+- (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager withCreativeId:(NSString*)creativeId
 {
-    if ([self.delegate respondsToSelector:@selector(bannerDidFailAttemptForAdUnitId:withCustomEventClass:error:)]) {
-        [self.delegate bannerDidFailAttemptForAdUnitId:self.adUnitId withCustomEventClass:customEventClass error:error];
+    if ([self.delegate respondsToSelector:@selector(bannerDidSucceedAttemptForAd:withCreativeId:)]) {
+        [self.delegate bannerDidSucceedAttemptForAd:self withCreativeId:creativeId];
+    }
+}
+
+- (void)bannerDidFailAttemptForAdManager:(MPBannerAdManager *)manager error:(NSError *)error
+{
+    if ([self.delegate respondsToSelector:@selector(bannerDidFailAttemptForAd:error:)]) {
+        [self.delegate bannerDidFailAttemptForAd:self error:error];
     }
 }
 
