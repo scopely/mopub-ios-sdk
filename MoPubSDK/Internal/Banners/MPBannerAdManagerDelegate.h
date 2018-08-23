@@ -24,8 +24,8 @@
 
 - (void)invalidateContentView;
 
-- (void)bannerWillStartAttemptForAdManager:(MPBannerAdManager *)manager withCustomEventClass:(NSString *)customEventClass;
-- (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager withCreativeId:(NSString*)creativeId;
+- (void)bannerWillStartAttemptForAdManager:(MPBannerAdManager *)manager;
+- (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager;
 - (void)bannerDidFailAttemptForAdManager:(MPBannerAdManager *)manager error:(NSError*)error;
 
 - (void)managerDidLoadAd:(UIView *)ad;

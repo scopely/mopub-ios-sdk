@@ -183,19 +183,29 @@ static MPRewardedVideo *gSharedInstance = nil;
 
 #pragma mark - MPRewardedVideoAdManagerDelegate
 
-- (void)rewardedVideoWillStartAttemptForAdManager:(MPRewardedVideoAdManager *)manager withCustomEventClass:(NSString *)customEventClass
+- (void)rewardedVideoWillStartAttemptForAdManager:(MPRewardedVideoAdManager *)manager
 {
     id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
     if ([delegate respondsToSelector:@selector(rewardedVideoWillStartAttemptForAdUnitID:withCustomEventClass:)]) {
+        NSString *customEventClass = NSStringFromClass([manager customEventClass]);
         [delegate rewardedVideoWillStartAttemptForAdUnitID:manager.adUnitID withCustomEventClass:customEventClass];
     }
 }
 
-- (void)rewardedVideoDidFailAttemptForAdManager:(MPRewardedVideoAdManager *)manager withCustomEventClass:(NSString *)customEventClass error:(NSError *)error
+- (void)rewardedVideoDidSucceedAttemptForAdManager:(MPRewardedVideoAdManager *)manager
 {
     id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
-    if ([delegate respondsToSelector:@selector(rewardedVideoDidFailAttemptForAdUnitID:withCustomEventClass:error:)]) {
-        [delegate rewardedVideoDidFailAttemptForAdUnitID:manager.adUnitID withCustomEventClass:customEventClass error:error];
+    if ([delegate respondsToSelector:@selector(rewardedVideoDidSucceedAttemptForAdUnitID:creativeId:)]) {
+        NSString *creativeId = [manager dspCreativeId];
+        [delegate rewardedVideoDidSucceedAttemptForAdUnitID:manager.adUnitID creativeId:creativeId];
+    }
+}
+
+- (void)rewardedVideoDidFailAttemptForAdManager:(MPRewardedVideoAdManager *)manager error:(NSError *)error
+{
+    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
+    if ([delegate respondsToSelector:@selector(rewardedVideoDidFailAttemptForAdUnitID:error:)]) {
+        [delegate rewardedVideoDidFailAttemptForAdUnitID:manager.adUnitID error:error];
     }
 }
 

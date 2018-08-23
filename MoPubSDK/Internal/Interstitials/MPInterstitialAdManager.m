@@ -20,7 +20,7 @@
 @interface MPInterstitialAdManager ()
 
 @property (nonatomic, assign) BOOL loading;
-@property (nonatomic, assign, readwrite) BOOL ready;
+@property (nonatomic, assign) BOOL ready;
 @property (nonatomic, strong) MPBaseInterstitialAdapter *adapter;
 @property (nonatomic, strong) MPAdServerCommunicator *communicator;
 @property (nonatomic, strong) MPAdConfiguration *configuration;
@@ -32,13 +32,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 @implementation MPInterstitialAdManager
-
-@synthesize loading = _loading;
-@synthesize ready = _ready;
-@synthesize delegate = _delegate;
-@synthesize communicator = _communicator;
-@synthesize adapter = _adapter;
-@synthesize configuration = _configuration;
 
 - (id)initWithDelegate:(id<MPInterstitialAdManagerDelegate>)delegate
 {
@@ -56,6 +49,16 @@
     [self.communicator setDelegate:nil];
 
     self.adapter = nil;
+}
+
+- (Class)customEventClass
+{
+    return self.configuration.customEventClass;
+}
+
+- (NSString*)dspCreativeId
+{
+    return self.configuration.dspCreativeId;
 }
 
 - (void)setAdapter:(MPBaseInterstitialAdapter *)adapter
@@ -170,7 +173,7 @@
         return;
     }
 
-    [self.delegate manager:self willStartInterstitialAttemptWithCustomEventClass:NSStringFromClass(configuration.customEventClass)];
+    [self.delegate managerWillStartInterstitialAttempt:self];
     
     MPBaseInterstitialAdapter *adapter = [[MPInterstitialCustomEventAdapter alloc] initWithDelegate:self];
 
@@ -189,7 +192,7 @@
 
 - (void)adapter:(MPBaseInterstitialAdapter *)adapter didFailToLoadAdWithError:(NSError *)error
 {
-    [self.delegate manager:self didFailInterstitialAttemptWithCustomEventClass:NSStringFromClass(self.configuration.customEventClass) error:error];
+    [self.delegate manager:self didFailInterstitialAttemptWithError:error];
     self.ready = NO;
     self.loading = NO;
     [self loadAdWithURL:self.configuration.failoverURL];

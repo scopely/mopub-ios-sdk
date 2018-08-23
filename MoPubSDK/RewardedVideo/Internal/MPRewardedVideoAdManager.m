@@ -59,6 +59,12 @@
     return self.configuration.customEventClass;
 }
 
+- (NSString*)dspCreativeId
+{
+    return self.configuration.dspCreativeId;
+}
+
+
 - (BOOL)hasAdAvailable
 {
     //An Ad is not ready or has expired.
@@ -204,8 +210,7 @@
 
     self.adapter = adapter;
     
-    [self.delegate rewardedVideoWillStartAttemptForAdManager:self
-                                        withCustomEventClass:NSStringFromClass(self.configuration.customEventClass)];
+    [self.delegate rewardedVideoWillStartAttemptForAdManager:self];
     [self.adapter getAdWithConfiguration:self.configuration];
 }
 
@@ -232,6 +237,7 @@
 
 - (void)rewardedVideoDidLoadForAdapter:(MPRewardedVideoAdapter *)adapter
 {
+    [self.delegate rewardedVideoDidSucceedAttemptForAdManager:self];
     self.ready = YES;
     self.loading = NO;
     [self.delegate rewardedVideoDidLoadForAdManager:self];
@@ -239,9 +245,7 @@
 
 - (void)rewardedVideoDidFailToLoadForAdapter:(MPRewardedVideoAdapter *)adapter error:(NSError *)error
 {
-    [self.delegate rewardedVideoDidFailAttemptForAdManager:self
-                                      withCustomEventClass:NSStringFromClass(self.configuration.customEventClass)
-                                                     error:error];
+    [self.delegate rewardedVideoDidFailAttemptForAdManager:self error:error];
     self.ready = NO;
     self.loading = NO;
     [self loadAdWithURL:self.configuration.failoverURL];

@@ -89,6 +89,16 @@
     return self.communicator.loading || self.requestingAdapter;
 }
 
+- (Class)customEventClass
+{
+    return self.requestingConfiguration.customEventClass;
+}
+
+- (NSString*)dspCreativeId
+{
+    return self.requestingConfiguration.dspCreativeId;
+}
+
 - (void)loadAd
 {
     if (!self.hasRequestedAtLeastOneAd) {
@@ -241,7 +251,7 @@
         return;
     }
 
-    [self.delegate bannerWillStartAttemptForAdManager:self withCustomEventClass:NSStringFromClass(self.requestingConfiguration.customEventClass)];
+    [self.delegate bannerWillStartAttemptForAdManager:self];
     
     [self.requestingAdapter _getAdWithConfiguration:self.requestingConfiguration containerSize:self.delegate.containerSize];
 }
@@ -312,7 +322,7 @@
 
 - (void)adapter:(MPBaseBannerAdapter *)adapter didFinishLoadingAd:(UIView *)ad
 {
-    [self.delegate bannerDidSucceedAttemptForAdManager:self withCreativeId:self.requestingConfiguration.dspCreativeId];
+    [self.delegate bannerDidSucceedAttemptForAdManager:self];
     
     if (self.requestingAdapter == adapter) {
         self.requestingAdapterAdContentView = ad;

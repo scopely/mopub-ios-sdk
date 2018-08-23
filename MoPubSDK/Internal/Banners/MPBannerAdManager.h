@@ -15,6 +15,10 @@
 
 @property (nonatomic, weak) id<MPBannerAdManagerDelegate> delegate;
 
+@property (nonatomic, readonly) Class customEventClass;
+@property (nonatomic, readonly) NSString* dspCreativeId;
+
+
 - (id)initWithDelegate:(id<MPBannerAdManagerDelegate>)delegate;
 
 - (void)loadAd;

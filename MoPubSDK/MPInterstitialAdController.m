@@ -117,17 +117,27 @@
     return self.delegate;
 }
 
-- (void)manager:(MPInterstitialAdManager *)manager willStartInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass
+
+- (void)managerWillStartInterstitialAttempt:(MPInterstitialAdManager *)manager
 {
-    if ([self.delegate respondsToSelector:@selector(interstitialWillStartAttemptToLoadAd:withCustomEventClass:)]) {
-        [self.delegate interstitialWillStartAttemptToLoadAd:self withCustomEventClass:customEventClass];
+    if ([self.delegate respondsToSelector:@selector(interstitialWillStartAttemptToLoadAd:customEventClass:)]) {
+        NSString *customEventClass = NSStringFromClass([manager customEventClass]);
+        [self.delegate interstitialWillStartAttemptToLoadAd:self customEventClass:customEventClass];
     }
 }
 
-- (void)manager:(MPInterstitialAdManager *)manager didFailInterstitialAttemptWithCustomEventClass:(NSString*)customEventClass error:(NSError*)error
+- (void)managerDidSucceedInterstitialAttempt:(MPInterstitialAdManager *)manager
 {
-    if ([self.delegate respondsToSelector:@selector(interstitialDidFailAttemptToLoadAd:withCustomEventClass:error:)]) {
-        [self.delegate interstitialDidFailAttemptToLoadAd:self withCustomEventClass:customEventClass error:error];
+    if ([self.delegate respondsToSelector:@selector(interstitialDidSucceedAttemptToLoadAd:creativeId:)]) {
+        NSString *creativeId = [manager dspCreativeId];
+        [self.delegate interstitialDidSucceedAttemptToLoadAd:self creativeId:creativeId];
+    }
+}
+
+- (void)manager:(MPInterstitialAdManager *)manager didFailInterstitialAttemptWithError:(NSError*)error
+{
+    if ([self.delegate respondsToSelector:@selector(interstitialDidFailAttemptToLoadAd:error:)]) {
+        [self.delegate interstitialDidFailAttemptToLoadAd:self error:error];
     }
 }
 

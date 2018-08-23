@@ -161,13 +161,20 @@
 - (void)rewardedVideoWillStartAttemptForAdUnitID:(NSString *)adUnitID withCustomEventClass:(NSString*)customEventClass;
 
 /**
+ * This method is called after an ad attempt succeeds to load.
+ *
+ * @param adUnitID The ad unit ID of the ad associated with the event.
+ * @param creativeId The id of the creative loaded.
+ */
+- (void)rewardedVideoDidSucceedAttemptForAdUnitID:(NSString *)adUnitID creativeId:(NSString *)creativeId;
+
+/**
  * This method is called after an ad attempt fails to load.
  *
  * @param adUnitID The ad unit ID of the ad associated with the event.
- * @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
  * @param error The error that occurred during the load.
  */
-- (void)rewardedVideoDidFailAttemptForAdUnitID:(NSString *)adUnitID withCustomEventClass:(NSString*)customEventClass error:(NSError *)error;
+- (void)rewardedVideoDidFailAttemptForAdUnitID:(NSString *)adUnitID error:(NSError *)error;
 
 /**
  * This method is called after an ad loads successfully.
