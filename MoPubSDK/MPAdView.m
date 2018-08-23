@@ -146,6 +146,8 @@
 - (void)bannerWillStartAttemptForAdManager:(MPBannerAdManager *)manager
 {
     if ([self.delegate respondsToSelector:@selector(bannerWillStartAttemptForAd:withCustomEventClass:)]) {
+        
+        manager.reques
         NSString *customEventClass = NSStringFromClass([manager customEventClass]);
         [self.delegate bannerWillStartAttemptForAd:self withCustomEventClass:customEventClass];
     }
