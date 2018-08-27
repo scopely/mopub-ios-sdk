@@ -174,7 +174,7 @@
 /**
  * This method is called after an ad attempt succeeds to load.
  *
- * @param adUnitID The ad unit ID of the ad associated with the event.
+ * @param interstitial The interstitial ad object sending the message.
  * @param creativeId The id of the creative loaded.
  */
 - (void)interstitialDidSucceedAttemptToLoadAd:(MPInterstitialAdController *)interstitial creativeId:(NSString*)creativeId;

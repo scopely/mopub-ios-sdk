@@ -158,7 +158,7 @@
  * @param adUnitID The ad unit ID of the ad associated with the event.
  * @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
  */
-- (void)rewardedVideoWillStartAttemptForAdUnitID:(NSString *)adUnitID withCustomEventClass:(NSString*)customEventClass;
+- (void)rewardedVideoWillStartAttemptForAdUnitID:(NSString *)adUnitID customEventClass:(NSString*)customEventClass;
 
 /**
  * This method is called after an ad attempt succeeds to load.
