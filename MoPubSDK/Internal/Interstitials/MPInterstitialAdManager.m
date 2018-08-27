@@ -185,6 +185,7 @@
 
 - (void)adapterDidFinishLoadingAd:(MPBaseInterstitialAdapter *)adapter
 {
+    [self.delegate managerDidSucceedInterstitialAttempt:self];
     self.ready = YES;
     self.loading = NO;
     [self.delegate managerDidLoadInterstitial:self];
