@@ -1,8 +1,9 @@
 //
 //  MPRewardedVideo+Testing.h
-//  MoPubSDK
 //
-//  Copyright © 2017 MoPub. All rights reserved.
+//  Copyright 2018 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPRewardedVideo.h"
@@ -10,6 +11,10 @@
 #import "MPRewardedVideoAdManager+Testing.h"
 
 @interface MPRewardedVideo (Testing)
+@property (nonatomic, strong) NSMapTable<NSString *, id<MPRewardedVideoDelegate>> * delegateTable;
+@property (nonatomic, strong) NSMutableDictionary * rewardedVideoAdManagers;
+
++ (MPRewardedVideo *)sharedInstance;
 + (void)setDidSendServerToServerCallbackUrl:(void(^)(NSURL * url))callback;
 + (void(^)(NSURL * url))didSendServerToServerCallbackUrl;
 

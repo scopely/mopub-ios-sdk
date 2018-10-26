@@ -1,26 +1,25 @@
 //
 //  MPRewardedVideoTests.m
-//  MoPubSDK
 //
-//  Copyright © 2017 MoPub. All rights reserved.
+//  Copyright 2018 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <XCTest/XCTest.h>
 #import "MPAdConfiguration.h"
+#import "MPAdServerKeys.h"
 #import "MoPub.h"
 #import "MPRewardedVideo.h"
 #import "MPRewardedVideo+Testing.h"
 #import "MPRewardedVideoAdapter+Testing.h"
 #import "MPRewardedVideoDelegateHandler.h"
 #import "MPStubCustomEvent.h"
+#import "MPURL.h"
 #import "NSURLComponents+Testing.h"
 
 static NSString * const kTestAdUnitId    = @"967f82c7-c059-4ae8-8cb6-41c34265b1ef";
 static const NSTimeInterval kTestTimeout = 2; // seconds
-
-// delegateHandler needs to be declared static because if it is a property, it
-// will be nil'ed out at the end of a test.
-static MPRewardedVideoDelegateHandler * delegateHandler = nil;
 
 @interface MPRewardedVideoTests : XCTestCase
 @end
@@ -32,37 +31,140 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
 
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        delegateHandler = [MPRewardedVideoDelegateHandler new];
-        [[MoPub sharedInstance] initializeRewardedVideoWithGlobalMediationSettings:nil delegate:delegateHandler];
+        MPMoPubConfiguration * config = [[MPMoPubConfiguration alloc] initWithAdUnitIdForAppInitialization:kTestAdUnitId];
+        config.advancedBidders = nil;
+        config.globalMediationSettings = nil;
+        config.mediatedNetworks = nil;
+        [MoPub.sharedInstance initializeSdkWithConfiguration:config completion:nil];
     });
 }
 
 - (void)tearDown {
     [super tearDown];
-    [delegateHandler resetHandlers];
+}
+
+#pragma mark - Delegates
+
+- (void)testRewardedSuccessfulDelegateSetUnset {
+    // Fake ad unit ID
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+
+    // Set the delegate handler
+    MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+
+    id<MPRewardedVideoDelegate> handler = [MPRewardedVideo.sharedInstance.delegateTable objectForKey:adUnitId];
+    XCTAssertNotNil(handler);
+    XCTAssert(handler == delegateHandler);
+
+    // Unset the delegate handler
+    [MPRewardedVideo removeDelegateForAdUnitId:adUnitId];
+    handler = [MPRewardedVideo.sharedInstance.delegateTable objectForKey:adUnitId];
+    XCTAssertNil(handler);
+}
+
+- (void)testRewardedSuccessfulDelegateSetUnsetMultiple {
+    // Fake ad unit ID
+    NSString * adUnitId1 = [NSString stringWithFormat:@"%@:%s_1", kTestAdUnitId, __FUNCTION__];
+    NSString * adUnitId2 = [NSString stringWithFormat:@"%@:%s_2", kTestAdUnitId, __FUNCTION__];
+
+    // Set the delegate handler
+    MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId1];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId2];
+
+    id<MPRewardedVideoDelegate> handler1 = [MPRewardedVideo.sharedInstance.delegateTable objectForKey:adUnitId1];
+    XCTAssertNotNil(handler1);
+    XCTAssert(handler1 == delegateHandler);
+
+    id<MPRewardedVideoDelegate> handler2 = [MPRewardedVideo.sharedInstance.delegateTable objectForKey:adUnitId2];
+    XCTAssertNotNil(handler2);
+    XCTAssert(handler2 == delegateHandler);
+
+    // Unset the delegate handler
+    [MPRewardedVideo removeDelegate:delegateHandler];
+    handler1 = [MPRewardedVideo.sharedInstance.delegateTable objectForKey:adUnitId1];
+    XCTAssertNil(handler1);
+
+    handler2 = [MPRewardedVideo.sharedInstance.delegateTable objectForKey:adUnitId2];
+    XCTAssertNil(handler2);
+}
+
+- (void)testRewardedSuccessfulDelegateSetAutoNil {
+    // Fake ad unit ID
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+
+    // Use autorelease pool to force memory cleanup
+    @autoreleasepool {
+        // Set the delegate handler
+        MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
+        [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+
+        id<MPRewardedVideoDelegate> handler = [MPRewardedVideo.sharedInstance.delegateTable objectForKey:adUnitId];
+        XCTAssertNotNil(handler);
+        XCTAssert(handler == delegateHandler);
+
+        delegateHandler = nil;
+    }
+
+    // Verify no handler
+    id<MPRewardedVideoDelegate> handler = [MPRewardedVideo.sharedInstance.delegateTable objectForKey:adUnitId];
+    XCTAssertNil(handler);
+}
+
+- (void)testRewardedSetNilDelegate {
+    // Fake ad unit ID
+    NSString * adUnitId = nil;
+
+    // Set the delegate handler
+    MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+
+    id<MPRewardedVideoDelegate> handler = [MPRewardedVideo.sharedInstance.delegateTable objectForKey:adUnitId];
+    XCTAssertNil(handler);
+}
+
+- (void)testRewardedSetNilDelegateHandler {
+    // Fake ad unit ID
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+
+    // Set the delegate handler
+    MPRewardedVideoDelegateHandler * delegateHandler = nil;
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+
+    id<MPRewardedVideoDelegate> handler = [MPRewardedVideo.sharedInstance.delegateTable objectForKey:adUnitId];
+    XCTAssertNil(handler);
 }
 
 #pragma mark - Single Currency
 
 - (void)testRewardedSingleCurrencyPresentationSuccess {
     // Setup rewarded ad configuration
-    NSDictionary * headers = @{ kRewardedVideoCurrencyNameHeaderKey: @"Diamonds",
-                                kRewardedVideoCurrencyAmountHeaderKey: @"3",
+    NSDictionary * headers = @{ kRewardedVideoCurrencyNameMetadataKey: @"Diamonds",
+                                kRewardedVideoCurrencyAmountMetadataKey: @"3",
                                 };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
 
     // Configure delegate handler to listen for the reward event.
     __block MPRewardedVideoReward * rewardForUser = nil;
+    MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
     delegateHandler.shouldRewardUser = ^(MPRewardedVideoReward * reward) {
         rewardForUser = reward;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new]];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
+
+    MPRewardedVideoReward * singleReward = ({
+        NSArray<MPRewardedVideoReward *> * rewards = [MPRewardedVideo availableRewardsForAdUnitID:adUnitId];
+        rewards.firstObject;
+    });
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:singleReward];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -71,6 +173,8 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     XCTAssertNotNil(rewardForUser);
     XCTAssert([rewardForUser.currencyType isEqualToString:@"Diamonds"]);
     XCTAssert(rewardForUser.amount.integerValue == 3);
+
+    [MPRewardedVideo removeDelegateForAdUnitId:adUnitId];
 }
 
 - (void)testRewardedSingleItemInMultiCurrencyPresentationSuccess {
@@ -79,21 +183,29 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     //     { "name": "Coins", "amount": 8 }
     //   ]
     // }
-    NSDictionary * headers = @{ kRewardedCurrenciesHeaderKey: @"{ \"rewards\": [ { \"name\": \"Coins\", \"amount\": 8 } ] }" };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    NSDictionary * headers = @{ kRewardedCurrenciesMetadataKey: @{ @"rewards": @[ @{ @"name": @"Coins", @"amount": @(8) } ] } };
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
 
     // Configure delegate handler to listen for the reward event.
     __block MPRewardedVideoReward * rewardForUser = nil;
+    MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
     delegateHandler.shouldRewardUser = ^(MPRewardedVideoReward * reward) {
         rewardForUser = reward;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new]];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
+
+    MPRewardedVideoReward * singleReward = ({
+        NSArray<MPRewardedVideoReward *> * rewards = [MPRewardedVideo availableRewardsForAdUnitID:adUnitId];
+        rewards.firstObject;
+    });
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:singleReward];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -102,6 +214,8 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     XCTAssertNotNil(rewardForUser);
     XCTAssert([rewardForUser.currencyType isEqualToString:@"Coins"]);
     XCTAssert(rewardForUser.amount.integerValue == 8);
+
+    [MPRewardedVideo removeDelegateForAdUnitId:adUnitId];
 }
 
 - (void)testRewardedSingleItemInMultiCurrencyPresentationS2SSuccess {
@@ -110,16 +224,17 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     //     { "name": "Coins", "amount": 8 }
     //   ]
     // }
-    NSDictionary * headers = @{ kRewardedVideoCompletionUrlHeaderKey: @"https://test.com?verifier=123",
-                                kRewardedCurrenciesHeaderKey: @"{ \"rewards\": [ { \"name\": \"Coins\", \"amount\": 8 } ] }"
+    NSDictionary * headers = @{ kRewardedVideoCompletionUrlMetadataKey: @"https://test.com?verifier=123",
+                                kRewardedCurrenciesMetadataKey: @{ @"rewards": @[ @{ @"name": @"Coins", @"amount": @(8) } ] }
                               };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
 
     // Configure delegate handler to listen for the reward event.
     __block MPRewardedVideoReward * rewardForUser = nil;
+    MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
     delegateHandler.shouldRewardUser = ^(MPRewardedVideoReward * reward) {
         rewardForUser = reward;
     };
@@ -131,8 +246,15 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new]];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
+
+    MPRewardedVideoReward * singleReward = ({
+        NSArray<MPRewardedVideoReward *> * rewards = [MPRewardedVideo availableRewardsForAdUnitID:adUnitId];
+        rewards.firstObject;
+    });
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:singleReward];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -141,9 +263,12 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     XCTAssertNotNil(rewardForUser);
     XCTAssertNotNil(s2sUrl);
 
-    NSURLComponents * s2sUrlComponents = [NSURLComponents componentsWithURL:s2sUrl resolvingAgainstBaseURL:NO];
-    XCTAssert([[s2sUrlComponents valueForQueryParameter:@"rcn"] isEqualToString:@"Coins"]);
-    XCTAssert([[s2sUrlComponents valueForQueryParameter:@"rca"] isEqualToString:@"8"]);
+    MPURL * s2sMoPubUrl = [s2sUrl isKindOfClass:[MPURL class]] ? (MPURL *)s2sUrl : nil;
+    XCTAssertNotNil(s2sMoPubUrl);
+    XCTAssert([[s2sMoPubUrl stringForPOSTDataKey:kRewardedCurrencyNameKey] isEqualToString:@"Coins"]);
+    XCTAssert([[s2sMoPubUrl stringForPOSTDataKey:kRewardedCurrencyAmountKey] isEqualToString:@"8"]);
+
+    [MPRewardedVideo removeDelegateForAdUnitId:adUnitId];
 }
 
 #pragma mark - Multiple Currency
@@ -156,22 +281,25 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     //     { "name": "Energy", "amount": 20 }
     //   ]
     // }
-    NSDictionary * headers = @{ kRewardedCurrenciesHeaderKey: @"{ \"rewards\": [ { \"name\": \"Coins\", \"amount\": 8 }, { \"name\": \"Diamonds\", \"amount\": 1 }, { \"name\": \"Energy\", \"amount\": 20 } ] }" };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    NSDictionary * headers = @{ kRewardedCurrenciesMetadataKey: @{ @"rewards": @[ @{ @"name": @"Coins", @"amount": @(8) }, @{ @"name": @"Diamonds", @"amount": @(1) }, @{ @"name": @"Energy", @"amount": @(20) } ] } };
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
 
     // Configure delegate handler to listen for the reward event.
     __block MPRewardedVideoReward * rewardForUser = nil;
+    MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
     delegateHandler.shouldRewardUser = ^(MPRewardedVideoReward * reward) {
         rewardForUser = reward;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
-    NSArray * availableRewards = [MPRewardedVideo availableRewardsForAdUnitID:kTestAdUnitId];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:availableRewards[1]];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
+    NSArray * availableRewards = [MPRewardedVideo availableRewardsForAdUnitID:adUnitId];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:availableRewards[1]];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -180,46 +308,8 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     XCTAssertNotNil(rewardForUser);
     XCTAssert([rewardForUser.currencyType isEqualToString:@"Diamonds"]);
     XCTAssert(rewardForUser.amount.integerValue == 1);
-}
 
-- (void)testRewardedMultiCurrencyPresentationAutoSelectionFailure {
-    // {
-    //   "rewards": [
-    //     { "name": "Coins", "amount": 8 },
-    //     { "name": "Diamonds", "amount": 1 },
-    //     { "name": "Energy", "amount": 20 }
-    //   ]
-    // }
-    NSDictionary * headers = @{ kRewardedCurrenciesHeaderKey: @"{ \"rewards\": [ { \"name\": \"Coins\", \"amount\": 8 }, { \"name\": \"Diamonds\", \"amount\": 1 }, { \"name\": \"Energy\", \"amount\": 20 } ] }" };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
-
-    // Semaphore to wait for asynchronous method to finish before continuing the test.
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
-
-    // Configure delegate handler to listen for the reward event.
-    __block MPRewardedVideoReward * rewardForUser = nil;
-    __block BOOL didFail = NO;
-    delegateHandler.shouldRewardUser = ^(MPRewardedVideoReward * reward) {
-        rewardForUser = reward;
-        didFail = NO;
-        [expectation fulfill];
-    };
-
-    delegateHandler.didFailToPlayAd = ^() {
-        rewardForUser = nil;
-        didFail = YES;
-        [expectation fulfill];
-    };
-
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new]];
-
-    [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
-        XCTAssertNil(error);
-    }];
-
-    XCTAssertNil(rewardForUser);
-    XCTAssertTrue(didFail);
+    [MPRewardedVideo removeDelegateForAdUnitId:adUnitId];
 }
 
 - (void)testRewardedMultiCurrencyPresentationNilParameterAutoSelectionFailure {
@@ -230,8 +320,8 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     //     { "name": "Energy", "amount": 20 }
     //   ]
     // }
-    NSDictionary * headers = @{ kRewardedCurrenciesHeaderKey: @"{ \"rewards\": [ { \"name\": \"Coins\", \"amount\": 8 }, { \"name\": \"Diamonds\", \"amount\": 1 }, { \"name\": \"Energy\", \"amount\": 20 } ] }" };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    NSDictionary * headers = @{ kRewardedCurrenciesMetadataKey: @{ @"rewards": @[ @{ @"name": @"Coins", @"amount": @(8) }, @{ @"name": @"Diamonds", @"amount": @(1) }, @{ @"name": @"Energy", @"amount": @(20) } ] } };
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
@@ -239,6 +329,7 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     // Configure delegate handler to listen for the reward event.
     __block MPRewardedVideoReward * rewardForUser = nil;
     __block BOOL didFail = NO;
+    MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
     delegateHandler.shouldRewardUser = ^(MPRewardedVideoReward * reward) {
         rewardForUser = reward;
         didFail = NO;
@@ -251,8 +342,10 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:nil];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:nil];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -260,6 +353,8 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
 
     XCTAssertNil(rewardForUser);
     XCTAssertTrue(didFail);
+
+    [MPRewardedVideo removeDelegateForAdUnitId:adUnitId];
 }
 
 - (void)testRewardedMultiCurrencyPresentationUnknownSelectionFail {
@@ -270,8 +365,8 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     //     { "name": "Energy", "amount": 20 }
     //   ]
     // }
-    NSDictionary * headers = @{ kRewardedCurrenciesHeaderKey: @"{ \"rewards\": [ { \"name\": \"Coins\", \"amount\": 8 }, { \"name\": \"Diamonds\", \"amount\": 1 }, { \"name\": \"Energy\", \"amount\": 20 } ] }" };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    NSDictionary * headers = @{ kRewardedCurrenciesMetadataKey: @{ @"rewards": @[ @{ @"name": @"Coins", @"amount": @(8) }, @{ @"name": @"Diamonds", @"amount": @(1) }, @{ @"name": @"Energy", @"amount": @(20) } ] } };
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
@@ -279,6 +374,7 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     // Configure delegate handler to listen for the reward event.
     __block MPRewardedVideoReward * rewardForUser = nil;
     __block BOOL didFail = NO;
+    MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
     delegateHandler.shouldRewardUser = ^(MPRewardedVideoReward * reward) {
         rewardForUser = reward;
         didFail = NO;
@@ -294,8 +390,10 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     // Create a malicious reward
     MPRewardedVideoReward * badReward = [[MPRewardedVideoReward alloc] initWithCurrencyType:@"$$$" amount:@(100)];
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:badReward];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:badReward];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -303,6 +401,8 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
 
     XCTAssertNil(rewardForUser);
     XCTAssertTrue(didFail);
+
+    [MPRewardedVideo removeDelegateForAdUnitId:adUnitId];
 }
 
 - (void)testRewardedMultiCurrencyS2SPresentationSuccess {
@@ -313,16 +413,17 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     //     { "name": "Energy", "amount": 20 }
     //   ]
     // }
-    NSDictionary * headers = @{ kRewardedVideoCompletionUrlHeaderKey: @"https://test.com?verifier=123",
-                                kRewardedCurrenciesHeaderKey: @"{ \"rewards\": [ { \"name\": \"Coins\", \"amount\": 8 }, { \"name\": \"Diamonds\", \"amount\": 1 }, { \"name\": \"Energy\", \"amount\": 20 } ] }"
+    NSDictionary * headers = @{ kRewardedVideoCompletionUrlMetadataKey: @"https://test.com?verifier=123",
+                                kRewardedCurrenciesMetadataKey: @{ @"rewards": @[ @{ @"name": @"Coins", @"amount": @(8) }, @{ @"name": @"Diamonds", @"amount": @(1) }, @{ @"name": @"Energy", @"amount": @(20) } ] }
                               };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
 
     // Configure delegate handler to listen for the reward event.
     __block MPRewardedVideoReward * rewardForUser = nil;
+    MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
     delegateHandler.shouldRewardUser = ^(MPRewardedVideoReward * reward) {
         rewardForUser = reward;
     };
@@ -334,9 +435,11 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
-    NSArray * availableRewards = [MPRewardedVideo availableRewardsForAdUnitID:kTestAdUnitId];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:availableRewards[1]];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
+    NSArray * availableRewards = [MPRewardedVideo availableRewardsForAdUnitID:adUnitId];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:availableRewards[1]];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -345,21 +448,25 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     XCTAssertNotNil(rewardForUser);
     XCTAssertNotNil(s2sUrl);
 
-    NSURLComponents * s2sUrlComponents = [NSURLComponents componentsWithURL:s2sUrl resolvingAgainstBaseURL:NO];
-    XCTAssert([[s2sUrlComponents valueForQueryParameter:@"rcn"] isEqualToString:@"Diamonds"]);
-    XCTAssert([[s2sUrlComponents valueForQueryParameter:@"rca"] isEqualToString:@"1"]);
+    MPURL * s2sMoPubUrl = [s2sUrl isKindOfClass:[MPURL class]] ? (MPURL *)s2sUrl : nil;
+    XCTAssertNotNil(s2sMoPubUrl);
+    XCTAssert([[s2sMoPubUrl stringForPOSTDataKey:kRewardedCurrencyNameKey] isEqualToString:@"Diamonds"]);
+    XCTAssert([[s2sMoPubUrl stringForPOSTDataKey:kRewardedCurrencyAmountKey] isEqualToString:@"1"]);
+
+    [MPRewardedVideo removeDelegateForAdUnitId:adUnitId];
 }
 
 - (void)testRewardedS2SNoRewardSpecified {
-    NSDictionary * headers = @{ kRewardedVideoCompletionUrlHeaderKey: @"https://test.com?verifier=123",
+    NSDictionary * headers = @{ kRewardedVideoCompletionUrlMetadataKey: @"https://test.com?verifier=123",
                                 };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
 
     // Configure delegate handler to listen for the reward event.
     __block MPRewardedVideoReward * rewardForUser = nil;
+    MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
     delegateHandler.shouldRewardUser = ^(MPRewardedVideoReward * reward) {
         rewardForUser = reward;
     };
@@ -371,9 +478,11 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
     NSArray * availableRewards = [MPRewardedVideo availableRewardsForAdUnitID:kTestAdUnitId];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:availableRewards[0]];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:availableRewards[0]];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -385,51 +494,8 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     NSURLComponents * s2sUrlComponents = [NSURLComponents componentsWithURL:s2sUrl resolvingAgainstBaseURL:NO];
     XCTAssertFalse([s2sUrlComponents hasQueryParameter:@"rcn"]);
     XCTAssertFalse([s2sUrlComponents valueForQueryParameter:@"rca"]);
-}
 
-#pragma mark - Network SDK Initialization
-
-- (void)testNetworkSDKInitializationSuccess {
-    [MPStubCustomEvent resetInitialization];
-    XCTAssertFalse([MPStubCustomEvent isInitialized]);
-
-    [MPRewardedVideo initializeWithOrder:@[@"MPStubCustomEvent"]];
-
-    // Wait for SDKs to initialize
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Expect timer to fire"];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)((kTestTimeout / 2.0) * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [expectation fulfill];
-    });
-
-    [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError *error) {
-        XCTAssertNil(error);
-    }];
-
-    XCTAssertTrue([MPStubCustomEvent isInitialized]);
-}
-
-- (void)testNoNetworkSDKInitialization {
-    [MPStubCustomEvent resetInitialization];
-    XCTAssertFalse([MPStubCustomEvent isInitialized]);
-
-    [MPRewardedVideo initializeWithOrder:nil];
-    XCTAssertFalse([MPStubCustomEvent isInitialized]);
-}
-
-- (void)testUnknownNetworkSDKInitialization {
-    [MPStubCustomEvent resetInitialization];
-    XCTAssertFalse([MPStubCustomEvent isInitialized]);
-
-    [MPRewardedVideo initializeWithOrder:@[@"badf00d"]];
-    XCTAssertFalse([MPStubCustomEvent isInitialized]);
-}
-
-- (void)testIntentionallyBadNetworkSDKInitialization {
-    [MPStubCustomEvent resetInitialization];
-    XCTAssertFalse([MPStubCustomEvent isInitialized]);
-
-    [MPRewardedVideo initializeWithOrder:@[@"MPRewardedVideo"]];
-    XCTAssertFalse([MPStubCustomEvent isInitialized]);
+    [MPRewardedVideo removeDelegateForAdUnitId:adUnitId];
 }
 
 #pragma mark - Custom Data
@@ -439,11 +505,11 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     NSString * customData = [@"" stringByPaddingToLength:512 withString:@"test" startingAtIndex:0];
 
     // Setup rewarded ad configuration
-    NSDictionary * headers = @{ kRewardedVideoCurrencyNameHeaderKey: @"Diamonds",
-                                kRewardedVideoCurrencyAmountHeaderKey: @"3",
-                                kRewardedVideoCompletionUrlHeaderKey: @"https://test.com?verifier=123",
+    NSDictionary * headers = @{ kRewardedVideoCurrencyNameMetadataKey: @"Diamonds",
+                                kRewardedVideoCurrencyAmountMetadataKey: @"3",
+                                kRewardedVideoCompletionUrlMetadataKey: @"https://test.com?verifier=123",
                                 };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
@@ -455,9 +521,10 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
     MPRewardedVideoReward * reward = [MPRewardedVideo availableRewardsForAdUnitID:kTestAdUnitId][0];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:reward customData:customData];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:reward customData:customData];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -465,8 +532,9 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
 
     XCTAssertNotNil(s2sUrl);
 
-    NSString * encodedCustomDataQueryParam = [NSString stringWithFormat:@"rcd=%@", customData];
-    XCTAssert([s2sUrl.absoluteString containsString:encodedCustomDataQueryParam]);
+    MPURL * s2sMoPubUrl = [s2sUrl isKindOfClass:[MPURL class]] ? (MPURL *)s2sUrl : nil;
+    XCTAssertNotNil(s2sMoPubUrl);
+    XCTAssert([[s2sMoPubUrl stringForPOSTDataKey:kRewardedCustomDataKey] isEqualToString:customData]);
 }
 
 - (void)testCustomDataExcessiveDataLength {
@@ -474,11 +542,11 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     NSString * customData = [@"" stringByPaddingToLength:8200 withString:@"test" startingAtIndex:0];
 
     // Setup rewarded ad configuration
-    NSDictionary * headers = @{ kRewardedVideoCurrencyNameHeaderKey: @"Diamonds",
-                                kRewardedVideoCurrencyAmountHeaderKey: @"3",
-                                kRewardedVideoCompletionUrlHeaderKey: @"https://test.com?verifier=123",
+    NSDictionary * headers = @{ kRewardedVideoCurrencyNameMetadataKey: @"Diamonds",
+                                kRewardedVideoCurrencyAmountMetadataKey: @"3",
+                                kRewardedVideoCompletionUrlMetadataKey: @"https://test.com?verifier=123",
                               };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
@@ -490,9 +558,10 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
     MPRewardedVideoReward * reward = [MPRewardedVideo availableRewardsForAdUnitID:kTestAdUnitId][0];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:reward customData:customData];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:reward customData:customData];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -500,17 +569,20 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
 
     XCTAssertNotNil(s2sUrl);
 
-    NSString * encodedCustomDataQueryParam = [NSString stringWithFormat:@"rcd=%@", customData];
-    XCTAssert([s2sUrl.absoluteString containsString:encodedCustomDataQueryParam]);
+    MPURL * s2sMoPubUrl = [s2sUrl isKindOfClass:[MPURL class]] ? (MPURL *)s2sUrl : nil;
+    XCTAssertNotNil(s2sMoPubUrl);
+    XCTAssert([[s2sMoPubUrl stringForPOSTDataKey:kRewardedCustomDataKey] isEqualToString:customData]);
+
+    [MPRewardedVideo removeDelegateForAdUnitId:adUnitId];
 }
 
 - (void)testCustomDataNil {
     // Setup rewarded ad configuration
-    NSDictionary * headers = @{ kRewardedVideoCurrencyNameHeaderKey: @"Diamonds",
-                                kRewardedVideoCurrencyAmountHeaderKey: @"3",
-                                kRewardedVideoCompletionUrlHeaderKey: @"https://test.com?verifier=123",
+    NSDictionary * headers = @{ kRewardedVideoCurrencyNameMetadataKey: @"Diamonds",
+                                kRewardedVideoCurrencyAmountMetadataKey: @"3",
+                                kRewardedVideoCompletionUrlMetadataKey: @"https://test.com?verifier=123",
                                 };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
@@ -522,9 +594,10 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
     MPRewardedVideoReward * reward = [MPRewardedVideo availableRewardsForAdUnitID:kTestAdUnitId][0];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:reward customData:nil];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:reward customData:nil];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -536,11 +609,11 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
 
 - (void)testCustomDataEmpty {
     // Setup rewarded ad configuration
-    NSDictionary * headers = @{ kRewardedVideoCurrencyNameHeaderKey: @"Diamonds",
-                                kRewardedVideoCurrencyAmountHeaderKey: @"3",
-                                kRewardedVideoCompletionUrlHeaderKey: @"https://test.com?verifier=123",
+    NSDictionary * headers = @{ kRewardedVideoCurrencyNameMetadataKey: @"Diamonds",
+                                kRewardedVideoCurrencyAmountMetadataKey: @"3",
+                                kRewardedVideoCompletionUrlMetadataKey: @"https://test.com?verifier=123",
                                 };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
@@ -552,9 +625,10 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
     MPRewardedVideoReward * reward = [MPRewardedVideo availableRewardsForAdUnitID:kTestAdUnitId][0];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:reward customData:@""];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:reward customData:@""];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -564,16 +638,16 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     XCTAssert(![s2sUrl.absoluteString containsString:@"rcd="]);
 }
 
-- (void)testCustomDataURIEncoded {
+- (void)testCustomDataInPOSTData {
     // Custom data in need of URI encoding
     NSString * customData = @"{ \"key\": \"some value with spaces\" }";
 
     // Setup rewarded ad configuration
-    NSDictionary * headers = @{ kRewardedVideoCurrencyNameHeaderKey: @"Diamonds",
-                                kRewardedVideoCurrencyAmountHeaderKey: @"3",
-                                kRewardedVideoCompletionUrlHeaderKey: @"https://test.com?verifier=123",
+    NSDictionary * headers = @{ kRewardedVideoCurrencyNameMetadataKey: @"Diamonds",
+                                kRewardedVideoCurrencyAmountMetadataKey: @"3",
+                                kRewardedVideoCompletionUrlMetadataKey: @"https://test.com?verifier=123",
                                 };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
@@ -585,9 +659,10 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
     MPRewardedVideoReward * reward = [MPRewardedVideo availableRewardsForAdUnitID:kTestAdUnitId][0];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:reward customData:customData];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:reward customData:customData];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -595,9 +670,9 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
 
     XCTAssertNotNil(s2sUrl);
 
-    NSString * uriEncodedCustomData = @"%7B%20%22key%22%3A%20%22some%20value%20with%20spaces%22%20%7D";
-    NSString * expectedQueryParam = [NSString stringWithFormat:@"rcd=%@", uriEncodedCustomData];
-    XCTAssert([s2sUrl.absoluteString containsString:expectedQueryParam]);
+    MPURL * s2sMoPubUrl = [s2sUrl isKindOfClass:[MPURL class]] ? (MPURL *)s2sUrl : nil;
+    XCTAssertNotNil(s2sMoPubUrl);
+    XCTAssert([[s2sMoPubUrl stringForPOSTDataKey:kRewardedCustomDataKey] isEqualToString:customData]);
 }
 
 - (void)testCustomDataLocalReward {
@@ -605,10 +680,10 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
     NSString * customData = [@"" stringByPaddingToLength:512 withString:@"test" startingAtIndex:0];
 
     // Setup rewarded ad configuration
-    NSDictionary * headers = @{ kRewardedVideoCurrencyNameHeaderKey: @"Diamonds",
-                                kRewardedVideoCurrencyAmountHeaderKey: @"3",
+    NSDictionary * headers = @{ kRewardedVideoCurrencyNameMetadataKey: @"Diamonds",
+                                kRewardedVideoCurrencyAmountMetadataKey: @"3",
                                 };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
@@ -621,18 +696,21 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
 
     // Configure delegate handler to listen for the reward event.
     __block MPRewardedVideoReward * rewardForUser = nil;
+    MPRewardedVideoDelegateHandler * delegateHandler = [MPRewardedVideoDelegateHandler new];
     delegateHandler.shouldRewardUser = ^(MPRewardedVideoReward * reward) {
         rewardForUser = reward;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo setDelegate:delegateHandler forAdUnitId:adUnitId];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
     MPRewardedVideoReward * reward = [MPRewardedVideo availableRewardsForAdUnitID:kTestAdUnitId][0];
 
-    MPRewardedVideoAdManager * manager = [MPRewardedVideo adManagerForAdUnitId:kTestAdUnitId];
+    MPRewardedVideoAdManager * manager = [MPRewardedVideo adManagerForAdUnitId:adUnitId];
     MPRewardedVideoAdapter * adapter = manager.adapter;
 
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:reward customData:customData];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:reward customData:customData];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -640,17 +718,19 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
 
     XCTAssertNil(s2sUrl);
     XCTAssertNotNil(adapter);
-    XCTAssertNil(adapter.urlEncodedCustomData);
+    XCTAssertNil(adapter.customData);
+
+    [MPRewardedVideo removeDelegateForAdUnitId:adUnitId];
 }
 
 - (void)testNetworkIdentifierInRewardCallback {
     // Setup rewarded ad configuration
-    NSDictionary * headers = @{ kCustomEventClassNameHeaderKey: @"MPMockChartboostRewardedVideoCustomEvent",
-                                kRewardedVideoCurrencyNameHeaderKey: @"Diamonds",
-                                kRewardedVideoCurrencyAmountHeaderKey: @"3",
-                                kRewardedVideoCompletionUrlHeaderKey: @"https://test.com?verifier=123",
+    NSDictionary * headers = @{ kCustomEventClassNameMetadataKey: @"MPMockChartboostRewardedVideoCustomEvent",
+                                kRewardedVideoCurrencyNameMetadataKey: @"Diamonds",
+                                kRewardedVideoCurrencyAmountMetadataKey: @"3",
+                                kRewardedVideoCompletionUrlMetadataKey: @"https://test.com?verifier=123",
                                 };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
@@ -662,27 +742,31 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
     MPRewardedVideoReward * reward = [MPRewardedVideo availableRewardsForAdUnitID:kTestAdUnitId][0];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:reward customData:nil];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:reward customData:nil];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
     }];
 
     XCTAssertNotNil(s2sUrl);
-    XCTAssert([s2sUrl.absoluteString containsString:@"cec=MPMockChartboostRewardedVideoCustomEvent"]);
+
+    MPURL * s2sMoPubUrl = [s2sUrl isKindOfClass:[MPURL class]] ? (MPURL *)s2sUrl : nil;
+    XCTAssertNotNil(s2sMoPubUrl);
+    XCTAssert([[s2sMoPubUrl stringForPOSTDataKey:kRewardedCustomEventNameKey] isEqualToString:@"MPMockChartboostRewardedVideoCustomEvent"]);
 }
 
 - (void)testMoPubNetworkIdentifierInRewardCallback {
     // Setup rewarded ad configuration
-    NSDictionary * headers = @{ kAdTypeHeaderKey: @"rewarded_video",
-                                kCustomEventClassNameHeaderKey: @"rewarded_video",
-                                kRewardedVideoCurrencyNameHeaderKey: @"Diamonds",
-                                kRewardedVideoCurrencyAmountHeaderKey: @"3",
-                                kRewardedVideoCompletionUrlHeaderKey: @"https://test.com?verifier=123",
+    NSDictionary * headers = @{ kAdTypeMetadataKey: @"rewarded_video",
+                                kCustomEventClassNameMetadataKey: @"rewarded_video",
+                                kRewardedVideoCurrencyNameMetadataKey: @"Diamonds",
+                                kRewardedVideoCurrencyAmountMetadataKey: @"3",
+                                kRewardedVideoCompletionUrlMetadataKey: @"https://test.com?verifier=123",
                                 };
-    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithHeaders:headers data:nil];
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:headers data:nil];
 
     // Semaphore to wait for asynchronous method to finish before continuing the test.
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for reward completion block to fire."];
@@ -694,16 +778,20 @@ static MPRewardedVideoDelegateHandler * delegateHandler = nil;
         [expectation fulfill];
     };
 
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:kTestAdUnitId withTestConfiguration:config];
+    NSString * adUnitId = [NSString stringWithFormat:@"%@:%s", kTestAdUnitId, __FUNCTION__];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:adUnitId withTestConfiguration:config];
     MPRewardedVideoReward * reward = [MPRewardedVideo availableRewardsForAdUnitID:kTestAdUnitId][0];
-    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:kTestAdUnitId fromViewController:[UIViewController new] withReward:reward customData:nil];
+    [MPRewardedVideo presentRewardedVideoAdForAdUnitID:adUnitId fromViewController:[UIViewController new] withReward:reward customData:nil];
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
     }];
 
     XCTAssertNotNil(s2sUrl);
-    XCTAssert([s2sUrl.absoluteString containsString:@"cec=MPMoPubRewardedVideoCustomEvent"]);
+
+    MPURL * s2sMoPubUrl = [s2sUrl isKindOfClass:[MPURL class]] ? (MPURL *)s2sUrl : nil;
+    XCTAssertNotNil(s2sMoPubUrl);
+    XCTAssert([[s2sMoPubUrl stringForPOSTDataKey:kRewardedCustomEventNameKey] isEqualToString:@"MPMoPubRewardedVideoCustomEvent"]);
 }
 
 @end

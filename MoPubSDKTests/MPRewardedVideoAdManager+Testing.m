@@ -1,8 +1,9 @@
 //
 //  MPRewardedVideoAdManager+Testing.m
-//  MoPubSDK
 //
-//  Copyright © 2017 MoPub. All rights reserved.
+//  Copyright 2018 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPRewardedVideoAdManager+Testing.h"
@@ -14,6 +15,9 @@
 @property (nonatomic, assign) BOOL ready;
 @property (nonatomic, assign) BOOL playedAd;
 @end
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wprotocol"
 
 @implementation MPRewardedVideoAdManager (Testing)
 @dynamic communicator;
@@ -27,3 +31,5 @@
 }
 
 @end
+
+#pragma clang diagnostic pop

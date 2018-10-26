@@ -1,15 +1,17 @@
 //
 //  MPBannerCustomEventAdapter.m
-//  MoPub
 //
-//  Copyright (c) 2012 MoPub, Inc. All rights reserved.
+//  Copyright 2018 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPBannerCustomEventAdapter.h"
 
 #import "MPAdConfiguration.h"
+#import "MPAdTargeting.h"
 #import "MPBannerCustomEvent.h"
-#import "MPInstanceProvider.h"
+#import "MPCoreInstanceProvider.h"
 #import "MPLogging.h"
 #import "MPAdImpressionTimer.h"
 #import "MPBannerCustomEvent+Internal.h"
@@ -65,7 +67,7 @@ WBBannerProxy *bannerProxy;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)getAdWithConfiguration:(MPAdConfiguration *)configuration containerSize:(CGSize)size
+- (void)getAdWithConfiguration:(MPAdConfiguration *)configuration targeting:(MPAdTargeting *)targeting containerSize:(CGSize)size
 {
     MPLogInfo(@"Looking for custom event class named %@.", configuration.customEventClass);
     self.configuration = configuration;
@@ -77,7 +79,9 @@ WBBannerProxy *bannerProxy;
         return;
     }
 
+
     self.bannerCustomEvent = customEvent;
+<<<<<<< HEAD
     bannerProxy.delegate = self;
     customEvent.delegate = bannerProxy;
     bannerProxy.attemptStart = [NSDate date];
@@ -86,6 +90,11 @@ WBBannerProxy *bannerProxy;
     [bannerProxy setFunnel];
     [bannerProxy setAttemptIdAndPostAttemptedEvent];
     [self.bannerCustomEvent requestAdWithSize:size customEventInfo:configuration.customEventClassData];
+=======
+    self.bannerCustomEvent.delegate = self;
+    self.bannerCustomEvent.localExtras = targeting.localExtras;
+    [self.bannerCustomEvent requestAdWithSize:size customEventInfo:configuration.customEventClassData adMarkup:configuration.advancedBidPayload];
+>>>>>>> sync-mopub
 }
 
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation
@@ -203,12 +212,15 @@ WBBannerProxy *bannerProxy;
 
 - (void)adViewWillLogImpression:(UIView *)adView
 {
-    // Ads server impression
+    // Track impression for all impression trackers known by the SDK
     [self trackImpression];
-    // MPX and other trackers;
-    [self.bannerCustomEvent trackMPXAndThirdPartyImpressions];
+    // Track impression for all impression trackers included in the markup
+    [self.bannerCustomEvent trackImpressionsIncludedInMarkup];
     // Start viewability tracking
     [self.bannerCustomEvent startViewabilityTracker];
+
+    // Notify delegate that an impression tracker was fired
+    [self.delegate adapter:self didTrackImpressionForAd:adView];
 }
 
 @end

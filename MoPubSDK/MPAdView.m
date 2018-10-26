@@ -1,16 +1,17 @@
 //
 //  MPAdView.m
-//  MoPub
 //
-//  Created by Nafis Jamal on 1/19/11.
-//  Copyright 2011 MoPub, Inc. All rights reserved.
+//  Copyright 2018 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPAdView.h"
-#import "MPClosableView.h"
+#import "MPAdTargeting.h"
 #import "MPBannerAdManager.h"
-#import "MPInstanceProvider.h"
 #import "MPBannerAdManagerDelegate.h"
+#import "MPClosableView.h"
+#import "MPCoreInstanceProvider.h"
 #import "MPLogging.h"
 
 @interface MPAdView () <MPBannerAdManagerDelegate>
@@ -78,7 +79,13 @@
 
 - (void)loadAd
 {
-    [self.adManager loadAd];
+    MPAdTargeting * targeting = [[MPAdTargeting alloc] init];
+    targeting.keywords = self.keywords;
+    targeting.localExtras = self.localExtras;
+    targeting.location = self.location;
+    targeting.userDataKeywords = self.userDataKeywords;
+
+    [self.adManager loadAdWithTargeting:targeting];
 }
 
 - (void)refreshAd
@@ -141,6 +148,29 @@
 - (void)invalidateContentView
 {
     [self setAdContentView:nil];
+}
+
+- (void)bannerWillStartAttemptForAdManager:(MPBannerAdManager *)manager
+{
+    if ([self.delegate respondsToSelector:@selector(bannerWillStartAttemptForAd:withCustomEventClass:)]) {
+        NSString *customEventClass = NSStringFromClass([manager customEventClass]);
+        [self.delegate bannerWillStartAttemptForAd:self withCustomEventClass:customEventClass];
+    }
+}
+
+- (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager
+{
+    if ([self.delegate respondsToSelector:@selector(bannerDidSucceedAttemptForAd:withCreativeId:)]) {
+        NSString *creativeId = [manager dspCreativeId];
+        [self.delegate bannerDidSucceedAttemptForAd:self withCreativeId:creativeId];
+    }
+}
+
+- (void)bannerDidFailAttemptForAdManager:(MPBannerAdManager *)manager error:(NSError *)error
+{
+    if ([self.delegate respondsToSelector:@selector(bannerDidFailAttemptForAd:error:)]) {
+        [self.delegate bannerDidFailAttemptForAd:self error:error];
+    }
 }
 
 - (void)managerDidFailToLoadAd

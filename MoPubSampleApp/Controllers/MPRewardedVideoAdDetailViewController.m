@@ -1,8 +1,9 @@
 //
 //  MPRewardedVideoAdDetailViewController.m
-//  MoPubSampleApp
 //
-//  Copyright (c) 2015 MoPub. All rights reserved.
+//  Copyright 2018 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPRewardedVideoAdDetailViewController.h"
@@ -44,12 +45,16 @@
     self.showButton.hidden = YES;
     self.rewardPickerView.dataSource = self;
     self.rewardPickerView.delegate = self;
-
-    [[MoPub sharedInstance] initializeRewardedVideoWithGlobalMediationSettings:@[] delegate:self];
-
     self.keywordsTextField.text = self.info.keywords;
 
+    [MPRewardedVideo setDelegate:self forAdUnitId:self.info.ID];
+
     [super viewDidLoad];
+}
+
+- (void)dealloc
+{
+    [MPRewardedVideo removeDelegateForAdUnitId:self.info.ID];
 }
 
 - (IBAction)didTapLoadButton:(id)sender
@@ -78,7 +83,8 @@
 
 
     // create Instance Mediation Settings as needed here
-    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:self.info.ID keywords:self.info.keywords location:nil customerId:@"testCustomerId" mediationSettings:@[]];
+    [self startTimer];
+    [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:self.info.ID keywords:self.info.keywords userDataKeywords:nil location:nil customerId:@"testCustomerId" mediationSettings:@[]];
 }
 
 - (IBAction)didTapShowButton:(id)sender
@@ -101,6 +107,7 @@
 
 - (void)rewardedVideoAdDidLoadForAdUnitID:(NSString *)adUnitID
 {
+    [self endTimer];
     [self.spinner stopAnimating];
     self.showButton.hidden = NO;
     self.loadButton.enabled = YES;
@@ -111,6 +118,7 @@
 
 - (void)rewardedVideoAdDidFailToLoadForAdUnitID:(NSString *)adUnitID error:(NSError *)error
 {
+    [self endTimer];
     self.failLabel.hidden = NO;
     self.loadButton.enabled = YES;
     [self.spinner stopAnimating];

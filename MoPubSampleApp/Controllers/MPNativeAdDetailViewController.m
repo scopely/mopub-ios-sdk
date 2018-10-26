@@ -1,8 +1,9 @@
 //
 //  MPNativeAdDetailViewController.m
-//  MoPub
 //
-//  Copyright (c) 2014 MoPub. All rights reserved.
+//  Copyright 2018 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPNativeAdDetailViewController.h"
@@ -18,11 +19,6 @@
 #import "MOPUBNativeVideoAdRendererSettings.h"
 #import "MOPUBNativeVideoAdRenderer.h"
 #import "MPNativeVideoView.h"
-
-#ifdef CUSTOM_EVENTS_ENABLED
-#import "FlurryNativeVideoAdRenderer.h"
-#import "MPGoogleAdMobNativeRenderer.h"
-#endif
 
 NSString *const kNativeAdDefaultActionViewKey = @"kNativeAdDefaultActionButtonKey";
 
@@ -99,12 +95,6 @@ NSString *const kNativeAdDefaultActionViewKey = @"kNativeAdDefaultActionButtonKe
     MPNativeAdRendererConfiguration *nativeVideoConfig = [MOPUBNativeVideoAdRenderer rendererConfigurationWithRendererSettings:nativeVideoAdSettings];
     [configurations addObject:nativeVideoConfig];
 
-    #ifdef CUSTOM_EVENTS_ENABLED
-    MPNativeAdRendererConfiguration * flurryConfig = [FlurryNativeVideoAdRenderer rendererConfigurationWithRendererSettings:nativeVideoAdSettings];
-    MPNativeAdRendererConfiguration *admobConfig = [MPGoogleAdMobNativeRenderer rendererConfigurationWithRendererSettings:settings];
-    [configurations addObjectsFromArray:@[admobConfig, flurryConfig]];
-    #endif
-
     MPNativeAdRequest *adRequest1 = [MPNativeAdRequest requestWithAdUnitIdentifier:self.info.ID rendererConfigurations:configurations];
     MPNativeAdRequestTargeting *targeting = [[MPNativeAdRequestTargeting alloc] init];
 
@@ -116,7 +106,9 @@ NSString *const kNativeAdDefaultActionViewKey = @"kNativeAdDefaultActionButtonKe
         [[MPAdPersistenceManager sharedManager] addSavedAd:self.info];
     }
 
+    [self startTimer];
     [adRequest1 startWithCompletionHandler:^(MPNativeAdRequest *request, MPNativeAd *response, NSError *error) {
+        [self endTimer];
         if (error) {
             NSLog(@"================> %@", error);
             [self configureAdLoadFail];

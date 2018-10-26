@@ -1,8 +1,9 @@
 //
 //  MPAdTableViewController.m
-//  MoPub
 //
-//  Copyright (c) 2013 MoPub. All rights reserved.
+//  Copyright 2018 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPAdTableViewController.h"
@@ -10,7 +11,6 @@
 #import "MPAdSection.h"
 #import "MPBannerAdDetailViewController.h"
 #import "MPInterstitialAdDetailViewController.h"
-#import "MPManualAdViewController.h"
 #import "MPMRectBannerAdDetailViewController.h"
 #import "MPLeaderboardBannerAdDetailViewController.h"
 #import "MPNativeAdDetailViewController.h"
@@ -22,6 +22,7 @@
 #import "MPNativeAdPlacerPageViewController.h"
 #import "MPSampleAppLogReader.h"
 #import "MPRewardedVideoAdDetailViewController.h"
+#import "MoPub.h"
 
 @interface MPAdTableViewController () <UIAlertViewDelegate, UIActionSheetDelegate>
 
@@ -89,11 +90,6 @@
     [infoAV show];
 }
 
-- (void)didTapManualButton:(id)sender
-{
-    [self.navigationController pushViewController:[[MPManualAdViewController alloc] init] animated:YES];
-}
-
 - (void)didTapNewAdButton:(id)sender
 {
     [self.navigationController pushViewController:[[MPAdEntryViewController alloc] init] animated:YES];
@@ -104,6 +100,22 @@
     [super viewWillAppear:animated];
 
     [self.tableView reloadData];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+
+    // Attempt to load/show the consent dialog if needed
+    if ([MoPub sharedInstance].shouldShowConsentDialog) {
+        __weak __typeof__(self) weakSelf = self;
+        [[MoPub sharedInstance] loadConsentDialogWithCompletion:^(NSError *error){
+            if (error == nil) {
+                [[MoPub sharedInstance] showConsentDialogFromViewController:weakSelf completion:nil];
+            } else {
+                NSLog(@"MoPubSampleApp failed to load consent dialog with error: %@", error);
+            }
+        }];
+    }
 }
 
 - (void)loadAd:(MPAdInfo *)info

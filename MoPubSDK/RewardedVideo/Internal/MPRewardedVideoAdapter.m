@@ -1,18 +1,21 @@
 //
 //  MPRewardedVideoAdapter.m
-//  MoPubSDK
 //
-//  Copyright (c) 2015 MoPub. All rights reserved.
+//  Copyright 2018 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPRewardedVideoAdapter.h"
 
 #import "MPAdConfiguration.h"
+#import "MPAdServerURLBuilder.h"
+#import "MPAdTargeting.h"
 #import "MPAnalyticsTracker.h"
 #import "MPCoreInstanceProvider.h"
+#import "MPError.h"
 #import "MPRewardedVideoError.h"
 #import "MPRewardedVideoCustomEvent.h"
-#import "MPInstanceProvider.h"
 #import "MPLogging.h"
 #import "MPTimer.h"
 #import "MPRewardedVideoReward.h"
@@ -22,12 +25,7 @@
 #import "MPMoPubRewardedPlayableCustomEvent.h"
 #import "MPRealTimeTimer.h"
 #import "NSString+MPAdditions.h"
-#import "WBFunnelKeys.h"
-#import "WBFunnelManager.h"
-#import "WBIncentivizedProxy.h"
-#import "WBFunnel.h"
 
-static const NSString *kRewardedVideoApiVersion = @"1";
 static const NSUInteger kExcessiveCustomDataLength = 8196;
 
 @interface MPRewardedVideoAdapter () <MPRewardedVideoCustomEventDelegate>
@@ -42,17 +40,16 @@ static const NSUInteger kExcessiveCustomDataLength = 8196;
 // Since we only notify the application of one success per load, we also only notify the application of one expiration per success.
 @property (nonatomic, assign) BOOL hasExpired;
 @property (nonatomic, strong) MPRealTimeTimer *expirationTimer;
-@property (nonatomic, copy) NSString * urlEncodedCustomData;
+@property (nonatomic, copy) NSString * customData;
 
 @end
 
 @implementation MPRewardedVideoAdapter
-WBIncentivizedProxy *incentivizedProxy;
+
 - (instancetype)initWithDelegate:(id<MPRewardedVideoAdapterDelegate>)delegate
 {
     if (self = [super init]) {
         _delegate = delegate;
-        incentivizedProxy = [WBIncentivizedProxy alloc];
     }
 
     return self;
@@ -71,29 +68,24 @@ WBIncentivizedProxy *incentivizedProxy;
     [[MPCoreInstanceProvider sharedProvider] keepObjectAliveForCurrentRunLoopIteration:_rewardedVideoCustomEvent];
 }
 
-- (void)getAdWithConfiguration:(MPAdConfiguration *)configuration
+- (void)getAdWithConfiguration:(MPAdConfiguration *)configuration targeting:(MPAdTargeting *)targeting
 {
     MPLogInfo(@"Looking for custom event class named %@.", configuration.customEventClass);
 
     self.configuration = configuration;
-
-    self.rewardedVideoCustomEvent = [[MPInstanceProvider sharedProvider] buildRewardedVideoCustomEventFromCustomClass:configuration.customEventClass delegate:self];
-
-    incentivizedProxy.delegate = self;
-    self.rewardedVideoCustomEvent.delegate = incentivizedProxy;
-    incentivizedProxy.attemptStart = [NSDate date];
-    [[[WBFunnelManager sharedManager] getFunnelForKey:[LoadIncentivizedKey stringByAppendingString:self.adUnitId]]
-            adNetworkResolver:NSStringFromClass(configuration.customEventClass)];
-    [incentivizedProxy setFunnelForAdUnit:self.adUnitId];
-    [incentivizedProxy setAttemptIdAndPostAttemptedEvent];
-
-    if (self.rewardedVideoCustomEvent) {
-        [self startTimeoutTimer];
-        [self.rewardedVideoCustomEvent requestRewardedVideoWithCustomEventInfo:configuration.customEventClassData];
-    } else {
+    MPRewardedVideoCustomEvent *customEvent = [[configuration.customEventClass alloc] init];
+    if (![customEvent isKindOfClass:[MPRewardedVideoCustomEvent class]]) {
+        MPLogError(@"**** Custom Event Class: %@ does not extend MPRewardedVideoCustomEvent ****", NSStringFromClass(configuration.customEventClass));
         NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorInvalidCustomEvent userInfo:nil];
-        [self.delegate rewardedVideoDidFailToLoadForAdapter:self error:error];
+        [self.delegate rewardedVideoDidFailToLoadForAdapter:nil error:error];
+        return;
     }
+    customEvent.delegate = self;
+    customEvent.localExtras = targeting.localExtras;
+
+    self.rewardedVideoCustomEvent = customEvent;
+    [self startTimeoutTimer];
+    [self.rewardedVideoCustomEvent requestRewardedVideoWithCustomEventInfo:configuration.customEventClassData adMarkup:configuration.advancedBidPayload];
 }
 
 - (BOOL)hasAdAvailable
@@ -112,7 +104,7 @@ WBIncentivizedProxy *incentivizedProxy;
             MPLogWarn(@"Custom data length %ld exceeds the receommended maximum length of %ld characters.", customDataLength, kExcessiveCustomDataLength);
         }
 
-        self.urlEncodedCustomData = [customData mp_URLEncodedString];
+        self.customData = customData;
     }
 
     [self.rewardedVideoCustomEvent presentRewardedVideoFromViewController:viewController];
@@ -142,8 +134,9 @@ WBIncentivizedProxy *incentivizedProxy;
 
 - (void)timeout
 {
-    NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorTimeout userInfo:nil];
+    NSError * error = [MOPUBError errorWithCode:MOPUBErrorAdRequestTimedOut localizedDescription:@"Rewarded video ad request timed out"];
     [self.delegate rewardedVideoDidFailToLoadForAdapter:self error:error];
+    self.delegate = nil;
 }
 
 - (void)didStopLoading
@@ -153,44 +146,31 @@ WBIncentivizedProxy *incentivizedProxy;
 
 - (NSURL *)rewardedVideoCompletionUrlByAppendingClientParams
 {
-    NSString *finalCompletionUrlString = self.configuration.rewardedVideoCompletionUrl;
-    if ([self.delegate respondsToSelector:@selector(rewardedVideoCustomerId)] && [self.delegate rewardedVideoCustomerId].length > 0) {
-        // self.configuration.rewardedVideoCompletionUrl is already url encoded. Only the customer_id added by the client needs url encoding.
-        NSString *urlEncodedCustomerId = [[self.delegate rewardedVideoCustomerId] mp_URLEncodedString];
-        finalCompletionUrlString = [NSString stringWithFormat:@"%@&customer_id=%@", finalCompletionUrlString, urlEncodedCustomerId];
-    }
-    finalCompletionUrlString = [NSString stringWithFormat:@"%@&nv=%@&v=%@", finalCompletionUrlString, [MP_SDK_VERSION mp_URLEncodedString], kRewardedVideoApiVersion];
+    NSString * sourceCompletionUrl = self.configuration.rewardedVideoCompletionUrl;
+    NSString * customerId = ([self.delegate respondsToSelector:@selector(rewardedVideoCustomerId)] ? [self.delegate rewardedVideoCustomerId] : nil);
+    MPRewardedVideoReward * reward = (self.configuration.selectedReward != nil && ![self.configuration.selectedReward.currencyType isEqualToString:kMPRewardedVideoRewardCurrencyTypeUnspecified] ? self.configuration.selectedReward : nil);
+    NSString * customEventName = NSStringFromClass([self.rewardedVideoCustomEvent class]);
 
-    if (self.configuration.selectedReward && ![self.configuration.selectedReward.currencyType isEqualToString:kMPRewardedVideoRewardCurrencyTypeUnspecified]) {
-        finalCompletionUrlString = [NSString stringWithFormat:@"%@&rcn=%@&rca=%i", finalCompletionUrlString, [self.configuration.selectedReward.currencyType mp_URLEncodedString], [self.configuration.selectedReward.amount intValue]];
-    }
-
-    // Append URL encoded custom event class name
-    if (self.rewardedVideoCustomEvent != nil) {
-        NSString * networkClassName = [NSStringFromClass([self.rewardedVideoCustomEvent class]) mp_URLEncodedString];
-        finalCompletionUrlString = [NSString stringWithFormat:@"%@&cec=%@", finalCompletionUrlString, networkClassName];
-    }
-
-    // Append URL encoded custom data
-    if (self.urlEncodedCustomData != nil) {
-        finalCompletionUrlString = [NSString stringWithFormat:@"%@&rcd=%@", finalCompletionUrlString, self.urlEncodedCustomData];
-    }
-
-    return [NSURL URLWithString:finalCompletionUrlString];
+    return [MPAdServerURLBuilder rewardedCompletionUrl:sourceCompletionUrl
+                                        withCustomerId:customerId
+                                            rewardType:reward.currencyType
+                                          rewardAmount:reward.amount
+                                       customEventName:customEventName
+                                        additionalData:self.customData];
 }
 
 #pragma mark - Metrics
 
 - (void)trackImpression
 {
-    [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackImpressionForConfiguration:self.configuration];
+    [[MPAnalyticsTracker sharedTracker] trackImpressionForConfiguration:self.configuration];
     self.hasTrackedImpression = YES;
     [self.expirationTimer invalidate];
 }
 
 - (void)trackClick
 {
-    [[[MPCoreInstanceProvider sharedProvider] sharedMPAnalyticsTracker] trackClickForConfiguration:self.configuration];
+    [[MPAnalyticsTracker sharedTracker] trackClickForConfiguration:self.configuration];
 }
 
 #pragma mark - MPRewardedVideoCustomEventDelegate

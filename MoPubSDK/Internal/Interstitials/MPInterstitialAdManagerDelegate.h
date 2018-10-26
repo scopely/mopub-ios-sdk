@@ -1,8 +1,9 @@
 //
 //  MPInterstitialAdManagerDelegate.h
-//  MoPub
 //
-//  Copyright (c) 2013 MoPub. All rights reserved.
+//  Copyright 2018 Twitter, Inc.
+//  Licensed under the MoPub SDK License Agreement
+//  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <Foundation/Foundation.h>
@@ -16,9 +17,13 @@
 - (MPInterstitialAdController *)interstitialAdController;
 - (CLLocation *)location;
 - (id)interstitialDelegate;
+
+- (void)managerWillStartInterstitialAttempt:(MPInterstitialAdManager *)manager;
+- (void)managerDidSucceedInterstitialAttempt:(MPInterstitialAdManager *)manager;
+- (void)manager:(MPInterstitialAdManager *)manager didFailInterstitialAttemptWithError:(NSError*)error;
+
 - (void)managerDidLoadInterstitial:(MPInterstitialAdManager *)manager;
-- (void)manager:(MPInterstitialAdManager *)manager
-didFailToLoadInterstitialWithError:(NSError *)error;
+- (void)manager:(MPInterstitialAdManager *)manager didFailToLoadInterstitialWithError:(NSError *)error;
 - (void)managerWillPresentInterstitial:(MPInterstitialAdManager *)manager;
 - (void)managerDidPresentInterstitial:(MPInterstitialAdManager *)manager;
 - (void)managerWillDismissInterstitial:(MPInterstitialAdManager *)manager;
