@@ -203,10 +203,6 @@
     return [NSMutableArray arrayWithArray:[[self class] sharedInterstitials].allValues];
 }
 
-- (NSString *)getCreativeId {
-    return [_manager getDspCreativeId];
-}
-
 + (void)removeSharedInterstitialAdController:(MPInterstitialAdController *)controller
 {
     @synchronized(self) {

@@ -26,5 +26,4 @@
 - (void)loadInterstitialWithAdUnitID:(NSString *)ID targeting:(MPAdTargeting *)targeting;
 - (void)presentInterstitialFromViewController:(UIViewController *)controller;
 
-- (NSString *)getDspCreativeId;
 @end

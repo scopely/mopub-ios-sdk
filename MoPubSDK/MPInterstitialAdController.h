@@ -145,8 +145,6 @@
  */
 + (void)removeSharedInterstitialAdController:(MPInterstitialAdController *)controller;
 
-- (NSString *)getCreativeId;
-
 /*
  * Returns the shared pool of interstitial objects for your application.
  */

@@ -15,10 +15,6 @@
 #import "MPLogging.h"
 #import "MPAdImpressionTimer.h"
 #import "MPBannerCustomEvent+Internal.h"
-#import "WBBannerProxy.h"
-#import "WBFunnelManager.h"
-#import "WBFunnelKeys.h"
-#import "WBFunnel.h"
 
 @interface MPBannerCustomEventAdapter () <MPAdImpressionTimerDelegate>
 
@@ -42,7 +38,7 @@ WBBannerProxy *bannerProxy;
     if (!configuration.customEventClass) {
         return nil;
     }
-    return [[self initWithDelegate:delegate] withBannerProxy:[WBBannerProxy alloc]];
+    return [self initWithDelegate:delegate];
 }
 
 - (instancetype)withBannerProxy:(WBBannerProxy *)proxy {
@@ -81,20 +77,9 @@ WBBannerProxy *bannerProxy;
 
 
     self.bannerCustomEvent = customEvent;
-<<<<<<< HEAD
-    bannerProxy.delegate = self;
-    customEvent.delegate = bannerProxy;
-    bannerProxy.attemptStart = [NSDate date];
-
-    [[[WBFunnelManager sharedManager] getFunnelForKey:ExistingBannerKey] adNetworkResolver: NSStringFromClass(configuration.customEventClass)];
-    [bannerProxy setFunnel];
-    [bannerProxy setAttemptIdAndPostAttemptedEvent];
-    [self.bannerCustomEvent requestAdWithSize:size customEventInfo:configuration.customEventClassData];
-=======
     self.bannerCustomEvent.delegate = self;
     self.bannerCustomEvent.localExtras = targeting.localExtras;
     [self.bannerCustomEvent requestAdWithSize:size customEventInfo:configuration.customEventClassData adMarkup:configuration.advancedBidPayload];
->>>>>>> sync-mopub
 }
 
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation
