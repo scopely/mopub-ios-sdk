@@ -118,6 +118,10 @@ NSString * const kAdvancedBiddingMarkupMetadataKey = @"adm";
 
 - (id)initWithMetadata:(NSDictionary *)metadata data:(NSData *)data
 {
+    for(NSString *key in [metadata allKeys]) {
+        NSLog(@"%@",[metadata objectForKey:key]);
+    }
+    
     self = [super init];
     if (self) {
         self.adResponseData = data;

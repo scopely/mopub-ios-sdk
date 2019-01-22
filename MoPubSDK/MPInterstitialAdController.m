@@ -69,6 +69,7 @@
 
 - (void)loadAd
 {
+    NSLog(@"**** >> MPInterstitialAdController loadAd");
     [self.manager loadInterstitialWithAdUnitID:self.adUnitId
                                       keywords:self.keywords
                               userDataKeywords:self.userDataKeywords
