@@ -255,9 +255,9 @@ typedef enum
  * This method is called after an ad attempt succeeds to load.
  *
  * @param view The ad view sending the message.
- * @param creativeId The id of the creative loaded.
+ * @param extraInfo extra info to be forwarded.
  */
-- (void)bannerDidSucceedAttemptForAd:(MPAdView *)view withCreativeId:(NSString*)creativeId;
+- (void)bannerDidSucceedAttemptForAd:(MPAdView *)view withExtraInfo:(NSString*)extraInfo;
 
 /**
  * This method is called after an ad attempt fails to load.
