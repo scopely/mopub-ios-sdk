@@ -70,9 +70,8 @@
     return self.configuration.dspCreativeId;
 }
 
-- (NSString*)lineItemId
-{
-    return self.configuration.lineItemId;
+- (NSString*)loadExtraInfo {
+    return self.configuration.getLoadExtraInfo;
 }
 
 - (BOOL)hasAdAvailable

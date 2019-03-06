@@ -20,7 +20,7 @@
 
 @property (nonatomic, readonly) Class customEventClass;
 @property (nonatomic, readonly) NSString* dspCreativeId;
-@property (nonatomic, readonly) NSString* lineItemId;
+@property (nonatomic, readonly) NSString* loadExtraInfo;
 
 - (id)initWithDelegate:(id<MPInterstitialAdManagerDelegate>)delegate;
 

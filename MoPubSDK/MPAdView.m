@@ -161,8 +161,7 @@
 - (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager
 {
     if ([self.delegate respondsToSelector:@selector(bannerDidSucceedAttemptForAd:withExtraInfo:)]) {
-        NSString *info = [NSString stringWithFormat:@"%@:%@", [manager dspCreativeId], [manager lineItemId]];
-        [self.delegate bannerDidSucceedAttemptForAd:self withExtraInfo:info];
+        [self.delegate bannerDidSucceedAttemptForAd:self withExtraInfo:[manager loadExtraInfo]];
     }
 }
 

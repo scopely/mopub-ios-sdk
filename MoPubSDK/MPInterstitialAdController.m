@@ -127,8 +127,7 @@
 - (void)managerDidSucceedInterstitialAttempt:(MPInterstitialAdManager *)manager
 {
     if ([self.delegate respondsToSelector:@selector(interstitialDidSucceedAttemptToLoadAd:withExtraInfo:)]) {
-        NSString *info = [NSString stringWithFormat:@"%@:%@", [manager dspCreativeId], [manager lineItemId]];
-        [self.delegate interstitialDidSucceedAttemptToLoadAd:self withExtraInfo:info];
+        [self.delegate interstitialDidSucceedAttemptToLoadAd:self withExtraInfo:[manager loadExtraInfo]];
     }
 }
 

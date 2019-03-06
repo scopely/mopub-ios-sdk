@@ -209,8 +209,7 @@ static MPRewardedVideo *gSharedInstance = nil;
 {
     id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
     if ([delegate respondsToSelector:@selector(rewardedVideoDidSucceedAttemptForAdUnitID:withExtraInfo:)]) {
-        NSString *info = [NSString stringWithFormat:@"%@:%@", [manager dspCreativeId], [manager lineItemId]];
-        [delegate rewardedVideoDidSucceedAttemptForAdUnitID:manager.adUnitID withExtraInfo:info];
+        [delegate rewardedVideoDidSucceedAttemptForAdUnitID:manager.adUnitID withExtraInfo:[manager loadExtraInfo]];
     }
 }
 
