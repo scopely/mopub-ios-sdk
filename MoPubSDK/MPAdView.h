@@ -257,7 +257,7 @@ typedef enum
  * @param view The ad view sending the message.
  * @param extraInfo extra info to be forwarded.
  */
-- (void)bannerDidSucceedAttemptForAd:(MPAdView *)view withExtraInfo:(NSString*)extraInfo;
+- (void)bannerDidSucceedAttemptForAd:(MPAdView *)view withCreativeId:(NSString*)creativeId withLineItemId:(NSString*)lineItemId;
 
 /**
  * This method is called after an ad attempt fails to load.

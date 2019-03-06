@@ -121,7 +121,6 @@ extern NSString * const kBannerImpressionMinPixelMetadataKey;
 
 - (BOOL)hasPreferredSize;
 - (NSString *)adResponseHTMLString;
-- (NSString *)getLoadExtraInfo;
 - (NSArray <NSURL *> *)afterLoadUrlsWithLoadDuration:(NSTimeInterval)duration loadResult:(MPAfterLoadResult)result;
 
 @end

@@ -191,7 +191,7 @@
  * @param adUnitID The ad unit ID of the ad associated with the event.
  * @param extraInfo extra info to be forwarded.
  */
-- (void)rewardedVideoDidSucceedAttemptForAdUnitID:(NSString *)adUnitID withExtraInfo:(NSString *)extraInfo;
+- (void)rewardedVideoDidSucceedAttemptForAdUnitID:(NSString *)adUnitID withCreativeId:(NSString*)creativeId withLineItemId:(NSString*)lineItemId
 
 /**
  * This method is called after an ad attempt fails to load.

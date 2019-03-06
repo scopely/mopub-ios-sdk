@@ -107,8 +107,8 @@
     return self.requestingConfiguration.dspCreativeId;
 }
 
-- (NSString*)loadExtraInfo {
-    return self.requestingConfiguration.getLoadExtraInfo;
+- (NSString*)lineItemId {
+    return self.requestingConfiguration.lineItemId;
 }
 
 - (void)loadAdWithTargeting:(MPAdTargeting *)targeting

@@ -160,8 +160,8 @@
 
 - (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager
 {
-    if ([self.delegate respondsToSelector:@selector(bannerDidSucceedAttemptForAd:withExtraInfo:)]) {
-        [self.delegate bannerDidSucceedAttemptForAd:self withExtraInfo:[manager loadExtraInfo]];
+    if ([self.delegate respondsToSelector:@selector(bannerDidSucceedAttemptForAd:withCreativeId:withLineItemId:)]) {
+        [self.delegate bannerDidSucceedAttemptForAd:self withCreativeId:[manager dspCreativeId] withLineItemId: [manager lineItemId]];
     }
 }
 

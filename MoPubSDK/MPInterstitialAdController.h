@@ -183,7 +183,7 @@
  * @param interstitial The interstitial ad object sending the message.
  * @param extraInfo extra info to be forwarded.
  */
-- (void)interstitialDidSucceedAttemptToLoadAd:(MPInterstitialAdController *)interstitial withExtraInfo:(NSString*)extraInfo;
+- (void)interstitialDidSucceedAttemptToLoadAd:(MPInterstitialAdController *)interstitial withCreativeId:(NSString*)creativeId withLineItemId:lineItemId;
 
 /**
  * This method is called after an ad attempt fails to load.

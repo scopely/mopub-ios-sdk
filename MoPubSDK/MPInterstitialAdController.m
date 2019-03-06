@@ -126,8 +126,8 @@
 
 - (void)managerDidSucceedInterstitialAttempt:(MPInterstitialAdManager *)manager
 {
-    if ([self.delegate respondsToSelector:@selector(interstitialDidSucceedAttemptToLoadAd:withExtraInfo:)]) {
-        [self.delegate interstitialDidSucceedAttemptToLoadAd:self withExtraInfo:[manager loadExtraInfo]];
+    if ([self.delegate respondsToSelector:@selector(interstitialDidSucceedAttemptToLoadAd:withCreativeId:withLineItemId:)]) {
+        [self.delegate interstitialDidSucceedAttemptToLoadAd:self withCreativeId:[manager dspCreativeId] withLineItemId:[manager lineItemId]];
     }
 }
 

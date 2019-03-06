@@ -23,7 +23,7 @@
 @property (nonatomic, strong) NSArray *mediationSettings;
 @property (nonatomic, copy) NSString *customerId;
 @property (nonatomic, readonly) NSString *dspCreativeId;
-@property (nonatomic, readonly) NSString* loadExtraInfo;
+@property (nonatomic, readonly) NSString *lineItemId;
 @property (nonatomic, strong) MPAdTargeting *targeting;
 
 /**

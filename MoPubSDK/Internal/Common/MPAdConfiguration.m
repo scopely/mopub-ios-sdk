@@ -320,10 +320,6 @@ NSString * const kAdvancedBiddingMarkupMetadataKey = @"adm";
     return _adResponseHTMLString;
 }
 
-- (NSString *)getLoadExtraInfo {
-    return [NSString stringWithFormat:@"%@:%@", [self dspCreativeId], [self lineItemId]];
-}
-
 - (NSArray <NSURL *> *)afterLoadUrlsWithLoadDuration:(NSTimeInterval)duration loadResult:(MPAfterLoadResult)result
 {
     NSArray <NSString *> * afterLoadUrls = [self concatenateBaseUrlArray:self.afterLoadUrlsWithMacros
