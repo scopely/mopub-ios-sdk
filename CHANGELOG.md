@@ -1,3 +1,7 @@
+## Version 5.5.0.1 (March 11, 2019)
+- **Features**
+  - Interstitial, Rewarded Video and Banner now return the line item id alongside with the creative id.
+
 ## Version 5.5.0 (January 28, 2019)
 - **Features**
   - Advanced Bidding automatically initializes
