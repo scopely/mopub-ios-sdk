@@ -181,7 +181,8 @@
  * This method is called after an ad attempt succeeds to load.
  *
  * @param interstitial The interstitial ad object sending the message.
- * @param extraInfo extra info to be forwarded.
+ * @param creativeId The id of the creative loaded
+ * @param lineItemId The id of line item the ad belongs to.
  */
 - (void)interstitialDidSucceedAttemptToLoadAd:(MPInterstitialAdController *)interstitial withCreativeId:(NSString*)creativeId withLineItemId:lineItemId;
 
