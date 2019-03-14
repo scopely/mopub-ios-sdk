@@ -160,9 +160,8 @@
 
 - (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager
 {
-    if ([self.delegate respondsToSelector:@selector(bannerDidSucceedAttemptForAd:withCreativeId:)]) {
-        NSString *creativeId = [manager dspCreativeId];
-        [self.delegate bannerDidSucceedAttemptForAd:self withCreativeId:creativeId];
+    if ([self.delegate respondsToSelector:@selector(bannerDidSucceedAttemptForAd:withCreativeId:withLineItemId:)]) {
+        [self.delegate bannerDidSucceedAttemptForAd:self withCreativeId:[manager dspCreativeId] withLineItemId: [manager lineItemId]];
     }
 }
 

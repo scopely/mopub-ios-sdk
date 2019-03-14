@@ -189,9 +189,10 @@
  * This method is called after an ad attempt succeeds to load.
  *
  * @param adUnitID The ad unit ID of the ad associated with the event.
- * @param creativeId The id of the creative loaded.
+ * @param creativeId The id of the creative loaded
+ * @param lineItemId The id of line item the ad belongs to.
  */
-- (void)rewardedVideoDidSucceedAttemptForAdUnitID:(NSString *)adUnitID creativeId:(NSString *)creativeId;
+- (void)rewardedVideoDidSucceedAttemptForAdUnitID:(NSString *)adUnitID withCreativeId:(NSString*)creativeId withLineItemId:(NSString*)lineItemId;
 
 /**
  * This method is called after an ad attempt fails to load.

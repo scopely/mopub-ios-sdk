@@ -70,6 +70,9 @@
     return self.configuration.dspCreativeId;
 }
 
+- (NSString*)lineItemId {
+    return self.configuration.lineItemId;
+}
 
 - (BOOL)hasAdAvailable
 {
