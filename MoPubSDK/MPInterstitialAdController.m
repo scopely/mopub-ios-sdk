@@ -117,17 +117,16 @@
 
 - (void)managerWillStartInterstitialAttempt:(MPInterstitialAdManager *)manager
 {
-    if ([self.delegate respondsToSelector:@selector(interstitialWillStartAttemptToLoadAd:customEventClass:)]) {
+    if ([self.delegate respondsToSelector:@selector(interstitialWillStartAttemptToLoadAd:customEventClass:withLineItemId:)]) {
         NSString *customEventClass = NSStringFromClass([manager customEventClass]);
-        [self.delegate interstitialWillStartAttemptToLoadAd:self customEventClass:customEventClass];
+        [self.delegate interstitialWillStartAttemptToLoadAd:self customEventClass:customEventClass withLineItemId:[manager lineItemId]];
     }
 }
 
 - (void)managerDidSucceedInterstitialAttempt:(MPInterstitialAdManager *)manager
 {
-    if ([self.delegate respondsToSelector:@selector(interstitialDidSucceedAttemptToLoadAd:creativeId:)]) {
-        NSString *creativeId = [manager dspCreativeId];
-        [self.delegate interstitialDidSucceedAttemptToLoadAd:self creativeId:creativeId];
+    if ([self.delegate respondsToSelector:@selector(interstitialDidSucceedAttemptToLoadAd:withCreativeId:)]) {
+        [self.delegate interstitialDidSucceedAttemptToLoadAd:self withCreativeId:[manager dspCreativeId]];
     }
 }
 

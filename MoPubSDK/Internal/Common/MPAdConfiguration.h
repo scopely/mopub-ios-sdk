@@ -94,6 +94,7 @@ extern NSString * const kBannerImpressionMinPixelMetadataKey;
 @property (nonatomic, assign) BOOL isVastVideoPlayer;
 @property (nonatomic, strong) NSDate *creationTimestamp;
 @property (nonatomic, copy) NSString *creativeId;
+@property (nonatomic, copy) NSString *lineItemId;
 @property (nonatomic, copy) NSString *metadataAdType;
 @property (nonatomic, assign) NSInteger nativeVideoPlayVisiblePercent;
 @property (nonatomic, assign) NSInteger nativeVideoPauseVisiblePercent;

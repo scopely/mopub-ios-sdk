@@ -199,18 +199,17 @@ static MPRewardedVideo *gSharedInstance = nil;
 - (void)rewardedVideoWillStartAttemptForAdManager:(MPRewardedVideoAdManager *)manager
 {
     id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
-    if ([delegate respondsToSelector:@selector(rewardedVideoWillStartAttemptForAdUnitID:customEventClass:)]) {
+    if ([delegate respondsToSelector:@selector(rewardedVideoWillStartAttemptForAdUnitID:customEventClass:withLineItemId:)]) {
         NSString *customEventClass = NSStringFromClass([manager customEventClass]);
-        [delegate rewardedVideoWillStartAttemptForAdUnitID:manager.adUnitID customEventClass:customEventClass];
+        [delegate rewardedVideoWillStartAttemptForAdUnitID:manager.adUnitID customEventClass:customEventClass withLineItemId:[manager lineItemId]];
     }
 }
 
 - (void)rewardedVideoDidSucceedAttemptForAdManager:(MPRewardedVideoAdManager *)manager
 {
     id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
-    if ([delegate respondsToSelector:@selector(rewardedVideoDidSucceedAttemptForAdUnitID:creativeId:)]) {
-        NSString *creativeId = [manager dspCreativeId];
-        [delegate rewardedVideoDidSucceedAttemptForAdUnitID:manager.adUnitID creativeId:creativeId];
+    if ([delegate respondsToSelector:@selector(rewardedVideoDidSucceedAttemptForAdUnitID:withCreativeId:)]) {
+        [delegate rewardedVideoDidSucceedAttemptForAdUnitID:manager.adUnitID withCreativeId:[manager dspCreativeId]];
     }
 }
 

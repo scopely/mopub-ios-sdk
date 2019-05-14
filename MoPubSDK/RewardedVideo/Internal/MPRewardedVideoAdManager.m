@@ -70,6 +70,10 @@
     return self.configuration.dspCreativeId;
 }
 
+- (NSString*)lineItemId {
+    return self.configuration.lineItemId;
+}
+
 - (BOOL)hasAdAvailable
 {
     //An Ad is not ready or has expired.

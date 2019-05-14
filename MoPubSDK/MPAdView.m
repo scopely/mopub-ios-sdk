@@ -152,17 +152,16 @@
 
 - (void)bannerWillStartAttemptForAdManager:(MPBannerAdManager *)manager
 {
-    if ([self.delegate respondsToSelector:@selector(bannerWillStartAttemptForAd:withCustomEventClass:)]) {
+    if ([self.delegate respondsToSelector:@selector(bannerWillStartAttemptForAd:withCustomEventClass:withLineItemId:)]) {
         NSString *customEventClass = NSStringFromClass([manager customEventClass]);
-        [self.delegate bannerWillStartAttemptForAd:self withCustomEventClass:customEventClass];
+        [self.delegate bannerWillStartAttemptForAd:self withCustomEventClass:customEventClass withLineItemId: [manager lineItemId]];
     }
 }
 
 - (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager
 {
     if ([self.delegate respondsToSelector:@selector(bannerDidSucceedAttemptForAd:withCreativeId:)]) {
-        NSString *creativeId = [manager dspCreativeId];
-        [self.delegate bannerDidSucceedAttemptForAd:self withCreativeId:creativeId];
+        [self.delegate bannerDidSucceedAttemptForAd:self withCreativeId:[manager dspCreativeId]];
     }
 }
 
