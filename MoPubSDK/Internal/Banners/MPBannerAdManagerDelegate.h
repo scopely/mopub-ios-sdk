@@ -22,10 +22,15 @@
 
 - (void)invalidateContentView;
 
+- (void)bannerWillStartAttemptForAdManager:(MPBannerAdManager *)manager;
+- (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager;
+- (void)bannerDidFailAttemptForAdManager:(MPBannerAdManager *)manager error:(NSError*)error;
+
 - (void)managerDidLoadAd:(UIView *)ad;
 - (void)managerDidFailToLoadAd;
 - (void)userActionWillBegin;
 - (void)userActionDidFinish;
 - (void)userWillLeaveApplication;
+- (void)managerRefreshAd:(UIView *)ad;
 
 @end

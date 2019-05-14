@@ -26,7 +26,7 @@
 @interface MPInterstitialAdManager ()
 
 @property (nonatomic, assign) BOOL loading;
-@property (nonatomic, assign, readwrite) BOOL ready;
+@property (nonatomic, assign) BOOL ready;
 @property (nonatomic, strong) MPBaseInterstitialAdapter *adapter;
 @property (nonatomic, strong) MPAdServerCommunicator *communicator;
 @property (nonatomic, strong) MPAdConfiguration *requestingConfiguration;
@@ -65,6 +65,16 @@
     [self.communicator setDelegate:nil];
 
     self.adapter = nil;
+}
+
+- (Class)customEventClass
+{
+    return self.requestingConfiguration.customEventClass;
+}
+
+- (NSString*)dspCreativeId
+{
+    return self.requestingConfiguration.dspCreativeId;
 }
 
 - (void)setAdapter:(MPBaseInterstitialAdapter *)adapter
@@ -191,6 +201,8 @@
         return;
     }
 
+    [self.delegate managerWillStartInterstitialAttempt:self];
+    
     MPBaseInterstitialAdapter *adapter = [[MPInterstitialCustomEventAdapter alloc] initWithDelegate:self];
     self.adapter = adapter;
     [self.adapter _getAdWithConfiguration:configuration targeting:self.targeting];
@@ -208,6 +220,8 @@
 
 - (void)adapterDidFinishLoadingAd:(MPBaseInterstitialAdapter *)adapter
 {
+    [self.delegate managerDidSucceedInterstitialAttempt:self];
+    
     self.remainingConfigurations = nil;
     self.ready = YES;
     self.loading = NO;
@@ -222,6 +236,8 @@
 
 - (void)adapter:(MPBaseInterstitialAdapter *)adapter didFailToLoadAdWithError:(NSError *)error
 {
+    [self.delegate manager:self didFailInterstitialAttemptWithError:error];
+    
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker
     // with the appropriate error code result.
     NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;

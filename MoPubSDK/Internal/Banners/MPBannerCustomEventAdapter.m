@@ -32,12 +32,19 @@
 
 @implementation MPBannerCustomEventAdapter
 
+WBBannerProxy *bannerProxy;
+
 - (instancetype)initWithConfiguration:(MPAdConfiguration *)configuration delegate:(id<MPBannerAdapterDelegate>)delegate
 {
     if (!configuration.customEventClass) {
         return nil;
     }
     return [self initWithDelegate:delegate];
+}
+
+- (instancetype)withBannerProxy:(WBBannerProxy *)proxy {
+    bannerProxy = proxy;
+    return self;
 }
 
 - (void)unregisterDelegate

@@ -196,6 +196,32 @@ static MPRewardedVideo *gSharedInstance = nil;
 
 #pragma mark - MPRewardedVideoAdManagerDelegate
 
+- (void)rewardedVideoWillStartAttemptForAdManager:(MPRewardedVideoAdManager *)manager
+{
+    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
+    if ([delegate respondsToSelector:@selector(rewardedVideoWillStartAttemptForAdUnitID:customEventClass:)]) {
+        NSString *customEventClass = NSStringFromClass([manager customEventClass]);
+        [delegate rewardedVideoWillStartAttemptForAdUnitID:manager.adUnitID customEventClass:customEventClass];
+    }
+}
+
+- (void)rewardedVideoDidSucceedAttemptForAdManager:(MPRewardedVideoAdManager *)manager
+{
+    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
+    if ([delegate respondsToSelector:@selector(rewardedVideoDidSucceedAttemptForAdUnitID:creativeId:)]) {
+        NSString *creativeId = [manager dspCreativeId];
+        [delegate rewardedVideoDidSucceedAttemptForAdUnitID:manager.adUnitID creativeId:creativeId];
+    }
+}
+
+- (void)rewardedVideoDidFailAttemptForAdManager:(MPRewardedVideoAdManager *)manager error:(NSError *)error
+{
+    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
+    if ([delegate respondsToSelector:@selector(rewardedVideoDidFailAttemptForAdUnitID:error:)]) {
+        [delegate rewardedVideoDidFailAttemptForAdUnitID:manager.adUnitID error:error];
+    }
+}
+
 - (void)rewardedVideoDidLoadForAdManager:(MPRewardedVideoAdManager *)manager
 {
     id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
@@ -311,6 +337,13 @@ static MPRewardedVideo *gSharedInstance = nil;
 - (void)rewardedVideoConnectionCompleted:(MPRewardedVideoConnection *)connection url:(NSURL *)url
 {
     [self.rewardedVideoConnections removeObject:connection];
+}
+
++ (NSString*) creativeIdForAdUnitID:(NSString *)adUnitID {
+    MPRewardedVideo *sharedInstance = [[self class] sharedInstance];
+    MPRewardedVideoAdManager *adManager = sharedInstance.rewardedVideoAdManagers[adUnitID];
+    
+    return [adManager getCreativeId];
 }
 
 @end

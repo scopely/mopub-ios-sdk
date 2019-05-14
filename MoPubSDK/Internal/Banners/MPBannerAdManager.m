@@ -97,6 +97,16 @@
     return self.communicator.loading || self.requestingAdapter;
 }
 
+- (Class)customEventClass
+{
+    return self.requestingConfiguration.customEventClass;
+}
+
+- (NSString*)dspCreativeId
+{
+    return self.requestingConfiguration.dspCreativeId;
+}
+
 - (void)loadAdWithTargeting:(MPAdTargeting *)targeting
 {
     MPLogAdEvent(MPLogEvent.adLoadAttempt, self.delegate.adUnitId);
@@ -208,6 +218,7 @@
 
 - (void)refreshTimerDidFire
 {
+    [self.delegate managerRefreshAd:self.requestingAdapterAdContentView];
     if (!self.loading && self.automaticallyRefreshesContents) {
         [self loadAdWithTargeting:self.targeting];
     }
@@ -247,6 +258,7 @@
         return;
     }
 
+    [self.delegate bannerWillStartAttemptForAdManager:self];
     [self.requestingAdapter _getAdWithConfiguration:configuration targeting:self.targeting containerSize:self.delegate.containerSize];
 }
 
@@ -339,6 +351,8 @@
 
 - (void)adapter:(MPBaseBannerAdapter *)adapter didFinishLoadingAd:(UIView *)ad
 {
+    [self.delegate bannerDidSucceedAttemptForAdManager:self];
+    
     if (self.requestingAdapter == adapter) {
         self.remainingConfigurations = nil;
         self.requestingAdapterAdContentView = ad;
@@ -354,6 +368,8 @@
 
 - (void)adapter:(MPBaseBannerAdapter *)adapter didFailToLoadAdWithError:(NSError *)error
 {
+    [self.delegate bannerDidFailAttemptForAdManager:self error:error];
+    
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker
     // with the appropriate error code result.
     NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;
@@ -448,6 +464,9 @@
     [self resumeRefreshTimer];
 }
 
+- (NSString *)getDspCreativeId {
+    return [_requestingConfiguration dspCreativeId];
+}
 @end
 
 

@@ -18,6 +18,9 @@
 @property (nonatomic, weak) id<MPInterstitialAdManagerDelegate> delegate;
 @property (nonatomic, assign, readonly) BOOL ready;
 
+@property (nonatomic, readonly) Class customEventClass;
+@property (nonatomic, readonly) NSString* dspCreativeId;
+
 - (id)initWithDelegate:(id<MPInterstitialAdManagerDelegate>)delegate;
 
 - (void)loadInterstitialWithAdUnitID:(NSString *)ID targeting:(MPAdTargeting *)targeting;
