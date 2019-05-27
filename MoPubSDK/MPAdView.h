@@ -210,4 +210,6 @@ typedef enum
  */
 - (void)startAutomaticallyRefreshingContents;
 
+- (NSString *)getCreativeId;
+
 @end

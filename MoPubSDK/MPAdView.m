@@ -150,6 +150,29 @@
     [self setAdContentView:nil];
 }
 
+- (void)bannerWillStartAttemptForAdManager:(MPBannerAdManager *)manager
+{
+    if ([self.delegate respondsToSelector:@selector(bannerWillStartAttemptForAd:withCustomEventClass:)]) {
+        NSString *customEventClass = NSStringFromClass([manager customEventClass]);
+        [self.delegate bannerWillStartAttemptForAd:self withCustomEventClass:customEventClass];
+    }
+}
+
+- (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager
+{
+    if ([self.delegate respondsToSelector:@selector(bannerDidSucceedAttemptForAd:withCreativeId:)]) {
+        NSString *creativeId = [manager dspCreativeId];
+        [self.delegate bannerDidSucceedAttemptForAd:self withCreativeId:creativeId];
+    }
+}
+
+- (void)bannerDidFailAttemptForAdManager:(MPBannerAdManager *)manager error:(NSError *)error
+{
+    if ([self.delegate respondsToSelector:@selector(bannerDidFailAttemptForAd:error:)]) {
+        [self.delegate bannerDidFailAttemptForAd:self error:error];
+    }
+}
+
 - (void)managerDidFailToLoadAdWithError:(NSError *)error
 {
     if ([self.delegate respondsToSelector:@selector(adViewDidFailToLoadAd:)]) {
@@ -201,6 +224,17 @@
 - (void)impressionDidFireWithImpressionData:(MPImpressionData *)impressionData {
     if ([self.delegate respondsToSelector:@selector(mopubAd:didTrackImpressionWithImpressionData:)]) {
         [self.delegate mopubAd:self didTrackImpressionWithImpressionData:impressionData];
+    }
+}
+
+- (NSString *)getCreativeId {
+    return [_adManager getDspCreativeId];
+}
+
+- (void)managerRefreshAd:(UIView *)ad
+{
+    if ([self.delegate respondsToSelector:@selector(adViewRefreshAd:)]) {
+        [self.delegate adViewRefreshAd:self];
     }
 }
 
