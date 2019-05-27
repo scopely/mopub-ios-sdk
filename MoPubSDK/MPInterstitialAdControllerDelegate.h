@@ -30,8 +30,9 @@
  *
  * @param interstitial The interstitial ad object sending the message.
  * @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
+ * @param lineItemId The id of line item the ad belongs to.
  */
-- (void)interstitialWillStartAttemptToLoadAd:(MPInterstitialAdController *)interstitial customEventClass:(NSString*)customEventClass;
+- (void)interstitialWillStartAttemptToLoadAd:(MPInterstitialAdController *)interstitial customEventClass:(NSString*)customEventClass withLineItemId:(NSString*)lineItemId;
 
 /**
  * This method is called after an ad attempt succeeds to load.
@@ -39,7 +40,7 @@
  * @param interstitial The interstitial ad object sending the message.
  * @param creativeId The id of the creative loaded.
  */
-- (void)interstitialDidSucceedAttemptToLoadAd:(MPInterstitialAdController *)interstitial creativeId:(NSString*)creativeId;
+- (void)interstitialDidSucceedAttemptToLoadAd:(MPInterstitialAdController *)interstitial withCreativeId:(NSString*)creativeId;
 
 /**
  * This method is called after an ad attempt fails to load.

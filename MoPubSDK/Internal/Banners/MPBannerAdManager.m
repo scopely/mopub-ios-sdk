@@ -99,6 +99,10 @@
     return self.requestingConfiguration.dspCreativeId;
 }
 
+- (NSString*)lineItemId {
+    return self.requestingConfiguration.lineItemId;
+}
+
 - (void)loadAdWithTargeting:(MPAdTargeting *)targeting
 {
     MPLogAdEvent(MPLogEvent.adLoadAttempt, self.delegate.adUnitId);

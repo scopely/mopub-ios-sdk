@@ -70,6 +70,10 @@
     return self.requestingConfiguration.dspCreativeId;
 }
 
+- (NSString*)lineItemId {
+    return self.requestingConfiguration.lineItemId;
+}
+
 - (void)setAdapter:(MPBaseInterstitialAdapter *)adapter
 {
     if (self.adapter != adapter) {

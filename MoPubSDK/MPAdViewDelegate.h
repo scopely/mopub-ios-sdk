@@ -40,8 +40,9 @@
  *
  * @param view The ad view sending the message.
  * @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
+ * @param lineItemId The id of line item the ad belongs to.
  */
-- (void)bannerWillStartAttemptForAd:(MPAdView *)view withCustomEventClass:(NSString*)customEventClass;
+- (void)bannerWillStartAttemptForAd:(MPAdView *)view withCustomEventClass:(NSString*)customEventClass withLineItemId:(NSString*)lineItemId;
 
 /**
  * This method is called after an ad attempt succeeds to load.
