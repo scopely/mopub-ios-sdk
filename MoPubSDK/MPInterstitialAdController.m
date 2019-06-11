@@ -7,10 +7,12 @@
 //
 
 #import "MPInterstitialAdController.h"
+#import "MoPub+Utility.h"
 #import "MPAdTargeting.h"
-#import "MPLogging.h"
+#import "MPImpressionTrackedNotification.h"
 #import "MPInterstitialAdManager.h"
 #import "MPInterstitialAdManagerDelegate.h"
+#import "MPLogging.h"
 
 @interface MPInterstitialAdController () <MPInterstitialAdManagerDelegate>
 
@@ -197,9 +199,9 @@
 }
 
 - (void)interstitialAdManager:(MPInterstitialAdManager *)manager didReceiveImpressionEventWithImpressionData:(MPImpressionData *)impressionData {
-    if ([self.delegate respondsToSelector:@selector(mopubAd:didTrackImpressionWithImpressionData:)]) {
-        [self.delegate mopubAd:self didTrackImpressionWithImpressionData:impressionData];
-    }
+    [MoPub sendImpressionDelegateAndNotificationFromAd:self
+                                              adUnitID:self.adUnitId
+                                        impressionData:impressionData];
 }
 
 + (NSMutableArray *)sharedInterstitialAdControllers

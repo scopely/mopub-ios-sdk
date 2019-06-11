@@ -6,7 +6,7 @@
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
-#import "MPNativeAd.h"
+#import "MPNativeAd+Internal.h"
 
 @interface MPNativeAd (Testing)
 

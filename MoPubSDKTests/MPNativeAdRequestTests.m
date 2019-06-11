@@ -23,6 +23,7 @@
 #import "MPNativeAdDelegateHandler.h"
 #import "MPNativeAd+Testing.h"
 #import "MPAdServerKeys.h"
+#import "MPImpressionTrackedNotification.h"
 
 static const NSTimeInterval kTestTimeout   = 2; // seconds
 
@@ -385,16 +386,31 @@ static const NSTimeInterval kTestTimeout   = 2; // seconds
 #pragma mark - Impression Level Revenue Data
 
 - (void)testImpressionDelegateFiresWithoutILRD {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for impression"];
+    XCTestExpectation * delegateExpectation = [self expectationWithDescription:@"Wait for impression delegate"];
+    XCTestExpectation * notificationExpectation = [self expectationWithDescription:@"Wait for impression notification"];
     NSString * testAdUnitId = @"FAKE_AD_UNIT_ID";
+
+    __block MPNativeAd * nativeAd = nil;
 
     // Make delegate handler
     MPNativeAdDelegateHandler * handler = [[MPNativeAdDelegateHandler alloc] init];
     handler.didTrackImpression = ^(MPNativeAd * ad, MPImpressionData * impressionData) {
-        [expectation fulfill];
+        [delegateExpectation fulfill];
 
         XCTAssertNil(impressionData);
     };
+
+    // Make notification handler
+    id notificationObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kMPImpressionTrackedNotification
+                                                                                object:nil
+                                                                                 queue:[NSOperationQueue mainQueue]
+                                                                            usingBlock:^(NSNotification * note){
+                                                                                [notificationExpectation fulfill];
+
+                                                                                XCTAssertNil(note.userInfo[kMPImpressionTrackedInfoImpressionDataKey]);
+                                                                                XCTAssert([nativeAd isEqual:note.object]);
+                                                                                XCTAssert([note.userInfo[kMPImpressionTrackedInfoAdUnitIDKey] isEqualToString:nativeAd.adUnitID]);
+                                                                            }];
 
     // Generate the ad configurations
     MPAdConfiguration * nativeAdThatShouldLoad = [MPAdConfigurationFactory defaultNativeAdConfigurationWithCustomEventClassName:@"MPMockNativeCustomEvent"];
@@ -412,6 +428,7 @@ static const NSTimeInterval kTestTimeout   = 2; // seconds
             XCTFail(@"Unexpected failure");
         }
 
+        nativeAd = response;
         response.delegate = handler;
         [response trackImpression];
     }];
@@ -421,20 +438,39 @@ static const NSTimeInterval kTestTimeout   = 2; // seconds
             XCTFail(@"Timed out");
         }
     }];
+
+    [[NSNotificationCenter defaultCenter] removeObserver:notificationObserver];
 }
 
 - (void)testImpressionDelegateFiresWithILRD {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for impression"];
+    XCTestExpectation * delegateExpectation = [self expectationWithDescription:@"Wait for impression delegate"];
+    XCTestExpectation * notificationExpectation = [self expectationWithDescription:@"Wait for impression notification"];
     NSString * testAdUnitId = @"FAKE_AD_UNIT_ID";
+
+    __block MPNativeAd * nativeAd = nil;
 
     // Make delegate handler
     MPNativeAdDelegateHandler * handler = [[MPNativeAdDelegateHandler alloc] init];
     handler.didTrackImpression = ^(MPNativeAd * ad, MPImpressionData * impressionData) {
-        [expectation fulfill];
+        [delegateExpectation fulfill];
 
         XCTAssertNotNil(impressionData);
         XCTAssert([impressionData.adUnitID isEqualToString:testAdUnitId]);
     };
+
+    // Make notification handler
+    id notificationObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kMPImpressionTrackedNotification
+                                                                                object:nil
+                                                                                 queue:[NSOperationQueue mainQueue]
+                                                                            usingBlock:^(NSNotification * note){
+                                                                                [notificationExpectation fulfill];
+
+                                                                                MPImpressionData * impressionData = note.userInfo[kMPImpressionTrackedInfoImpressionDataKey];
+                                                                                XCTAssertNotNil(impressionData);
+                                                                                XCTAssert([impressionData.adUnitID isEqualToString:testAdUnitId]);
+                                                                                XCTAssert([nativeAd isEqual:note.object]);
+                                                                                XCTAssert([note.userInfo[kMPImpressionTrackedInfoAdUnitIDKey] isEqualToString:nativeAd.adUnitID]);
+                                                                            }];
 
     // Generate the ad configurations
     MPAdConfiguration * nativeAdThatShouldLoad = [MPAdConfigurationFactory defaultNativeAdConfigurationWithCustomEventClassName:@"MPMockNativeCustomEvent"];
@@ -455,6 +491,7 @@ static const NSTimeInterval kTestTimeout   = 2; // seconds
             XCTFail(@"Unexpected failure");
         }
 
+        nativeAd = response;
         response.delegate = handler;
         [response trackImpression];
     }];
@@ -464,6 +501,8 @@ static const NSTimeInterval kTestTimeout   = 2; // seconds
             XCTFail(@"Timed out");
         }
     }];
+
+    [[NSNotificationCenter defaultCenter] removeObserver:notificationObserver];
 }
 
 @end

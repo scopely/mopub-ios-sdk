@@ -14,6 +14,8 @@
 		2A35FAA921B5DA1C00DC8805 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A35FAA821B5DA1C00DC8805 /* AVFoundation.framework */; };
 		2A35FAAB21B5DA6200DC8805 /* QRCodeCameraInterfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A35FAAA21B5DA6200DC8805 /* QRCodeCameraInterfaceViewController.swift */; };
 		2A35FAAC21B5DA6200DC8805 /* QRCodeCameraInterfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A35FAAA21B5DA6200DC8805 /* QRCodeCameraInterfaceViewController.swift */; };
+		2A49E2002298766C0049B61B /* TestingMenuDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A49E1FF2298766C0049B61B /* TestingMenuDataSource.swift */; };
+		2A49E20222987B530049B61B /* SafeAreaTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A49E20122987B530049B61B /* SafeAreaTestViewController.swift */; };
 		2A4D35E3211D074800BE9377 /* APIEndpointMenuDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A4D35E1211D074800BE9377 /* APIEndpointMenuDataSource.swift */; };
 		3FFB21881C2230B8120188EF /* Pods_AppStore_Application.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB1088039C5F170AE338BACD /* Pods_AppStore_Application.framework */; };
 		40FDA37129281ACEDA16C5D1 /* Pods_Internal_Application.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04062B8FCC938E7869BA852B /* Pods_Internal_Application.framework */; };
@@ -270,6 +272,8 @@
 		2A1F52F52216230300933277 /* UIAlertController+Picker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Picker.swift"; sourceTree = "<group>"; };
 		2A35FAA821B5DA1C00DC8805 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		2A35FAAA21B5DA6200DC8805 /* QRCodeCameraInterfaceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeCameraInterfaceViewController.swift; sourceTree = "<group>"; };
+		2A49E1FF2298766C0049B61B /* TestingMenuDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestingMenuDataSource.swift; sourceTree = "<group>"; };
+		2A49E20122987B530049B61B /* SafeAreaTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeAreaTestViewController.swift; sourceTree = "<group>"; };
 		2A4D35E1211D074800BE9377 /* APIEndpointMenuDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpointMenuDataSource.swift; sourceTree = "<group>"; };
 		792ED9133D866365E93CDB2E /* Pods-AppStore Application.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AppStore Application.release.xcconfig"; path = "Pods/Target Support Files/Pods-AppStore Application/Pods-AppStore Application.release.xcconfig"; sourceTree = "<group>"; };
 		7B24E5575F339F1A17104381 /* Pods-Internal Application.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Internal Application.release.xcconfig"; path = "Pods/Target Support Files/Pods-Internal Application/Pods-Internal Application.release.xcconfig"; sourceTree = "<group>"; };
@@ -457,6 +461,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2A49E1FE229876310049B61B /* Testing */ = {
+			isa = PBXGroup;
+			children = (
+				2A49E1FF2298766C0049B61B /* TestingMenuDataSource.swift */,
+				2A49E20122987B530049B61B /* SafeAreaTestViewController.swift */,
+			);
+			path = Testing;
+			sourceTree = "<group>";
+		};
 		2A4D35E0211D06ED00BE9377 /* APIEndpoint */ = {
 			isa = PBXGroup;
 			children = (
@@ -593,6 +606,7 @@
 				BC04944620F91BF400CFD9C2 /* Internal.storyboard */,
 				BC04945C20F9266A00CFD9C2 /* Internal.swift */,
 				BC713BAF21700BC6003655B2 /* ReleaseTesting */,
+				2A49E1FE229876310049B61B /* Testing */,
 				BC04944920F91BFC00CFD9C2 /* NetworkAds */,
 				BCE7078B20B373A500DA4BCB /* Privacy */,
 			);
@@ -1143,25 +1157,26 @@
 				"${BUILT_PRODUCTS_DIR}/Flurry-iOS-SDK/Flurry_iOS_SDK.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
 				"${BUILT_PRODUCTS_DIR}/LoremIpsum/LoremIpsum.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsCore.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsInlinePlacement.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsInlineWebAdapter.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsInterstitialPlacement.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsInterstitialVASTAdapter.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsInterstitialWebAdapter.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsNativeOpenRTBNativeAdapter.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsNativePlacement.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsOMSDK.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsOpenRTBNativeController.framework",
+				"${PODS_ROOT}/Verizon-Ads-Core/VerizonAdsCore.framework",
+				"${PODS_ROOT}/Verizon-Ads-InlinePlacement/VerizonAdsInlinePlacement.framework",
+				"${PODS_ROOT}/Verizon-Ads-InlineWebAdapter/VerizonAdsInlineWebAdapter.framework",
+				"${PODS_ROOT}/Verizon-Ads-InterstitialPlacement/VerizonAdsInterstitialPlacement.framework",
+				"${PODS_ROOT}/Verizon-Ads-InterstitialVASTAdapter/VerizonAdsInterstitialVASTAdapter.framework",
+				"${PODS_ROOT}/Verizon-Ads-InterstitialWebAdapter/VerizonAdsInterstitialWebAdapter.framework",
+				"${PODS_ROOT}/Verizon-Ads-NativePlacement/VerizonAdsNativePlacement.framework",
+				"${PODS_ROOT}/Verizon-Ads-NativeVerizonNativeAdapter/VerizonAdsNativeVerizonNativeAdapter.framework",
+				"${PODS_ROOT}/Verizon-Ads-OMSDK/VerizonAdsOMSDK.framework",
 				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsStandardEdition.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsSupport.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsVASTController.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsVerizonSSPConfigProvider.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsVerizonSSPReporter.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsVerizonSSPWaterfallProvider.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsVideoPlayer.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsWebController.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsWebView.framework",
+				"${PODS_ROOT}/Verizon-Ads-Support/VerizonAdsSupport.framework",
+				"${PODS_ROOT}/Verizon-Ads-URIExperience/VerizonAdsURIExperience.framework",
+				"${PODS_ROOT}/Verizon-Ads-VASTController/VerizonAdsVASTController.framework",
+				"${PODS_ROOT}/Verizon-Ads-VerizonNativeController/VerizonAdsVerizonNativeController.framework",
+				"${PODS_ROOT}/Verizon-Ads-VerizonSSPConfigProvider/VerizonAdsVerizonSSPConfigProvider.framework",
+				"${PODS_ROOT}/Verizon-Ads-VerizonSSPReporter/VerizonAdsVerizonSSPReporter.framework",
+				"${PODS_ROOT}/Verizon-Ads-VerizonSSPWaterfallProvider/VerizonAdsVerizonSSPWaterfallProvider.framework",
+				"${PODS_ROOT}/Verizon-Ads-VideoPlayer/VerizonAdsVideoPlayer.framework",
+				"${PODS_ROOT}/Verizon-Ads-WebController/VerizonAdsWebController.framework",
+				"${PODS_ROOT}/Verizon-Ads-WebView/VerizonAdsWebView.framework",
 				"${BUILT_PRODUCTS_DIR}/mopub-ios-sdk/MoPub.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
@@ -1178,13 +1193,14 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsInterstitialPlacement.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsInterstitialVASTAdapter.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsInterstitialWebAdapter.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsNativeOpenRTBNativeAdapter.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsNativePlacement.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsNativeVerizonNativeAdapter.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsOMSDK.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsOpenRTBNativeController.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsStandardEdition.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsSupport.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsURIExperience.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsVASTController.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsVerizonNativeController.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsVerizonSSPConfigProvider.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsVerizonSSPReporter.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsVerizonSSPWaterfallProvider.framework",
@@ -1256,25 +1272,26 @@
 				"${BUILT_PRODUCTS_DIR}/Flurry-iOS-SDK/Flurry_iOS_SDK.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
 				"${BUILT_PRODUCTS_DIR}/LoremIpsum/LoremIpsum.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsCore.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsInlinePlacement.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsInlineWebAdapter.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsInterstitialPlacement.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsInterstitialVASTAdapter.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsInterstitialWebAdapter.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsNativeOpenRTBNativeAdapter.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsNativePlacement.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsOMSDK.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsOpenRTBNativeController.framework",
+				"${PODS_ROOT}/Verizon-Ads-Core/VerizonAdsCore.framework",
+				"${PODS_ROOT}/Verizon-Ads-InlinePlacement/VerizonAdsInlinePlacement.framework",
+				"${PODS_ROOT}/Verizon-Ads-InlineWebAdapter/VerizonAdsInlineWebAdapter.framework",
+				"${PODS_ROOT}/Verizon-Ads-InterstitialPlacement/VerizonAdsInterstitialPlacement.framework",
+				"${PODS_ROOT}/Verizon-Ads-InterstitialVASTAdapter/VerizonAdsInterstitialVASTAdapter.framework",
+				"${PODS_ROOT}/Verizon-Ads-InterstitialWebAdapter/VerizonAdsInterstitialWebAdapter.framework",
+				"${PODS_ROOT}/Verizon-Ads-NativePlacement/VerizonAdsNativePlacement.framework",
+				"${PODS_ROOT}/Verizon-Ads-NativeVerizonNativeAdapter/VerizonAdsNativeVerizonNativeAdapter.framework",
+				"${PODS_ROOT}/Verizon-Ads-OMSDK/VerizonAdsOMSDK.framework",
 				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsStandardEdition.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsSupport.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsVASTController.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsVerizonSSPConfigProvider.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsVerizonSSPReporter.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsVerizonSSPWaterfallProvider.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsVideoPlayer.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsWebController.framework",
-				"${PODS_ROOT}/Verizon-Ads-StandardEdition/VerizonAdsWebView.framework",
+				"${PODS_ROOT}/Verizon-Ads-Support/VerizonAdsSupport.framework",
+				"${PODS_ROOT}/Verizon-Ads-URIExperience/VerizonAdsURIExperience.framework",
+				"${PODS_ROOT}/Verizon-Ads-VASTController/VerizonAdsVASTController.framework",
+				"${PODS_ROOT}/Verizon-Ads-VerizonNativeController/VerizonAdsVerizonNativeController.framework",
+				"${PODS_ROOT}/Verizon-Ads-VerizonSSPConfigProvider/VerizonAdsVerizonSSPConfigProvider.framework",
+				"${PODS_ROOT}/Verizon-Ads-VerizonSSPReporter/VerizonAdsVerizonSSPReporter.framework",
+				"${PODS_ROOT}/Verizon-Ads-VerizonSSPWaterfallProvider/VerizonAdsVerizonSSPWaterfallProvider.framework",
+				"${PODS_ROOT}/Verizon-Ads-VideoPlayer/VerizonAdsVideoPlayer.framework",
+				"${PODS_ROOT}/Verizon-Ads-WebController/VerizonAdsWebController.framework",
+				"${PODS_ROOT}/Verizon-Ads-WebView/VerizonAdsWebView.framework",
 				"${BUILT_PRODUCTS_DIR}/mopub-ios-sdk/MoPub.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
@@ -1291,13 +1308,14 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsInterstitialPlacement.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsInterstitialVASTAdapter.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsInterstitialWebAdapter.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsNativeOpenRTBNativeAdapter.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsNativePlacement.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsNativeVerizonNativeAdapter.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsOMSDK.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsOpenRTBNativeController.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsStandardEdition.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsSupport.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsURIExperience.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsVASTController.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsVerizonNativeController.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsVerizonSSPConfigProvider.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsVerizonSSPReporter.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VerizonAdsVerizonSSPWaterfallProvider.framework",
@@ -1481,6 +1499,7 @@
 				BC00C5B9208FCF46008E0AEB /* AppDelegate+Consent.swift in Sources */,
 				BC3B0C962007DAA5002D28B1 /* NativeAdCollectionViewController.swift in Sources */,
 				EC325253224ED56F00D955C3 /* UserDefaults+Subscript.swift in Sources */,
+				2A49E2002298766C0049B61B /* TestingMenuDataSource.swift in Sources */,
 				ECF218162278D9A4008BD940 /* OrderPreferenceViewController.swift in Sources */,
 				BC713BB121700C9B003655B2 /* ReleaseTestingViewController.swift in Sources */,
 				ECF218132278D5B8008BD940 /* NativeAdRendererMenuDataSource.swift in Sources */,
@@ -1514,6 +1533,7 @@
 				BC04945420F91BFC00CFD9C2 /* NetworkAdsViewController.swift in Sources */,
 				EC32526522527BCB00D955C3 /* UITableView+Utility.swift in Sources */,
 				BCA042F3211E15FB001B1AF5 /* BannerAdDataSource.swift in Sources */,
+				2A49E20222987B530049B61B /* SafeAreaTestViewController.swift in Sources */,
 				BCB63FE020AA426300C22C7F /* MenuDisplayable.swift in Sources */,
 				BC2CEFB7211CF12C00EAA99D /* TextEntryTableViewCell.swift in Sources */,
 				BC525EE12130A362007B1761 /* NativeAdDataSource.swift in Sources */,
@@ -1626,7 +1646,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Canary;
+				TEST_TARGET_NAME = "AppStore Application";
 			};
 			name = Debug;
 		};
@@ -1644,7 +1664,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Canary;
+				TEST_TARGET_NAME = "AppStore Application";
 			};
 			name = Release;
 		};
@@ -1767,7 +1787,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				INFOPLIST_FILE = Canary/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1784,7 +1804,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				INFOPLIST_FILE = Canary/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1801,7 +1821,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon.Internal;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				INFOPLIST_FILE = "Canary/Internal/Internal-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1819,7 +1839,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon.Internal;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				INFOPLIST_FILE = "Canary/Internal/Internal-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

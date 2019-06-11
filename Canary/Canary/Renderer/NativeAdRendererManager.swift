@@ -74,16 +74,16 @@ private extension NativeAdRendererManager {
     var rendererConfigurations: [MPNativeAdRendererConfiguration] {
         let networkRendererConfigurations = self.networkRendererConfigurations // cache computed var result
         var configs = [MPNativeAdRendererConfiguration]()
-        configs.append({
+        configs.append(MOPUBNativeVideoAdRenderer.rendererConfiguration(with: mopubVideoRendererSettings))
+        configs.append(contentsOf: networkRendererConfigurations)
+        configs.append({ // add `MPStaticNativeAdRenderer`
             var networkSupportedCustomEvents = Set<String>() // add the custom event names to `MPStaticNativeAdRenderer`
             networkRendererConfigurations.forEach {
                 networkSupportedCustomEvents.formUnion($0.supportedCustomEvents as? [String] ?? [])
             }
             return MPStaticNativeAdRenderer.rendererConfiguration(with: mopubRendererSettings,
                                                                   additionalSupportedCustomEvents: Array(networkSupportedCustomEvents))
-            }())
-        configs.append(MOPUBNativeVideoAdRenderer.rendererConfiguration(with: mopubVideoRendererSettings))
-        configs.append(contentsOf: networkRendererConfigurations)
+        }())
         
         return configs
     }

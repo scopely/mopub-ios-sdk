@@ -24,4 +24,31 @@
     }
 }
 
++ (void)sendImpressionNotificationFromAd:(id)ad
+                                adUnitID:(NSString *)adUnitID
+                          impressionData:(MPImpressionData * _Nullable)impressionData {
+    // This dictionary must always contain the adunit ID but may or may not include @c impressionData depending on if it's @c nil.
+    // If adding keys and objects in the future, put them above @c impressionData to avoid being skipped in the case of nil data.
+    NSDictionary * userInfo = [NSDictionary dictionaryWithObjectsAndKeys:adUnitID,
+                               kMPImpressionTrackedInfoAdUnitIDKey,
+                               impressionData,
+                               kMPImpressionTrackedInfoImpressionDataKey,
+                               nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kMPImpressionTrackedNotification
+                                                        object:ad
+                                                      userInfo:userInfo];
+}
+
++ (void)sendImpressionDelegateAndNotificationFromAd:(id<MPMoPubAd>)ad
+                                           adUnitID:(NSString *)adUnitID
+                                     impressionData:(MPImpressionData * _Nullable)impressionData {
+    [self sendImpressionNotificationFromAd:ad
+                                  adUnitID:adUnitID
+                            impressionData:impressionData];
+
+    if ([ad.delegate respondsToSelector:@selector(mopubAd:didTrackImpressionWithImpressionData:)]) {
+        [ad.delegate mopubAd:ad didTrackImpressionWithImpressionData:impressionData];
+    }
+}
+
 @end

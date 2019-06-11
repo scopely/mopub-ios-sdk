@@ -33,6 +33,28 @@ NS_ASSUME_NONNULL_BEGIN
         options:(NSDictionary<UIApplicationOpenExternalURLOptionsKey, id> *)options
      completion:(void (^ __nullable)(BOOL success))completion;
 
+/**
+ This method sends an impression @c NSNotification.
+
+ @param ad the ad from which to send the notification, or @c nil
+ @param adUnitID the adunit ID of the ad that sent the notification
+ @param impressionData the impression data associated with the ad, or nil if no impression data
+ */
++ (void)sendImpressionNotificationFromAd:(id _Nullable)ad
+                                adUnitID:(NSString *)adUnitID
+                          impressionData:(MPImpressionData * _Nullable)impressionData;
+
+/**
+ This method sends an impression @c NSNotification and notifies the @c ad's delegate of the impression.
+
+ @param ad the ad from which to send the notification
+ @param adUnitID the adunit ID of the ad that sent the notification
+ @param impressionData the impression data associated with the ad, or nil if no impression data
+ */
++ (void)sendImpressionDelegateAndNotificationFromAd:(id<MPMoPubAd>)ad
+                                           adUnitID:(NSString *)adUnitID
+                                     impressionData:(MPImpressionData * _Nullable)impressionData;
+
 @end
 
 NS_ASSUME_NONNULL_END

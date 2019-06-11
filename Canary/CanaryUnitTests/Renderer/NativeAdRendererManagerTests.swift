@@ -13,11 +13,11 @@ final class NativeAdRendererManagerTests: XCTestCase {
     private var userDefaults: UserDefaults!
     private var nativeAdRendererManager: NativeAdRendererManager!
     
-    private let defaultRenderers = ["MPStaticNativeAdRenderer",
-                                    "MOPUBNativeVideoAdRenderer",
+    private let defaultRenderers = ["MOPUBNativeVideoAdRenderer",
                                     "MPGoogleAdMobNativeRenderer",
                                     "FacebookNativeAdRenderer",
-                                    "FlurryNativeVideoAdRenderer"]
+                                    "FlurryNativeVideoAdRenderer",
+                                    "MPStaticNativeAdRenderer"]
     
     override func setUp() {
         userDefaults = UserDefaults(suiteName: #file)

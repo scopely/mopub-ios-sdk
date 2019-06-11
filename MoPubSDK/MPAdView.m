@@ -7,11 +7,13 @@
 //
 
 #import "MPAdView.h"
+#import "MoPub+Utility.h"
 #import "MPAdTargeting.h"
 #import "MPBannerAdManager.h"
 #import "MPBannerAdManagerDelegate.h"
 #import "MPClosableView.h"
 #import "MPCoreInstanceProvider.h"
+#import "MPImpressionTrackedNotification.h"
 #import "MPLogging.h"
 
 @interface MPAdView () <MPBannerAdManagerDelegate>
@@ -221,9 +223,9 @@
 }
 
 - (void)impressionDidFireWithImpressionData:(MPImpressionData *)impressionData {
-    if ([self.delegate respondsToSelector:@selector(mopubAd:didTrackImpressionWithImpressionData:)]) {
-        [self.delegate mopubAd:self didTrackImpressionWithImpressionData:impressionData];
-    }
+    [MoPub sendImpressionDelegateAndNotificationFromAd:self
+                                              adUnitID:self.adUnitId
+                                        impressionData:impressionData];
 }
 
 - (NSString *)getCreativeId {

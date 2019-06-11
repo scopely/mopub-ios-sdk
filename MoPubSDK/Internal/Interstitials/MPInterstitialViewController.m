@@ -200,18 +200,7 @@ static NSString * const kCloseButtonXImageName = @"MPCloseButtonX.png";
     return YES;
 }
 
-#pragma mark - Autorotation (iOS 6.0 and above)
-
-- (BOOL)shouldAutorotate
-{
-    return YES;
-}
-
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= MP_IOS_9_0
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations
-#else
-- (NSUInteger)supportedInterfaceOrientations
-#endif
 {
     NSUInteger applicationSupportedOrientations =
     [[UIApplication sharedApplication] supportedInterfaceOrientationsForWindow:MPKeyWindow()];

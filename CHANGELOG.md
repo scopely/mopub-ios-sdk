@@ -1,3 +1,10 @@
+## Version 5.7.1 (June 3, 2019)
+- **Features**
+  - Impression Level Revenue Data can now be received via a notification
+
+- **Bug Fixes**
+  - Fixed occasional crash due to multithreading bug
+
 ## Version 5.7.0 (May 20, 2019)
 - **Features**
   - Impression Level Revenue Data: A data object that includes revenue information associated with each impression

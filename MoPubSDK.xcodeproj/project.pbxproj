@@ -165,6 +165,10 @@
 		2A2702B020214502004A72E6 /* MPInterstitialAdController.m in Sources */ = {isa = PBXBuildFile; fileRef = AEF9D537171CA895005AAA5A /* MPInterstitialAdController.m */; };
 		2A2702B120214502004A72E6 /* MPInterstitialCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = AEF9D539171CA895005AAA5A /* MPInterstitialCustomEvent.m */; };
 		2A2702B220214502004A72E6 /* MoPub.m in Sources */ = {isa = PBXBuildFile; fileRef = A71DB8121A2FE68300D3B229 /* MoPub.m */; };
+		2A48DF3B229601C1003763C2 /* MPImpressionTrackedNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A48DF39229601C1003763C2 /* MPImpressionTrackedNotification.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2A48DF3C229601C1003763C2 /* MPImpressionTrackedNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A48DF3A229601C1003763C2 /* MPImpressionTrackedNotification.m */; };
+		2A48DF3D229601C1003763C2 /* MPImpressionTrackedNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A48DF3A229601C1003763C2 /* MPImpressionTrackedNotification.m */; };
+		2A48DF3E229601C1003763C2 /* MPImpressionTrackedNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A48DF3A229601C1003763C2 /* MPImpressionTrackedNotification.m */; };
 		2A4A5D221F86DF270082FC4C /* MPAdServerCommunicatorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A4A5D211F86DF270082FC4C /* MPAdServerCommunicatorTests.m */; };
 		2A4A5D371F86E02A0082FC4C /* MPAdserverCommunicatorDelegateHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A4A5D361F86E02A0082FC4C /* MPAdserverCommunicatorDelegateHandler.m */; };
 		2A4A5D441F86E2340082FC4C /* MPAdServerCommunicator+Testing.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A4A5D431F86E2340082FC4C /* MPAdServerCommunicator+Testing.m */; };
@@ -931,6 +935,8 @@
 /* Begin PBXFileReference section */
 		2A2701ED2020FC7E004A72E6 /* MPViewabilityOption.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MPViewabilityOption.h; path = MoPubSDK/Viewability/MPViewabilityOption.h; sourceTree = SOURCE_ROOT; };
 		2A2701EE2020FCDC004A72E6 /* MOPUBDisplayAgentType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MOPUBDisplayAgentType.h; sourceTree = "<group>"; };
+		2A48DF39229601C1003763C2 /* MPImpressionTrackedNotification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MPImpressionTrackedNotification.h; sourceTree = "<group>"; };
+		2A48DF3A229601C1003763C2 /* MPImpressionTrackedNotification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MPImpressionTrackedNotification.m; sourceTree = "<group>"; };
 		2A4A5D211F86DF270082FC4C /* MPAdServerCommunicatorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MPAdServerCommunicatorTests.m; sourceTree = "<group>"; };
 		2A4A5D351F86E02A0082FC4C /* MPAdserverCommunicatorDelegateHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MPAdserverCommunicatorDelegateHandler.h; sourceTree = "<group>"; };
 		2A4A5D361F86E02A0082FC4C /* MPAdserverCommunicatorDelegateHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MPAdserverCommunicatorDelegateHandler.m; sourceTree = "<group>"; };
@@ -2058,6 +2064,8 @@
 				57B86B5619C78F5D00AD50EE /* MPConstants.m */,
 				2AFEE721225BC38400DD82C8 /* MPImpressionData.h */,
 				2AFEE722225BC38400DD82C8 /* MPImpressionData.m */,
+				2A48DF39229601C1003763C2 /* MPImpressionTrackedNotification.h */,
+				2A48DF3A229601C1003763C2 /* MPImpressionTrackedNotification.m */,
 				AEF9D536171CA895005AAA5A /* MPInterstitialAdController.h */,
 				AEF9D537171CA895005AAA5A /* MPInterstitialAdController.m */,
 				2A73E338226E44F8001FEE03 /* MPInterstitialAdControllerDelegate.h */,
@@ -2787,6 +2795,7 @@
 				2AF032842016B78800909F29 /* MPVASTWrapper.h in Headers */,
 				2A73E337226E43D3001FEE03 /* MPAdViewDelegate.h in Headers */,
 				2AF032852016B78800909F29 /* MPVASTTracking.h in Headers */,
+				2A48DF3B229601C1003763C2 /* MPImpressionTrackedNotification.h in Headers */,
 				2AF032862016B78800909F29 /* MPCoreInstanceProvider.h in Headers */,
 				2A73E339226E44F8001FEE03 /* MPInterstitialAdControllerDelegate.h in Headers */,
 				2AF0328A2016B78800909F29 /* MPViewabilityTracker.h in Headers */,
@@ -3226,6 +3235,7 @@
 				2A27024520214502004A72E6 /* MPNativeAdRequest.m in Sources */,
 				2A27024620214502004A72E6 /* MPNativeAdRequestTargeting.m in Sources */,
 				2A27024720214502004A72E6 /* MPNativeCustomEvent.m in Sources */,
+				2A48DF3E229601C1003763C2 /* MPImpressionTrackedNotification.m in Sources */,
 				BC926EF820D9753B004ED8F7 /* MPMemoryCache.m in Sources */,
 				BC88E7E520769A3D002A3357 /* MPReachabilityManager.m in Sources */,
 				BCAD021E20CB388D007DC2B2 /* NSDate+MPAdditions.m in Sources */,
@@ -3425,6 +3435,7 @@
 				BCA2EA4B2023DAC9000F24C0 /* MPHTTPNetworkTaskData.m in Sources */,
 				A7A1CDD31974782E0082A6FA /* MPTableViewAdPlacer.m in Sources */,
 				AE515F57171F1B110086B464 /* MPInterstitialAdManager.m in Sources */,
+				2A48DF3C229601C1003763C2 /* MPImpressionTrackedNotification.m in Sources */,
 				A7220FF11B6C2D750099DCF6 /* MPVASTResource.m in Sources */,
 				57EAA4DD1A1F3BE300923851 /* MRExpandModalViewController.m in Sources */,
 				BC88E7E320769A3D002A3357 /* MPReachabilityManager.m in Sources */,
@@ -3613,6 +3624,7 @@
 				BCA00B491EF47A91006FF762 /* NSJSONSerialization+MPAdditions.m in Sources */,
 				BCA00B4A1EF47A91006FF762 /* MPActivityViewControllerHelper+TweetShare.m in Sources */,
 				BCA00B4C1EF47A91006FF762 /* MPConstants.m in Sources */,
+				2A48DF3D229601C1003763C2 /* MPImpressionTrackedNotification.m in Sources */,
 				BCA00B4D1EF47A91006FF762 /* MRProperty.m in Sources */,
 				BCA00B521EF47A91006FF762 /* NSURL+MPAdditions.m in Sources */,
 				BCFE67DB208508D3005E458A /* MPConsentChangedReason.m in Sources */,
@@ -3690,7 +3702,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -3731,7 +3743,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -3773,12 +3785,12 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 5.7.0;
+				DYLIB_CURRENT_VERSION = 5.7.1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -3820,12 +3832,12 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 5.7.0;
+				DYLIB_CURRENT_VERSION = 5.7.1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -3859,7 +3871,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -3893,7 +3905,7 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -3920,7 +3932,7 @@
 		AE515F9A171F1B110086B464 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DSTROOT = /tmp/MoPubSDK.dst;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3940,7 +3952,7 @@
 		AE515F9B171F1B110086B464 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DSTROOT = /tmp/MoPubSDK.dst;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4057,7 +4069,7 @@
 		BCA00B951EF47A91006FF762 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DSTROOT = /tmp/MoPubSDK.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -4074,7 +4086,7 @@
 		BCA00B961EF47A91006FF762 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 5.7.0;
+				CURRENT_PROJECT_VERSION = 5.7.1;
 				DSTROOT = /tmp/MoPubSDK.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;

@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * @c MPTimer wraps an @c NSTimer and adds pause/resume functionality.
+ * @c MPTimer is a thread safe @c NSTimer wrapper, with pause / resume functionality.
  */
 @interface MPTimer : NSObject
 

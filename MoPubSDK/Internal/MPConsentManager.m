@@ -137,9 +137,16 @@ static NSString * const kMacroReplaceLanguageCode = @"%%LANGUAGE%%";
         _consentDialogViewController = nil;
         _syncFrequency = kDefaultRefreshInterval;
 
-        // Initializing the timer must be done last since it depends on the
-        // value of _syncFrequency
-        _nextUpdateTimer = [self newNextUpdateTimer];
+        // Initializing the timer must be done last since it depends on the value of _syncFrequency
+        __weak __typeof__(self) weakSelf = self;
+        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            // During SDK init, the chain of calls `MPConsentManager.sharedManager` -> `newNextUpdateTimer`
+            // -> `MPTimer.scheduleNow` -> `MPLogDebug` -> `MPIdentityProvider.identifier` ->
+            // `MPConsentManager.sharedManager` will cause a crash with EXC_BAD_INSTRUCTION since
+            // the same `dispatch_once` is called twice for `MPConsentManager.sharedManager` in the
+            // same call stack. To avoid this crash, call `newNextUpdateTimer` asynchronusly for now.
+            weakSelf.nextUpdateTimer = [weakSelf newNextUpdateTimer];
+        });
     }
 
     return self;
@@ -593,14 +600,7 @@ static NSString * const kMacroReplaceLanguageCode = @"%%LANGUAGE%%";
  */
 - (MPTimer * _Nonnull)newNextUpdateTimer {
     MPTimer * timer = [MPTimer timerWithTimeInterval:self.syncFrequency target:self selector:@selector(onNextUpdateFiredWithTimer) repeats:YES];
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        // During SDK init, the chain of calls `MPConsentManager.sharedManager` -> `newNextUpdateTimer`
-        // -> `MPTimer.scheduleNow` -> `MPLogDebug` -> `MPIdentityProvider.identifier` ->
-        // `MPConsentManager.sharedManager` will cause a crash with EXC_BAD_INSTRUCTION since
-        // the same `dispatch_once` is called twice for `MPConsentManager.sharedManager` in the same
-        // call stack. To avoid this crash, call `MPTimer.scheduleNow` asynchronusly for now.
-        [timer scheduleNow];
-    });
+    [timer scheduleNow];
     return timer;
 }
 

@@ -27,6 +27,7 @@
 #import "MPGlobal.h"
 #import "MPIdentityProvider.h"
 #import "MPImpressionData.h"
+#import "MPImpressionTrackedNotification.h"
 #import "MPInterstitialAdController.h"
 #import "MPInterstitialAdControllerDelegate.h"
 #import "MPInterstitialCustomEvent.h"

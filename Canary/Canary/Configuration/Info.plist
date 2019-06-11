@@ -15,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>5.7.0</string>
+	<string>5.7.1</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -28,7 +28,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>5.7.0</string>
+	<string>5.7.1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -69,6 +69,12 @@
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>The MoPub Canary app uses the camera for the ease-of-use feature of reading MoPub ad QR codes.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Calendar access requested on behalf of Verizon Ads Network.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo access requested on behalf of Verizon Ads Network.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Bluetooth access requested on behalf of Verizon Ads Network.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>GADApplicationIdentifier</key>

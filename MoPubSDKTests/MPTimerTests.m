@@ -267,4 +267,91 @@ static const NSTimeInterval kWaitTimeTolerance = 2;
     }];
 }
 
+// Test thread safety of `MPTimer`. `MPTimer` wasn't thread safe in the past, and `scheduleNow` might
+// crash if the internal `NSTimer` is set to `nil` by `invalidate` before `scheduleNow` completes.
+// With a thread safety update, `MPTimer` should not crash for any call sequence (ADF-4128).
+- (void)testMultiThreadSchedulingAndInvalidation {
+    uint32_t randomNumberUpperBound = 100;
+    int numberOfTimers = 10000;
+
+    for (int i = 0; i < numberOfTimers; i++) {
+        NSString * timerTitle = [NSString stringWithFormat:@"%@ [%d]", NSStringFromSelector(_cmd), i];
+        MPTimer * timer = [self generateTestTimerWithTitle:timerTitle];
+
+        dispatch_queue_t randomScheduleQueue;
+        switch (arc4random_uniform(randomNumberUpperBound) % 5) {
+            case 0:
+                randomScheduleQueue = dispatch_get_main_queue();
+                break;
+            case 1:
+                randomScheduleQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
+                break;
+            case 2:
+                randomScheduleQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+                break;
+            case 3:
+                randomScheduleQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
+                break;
+            default:
+                randomScheduleQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+                break;
+        }
+
+        dispatch_queue_t randomInvalidateQueue;
+        switch (arc4random_uniform(randomNumberUpperBound) % 5) {
+            case 0:
+                randomInvalidateQueue = dispatch_get_main_queue();
+                break;
+            case 1:
+                randomInvalidateQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
+                break;
+            case 2:
+                randomInvalidateQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+                break;
+            case 3:
+                randomInvalidateQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
+                break;
+            default:
+                randomInvalidateQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+                break;
+        }
+
+        // call `scheduleNow` and `invalidate` in random order in random queues (threads)
+        if (arc4random_uniform(randomNumberUpperBound) % 2 == 0) {
+            // `scheduleNow` and then `invalidate`
+            dispatch_async(randomScheduleQueue, ^{
+                [timer scheduleNow];
+            });
+            dispatch_async(randomInvalidateQueue, ^{
+                [timer invalidate];
+            });
+        } else {
+            // `invalidate` and then `scheduleNow`
+            dispatch_async(randomInvalidateQueue, ^{
+                [timer invalidate];
+            });
+            dispatch_async(randomScheduleQueue, ^{
+                [timer scheduleNow];
+            });
+        }
+    }
+
+    // The last timer is for fulfilling the test expectation and finishing this test - previous timers
+    // are randomly invalidated and we cannot rely on them for fulfilling the test expection.
+    NSString * timerTitle = [NSString stringWithFormat:@"%@ %@", NSStringFromSelector(_cmd), @"ending timer"];
+    XCTestExpectation * expectation = [self expectationWithDescription:timerTitle];
+    MPTimer * endingTimer = [self generateTestTimerWithTitle:timerTitle];
+    self.testNameVsExpectation[timerTitle] = expectation;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [endingTimer scheduleNow];
+    });
+
+    // The `for` loop might take a while if there are a large number of loops on slow machines, so
+    // use a long timeout and rely on the `endingTimer` to fulfill the test expectation early. On
+    // faster machines with 10000 loops, this test case takes about 0.25 second.
+    [self waitForExpectationsWithTimeout:60 handler:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+    }];
+}
+
 @end
