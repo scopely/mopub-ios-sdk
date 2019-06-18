@@ -216,7 +216,9 @@
 {
     [self.delegate managerRefreshAd:self.requestingAdapterAdContentView];
     if (!self.loading && self.automaticallyRefreshesContents) {
-        [self loadAdWithTargeting:self.targeting];
+        // Instead of reusing the existing `MPAdTargeting` that is potentially outdated, ask the
+        // delegate to provide the `MPAdTargeting` so that it's the latest.
+        [self loadAdWithTargeting:self.delegate.adTargeting];
     }
 }
 

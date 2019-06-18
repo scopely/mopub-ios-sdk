@@ -81,13 +81,7 @@
 
 - (void)loadAd
 {
-    MPAdTargeting * targeting = [[MPAdTargeting alloc] init];
-    targeting.keywords = self.keywords;
-    targeting.localExtras = self.localExtras;
-    targeting.location = self.location;
-    targeting.userDataKeywords = self.userDataKeywords;
-
-    [self.adManager loadAdWithTargeting:targeting];
+    [self.adManager loadAdWithTargeting: self.adTargeting];
 }
 
 - (void)refreshAd
@@ -145,6 +139,15 @@
 - (UIViewController *)viewControllerForPresentingModalView
 {
     return [self.delegate viewControllerForPresentingModalView];
+}
+
+- (MPAdTargeting *)adTargeting {
+    MPAdTargeting * targeting = [[MPAdTargeting alloc] init];
+    targeting.keywords = self.keywords;
+    targeting.localExtras = self.localExtras;
+    targeting.location = self.location;
+    targeting.userDataKeywords = self.userDataKeywords;
+    return targeting;
 }
 
 - (void)invalidateContentView
