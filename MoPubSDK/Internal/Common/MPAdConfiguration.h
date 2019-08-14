@@ -94,6 +94,7 @@ extern NSString * const kBannerImpressionMinPixelMetadataKey;
 @property (nonatomic, strong) NSDictionary *customEventClassData;
 @property (nonatomic, assign) MPInterstitialOrientationType orientationType;
 @property (nonatomic, copy) NSString *dspCreativeId;
+@property (nonatomic, copy) NSString *lineItemId;
 @property (nonatomic, assign) BOOL precacheRequired;
 @property (nonatomic, assign) BOOL isVastVideoPlayer;
 @property (nonatomic, strong) NSDate *creationTimestamp;
