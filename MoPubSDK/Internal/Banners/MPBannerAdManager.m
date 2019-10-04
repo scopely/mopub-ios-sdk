@@ -232,15 +232,18 @@
 
 - (void)fetchAdWithConfiguration:(MPAdConfiguration *)configuration {
     MPLogInfo(@"Banner ad view is fetching ad network type: %@", configuration.networkType);
+    [self.delegate bannerWillStartAttemptForAdManager:self];
 
     if (configuration.adUnitWarmingUp) {
         MPLogInfo(kMPWarmingUpErrorLogFormatWithAdUnitID, self.delegate.adUnitId);
+        [self.delegate bannerDidFailAttemptForAdManager:self error:[NSError errorWithCode:MOPUBErrorAdUnitWarmingUp]];
         [self didFailToLoadAdapterWithError:[NSError errorWithCode:MOPUBErrorAdUnitWarmingUp]];
         return;
     }
 
     if ([configuration.networkType isEqualToString:kAdTypeClear]) {
         MPLogInfo(kMPClearErrorLogFormatWithAdUnitID, self.delegate.adUnitId);
+        [self.delegate bannerDidFailAttemptForAdManager:self error:[NSError errorWithCode:MOPUBErrorNoInventory]];
         [self didFailToLoadAdapterWithError:[NSError errorWithCode:MOPUBErrorNoInventory]];
         return;
     }
@@ -258,7 +261,6 @@
         return;
     }
 
-    [self.delegate bannerWillStartAttemptForAdManager:self];
     [self.requestingAdapter _getAdWithConfiguration:configuration targeting:self.targeting containerSize:self.delegate.containerSize];
 }
 
