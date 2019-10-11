@@ -90,6 +90,20 @@
     return self.communicator.loading || self.requestingAdapter;
 }
 
+- (Class)customEventClass
+{
+    return self.requestingConfiguration.customEventClass;
+}
+
+- (NSString*)dspCreativeId
+{
+    return self.requestingConfiguration.dspCreativeId;
+}
+
+- (NSString*)lineItemId {
+    return self.requestingConfiguration.lineItemId;
+}
+
 - (void)loadAdWithTargeting:(MPAdTargeting *)targeting
 {
     MPLogAdEvent(MPLogEvent.adLoadAttempt, self.delegate.adUnitId);
@@ -205,6 +219,7 @@
 
 - (void)refreshTimerDidFire
 {
+    [self.delegate managerRefreshAd:self.requestingAdapterAdContentView];
     if (!self.loading) {
         // Instead of reusing the existing `MPAdTargeting` that is potentially outdated, ask the
         // delegate to provide the `MPAdTargeting` so that it's the latest.
@@ -246,6 +261,7 @@
         return;
     }
 
+    [self.delegate bannerWillStartAttemptForAdManager:self];
     [self.requestingAdapter _getAdWithConfiguration:configuration targeting:self.targeting containerSize:self.delegate.containerSize];
 }
 
@@ -338,6 +354,7 @@
 
 - (void)adapter:(MPBaseBannerAdapter *)adapter didFinishLoadingAd:(UIView *)ad
 {
+    [self.delegate bannerDidSucceedAttemptForAdManager:self];
     if (self.requestingAdapter == adapter) {
         self.remainingConfigurations = nil;
         self.requestingAdapterAdContentView = ad;
@@ -353,6 +370,7 @@
 
 - (void)adapter:(MPBaseBannerAdapter *)adapter didFailToLoadAdWithError:(NSError *)error
 {
+    [self.delegate bannerDidFailAttemptForAdManager:self error:error];
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker
     // with the appropriate error code result.
     NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;
@@ -448,6 +466,10 @@
     // Once the banner ad is collapsed back into its default state, the refresh timer
     // should be resumed to queue up the next ad.
     [self resumeRefreshTimer];
+}
+
+- (NSString *)getDspCreativeId {
+    return [_requestingConfiguration dspCreativeId];
 }
 
 @end

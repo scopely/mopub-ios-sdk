@@ -61,6 +61,20 @@
     self.adapter = nil;
 }
 
+- (Class)customEventClass
+{
+    return self.requestingConfiguration.customEventClass;
+}
+
+- (NSString*)dspCreativeId
+{
+    return self.requestingConfiguration.dspCreativeId;
+}
+
+- (NSString*)lineItemId {
+    return self.requestingConfiguration.lineItemId;
+}
+
 - (void)setAdapter:(MPBaseInterstitialAdapter *)adapter
 {
     if (self.adapter != adapter) {
@@ -183,6 +197,8 @@
         return;
     }
 
+    [self.delegate managerWillStartInterstitialAttempt:self];
+
     MPBaseInterstitialAdapter *adapter = [[MPInterstitialCustomEventAdapter alloc] initWithDelegate:self];
     self.adapter = adapter;
     [self.adapter _getAdWithConfiguration:configuration targeting:self.targeting];
@@ -204,6 +220,8 @@
     self.ready = YES;
     self.loading = NO;
 
+    [self.delegate managerDidSucceedInterstitialAttempt:self];
+
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker.
     NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;
     [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:MPAfterLoadResultAdLoaded];
@@ -214,6 +232,8 @@
 
 - (void)adapter:(MPBaseInterstitialAdapter *)adapter didFailToLoadAdWithError:(NSError *)error
 {
+    [self.delegate manager:self didFailInterstitialAttemptWithError:error];
+
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker
     // with the appropriate error code result.
     NSTimeInterval duration = NSDate.now.timeIntervalSince1970 - self.adapterLoadStartTimestamp;

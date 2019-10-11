@@ -23,6 +23,8 @@
 @property (nonatomic, readonly) NSString *adUnitID;
 @property (nonatomic, strong) NSArray *mediationSettings;
 @property (nonatomic, copy) NSString *customerId;
+@property (nonatomic, readonly) NSString *dspCreativeId;
+@property (nonatomic, readonly) NSString *lineItemId;
 @property (nonatomic, strong) MPAdTargeting *targeting;
 
 /**
@@ -76,10 +78,15 @@
  */
 - (void)handleAdPlayedForCustomEventNetwork;
 
+- (NSString *) getCreativeId;
+
 @end
 
 @protocol MPRewardedVideoAdManagerDelegate <NSObject>
 
+- (void)rewardedVideoWillStartAttemptForAdManager:(MPRewardedVideoAdManager *)manager;
+- (void)rewardedVideoDidSucceedAttemptForAdManager:(MPRewardedVideoAdManager *)manager;
+- (void)rewardedVideoDidFailAttemptForAdManager:(MPRewardedVideoAdManager *)manager error:(NSError*)error;
 - (void)rewardedVideoDidLoadForAdManager:(MPRewardedVideoAdManager *)manager;
 - (void)rewardedVideoDidFailToLoadForAdManager:(MPRewardedVideoAdManager *)manager error:(NSError *)error;
 - (void)rewardedVideoDidExpireForAdManager:(MPRewardedVideoAdManager *)manager;

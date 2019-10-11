@@ -240,6 +240,28 @@
     [self setAdContentView:nil];
 }
 
+- (void)bannerWillStartAttemptForAdManager:(MPBannerAdManager *)manager
+{
+    if ([self.delegate respondsToSelector:@selector(bannerWillStartAttemptForAd:withCustomEventClass:withLineItemId:)]) {
+        NSString *customEventClass = NSStringFromClass([manager customEventClass]);
+        [self.delegate bannerWillStartAttemptForAd:self withCustomEventClass:customEventClass withLineItemId: [manager lineItemId]];
+    }
+}
+
+- (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager
+{
+    if ([self.delegate respondsToSelector:@selector(bannerDidSucceedAttemptForAd:withCreativeId:)]) {
+        [self.delegate bannerDidSucceedAttemptForAd:self withCreativeId:[manager dspCreativeId]];
+    }
+}
+
+- (void)bannerDidFailAttemptForAdManager:(MPBannerAdManager *)manager error:(NSError *)error
+{
+    if ([self.delegate respondsToSelector:@selector(bannerDidFailAttemptForAd:error:)]) {
+        [self.delegate bannerDidFailAttemptForAd:self error:error];
+    }
+}
+
 - (void)managerDidFailToLoadAdWithError:(NSError *)error
 {
     if ([self.delegate respondsToSelector:@selector(adViewDidFailToLoadAd:)]) {
@@ -299,6 +321,17 @@
     [MoPub sendImpressionDelegateAndNotificationFromAd:self
                                               adUnitID:self.adUnitId
                                         impressionData:impressionData];
+}
+
+- (NSString *)getCreativeId {
+    return [_adManager getDspCreativeId];
+}
+
+- (void)managerRefreshAd:(UIView *)ad
+{
+    if ([self.delegate respondsToSelector:@selector(adViewRefreshAd:)]) {
+        [self.delegate adViewRefreshAd:self];
+    }
 }
 
 @end
