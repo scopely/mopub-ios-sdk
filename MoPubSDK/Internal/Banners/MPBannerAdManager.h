@@ -19,6 +19,10 @@
 @property (nonatomic, weak) id<MPBannerAdManagerDelegate> delegate;
 @property (nonatomic, readonly) BOOL isMraidAd;
 
+@property (nonatomic, readonly) Class customEventClass;
+@property (nonatomic, readonly) NSString* dspCreativeId;
+@property (nonatomic, readonly) NSString* lineItemId;
+
 - (id)initWithDelegate:(id<MPBannerAdManagerDelegate>)delegate;
 
 - (void)loadAdWithTargeting:(MPAdTargeting *)targeting;
@@ -26,5 +30,6 @@
 - (void)stopAutomaticallyRefreshingContents;
 - (void)startAutomaticallyRefreshingContents;
 - (void)rotateToOrientation:(UIInterfaceOrientation)orientation;
+- (NSString *)getDspCreativeId;
 
 @end
