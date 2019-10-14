@@ -46,7 +46,7 @@ Pod::Spec.new do |spec|
   spec.subspec 'Core' do |core|
     core.source_files         = 'MoPubSDK/**/*.{h,m}'
     core.resources            = ['MoPubSDK/**/*.{png,bundle,xib,nib}', 'MoPubSDK/**/MPAdapters.plist']
-    core.exclude_files        = ['MoPubSDK/Viewability/Moat', 'MoPubSDK/Viewability/Avid']
+    core.exclude_files        = ['MoPubSDK/Viewability/MOAT', 'MoPubSDK/Viewability/Avid']
   end
 
   spec.subspec 'Avid' do |avid|
