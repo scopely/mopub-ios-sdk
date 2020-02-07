@@ -1,7 +1,7 @@
 //
 //  MPRewardedVideoDelegateHandler.h
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "MPRewardedVideoAdManager.h"
 #import "MPRewardedVideo.h"
+#import "MPImpressionData.h"
 
 /**
  * Delegate capturing object used to handle the following protocols:
@@ -25,6 +26,7 @@
 @property (nonatomic, copy) void(^willDisappear)(void);
 @property (nonatomic, copy) void(^didDisappear)(void);
 @property (nonatomic, copy) void(^didReceiveTap)(void);
+@property (nonatomic, copy) void(^didReceiveImpression)(MPImpressionData *);
 @property (nonatomic, copy) void(^willLeaveApp)(void);
 @property (nonatomic, copy) void(^shouldRewardUser)(MPRewardedVideoReward *);
 

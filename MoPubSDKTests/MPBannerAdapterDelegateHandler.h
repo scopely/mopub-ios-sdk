@@ -1,7 +1,7 @@
 //
 //  MPBannerAdapterDelegateHandler.h
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -26,5 +26,8 @@ typedef void(^MPBannerAdapterDelegateHandlerFailureBlock)(NSError * error);
 @property (nonatomic, copy) MPBannerAdapterDelegateHandlerBlock didFinishUserAction;
 @property (nonatomic, copy) MPBannerAdapterDelegateHandlerBlock willLeaveApplication;
 @property (nonatomic, copy) MPBannerAdapterDelegateHandlerBlock didTrackImpression;
+
+@property (nonatomic, copy) MPBannerAdapterDelegateHandlerBlock willExpand;
+@property (nonatomic, copy) MPBannerAdapterDelegateHandlerBlock didCollapse;
 
 @end

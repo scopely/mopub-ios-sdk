@@ -1,7 +1,7 @@
 //
 //  MPRewardedVideo+Testing.h
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -20,5 +20,8 @@
 
 + (void)loadRewardedVideoAdWithAdUnitID:(NSString *)adUnitID withTestConfiguration:(MPAdConfiguration *)config;
 + (MPRewardedVideoAdManager *)adManagerForAdUnitId:(NSString *)adUnitID;
++ (MPRewardedVideoAdManager *)makeAdManagerForAdUnitId:(NSString *)adUnitId;
+
+- (void)rewardedVideoAdManager:(MPRewardedVideoAdManager *)manager didReceiveImpressionEventWithImpressionData:(MPImpressionData *)impressionData;
 
 @end

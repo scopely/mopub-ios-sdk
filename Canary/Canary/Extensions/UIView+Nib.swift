@@ -1,7 +1,7 @@
 //
 //  UIView+Nib.swift
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -21,7 +21,7 @@ extension UIView {
     
     func sizeFitting(view: UIView) -> CGSize {
         var fittingSize: CGSize = .zero
-        if #available(iOS 11.0, *) {
+        if #available(iOS 11, *) {
             fittingSize = CGSize(width: view.bounds.width - (view.safeAreaInsets.left + view.safeAreaInsets.right), height: 0)
         }
         else {

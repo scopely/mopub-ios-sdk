@@ -1,7 +1,7 @@
 //
 //  NativeAdView.swift
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -51,8 +51,14 @@ class NativeAdView: UIView {
             return
         }
         
+        // Accessibility
+        mainImageView.accessibilityIdentifier = AccessibilityIdentifier.nativeAdImageView
+        
         // Size the nib's view to the container and add it as a subview.
         view.frame = bounds
+        if #available(iOS 13.0, *) {
+            view.backgroundColor = .systemBackground
+        }
         addSubview(view)
         contentView = view
         

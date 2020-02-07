@@ -1,7 +1,7 @@
 //
 //  MenuViewController.swift
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -43,6 +43,17 @@ class MenuViewController: UIViewController {
     func add(menu: MenuDisplayable) {
         dataSource.add(menu: menu)
     }
+    
+    /**
+     Updates the data source if needed.
+     */
+    func updateIfNeeded() {
+        if dataSource.updateIfNeeded() {
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
+    }
 }
 
 extension MenuViewController: UITableViewDataSource {
@@ -75,6 +86,11 @@ extension MenuViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return UITableView.automaticDimension
     }
+    
+    func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        let canSelectRow: Bool = dataSource.canSelect(itemAtIndexPath: indexPath, inTableView: tableView)
+        return (canSelectRow ? indexPath : nil)
+    }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         defer {
@@ -83,10 +99,12 @@ extension MenuViewController: UITableViewDelegate {
         }
         
         // If the menu item was successfully selected, close the menu after presentation
-        if let container = (UIApplication.shared.delegate as? AppDelegate)?.containerViewController,
-            let presentingController = container.mainTabBarController,
-            dataSource.didSelect(itemAtIndexPath: indexPath, inTableView: tableView, presentingFrom: presentingController) {
-            container.closeMenu(animated: true)
+        if let containerViewController = containerViewController,
+            let presentingController = containerViewController.mainTabBarController {
+            let shouldCloseMenu: Bool = dataSource.didSelect(itemAtIndexPath: indexPath, inTableView: tableView, presentingFrom: presentingController)
+            if shouldCloseMenu {
+                containerViewController.closeMenu()
+            }
         }
     }
 }

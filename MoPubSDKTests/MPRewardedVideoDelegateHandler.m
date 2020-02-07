@@ -1,7 +1,7 @@
 //
 //  MPRewardedVideoDelegateHandler.m
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -20,6 +20,7 @@
     self.willDisappear = nil;
     self.didDisappear = nil;
     self.didReceiveTap = nil;
+    self.didReceiveImpression = nil;
     self.willLeaveApp = nil;
     self.shouldRewardUser = nil;
 }
@@ -70,6 +71,10 @@
     if (self.shouldRewardUser != nil) { self.shouldRewardUser(reward); }
 }
 
+- (void)rewardedVideoAdManager:(MPRewardedVideoAdManager *)manager didReceiveImpressionEventWithImpressionData:(MPImpressionData *)impressionData {
+    if (self.didReceiveImpression != nil) { self.didReceiveImpression(impressionData); }
+}
+
 #pragma mark - MPRewardedVideoDelegate
 
 - (void)rewardedVideoAdDidLoadForAdUnitID:(NSString *)adUnitID {
@@ -106,6 +111,10 @@
 
 - (void)rewardedVideoAdDidReceiveTapEventForAdUnitID:(NSString *)adUnitID {
     if (self.didReceiveTap != nil) { self.didReceiveTap(); }
+}
+
+- (void)didTrackImpressionWithAdUnitID:(NSString *)adUnitID impressionData:(MPImpressionData *)impressionData {
+    if (self.didReceiveImpression != nil) { self.didReceiveImpression(impressionData); }
 }
 
 - (void)rewardedVideoAdWillLeaveApplicationForAdUnitID:(NSString *)adUnitID {

@@ -1,7 +1,7 @@
 //
 //  MPBannerCustomEventAdapter.h
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -16,6 +16,7 @@
 @interface MPBannerCustomEventAdapter : MPBaseBannerAdapter <MPPrivateBannerCustomEventDelegate>
 
 - (instancetype)initWithConfiguration:(MPAdConfiguration *)configuration delegate:(id<MPBannerAdapterDelegate>)delegate;
+- (instancetype)withBannerProxy:(WBBannerProxy *)proxy;
 
 - (instancetype)withBannerProxy:(WBBannerProxy *)proxy;
 @end

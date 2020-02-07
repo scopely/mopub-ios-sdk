@@ -1,7 +1,7 @@
 //
 //  MPRewardedVideoAdapterDelegateHandler.m
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -28,5 +28,6 @@
 - (void)rewardedVideoDidReceiveTapEventForAdapter:(MPRewardedVideoAdapter *)adapter { if (self.rewardedVideoDidReceiveTapEvent) self.rewardedVideoDidReceiveTapEvent(adapter); }
 - (void)rewardedVideoWillLeaveApplicationForAdapter:(MPRewardedVideoAdapter *)adapter { if (self.rewardedVideoWillLeaveApplication) self.rewardedVideoWillLeaveApplication(adapter); }
 - (void)rewardedVideoShouldRewardUserForAdapter:(MPRewardedVideoAdapter *)adapter reward:(MPRewardedVideoReward *)reward { if (self.rewardedVideoShouldRewardUser) self.rewardedVideoShouldRewardUser(adapter, reward); }
+- (void)rewardedVideoDidReceiveImpressionEventForAdapter:(MPRewardedVideoAdapter *)adapter { if (self.rewardedVideoDidReceiveImpressionEvent) self.rewardedVideoDidReceiveImpressionEvent(adapter); }
 
 @end

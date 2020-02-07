@@ -1,12 +1,13 @@
 //
 //  MPDiskLRUCache.h
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <Foundation/Foundation.h>
+#import "MPMediaFileCache.h"
 
 @interface MPDiskLRUCache : NSObject
 
@@ -20,4 +21,7 @@
 - (void)storeData:(NSData *)data forKey:(NSString *)key;
 - (void)removeAllCachedFiles;
 
+@end
+
+@interface MPDiskLRUCache (MPMediaFileCache) <MPMediaFileCache>
 @end

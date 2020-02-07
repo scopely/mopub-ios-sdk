@@ -1,7 +1,7 @@
 //
 //  LogingLevelMenuDataSource.swift
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -10,31 +10,21 @@ import UIKit
 import MoPub
 
 fileprivate enum LoggingLevelMenuOptions: String {
-    case all = "All"
-    case trace = "Trace"
     case debug = "Debug"
     case info = "Informational"
-    case warn = "Warnings"
-    case error = "Errors"
-    case fatal = "Fatal"
-    case off = "Off"
+    case none = "None"
     
-    var logLevel: MPLogLevel {
+    var logLevel: MPBLogLevel {
         switch self {
-        case .all: return MPLogLevelAll
-        case .trace: return MPLogLevelTrace
-        case .debug: return MPLogLevelDebug
-        case .info: return MPLogLevelInfo
-        case .warn: return MPLogLevelWarn
-        case .error: return MPLogLevelError
-        case .fatal: return MPLogLevelFatal
-        case .off: return MPLogLevelOff
+        case .debug: return MPBLogLevel.debug
+        case .info: return MPBLogLevel.info
+        case .none: return MPBLogLevel.none
         }
     }
 }
 
 class LogingLevelMenuDataSource {
-    fileprivate let items: [LoggingLevelMenuOptions] = [.all, .trace, .debug, .info, .warn, .error, .fatal, .off]
+    fileprivate let items: [LoggingLevelMenuOptions] = [.debug, .info, .none]
 }
 
 extension LogingLevelMenuDataSource: MenuDisplayable {
@@ -59,9 +49,9 @@ extension LogingLevelMenuDataSource: MenuDisplayable {
      - Returns: A configured `UITableViewCell`
      */
     func cell(forItem index: Int, inTableView tableView: UITableView) -> UITableViewCell {
-        let cell: BasicMenuTableViewCell = basicMenuCell(inTableView: tableView)
+        let cell = tableView.dequeueCellFromNib(cellType: BasicMenuTableViewCell.self)
         let item: LoggingLevelMenuOptions = items[index]
-        let currentLogLevel: MPLogLevel = MoPub.sharedInstance().logLevel
+        let currentLogLevel: MPBLogLevel = MPLogging.consoleLogLevel
         
         cell.accessoryType = (currentLogLevel == item.logLevel ? .checkmark : .none)
         cell.title.text = item.rawValue
@@ -81,14 +71,16 @@ extension LogingLevelMenuDataSource: MenuDisplayable {
     
     /**
      Performs an optional selection action for the menu item
-     - Parameter index: Menu item index assumed to be in bounds
+     - Parameter indexPath: Menu item indexPath assumed to be in bounds
      - Parameter tableView: `UITableView` that rendered the item
      - Parameter viewController: Presenting view controller
+     - Returns: `true` if the menu should collapse when selected; `false` otherwise.
      */
-    func didSelect(itemAt index: Int, inTableView tableView: UITableView, presentFrom viewController: UIViewController) -> Swift.Void {
-        let item: LoggingLevelMenuOptions = items[index]
-        MoPub.sharedInstance().logLevel = item.logLevel
+    func didSelect(itemAt indexPath: IndexPath, inTableView tableView: UITableView, presentFrom viewController: UIViewController) -> Bool {
+        let item: LoggingLevelMenuOptions = items[indexPath.row]
+        MPLogging.consoleLogLevel = item.logLevel
         
         tableView.reloadData()
+        return true
     }
 }

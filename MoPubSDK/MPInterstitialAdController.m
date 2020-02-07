@@ -1,16 +1,19 @@
 //
 //  MPInterstitialAdController.m
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import "MPInterstitialAdController.h"
+#import "MoPub+Utility.h"
 #import "MPAdTargeting.h"
-#import "MPLogging.h"
+#import "MPGlobal.h"
+#import "MPImpressionTrackedNotification.h"
 #import "MPInterstitialAdManager.h"
 #import "MPInterstitialAdManagerDelegate.h"
+#import "MPLogging.h"
 
 @interface MPInterstitialAdController () <MPInterstitialAdManagerDelegate>
 
@@ -50,6 +53,7 @@
         // Create a new ad controller for this ad unit ID if one doesn't already exist.
         if (interstitial == nil) {
             interstitial = [[[self class] alloc] initWithAdUnitId:adUnitId];
+            [[self alloc] initWithAdUnitId:adUnitId];
             interstitials[adUnitId] = interstitial;
         }
 
@@ -64,7 +68,7 @@
 
 - (void)loadAd
 {
-    MPAdTargeting * targeting = [[MPAdTargeting alloc] init];
+    MPAdTargeting * targeting = [MPAdTargeting targetingWithCreativeSafeSize:MPApplicationFrame(YES).size];
     targeting.keywords = self.keywords;
     targeting.localExtras = self.localExtras;
     targeting.location = self.location;
@@ -76,13 +80,13 @@
 - (void)showFromViewController:(UIViewController *)controller
 {
     if (!controller) {
-        MPLogWarn(@"The interstitial could not be shown: "
+        MPLogInfo(@"The interstitial could not be shown: "
                   @"a nil view controller was passed to -showFromViewController:.");
         return;
     }
 
     if (![controller.view.window isKeyWindow]) {
-        MPLogWarn(@"Attempted to present an interstitial ad in non-key window. The ad may not render properly");
+        MPLogInfo(@"Attempted to present an interstitial ad in non-key window. The ad may not render properly");
     }
 
     [self.manager presentInterstitialFromViewController:controller];
@@ -115,20 +119,18 @@
     return self.delegate;
 }
 
-
 - (void)managerWillStartInterstitialAttempt:(MPInterstitialAdManager *)manager
 {
-    if ([self.delegate respondsToSelector:@selector(interstitialWillStartAttemptToLoadAd:customEventClass:)]) {
+    if ([self.delegate respondsToSelector:@selector(interstitialWillStartAttemptToLoadAd:customEventClass:withLineItemId:)]) {
         NSString *customEventClass = NSStringFromClass([manager customEventClass]);
-        [self.delegate interstitialWillStartAttemptToLoadAd:self customEventClass:customEventClass];
+        [self.delegate interstitialWillStartAttemptToLoadAd:self customEventClass:customEventClass withLineItemId:[manager lineItemId]];
     }
 }
 
 - (void)managerDidSucceedInterstitialAttempt:(MPInterstitialAdManager *)manager
 {
-    if ([self.delegate respondsToSelector:@selector(interstitialDidSucceedAttemptToLoadAd:creativeId:)]) {
-        NSString *creativeId = [manager dspCreativeId];
-        [self.delegate interstitialDidSucceedAttemptToLoadAd:self creativeId:creativeId];
+    if ([self.delegate respondsToSelector:@selector(interstitialDidSucceedAttemptToLoadAd:withCreativeId:)]) {
+        [self.delegate interstitialDidSucceedAttemptToLoadAd:self withCreativeId:[manager dspCreativeId]];
     }
 }
 
@@ -196,6 +198,12 @@
     if ([self.delegate respondsToSelector:@selector(interstitialDidReceiveTapEvent:)]) {
         [self.delegate interstitialDidReceiveTapEvent:self];
     }
+}
+
+- (void)interstitialAdManager:(MPInterstitialAdManager *)manager didReceiveImpressionEventWithImpressionData:(MPImpressionData *)impressionData {
+    [MoPub sendImpressionDelegateAndNotificationFromAd:self
+                                              adUnitID:self.adUnitId
+                                        impressionData:impressionData];
 }
 
 + (NSMutableArray *)sharedInterstitialAdControllers

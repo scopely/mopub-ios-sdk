@@ -1,13 +1,13 @@
 //
 //  MPRealTimeTimerTests.m
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <XCTest/XCTest.h>
-#import "MPRealTimeTimer.h"
+#import "MPRealTimeTimer+Testing.h"
 
 static NSTimeInterval const kTestTimeout = 4;
 static NSTimeInterval const kTestLength = 2;
@@ -135,6 +135,34 @@ static NSTimeInterval const kTestTooLong = 10000;
         [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationWillEnterForegroundNotification object:nil];
         [foregroundExpectation fulfill];
     });
+
+    [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError *error) {
+        XCTAssertNil(error);
+    }];
+
+    XCTAssertTrue(timerFired);
+    XCTAssertFalse(self.timer.isScheduled);
+}
+
+- (void)testTimerDoesNotGetResetOnNewWindow {
+    XCTestExpectation *fireExpectation = [self expectationWithDescription:@"Expect timer to fire"];
+
+    __block BOOL timerFired = NO;
+    self.timer = [[MPRealTimeTimer alloc] initWithInterval:kTestLength block:^(MPRealTimeTimer *timer){
+        timerFired = YES;
+        [fireExpectation fulfill];
+    }];
+    [self.timer scheduleNow];
+    MPTimer * backingTimer = self.timer.timer;
+    XCTAssertTrue(self.timer.isScheduled);
+
+    XCTAssertFalse(timerFired);
+
+    // Open new windows
+    [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationWillEnterForegroundNotification object:nil];
+
+    XCTAssertEqual(backingTimer, self.timer.timer); // Intentionally compare references to be sure the backing timer instance did not change
 
     [self waitForExpectationsWithTimeout:kTestTimeout handler:^(NSError *error) {
         XCTAssertNil(error);

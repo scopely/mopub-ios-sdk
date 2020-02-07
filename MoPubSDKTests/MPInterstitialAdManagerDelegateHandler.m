@@ -1,7 +1,7 @@
 //
 //  MPInterstitialAdManagerDelegateHandler.m
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -40,6 +40,10 @@
 
 - (void)managerDidReceiveTapEventFromInterstitial:(MPInterstitialAdManager *)manager {
     if (self.didTap != nil) { self.didTap(); }
+}
+
+- (void)interstitialAdManager:(MPInterstitialAdManager *)manager didReceiveImpressionEventWithImpressionData:(MPImpressionData *)impressionData {
+    if (self.didReceiveImpression != nil) { self.didReceiveImpression(impressionData); }
 }
 
 @end

@@ -1,7 +1,7 @@
 //
 //  MPVASTCompanionAd.m
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -10,6 +10,7 @@
 #import "MPVASTResource.h"
 #import "MPVASTStringUtilities.h"
 #import "MPVASTTrackingEvent.h"
+#import "MPVASTTracking.h"
 
 @implementation MPVASTCompanionAd
 
@@ -30,7 +31,7 @@
             }
             [events addObject:event];
         }
-        _trackingEvents = eventsDictionary;
+        _creativeViewTrackers = eventsDictionary[MPVideoEventCreativeView];
     }
     return self;
 }
@@ -48,6 +49,12 @@
              @"HTMLResources":      @[@"HTMLResource", MPParseArrayOf(MPParseClass([MPVASTResource class]))],
              @"iframeResources":    @[@"IFrameResource", MPParseArrayOf(MPParseClass([MPVASTResource class]))],
              @"staticResources":    @[@"StaticResource", MPParseArrayOf(MPParseClass([MPVASTResource class]))]};
+}
+
+- (BOOL)hasResources {
+    return (self.staticResources.count > 0
+            || self.HTMLResources.count > 0
+            || self.iframeResources.count > 0);
 }
 
 @end

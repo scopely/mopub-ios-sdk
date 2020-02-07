@@ -1,16 +1,23 @@
 //
 //  AdUnitTableViewController.swift
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 import UIKit
+import AVFoundation
+
+struct AdUnitTableViewControllerSegueIdentifier {
+    static let ModallyPresentCameraInterfaceSegueIdentifier = "modallyPresentCameraInterfaceViewController"
+    static let ModallyPresentManualEntryInterfaceSegueIdentifier = "modallyPresentManualEntryInterfaceViewController"
+}
 
 class AdUnitTableViewController: UIViewController {
     // Outlets from `Main.storyboard`
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet var addButton: UIBarButtonItem?
     
     // Table data source.
     fileprivate var dataSource: AdUnitDataSource? = nil
@@ -36,6 +43,12 @@ class AdUnitTableViewController: UIViewController {
         AdUnitTableViewHeader.register(with: tableView)
         tableView.dataSource = self
         tableView.delegate = self
+        
+        // Set up background color for Dark Mode
+        if #available(iOS 13.0, *) {
+            tableView.dragDelegate = self
+            view.backgroundColor = .systemBackground
+        }
     }
     
     // MARK: - Ad Loading
@@ -46,7 +59,10 @@ class AdUnitTableViewController: UIViewController {
             return
         }
         
-        splitViewController?.showDetailViewController(destination, sender: self)
+        // Embed the destination ad view controller into a navigation controller so that
+        // pushing onto the navigation stack will work.
+        let navigationController: UINavigationController = UINavigationController(rootViewController: destination)
+        splitViewController?.showDetailViewController(navigationController, sender: self)
     }
     
     /**
@@ -56,6 +72,44 @@ class AdUnitTableViewController: UIViewController {
     public func reloadData() {
         dataSource?.reloadData()
         tableView.reloadData()
+    }
+    
+    // MARK: - IBActions
+    
+    @IBAction func addButtonAction(_ sender: Any) {
+        let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: QRCodeCameraInterfaceViewController.defaultMediaType)
+        let showCameraButton = cameraAuthorizationStatus == .authorized || cameraAuthorizationStatus == .notDetermined ? true : false
+        
+        // If camera use is not authorized, show the manual interface without giving a choice
+        if !showCameraButton {
+            performSegue(withIdentifier: AdUnitTableViewControllerSegueIdentifier.ModallyPresentManualEntryInterfaceSegueIdentifier, sender: self)
+            return
+        }
+        
+        // If camera use is authorized, show action sheet with a choice between manual interface and camera interface
+        
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        actionSheet.addAction(UIAlertAction(title: "Enter Ad Unit ID Manually", style: .default, handler: { [unowned self] _ in
+            self.performSegue(withIdentifier: AdUnitTableViewControllerSegueIdentifier.ModallyPresentManualEntryInterfaceSegueIdentifier, sender: self)
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "Use QR Code", style: .default, handler: { [unowned self] _ in
+            self.performSegue(withIdentifier: AdUnitTableViewControllerSegueIdentifier.ModallyPresentCameraInterfaceSegueIdentifier, sender: self)
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        if let popoverPresentationController = actionSheet.popoverPresentationController {
+            guard let barButtonItem = sender as? UIBarButtonItem else {
+                assertionFailure("\(#function) sender is not `UIBarButtonItem` as expected")
+                return
+            }
+            // ADF-4094: app will crash if popover source is not set for popover presentation
+            popoverPresentationController.barButtonItem = barButtonItem
+        }
+        
+        present(actionSheet, animated: true, completion: nil)
     }
 }
 
@@ -71,11 +125,12 @@ extension AdUnitTableViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let adUnitCell: AdUnitTableViewCell = tableView.dequeueReusableCell(withIdentifier: AdUnitTableViewCell.reuseId, for: indexPath) as? AdUnitTableViewCell,
-            let adUnit: AdUnit = dataSource?.item(at: indexPath) else {
+        guard let adUnit: AdUnit = dataSource?.item(at: indexPath) else {
             return UITableViewCell()
         }
         
+        let adUnitCell = tableView.dequeueCellFromNib(cellType: AdUnitTableViewCell.self)
+        adUnitCell.accessibilityIdentifier = adUnit.id
         adUnitCell.refresh(adUnit: adUnit)
         adUnitCell.setNeedsLayout()
         return adUnitCell
@@ -86,15 +141,12 @@ extension AdUnitTableViewController: UITableViewDelegate {
     // MARK: - UITableViewDelegate
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // Intentionally not to deselect cell to help user to keep track of the long list
         guard let adUnit: AdUnit = dataSource?.item(at: indexPath) else {
-            tableView.deselectRow(at: indexPath, animated: true)
             return
         }
         
         loadAd(with: adUnit)
-        
-        // Unselect the row.
-        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -113,5 +165,27 @@ extension AdUnitTableViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return UITableView.automaticDimension
+    }
+}
+
+// MARK: - UITableViewDragDelegate
+
+@available(iOS 11, *)
+extension AdUnitTableViewController: UITableViewDragDelegate {
+    func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        // Drag & Drop is available since iOS 11, but multi-scene is available since iOS 13.
+        guard
+            #available(iOS 13, *),
+            let adUnit: AdUnit = dataSource?.item(at: indexPath)else {
+            return []
+        }
+        
+        let itemProvider = NSItemProvider()
+        itemProvider.registerObject(adUnit.openAdViewActivity , visibility: .all)
+
+        let dragItem = UIDragItem(itemProvider: itemProvider)
+        dragItem.localObject = adUnit
+        
+        return [dragItem]
     }
 }

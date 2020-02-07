@@ -1,13 +1,14 @@
 //
 //  MPRewardedVideoAdManager.h
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <UIKit/UIKit.h>
 #import "MPAdTargeting.h"
+#import "MPImpressionData.h"
 
 @class MPRewardedVideoReward;
 @protocol MPRewardedVideoAdManagerDelegate;
@@ -23,6 +24,8 @@
 @property (nonatomic, strong) NSArray *mediationSettings;
 @property (nonatomic, copy) NSString *customerId;
 @property (nonatomic, readonly) NSString *dspCreativeId;
+
+@property (nonatomic, readonly) NSString *lineItemId;
 @property (nonatomic, strong) MPAdTargeting *targeting;
 
 /**
@@ -81,6 +84,7 @@
 @end
 
 @protocol MPRewardedVideoAdManagerDelegate <NSObject>
+
 - (void)rewardedVideoWillStartAttemptForAdManager:(MPRewardedVideoAdManager *)manager;
 - (void)rewardedVideoDidSucceedAttemptForAdManager:(MPRewardedVideoAdManager *)manager;
 - (void)rewardedVideoDidFailAttemptForAdManager:(MPRewardedVideoAdManager *)manager error:(NSError*)error;
@@ -93,6 +97,7 @@
 - (void)rewardedVideoWillDisappearForAdManager:(MPRewardedVideoAdManager *)manager;
 - (void)rewardedVideoDidDisappearForAdManager:(MPRewardedVideoAdManager *)manager;
 - (void)rewardedVideoDidReceiveTapEventForAdManager:(MPRewardedVideoAdManager *)manager;
+- (void)rewardedVideoAdManager:(MPRewardedVideoAdManager *)manager didReceiveImpressionEventWithImpressionData:(MPImpressionData *)impressionData;
 - (void)rewardedVideoWillLeaveApplicationForAdManager:(MPRewardedVideoAdManager *)manager;
 - (void)rewardedVideoShouldRewardUserForAdManager:(MPRewardedVideoAdManager *)manager reward:(MPRewardedVideoReward *)reward;
 

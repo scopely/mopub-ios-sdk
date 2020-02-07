@@ -1,13 +1,14 @@
 //
 //  MPRewardedVideo.h
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "MPImpressionData.h"
 
 @class MPRewardedVideoReward;
 @class CLLocation;
@@ -182,8 +183,9 @@
  *
  * @param adUnitID The ad unit ID of the ad associated with the event.
  * @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
+ * @param lineItemId The id of line item the ad belongs to.
  */
-- (void)rewardedVideoWillStartAttemptForAdUnitID:(NSString *)adUnitID customEventClass:(NSString*)customEventClass;
+- (void)rewardedVideoWillStartAttemptForAdUnitID:(NSString *)adUnitID customEventClass:(NSString*)customEventClass withLineItemId:(NSString*)lineItemId;
 
 /**
  * This method is called after an ad attempt succeeds to load.
@@ -191,7 +193,7 @@
  * @param adUnitID The ad unit ID of the ad associated with the event.
  * @param creativeId The id of the creative loaded.
  */
-- (void)rewardedVideoDidSucceedAttemptForAdUnitID:(NSString *)adUnitID creativeId:(NSString *)creativeId;
+- (void)rewardedVideoDidSucceedAttemptForAdUnitID:(NSString *)adUnitID withCreativeId:(NSString*)creativeId;
 
 /**
  * This method is called after an ad attempt fails to load.
@@ -280,5 +282,13 @@
  * @param reward The object that contains all the information regarding how much you should reward the user.
  */
 - (void)rewardedVideoAdShouldRewardForAdUnitID:(NSString *)adUnitID reward:(MPRewardedVideoReward *)reward;
+
+/**
+ Called when an impression is fired on a Rewarded Video. Includes information about the impression if applicable.
+
+ @param adUnitID The ad unit ID of the rewarded video that fired the impression.
+ @param impressionData Information about the impression, or @c nil if the server didn't return any information.
+ */
+- (void)didTrackImpressionWithAdUnitID:(NSString *)adUnitID impressionData:(MPImpressionData *)impressionData;
 
 @end

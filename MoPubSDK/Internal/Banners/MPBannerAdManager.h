@@ -1,7 +1,7 @@
 //
 //  MPBannerAdManager.h
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -17,6 +17,11 @@
 @interface MPBannerAdManager : NSObject <MPAdServerCommunicatorDelegate, MPBannerAdapterDelegate>
 
 @property (nonatomic, weak) id<MPBannerAdManagerDelegate> delegate;
+@property (nonatomic, readonly) BOOL isMraidAd;
+
+@property (nonatomic, readonly) Class customEventClass;
+@property (nonatomic, readonly) NSString* dspCreativeId;
+@property (nonatomic, readonly) NSString* lineItemId;
 
 @property (nonatomic, readonly) Class customEventClass;
 @property (nonatomic, readonly) NSString* dspCreativeId;
@@ -29,6 +34,7 @@
 - (void)stopAutomaticallyRefreshingContents;
 - (void)startAutomaticallyRefreshingContents;
 - (void)rotateToOrientation:(UIInterfaceOrientation)orientation;
+- (NSString *)getDspCreativeId;
 
 - (NSString *)getDspCreativeId;
 @end

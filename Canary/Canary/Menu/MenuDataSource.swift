@@ -1,7 +1,7 @@
 //
 //  MenuDataSource.swift
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -14,7 +14,11 @@ class MenuDataSource {
     /**
      Ordered section titles
      */
-    private(set) var sections: [String] = []
+    private(set) var sections: [String] = [] {
+        didSet {
+            sections.sort()
+        }
+    }
     
     /**
      Internal data sources for each menu grouping
@@ -24,8 +28,9 @@ class MenuDataSource {
     // MARK: - Initialization
     
     init() {
-        add(menu: PrivacyMenuDataSource())
+        add(menu: AdapterVersionsMenuDataSource())
         add(menu: LogingLevelMenuDataSource())
+        add(menu: NativeAdRendererMenuDataSource())
     }
     
     // MARK: - Data Source
@@ -43,6 +48,14 @@ class MenuDataSource {
         sources[menu.title] = menu
     }
     
+    /**
+     Updates all data sources if needed.
+     - Returns: `true` update happened; `false` otherwise.
+     */
+    func updateIfNeeded() -> Bool {
+        return sources.values.reduce(false) { $0 || $1.updateIfNeeded() }
+    }
+    
     // MARK: - Accessors
     
     func cell(forIndexPath indexPath: IndexPath, inTableView tableView: UITableView) -> UITableViewCell {
@@ -57,12 +70,13 @@ class MenuDataSource {
         return sources[sections[index]]?.count ?? 0
     }
     
+    func canSelect(itemAtIndexPath indexPath: IndexPath, inTableView tableView: UITableView) -> Bool {
+        return sources[sections[indexPath.section]]?.canSelect(itemAt: indexPath.row, inTableView: tableView) ?? false
+    }
+    
     func didSelect(itemAtIndexPath indexPath: IndexPath, inTableView tableView: UITableView, presentingFrom viewController: UIViewController) -> Bool {
-        let canSelect = sources[sections[indexPath.section]]?.canSelect(itemAt: indexPath.row, inTableView: tableView) ?? false
-        if canSelect {
-            sources[sections[indexPath.section]]?.didSelect(itemAt: indexPath.row, inTableView: tableView, presentFrom: viewController)
-        }
+        let shouldCloseMenu: Bool = sources[sections[indexPath.section]]?.didSelect(itemAt: indexPath, inTableView: tableView, presentFrom: viewController) ?? true
         
-        return canSelect
+        return shouldCloseMenu
     }
 }
