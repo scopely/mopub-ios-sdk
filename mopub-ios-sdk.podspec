@@ -50,6 +50,11 @@ Pod::Spec.new do |spec|
     core.exclude_files        = ['MoPubSDK/Viewability/Moat', 'MoPubSDK/Viewability/Avid']
   end
 
+  spec.subspec 'NativeAds' do |native|
+    native.dependency             'mopub-ios-sdk/Core'
+    native.source_files         = ['MoPubSDK/NativeAds/**/*.{h,m}', 'MoPubSDK/NativeVideo/**/*.{h,m}']
+  end
+
   spec.subspec 'Avid' do |avid|
     avid.dependency             'mopub-ios-sdk/Core'
     avid.source_files         = 'MoPubSDK/Viewability/Avid/*.{h,m}'
