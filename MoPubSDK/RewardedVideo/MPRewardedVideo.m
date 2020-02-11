@@ -201,26 +201,26 @@ static MPRewardedVideo *gSharedInstance = nil;
 
 - (void)rewardedVideoWillStartAttemptForAdManager:(MPRewardedVideoAdManager *)manager
 {
-    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
+    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
     if ([delegate respondsToSelector:@selector(rewardedVideoWillStartAttemptForAdUnitID:customEventClass:withLineItemId:)]) {
         NSString *customEventClass = NSStringFromClass([manager customEventClass]);
-        [delegate rewardedVideoWillStartAttemptForAdUnitID:manager.adUnitID customEventClass:customEventClass withLineItemId:[manager lineItemId]];
+        [delegate rewardedVideoWillStartAttemptForAdUnitID:manager.adUnitId customEventClass:customEventClass withLineItemId:[manager lineItemId]];
     }
 }
 
 - (void)rewardedVideoDidSucceedAttemptForAdManager:(MPRewardedVideoAdManager *)manager
 {
-    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
+    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
     if ([delegate respondsToSelector:@selector(rewardedVideoDidSucceedAttemptForAdUnitID:withCreativeId:)]) {
-        [delegate rewardedVideoDidSucceedAttemptForAdUnitID:manager.adUnitID withCreativeId:[manager dspCreativeId]];
+        [delegate rewardedVideoDidSucceedAttemptForAdUnitID:manager.adUnitId withCreativeId:[manager dspCreativeId]];
     }
 }
 
 - (void)rewardedVideoDidFailAttemptForAdManager:(MPRewardedVideoAdManager *)manager error:(NSError *)error
 {
-    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitID];
+    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
     if ([delegate respondsToSelector:@selector(rewardedVideoDidFailAttemptForAdUnitID:error:)]) {
-        [delegate rewardedVideoDidFailAttemptForAdUnitID:manager.adUnitID error:error];
+        [delegate rewardedVideoDidFailAttemptForAdUnitID:manager.adUnitId error:error];
     }
 }
 
