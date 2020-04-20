@@ -68,6 +68,15 @@
     return self.configuration.customEventClass;
 }
 
+- (NSString*)dspCreativeId
+{
+    return self.configuration.dspCreativeId;
+}
+
+- (NSString*)lineItemId {
+    return self.configuration.lineItemId;
+}
+
 - (BOOL)hasAdAvailable
 {
     //An Ad is not ready or has expired.
@@ -210,6 +219,7 @@
     }
 
     self.adapter = adapter;
+    [self.delegate rewardedVideoWillStartAttemptForAdManager:self];
     [self.adapter getAdWithConfiguration:configuration targeting:self.targeting];
 }
 
@@ -259,6 +269,7 @@
 
 - (void)rewardedVideoDidLoadForAdapter:(MPRewardedVideoAdapter *)adapter
 {
+    [self.delegate rewardedVideoDidSucceedAttemptForAdManager:self];
     self.remainingConfigurations = nil;
     self.ready = YES;
     self.loading = NO;
@@ -274,6 +285,8 @@
 
 - (void)rewardedVideoDidFailToLoadForAdapter:(MPRewardedVideoAdapter *)adapter error:(NSError *)error
 {
+    [self.delegate rewardedVideoDidFailAttemptForAdManager:self error:error];
+
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker
     // with the appropriate error code result.
     NSTimeInterval duration = [self.loadStopwatch stop];
@@ -383,6 +396,11 @@
 - (NSString *)rewardedVideoCustomerId
 {
     return self.customerId;
+}
+
+- (NSString *) getCreativeId
+{
+    return self.configuration.dspCreativeId;
 }
 
 @end

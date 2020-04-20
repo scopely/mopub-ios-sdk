@@ -47,6 +47,7 @@ typedef NS_ENUM(NSUInteger, MPVASTPlayerVersion) {
     MPVASTPlayerVersionNativePlayer = 2
 };
 
+NSString * const kAdLineItemIdKey = @"x-adgroupid";
 NSString * const kAdTypeMetadataKey = @"x-adtype";
 NSString * const kAdUnitWarmingUpMetadataKey = @"x-warmup";
 NSString * const kClickthroughMetadataKey = @"x-clickthrough";
@@ -224,6 +225,8 @@ NSString * const kVASTClickabilityExperimentKey = @"vast-click-enabled";
     self.creationTimestamp = [NSDate date];
 
     self.creativeId = [metadata objectForKey:kCreativeIdMetadataKey];
+
+    self.lineItemId = [metadata objectForKey:kAdLineItemIdKey];
 
     self.metadataAdType = [metadata objectForKey:kAdTypeMetadataKey];
 

@@ -222,6 +222,8 @@ IB_DESIGNABLE
  */
 - (void)stopAutomaticallyRefreshingContents;
 
+- (NSString *)getCreativeId;
+
 /**
  * Causes the ad view to periodically load new advertisements in accordance with user-defined
  * refresh settings on the MoPub website.
