@@ -40,31 +40,16 @@ Pod::Spec.new do |spec|
 
   spec.subspec 'MoPubSDK' do |sdk|
     sdk.dependency              'mopub-ios-sdk/Core'
-    sdk.dependency              'mopub-ios-sdk/Avid'
-    sdk.dependency              'mopub-ios-sdk/Moat'
   end
 
   spec.subspec 'Core' do |core|
     core.source_files         = 'MoPubSDK/**/*.{h,m}'
     core.resources            = ['MoPubSDK/**/*.{png,bundle,xib,nib}', 'MoPubSDK/**/MPAdapters.plist']
-    core.exclude_files        = ['MoPubSDK/Viewability/Moat', 'MoPubSDK/Viewability/Avid']
   end
 
   spec.subspec 'NativeAds' do |native|
     native.dependency             'mopub-ios-sdk/Core'
     native.source_files         = ['MoPubSDK/NativeAds/**/*.{h,m}', 'MoPubSDK/NativeVideo/**/*.{h,m}']
-  end
-
-  spec.subspec 'Avid' do |avid|
-    avid.dependency             'mopub-ios-sdk/Core'
-    avid.source_files         = 'MoPubSDK/Viewability/Avid/*.{h,m}'
-    avid.vendored_libraries   = 'MoPubSDK/Viewability/Avid/*.{a}'
-  end
-
-  spec.subspec 'Moat' do |moat|
-    moat.dependency             'mopub-ios-sdk/Core'
-    moat.vendored_frameworks  = 'MoPubSDK/Viewability/Moat/MPUBMoatMobileAppKit.framework'
-    moat.source_files         = 'MoPubSDK/Viewability/MOAT/*.{h,m}'
   end
 end
 
