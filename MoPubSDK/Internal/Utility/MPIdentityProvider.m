@@ -17,11 +17,6 @@
 #define MOPUB_ALL_ZERO_UUID @"00000000-0000-0000-0000-000000000000"
 NSString *const mopubPrefix = @"mopub:";
 
-
-
-// All zero UUID
-static NSString * const kAllZeroUUID = @"00000000-0000-0000-0000-000000000000";
-
 static BOOL gFrequencyCappingIdUsageEnabled = YES;
 
 @interface MPIdentityProvider ()
