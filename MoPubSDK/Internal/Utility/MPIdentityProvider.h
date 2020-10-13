@@ -6,6 +6,7 @@
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
+#import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <Foundation/Foundation.h>
 
 @interface MPIdentityProvider : NSObject
@@ -30,7 +31,14 @@
  */
 + (NSString *)unobfuscatedMoPubIdentifier;
 
-+ (BOOL)advertisingTrackingEnabled;
+/**
+ Returns @c YES if Limit Ad Tracking is OFF (including if
+ @c trackingAuthorizationStatus reports as
+ @c ATTrackingManagerAuthorizationStatusAuthorized in iOS 14)
+
+ Returns @c NO if Limit Ad Tracking is ON
+ */
+@property (class, nonatomic, assign, readonly) BOOL advertisingTrackingEnabled;
 
 /**
  * A Boolean value indicating whether the MoPub SDK should create a MoPub ID that can be used
@@ -43,5 +51,12 @@
  */
 + (void)setFrequencyCappingIdUsageEnabled:(BOOL)frequencyCappingIdUsageEnabled;
 + (BOOL)frequencyCappingIdUsageEnabled;
+
+/**
+ Returns the present @c trackingAuthorizationStatus of the application.
+
+ Only available on iOS 14.
+ */
+@property (class, nonatomic, assign, readonly) ATTrackingManagerAuthorizationStatus trackingAuthorizationStatus API_AVAILABLE(ios(14.0));
 
 @end

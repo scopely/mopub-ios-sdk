@@ -17,6 +17,11 @@
 #define MOPUB_ALL_ZERO_UUID @"00000000-0000-0000-0000-000000000000"
 NSString *const mopubPrefix = @"mopub:";
 
+
+
+// All zero UUID
+static NSString * const kAllZeroUUID = @"00000000-0000-0000-0000-000000000000";
+
 static BOOL gFrequencyCappingIdUsageEnabled = YES;
 
 @interface MPIdentityProvider ()
@@ -68,6 +73,27 @@ static BOOL gFrequencyCappingIdUsageEnabled = YES;
 
 + (BOOL)advertisingTrackingEnabled
 {
+    if (@available(iOS 14.0, *)) {
+        /*
+         As of iOS 14, Apple does not provide an explicit means of checking if the IDFA is available.
+         The IDFA may or may not be available with an ATT status of NotDetermined, depending on if
+         Apple has decided to enforce ATT as opt-in as they plan to. Therefore, if the ATT status
+         is NotDetermined, use the IDFA itself to work out the return value of this method.
+         @c MPConsentManager depends on this method to detect DoNotTrack consent status. Given that,
+         if this method were to use the @c ifa getter to grab the IDFA, which checks @c MPConsentManager
+         to verify if IDFA is allowed to be collected, any GDPR status other than explicit_yes, combined
+         with a "not_determined" ATT status, would result in @c MPConsentManager mistakenly locking into
+         a DNT state. Therefore, check @c MPConsentManager's @c rawIfa value directly. Note that
+         we are only checking if the IDFA is non-nil; IDFA is not collected here and should not ever
+         be collected via any means besides the @c ifa getter below (minus special circumstances
+         internal to @c MPConsentManager).
+        */
+        NSString *identifier = ASIdentifierManager.sharedManager.advertisingIdentifier.UUIDString;
+        return self.trackingAuthorizationStatus == ATTrackingManagerAuthorizationStatusAuthorized ||
+            (self.trackingAuthorizationStatus == ATTrackingManagerAuthorizationStatusNotDetermined &&
+             ![identifier isEqualToString:MOPUB_ALL_ZERO_UUID]);
+    }
+
     return [[ASIdentifierManager sharedManager] isAdvertisingTrackingEnabled];
 }
 
@@ -131,6 +157,10 @@ static BOOL gFrequencyCappingIdUsageEnabled = YES;
 + (BOOL)frequencyCappingIdUsageEnabled
 {
     return gFrequencyCappingIdUsageEnabled;
+}
+
++ (ATTrackingManagerAuthorizationStatus)trackingAuthorizationStatus {
+    return ATTrackingManager.trackingAuthorizationStatus;
 }
 
 @end
