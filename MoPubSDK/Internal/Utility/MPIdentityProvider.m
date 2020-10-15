@@ -84,9 +84,7 @@ static BOOL gFrequencyCappingIdUsageEnabled = YES;
          internal to @c MPConsentManager).
         */
         NSString *identifier = ASIdentifierManager.sharedManager.advertisingIdentifier.UUIDString;
-        return self.trackingAuthorizationStatus == ATTrackingManagerAuthorizationStatusAuthorized ||
-            (self.trackingAuthorizationStatus == ATTrackingManagerAuthorizationStatusNotDetermined &&
-             ![identifier isEqualToString:MOPUB_ALL_ZERO_UUID]);
+        return ![identifier isEqualToString:MOPUB_ALL_ZERO_UUID];
     }
 
     return [[ASIdentifierManager sharedManager] isAdvertisingTrackingEnabled];
@@ -152,10 +150,6 @@ static BOOL gFrequencyCappingIdUsageEnabled = YES;
 + (BOOL)frequencyCappingIdUsageEnabled
 {
     return gFrequencyCappingIdUsageEnabled;
-}
-
-+ (ATTrackingManagerAuthorizationStatus)trackingAuthorizationStatus {
-    return ATTrackingManager.trackingAuthorizationStatus;
 }
 
 @end

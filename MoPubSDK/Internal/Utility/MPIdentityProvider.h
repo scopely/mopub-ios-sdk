@@ -6,7 +6,6 @@
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
-#import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <Foundation/Foundation.h>
 
 @interface MPIdentityProvider : NSObject
@@ -52,11 +51,5 @@
 + (void)setFrequencyCappingIdUsageEnabled:(BOOL)frequencyCappingIdUsageEnabled;
 + (BOOL)frequencyCappingIdUsageEnabled;
 
-/**
- Returns the present @c trackingAuthorizationStatus of the application.
-
- Only available on iOS 14.
- */
-@property (class, nonatomic, assign, readonly) ATTrackingManagerAuthorizationStatus trackingAuthorizationStatus API_AVAILABLE(ios(14.0));
 
 @end
