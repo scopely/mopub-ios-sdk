@@ -235,4 +235,6 @@ IB_DESIGNABLE
  */
 - (void)startAutomaticallyRefreshingContents;
 
+- (NSString *)getCreativeId;
+
 @end

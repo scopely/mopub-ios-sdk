@@ -71,6 +71,20 @@
     self.adapter = nil;
 }
 
+- (Class)customEventClass
+{
+    return self.requestingConfiguration.customEventClass;
+}
+
+- (NSString*)dspCreativeId
+{
+    return self.requestingConfiguration.dspCreativeId;
+}
+
+- (NSString*)lineItemId {
+    return self.requestingConfiguration.lineItemId;
+}
+
 #pragma mark - Public
 
 - (void)loadAdWithURL:(NSURL *)URL
@@ -179,6 +193,8 @@
         [self adapter:nil didFailToLoadAdWithError:nil];
         return;
     }
+    
+    [self.delegate managerWillStartInterstitialAttempt:self];
 
     NSObject *object = [configuration.adapterClass new];
     if ([object isKindOfClass:MPFullscreenAdAdapter.class]) {
@@ -212,6 +228,8 @@
             self.remainingConfigurations = nil;
             self.ready = YES;
             self.loading = NO;
+            
+            [self.delegate managerDidSucceedInterstitialAttempt:self];
 
             // Record the end of the adapter load and send off the fire and forget after-load-url tracker.
             NSTimeInterval duration = [self.loadStopwatch stop];
@@ -269,6 +287,7 @@
 - (void)adapter:(id<MPAdAdapter> _Nullable)adapter didFailToLoadAdWithError:(NSError *)error {
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker
     // with the appropriate error code result.
+    [self.delegate manager:self didFailInterstitialAttemptWithError:error];
     NSTimeInterval duration = [self.loadStopwatch stop];
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
     [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:result];

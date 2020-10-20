@@ -37,6 +37,7 @@
 #define AFTER_LOAD_DURATION_MACRO   @"%%LOAD_DURATION_MS%%"
 #define AFTER_LOAD_RESULT_MACRO   @"%%LOAD_RESULT%%"
 
+NSString * const kAdLineItemIdKey = @"x-adgroupid";
 NSString * const kAdTypeMetadataKey = @"x-adtype";
 NSString * const kAdUnitWarmingUpMetadataKey = @"x-warmup";
 NSString * const kClickthroughMetadataKey = @"clicktrackers";
@@ -206,6 +207,8 @@ NSString * const kVASTClickabilityExperimentKey = @"vast-click-enabled";
     self.creationTimestamp = [NSDate date];
 
     self.creativeId = [metadata objectForKey:kCreativeIdMetadataKey];
+    
+    self.lineItemId = [metadata objectForKey:kAdLineItemIdKey];
 
     self.metadataAdType = [metadata objectForKey:kAdTypeMetadataKey];
 

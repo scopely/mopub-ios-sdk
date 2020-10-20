@@ -88,6 +88,20 @@
     return self.communicator.loading || self.requestingAdapter;
 }
 
+- (Class)customEventClass
+{
+    return self.requestingConfiguration.customEventClass;
+}
+
+- (NSString*)dspCreativeId
+{
+    return self.requestingConfiguration.dspCreativeId;
+}
+
+- (NSString*)lineItemId {
+    return self.requestingConfiguration.lineItemId;
+}
+
 - (void)loadAdWithTargeting:(MPAdTargeting *)targeting
 {
     MPLogAdEvent(MPLogEvent.adLoadAttempt, self.delegate.adUnitId);
@@ -204,6 +218,7 @@
 
 - (void)refreshTimerDidFire
 {
+    [self.delegate managerRefreshAd:self.requestingAdapterAdContentView];
     if (!self.loading) {
         // Instead of reusing the existing `MPAdTargeting` that is potentially outdated, ask the
         // delegate to provide the `MPAdTargeting` so that it's the latest.
@@ -253,7 +268,8 @@
 
     self.requestingAdapter.adUnitId = self.adUnitId;
     self.requestingAdapter.adapterDelegate = self;
-
+    
+    [self.delegate bannerWillStartAttemptForAdManager:self];
     [self.requestingAdapter getAdWithConfiguration:configuration targeting:self.targeting];
 }
 
@@ -375,7 +391,8 @@
     NSTimeInterval duration = [self.loadStopwatch stop];
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
     [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:result];
-
+    
+    [self.delegate bannerDidSucceedAttemptForAdManager:self];
     if (self.requestingAdapter == adapter) {
         // There are more ad configurations to try.
         if (self.remainingConfigurations.count > 0) {
@@ -468,6 +485,10 @@
     // Once the banner ad is collapsed back into its default state, the refresh timer
     // should be resumed to queue up the next ad.
     [self resumeRefreshTimer];
+}
+
+- (NSString *)getDspCreativeId {
+    return [_requestingConfiguration dspCreativeId];
 }
 
 @end
