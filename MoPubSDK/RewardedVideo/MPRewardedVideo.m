@@ -225,7 +225,7 @@ static MPRewardedVideo *gSharedInstance = nil;
 {
     id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
     if ([delegate respondsToSelector:@selector(rewardedVideoWillStartAttemptForAdUnitID:customEventClass:withLineItemId:)]) {
-        NSString *customEventClass = NSStringFromClass([manager adapterClass]);
+        NSString *customEventClass = NSStringFromClass([manager customEventClass]);
         [delegate rewardedVideoWillStartAttemptForAdUnitID:manager.adUnitId customEventClass:customEventClass withLineItemId:[manager lineItemId]];
     }
 }

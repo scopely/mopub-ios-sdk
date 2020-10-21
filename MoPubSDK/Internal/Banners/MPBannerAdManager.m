@@ -90,7 +90,7 @@
 
 - (Class)customEventClass
 {
-    return self.requestingConfiguration.adapterClass;
+    return self.requestingConfiguration.customEventClass;
 }
 
 - (NSString*)dspCreativeId
@@ -387,13 +387,13 @@
 
 - (void)adapter:(id<MPAdAdapter>)adapter didFailToLoadAdWithError:(NSError *)error
 {
+    [self.delegate bannerDidFailAttemptForAdManager:self error:error];
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker
     // with the appropriate error code result.
     NSTimeInterval duration = [self.loadStopwatch stop];
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
     [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:result];
     
-    [self.delegate bannerDidFailAttemptForAdManager:self error:error];
     if (self.requestingAdapter == adapter) {
         // There are more ad configurations to try.
         if (self.remainingConfigurations.count > 0) {
