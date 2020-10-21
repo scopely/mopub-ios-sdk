@@ -371,6 +371,7 @@
 
 - (void)inlineAdAdapter:(id<MPAdAdapter>)adapter didLoadAdWithAdView:(UIView *)adView
 {
+    [self.delegate bannerDidSucceedAttemptForAdManager:self];
     if (self.requestingAdapter == adapter) {
         self.remainingConfigurations = nil;
         self.requestingAdapterAdContentView = adView;
@@ -392,7 +393,7 @@
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
     [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:result];
     
-    [self.delegate bannerDidSucceedAttemptForAdManager:self];
+    [self.delegate bannerDidFailAttemptForAdManager:self error:error];
     if (self.requestingAdapter == adapter) {
         // There are more ad configurations to try.
         if (self.remainingConfigurations.count > 0) {
