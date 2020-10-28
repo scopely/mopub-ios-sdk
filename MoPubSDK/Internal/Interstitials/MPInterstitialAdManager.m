@@ -297,7 +297,6 @@
         [self fetchAdWithConfiguration:self.requestingConfiguration];
     }
     
-    [self.delegate manager:self didFailInterstitialAttemptWithError:error];
     // No more configurations to try. Send new request to Ads server to get more Ads.
     else if (self.requestingConfiguration.nextURL != nil
              && [self.requestingConfiguration.nextURL isEqual:self.mostRecentlyLoadedURL] == false) {
@@ -312,6 +311,7 @@
 
         NSError * clearResponseError = [NSError errorWithCode:MOPUBErrorNoInventory localizedDescription:[NSString stringWithFormat:kMPClearErrorLogFormatWithAdUnitID, self.delegate.interstitialAdController.adUnitId]];
         MPLogAdEvent([MPLogEvent adFailedToLoadWithError:clearResponseError], self.delegate.interstitialAdController.adUnitId);
+        [self.delegate manager:self didFailInterstitialAttemptWithError:error];
         [self.delegate manager:self didFailToLoadInterstitialWithError:clearResponseError];
     }
 }
