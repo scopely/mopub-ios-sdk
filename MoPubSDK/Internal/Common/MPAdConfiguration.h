@@ -95,6 +95,7 @@ extern NSString * const kBannerImpressionMinPixelMetadataKey;
 @property (nonatomic, assign) NSTimeInterval adTimeoutInterval;
 @property (nonatomic, copy) NSData *adResponseData;
 @property (nonatomic, strong) NSDictionary *nativeSDKParameters;
+@property (nonatomic, assign) Class customEventClass;
 @property (nonatomic, assign) Class adapterClass;
 @property (nonatomic, strong) NSDictionary *adapterClassData;
 @property (nonatomic, assign) MPInterstitialOrientationType orientationType;

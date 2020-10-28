@@ -193,6 +193,17 @@ NSString * const kVASTClickabilityExperimentKey = @"vast-click-enabled";
                                                      forKey:kNativeSDKParametersMetadataKey];
 
     self.orientationType = [self orientationTypeFromMetadata:metadata];
+    
+    switch ([metadata mp_unsignedIntegerForKey:kVASTPlayerVersionKey]) {
+        case MPVASTPlayerVersionNativePlayer:
+            self.customEventClass = [self setUpCustomEventClassFromMetadata:metadata
+                                                          vastPlayerVersion:MPVASTPlayerVersionNativePlayer];
+            break;
+        default:
+            self.customEventClass = [self setUpCustomEventClassFromMetadata:metadata
+                                                          vastPlayerVersion:MPVASTPlayerVersionWebViewPlayer];
+            break;
+    }
 
     self.adapterClass = [self setUpAdapterClassFromMetadata:metadata];
 
