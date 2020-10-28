@@ -289,6 +289,7 @@
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker
     // with the appropriate error code result.
     NSTimeInterval duration = [self.loadStopwatch stop];
+    [self.delegate rewardedVideoDidFailAttemptForAdManager:self error:error];
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
     [self.communicator sendAfterLoadUrlWithConfiguration:self.configuration adapterLoadDuration:duration adapterLoadResult:result];
 
@@ -314,7 +315,6 @@
                                                            code:MPRewardedVideoAdErrorNoAdsAvailable
                                                        userInfo:@{NSLocalizedDescriptionKey: errorDescription}];
         MPLogAdEvent([MPLogEvent adFailedToLoadWithError:clearResponseError], self.adUnitId);
-        [self.delegate rewardedVideoDidFailAttemptForAdManager:self error:error];
         [self.delegate rewardedVideoDidFailToLoadForAdManager:self error:clearResponseError];
     }
 }

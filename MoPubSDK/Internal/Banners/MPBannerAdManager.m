@@ -390,6 +390,7 @@
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker
     // with the appropriate error code result.
     NSTimeInterval duration = [self.loadStopwatch stop];
+    [self.delegate bannerDidFailAttemptForAdManager:self error:error];
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
     [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:result];
     
@@ -408,7 +409,6 @@
         else {
             NSError * clearResponseError = [NSError errorWithCode:MOPUBErrorNoInventory localizedDescription:[NSString stringWithFormat:kMPClearErrorLogFormatWithAdUnitID, self.delegate.banner.adUnitId]];
             MPLogAdEvent([MPLogEvent adFailedToLoadWithError:clearResponseError], self.delegate.banner.adUnitId);
-            [self.delegate bannerDidFailAttemptForAdManager:self error:error];
             [self didFailToLoadAdapterWithError:clearResponseError];
         }
     }
