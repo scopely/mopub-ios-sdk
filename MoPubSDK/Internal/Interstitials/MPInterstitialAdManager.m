@@ -287,7 +287,6 @@
 - (void)adapter:(id<MPAdAdapter> _Nullable)adapter didFailToLoadAdWithError:(NSError *)error {
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker
     // with the appropriate error code result.
-    [self.delegate manager:self didFailInterstitialAttemptWithError:error];
     NSTimeInterval duration = [self.loadStopwatch stop];
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
     [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:result];
@@ -297,6 +296,8 @@
         self.requestingConfiguration = [self.remainingConfigurations removeFirst];
         [self fetchAdWithConfiguration:self.requestingConfiguration];
     }
+    
+    [self.delegate manager:self didFailInterstitialAttemptWithError:error];
     // No more configurations to try. Send new request to Ads server to get more Ads.
     else if (self.requestingConfiguration.nextURL != nil
              && [self.requestingConfiguration.nextURL isEqual:self.mostRecentlyLoadedURL] == false) {
