@@ -73,7 +73,7 @@
 
 - (Class)customEventClass
 {
-    return self.requestingConfiguration.customEventClass;
+    return self.requestingConfiguration.adapterClass;
 }
 
 - (NSString*)dspCreativeId
