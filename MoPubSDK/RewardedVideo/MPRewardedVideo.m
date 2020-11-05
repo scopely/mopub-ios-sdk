@@ -233,8 +233,8 @@ static MPRewardedVideo *gSharedInstance = nil;
 - (void)rewardedVideoDidSucceedAttemptForAdManager:(MPRewardedVideoAdManager *)manager
 {
     id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
-    if ([delegate respondsToSelector:@selector(rewardedVideoDidSucceedAttemptForAdUnitID:withCreativeId:)]) {
-        [delegate rewardedVideoDidSucceedAttemptForAdUnitID:manager.adUnitId withCreativeId:[manager dspCreativeId]];
+    if ([delegate respondsToSelector:@selector(rewardedVideoDidSucceedAttemptForAdUnitID:withCreativeId:withPublisherRevenue:)]) {
+        [delegate rewardedVideoDidSucceedAttemptForAdUnitID:manager.adUnitId withCreativeId:[manager dspCreativeId] withPublisherRevenue:[manager publisherRevenue]];
     }
 }
 

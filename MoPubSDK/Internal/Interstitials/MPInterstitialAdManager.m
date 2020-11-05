@@ -85,6 +85,14 @@
     return self.requestingConfiguration.lineItemId;
 }
 
+- (NSNumber*)publisherRevenue {
+    if (self.requestingConfiguration == nil ||
+        self.requestingConfiguration.impressionData == nil){
+        return nil;
+    }
+    return self.requestingConfiguration.impressionData.publisherRevenue;
+}
+
 #pragma mark - Public
 
 - (void)loadAdWithURL:(NSURL *)URL

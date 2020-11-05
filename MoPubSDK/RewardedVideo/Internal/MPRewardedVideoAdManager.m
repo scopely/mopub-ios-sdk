@@ -89,6 +89,14 @@
     return self.configuration.lineItemId;
 }
 
+- (NSNumber*)publisherRevenue {
+    if (self.configuration == nil ||
+        self.configuration.impressionData == nil){
+        return nil;
+    }
+    return self.configuration.impressionData.publisherRevenue;
+}
+
 - (BOOL)hasAdAvailable
 {
     //An Ad is not ready or has expired.

@@ -50,7 +50,7 @@
  * @param view The ad view sending the message.
  * @param creativeId The id of the creative loaded.
  */
-- (void)bannerDidSucceedAttemptForAd:(MPAdView *)view withCreativeId:(NSString*)creativeId;
+- (void)bannerDidSucceedAttemptForAd:(MPAdView *)view withCreativeId:(NSString*)creativeId withPublisherRevenue:(NSNumber*)publisherRevenue;
 
 /**
  * This method is called after an ad attempt fails to load.

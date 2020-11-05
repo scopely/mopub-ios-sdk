@@ -102,6 +102,14 @@
     return self.requestingConfiguration.lineItemId;
 }
 
+- (NSNumber*)publisherRevenue {
+    if (self.requestingConfiguration == nil ||
+        self.requestingConfiguration.impressionData == nil){
+        return nil;
+    }
+    return self.requestingConfiguration.impressionData.publisherRevenue;
+}
+
 - (void)loadAdWithTargeting:(MPAdTargeting *)targeting
 {
     MPLogAdEvent(MPLogEvent.adLoadAttempt, self.delegate.adUnitId);
