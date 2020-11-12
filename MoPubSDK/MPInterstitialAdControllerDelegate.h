@@ -40,7 +40,7 @@
  * @param interstitial The interstitial ad object sending the message.
  * @param creativeId The id of the creative loaded.
  */
-- (void)interstitialDidSucceedAttemptToLoadAd:(MPInterstitialAdController *)interstitial withCreativeId:(NSString*)creativeId withPublisherRevenue:(NSNumber*)publisherRevenue;
+- (void)interstitialDidSucceedAttemptToLoadAd:(MPInterstitialAdController *)interstitial withCreativeId:(NSString*)creativeId withImpressionData:(MPImpressionData *)impressionData;
 
 /**
  * This method is called after an ad attempt fails to load.

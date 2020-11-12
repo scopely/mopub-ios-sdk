@@ -102,12 +102,11 @@
     return self.requestingConfiguration.lineItemId;
 }
 
-- (NSNumber*)publisherRevenue {
-    if (self.requestingConfiguration == nil ||
-        self.requestingConfiguration.impressionData == nil){
+- (MPImpressionData *)impressionData {
+    if (self.requestingConfiguration == nil){
         return nil;
     }
-    return self.requestingConfiguration.impressionData.publisherRevenue;
+    return self.requestingConfiguration.impressionData;
 }
 
 - (void)loadAdWithTargeting:(MPAdTargeting *)targeting
