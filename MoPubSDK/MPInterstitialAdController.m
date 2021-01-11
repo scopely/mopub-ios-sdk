@@ -134,8 +134,8 @@
 
 - (void)manager:(MPInterstitialAdManager *)manager didFailInterstitialAttemptWithError:(NSError*)error
 {
-    if ([self.delegate respondsToSelector:@selector(interstitialDidFailAttemptToLoadAd:error:)]) {
-        [self.delegate interstitialDidFailAttemptToLoadAd:self error:error];
+    if ([self.delegate respondsToSelector:@selector(interstitialDidFailAttemptToLoadAd:error:withImpressionData:)]) {
+        [self.delegate interstitialDidFailAttemptToLoadAd:self error:error withImpressionData:[manager impressionData]];
     }
 }
 
