@@ -241,8 +241,8 @@ static MPRewardedVideo *gSharedInstance = nil;
 - (void)rewardedVideoDidFailAttemptForAdManager:(MPRewardedVideoAdManager *)manager error:(NSError *)error
 {
     id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
-    if ([delegate respondsToSelector:@selector(rewardedVideoDidFailAttemptForAdUnitID:error:)]) {
-        [delegate rewardedVideoDidFailAttemptForAdUnitID:manager.adUnitId error:error];
+    if ([delegate respondsToSelector:@selector(rewardedVideoDidFailAttemptForAdUnitID:error:withImpressionData:)]) {
+        [delegate rewardedVideoDidFailAttemptForAdUnitID:manager.adUnitId error:error withImpressionData:[manager impressionData]];
     }
 }
 
