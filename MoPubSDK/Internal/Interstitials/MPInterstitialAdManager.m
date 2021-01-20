@@ -71,6 +71,28 @@
     self.adapter = nil;
 }
 
+- (Class)customEventClass
+{
+    return self.requestingConfiguration.adapterClass;
+}
+
+- (NSString*)dspCreativeId
+{
+    return self.requestingConfiguration.dspCreativeId;
+}
+
+- (NSString*)lineItemId {
+    return self.requestingConfiguration.lineItemId;
+}
+
+- (NSNumber*)publisherRevenue {
+    if (self.requestingConfiguration == nil ||
+        self.requestingConfiguration.impressionData == nil){
+        return nil;
+    }
+    return self.requestingConfiguration.impressionData.publisherRevenue;
+}
+
 #pragma mark - Public
 
 - (void)loadAdWithURL:(NSURL *)URL
@@ -180,6 +202,8 @@
         return;
     }
 
+    [self.delegate managerWillStartInterstitialAttempt:self];
+
     NSObject *object = [configuration.adapterClass new];
     if ([object isKindOfClass:MPFullscreenAdAdapter.class]) {
         MPFullscreenAdAdapter *adapter = (MPFullscreenAdAdapter *)object;
@@ -212,6 +236,8 @@
             self.remainingConfigurations = nil;
             self.ready = YES;
             self.loading = NO;
+
+            [self.delegate managerDidSucceedInterstitialAttempt:self];
 
             // Record the end of the adapter load and send off the fire and forget after-load-url tracker.
             NSTimeInterval duration = [self.loadStopwatch stop];
@@ -272,6 +298,7 @@
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker
     // with the appropriate error code result.
     NSTimeInterval duration = [self.loadStopwatch stop];
+    [self.delegate manager:self didFailInterstitialAttemptWithError:error];
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
     [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:result];
 
@@ -280,6 +307,7 @@
         self.requestingConfiguration = [self.remainingConfigurations removeFirst];
         [self fetchAdWithConfiguration:self.requestingConfiguration];
     }
+
     // No more configurations to try. Send new request to Ads server to get more Ads.
     else if (self.requestingConfiguration.nextURL != nil
              && [self.requestingConfiguration.nextURL isEqual:self.mostRecentlyLoadedURL] == false) {

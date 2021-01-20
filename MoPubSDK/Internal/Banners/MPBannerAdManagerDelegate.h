@@ -29,11 +29,16 @@
 
 - (void)invalidateContentView;
 
+- (void)bannerWillStartAttemptForAdManager:(MPBannerAdManager *)manager;
+- (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager;
+- (void)bannerDidFailAttemptForAdManager:(MPBannerAdManager *)manager error:(NSError*)error;
+
 - (void)managerDidLoadAd:(UIView *)ad;
 - (void)managerDidFailToLoadAdWithError:(NSError *)error;
 - (void)userActionWillBegin;
 - (void)userActionDidFinish;
 - (void)userWillLeaveApplication;
 - (void)impressionDidFireWithImpressionData:(MPImpressionData *)impressionData;
+- (void)managerRefreshAd:(UIView *)ad;
 
 @end
