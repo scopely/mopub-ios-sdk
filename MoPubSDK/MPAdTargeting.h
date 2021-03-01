@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The device's current location if permission to access location has been granted.
- * @deprecated This API is deprecated and will be removed in a future version.
+ @deprecated This API is deprecated and will be removed in a future version.
  */
 @property (nullable, nonatomic, copy) CLLocation * location __attribute__((deprecated("This API is deprecated and will be removed in a future version.")));
 

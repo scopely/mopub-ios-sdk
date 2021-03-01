@@ -17,6 +17,10 @@
 @property (nonatomic, assign) BOOL isRepeatingTimer;
 @property (nonatomic, assign) BOOL isCountdownActive;
 
+// Time remaining after `pause` has been called. Values <= 0 indicate this field
+// is not valid at this time.
+@property (nonatomic, assign) NSTimeInterval remainingTime;
+
 @property (nonatomic, copy) void(^timerCallbackBlock)(MPTimer *timer);
 
 // Access to `NSTimer` is not thread-safe by default, so we will gate access
@@ -40,12 +44,16 @@
         _isRepeatingTimer = repeats;
         _timerCallbackBlock = block;
         _timeInterval = seconds;
+        _remainingTime = 0;
 
         // Initialize the internal `NSTimer`, but set its fire date in the far future.
         // `scheduleNow` will handle the firing of the timer.
         __typeof__(self) __weak weakSelf = self;
         _timer = [NSTimer timerWithTimeInterval:seconds repeats:repeats block:^(NSTimer * _Nonnull nsTimer) {
             __typeof__(self) strongSelf = weakSelf;
+
+            // Timer has fired, so there is no remaining time left.
+            strongSelf.remainingTime = 0;
 
             // This is the last block to fire.
             if (!strongSelf.isRepeatingTimer) {
@@ -142,7 +150,11 @@
             return;
         }
 
-        NSDate *newFireDate = [NSDate dateWithTimeInterval:self.timeInterval sinceDate:[NSDate date]];
+        // Use the remaining time if this timer was paused; otherwise
+        // use the caller-specified time interval.
+        NSTimeInterval interval = (self.remainingTime <= 0 ? self.timeInterval : self.remainingTime);
+
+        NSDate *newFireDate = [NSDate dateWithTimeInterval:interval sinceDate:[NSDate date]];
         [self.timer setFireDate:newFireDate];
         self.isCountdownActive = YES;
     });
@@ -166,6 +178,7 @@
         if (secondsLeft <= 0) {
             MPLogInfo(@"An MPTimer was somehow paused after it was supposed to fire.");
         } else {
+            self.remainingTime = secondsLeft;
             MPLogDebug(@"Paused MPTimer (%p) %.1f seconds left before firing.", self, secondsLeft);
         }
 
@@ -177,6 +190,7 @@
 
 - (void)resume {
     [self scheduleNow];
+    MPLogDebug(@"Resuming MPTimer (%p) %.1f seconds left before firing.", self, self.remainingTime);
 }
 
 @end

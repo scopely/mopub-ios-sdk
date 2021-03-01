@@ -333,4 +333,38 @@ static const NSTimeInterval kDefaultTimeout = 10;
     }];
 }
 
+#pragma mark - Edge Cases
+
+- (void)testInvalidAdapterContinuesClientSideWaterfall {
+    // Test to make sure the CSW continues when an adapter is valid but
+    // fails to load, and is followed by a conifig with an invalid adapter class.
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for banner load failure"];
+
+    MPBannerAdManagerDelegateHandler * handler = [MPBannerAdManagerDelegateHandler new];
+    handler.didLoadAd = ^{
+        XCTFail(@"Encountered an unexpected load success");
+        [expectation fulfill];
+    };
+    handler.didFailToLoadAd = ^(NSError * error){
+        [expectation fulfill];
+    };
+
+    // The first config must be valid, but fail to load.
+    MPAdConfiguration * bannerWithNoInventory = [MPAdConfigurationFactory defaultBannerConfigurationWithCustomEventClassName:@"MPInlineAdAdapterErrorMock"];
+    // The second load must fail due to not existing.
+    MPAdConfiguration * bannerWithInvalidAdapter = [MPAdConfigurationFactory defaultBannerConfigurationWithCustomEventClassName:@"InvalidCustomEventClassName"];
+    NSArray * configurations = @[ bannerWithNoInventory, bannerWithInvalidAdapter ];
+
+    MPBannerAdManager * manager = [[MPBannerAdManager alloc] initWithDelegate:handler];
+    MPMockAdServerCommunicator * communicator = [[MPMockAdServerCommunicator alloc] initWithDelegate:manager];
+    manager.communicator = communicator;
+    [manager communicatorDidReceiveAdConfigurations:configurations];
+
+    [self waitForExpectationsWithTimeout:kDefaultTimeout handler:^(NSError * _Nullable error) {
+        if (error != nil) {
+            XCTFail(@"Timed out");
+        }
+    }];
+}
+
 @end

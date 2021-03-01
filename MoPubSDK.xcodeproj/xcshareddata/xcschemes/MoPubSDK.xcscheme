@@ -39,6 +39,16 @@
                ReferencedContainer = "container:MoPubSDK.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "631B57332537AE3B009A6C51"
+               BuildableName = "MoPubSDKSwiftTests.xctest"
+               BlueprintName = "MoPubSDKSwiftTests"
+               ReferencedContainer = "container:MoPubSDK.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

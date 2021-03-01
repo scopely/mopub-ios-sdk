@@ -20,11 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MPAdContainerViewWebAdDelegate;
 
 /**
- This is the unified ad container view for all inline and fullscreen ad formats. Ad content view
- (either a web view or a native video view) is added as a subview. An overlay with all the accessory
- views (Close, Skip, Countdown timer, CTA) is always also added as a subview. This overlay is
- always on top of the content view, and is able to intercept all touch events before passing to the
- content view.
+ This is the unified ad container view for all inline and fullscreen ad formats. Ad content view is
+ added as a subview. An overlay with all the accessory views (Close, Skip, Countdown timer, CTA)
+ is always also added as a subview. This overlay is always on top of the content view, and is able to
+ intercept all touch events before passing to the content view.
  */
 @interface MPAdContainerView : MPViewableView
 

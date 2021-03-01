@@ -7,10 +7,10 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <MoPub/MoPub-Swift.h>
 #import "MPAdServerKeys.h"
 #import "MPAdView.h"
 #import "MPAdView+Testing.h"
-#import "MPAPIEndpoints.h"
 #import "MPBannerAdManager+Testing.h"
 #import "MPError.h"
 #import "MPLogging.h"

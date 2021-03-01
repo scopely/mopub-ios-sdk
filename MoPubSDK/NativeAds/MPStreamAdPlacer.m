@@ -340,16 +340,16 @@ static const NSUInteger kIndexPathItemIndex = 1;
 }
 
 /*
- * Returns the range to consider removing cells from the datasource for a given section.
- *
- * We want to prevent a state where ads are present after the last remaining content item.
- * In order to do this, we need to find the range between the last remaining content item
- * (after deletion occurs) and last item being deleted. If the end of this range includes
- * the (current) last remaining item, we should delete all ads within the range, since they
- * would otherwise be "trailing" ads.
- *
- * The range returned from this method will not include any ads that appear before the
- * last remaining content item, because all we care about is preventing trailing ads.
+ Returns the range to consider removing cells from the datasource for a given section.
+
+ We want to prevent a state where ads are present after the last remaining content item.
+ In order to do this, we need to find the range between the last remaining content item
+ (after deletion occurs) and last item being deleted. If the end of this range includes
+ the (current) last remaining item, we should delete all ads within the range, since they
+ would otherwise be "trailing" ads.
+
+ The range returned from this method will not include any ads that appear before the
+ last remaining content item, because all we care about is preventing trailing ads.
  */
 - (NSRange)rangeToDeleteInSection:(NSNumber *)section forOriginalContentIndexPaths:(NSArray *)originalContentIndexPaths
 {

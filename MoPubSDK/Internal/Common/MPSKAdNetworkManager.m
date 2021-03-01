@@ -175,9 +175,11 @@ NSString *const kSKAdNetworkIdentifierInfoPlistKey = @"SKAdNetworkIdentifier";
             return;
         }
 
-        NSMutableArray *networkIdentifiers = [NSMutableArray arrayWithCapacity:skAdNetworkItemsArray.count];
+        // Use a set to keep track of the list of SKAdNetworks. This ensures that the list the
+        // SDK keeps track of is de-duplicated.
+        NSMutableSet *networkIdentifiers = [NSMutableSet setWithCapacity:skAdNetworkItemsArray.count];
 
-        // Transform dictionary entries into strings, and add into @c networkIdentifiers array
+        // Transform dictionary entries into strings, and add into @c networkIdentifiers set
         for (NSDictionary *item in skAdNetworkItemsArray) {
             NSString *networkIdentifier = item[kSKAdNetworkIdentifierInfoPlistKey];
 
@@ -186,11 +188,11 @@ NSString *const kSKAdNetworkIdentifierInfoPlistKey = @"SKAdNetworkIdentifier";
                 continue;
             }
 
-            // Add network identifier to array
+            // Add network identifier to set
             [networkIdentifiers addObject:networkIdentifier];
         }
 
-        sSupportedNetworks = networkIdentifiers.count > 0 ? [NSArray arrayWithArray:networkIdentifiers] : nil;
+        sSupportedNetworks = networkIdentifiers.count > 0 ? [networkIdentifiers allObjects] : nil;
     });
 
     return sSupportedNetworks;

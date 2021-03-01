@@ -6,10 +6,14 @@
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
+#if __has_include(<MoPub/MoPub-Swift.h>)
+    #import <MoPub/MoPub-Swift.h>
+#else
+    #import "MoPub-Swift.h"
+#endif
 #import "MPAdWebViewAgent.h"
 #import "MPAdDestinationDisplayAgent.h"
 #import "MPAnalyticsTracker.h"
-#import "MPAPIEndpoints.h"
 #import "MPLogging.h"
 #import "MPUserInteractionGestureRecognizer.h"
 #import "NSURL+MPAdditions.h"

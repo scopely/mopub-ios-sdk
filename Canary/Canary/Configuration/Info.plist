@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>AppLovinSdkKey</key>
+	<string></string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -32,7 +34,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<string></string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -42,18 +44,20 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Bluetooth access requested on behalf of Verizon Ads Network.</string>
-	<key>NSCalendarsUsageDescription</key>
-	<string>Calendar access requested on behalf of Verizon Ads Network.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>The MoPub Canary app uses the camera for the ease-of-use feature of reading MoPub ad QR codes.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Photo access requested on behalf of Verizon Ads Network.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>The MoPub Canary app uses location to provide an accurate advertising experience.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>The MoPub Canary app uses location to provide an accurate advertising experience.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>The MoPub Canary app uses location to provide an accurate advertising experience.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>com.mopub.canary.openAdView</string>
 	</array>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>The MoPub Canary app uses tracking to provide an accurate advertising experience.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
@@ -232,6 +236,10 @@
 			<key>SKAdNetworkIdentifier</key>
 			<string>z4gj7hsk7h.skadnetwork</string>
 		</dict>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>424M5254LK.skadnetwork</string>
+		</dict>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
@@ -266,8 +274,6 @@
 	<array>
 		<string>armv7</string>
 	</array>
-	<key>UIStatusBarHidden</key>
-	<false/>
 	<key>UIStatusBarTintParameters</key>
 	<dict>
 		<key>UINavigationBar</key>

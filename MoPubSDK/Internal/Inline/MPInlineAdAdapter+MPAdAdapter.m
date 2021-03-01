@@ -15,7 +15,7 @@
 @dynamic adapterDelegate;
 @dynamic analyticsTracker;
 
-- (id<MPAdAdapterInlineEventDelegate>)inlineAdAdapterDelegate {
+- (id<MPAdAdapterInlineEventDelegate> _Nullable)inlineAdAdapterDelegate {
     if ([self.adapterDelegate conformsToProtocol:@protocol(MPAdAdapterInlineEventDelegate)]) {
         return (id<MPAdAdapterInlineEventDelegate>)self.adapterDelegate;
     }
@@ -30,7 +30,7 @@
     [self startTimeoutTimer];
 
     self.localExtras = targeting.localExtras;
-    
+
     [self requestAdWithSize:targeting.creativeSafeSize adapterInfo:configuration.adapterClassData adMarkup:configuration.advancedBidPayload];
 }
 

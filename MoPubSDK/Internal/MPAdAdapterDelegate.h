@@ -46,9 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol MPAdAdapterRewardEventDelegate <MPAdAdapterBaseDelegate>
 
-- (NSString *)customerId;
+- (NSString * _Nullable)customerId;
 
-- (id<MPMediationSettingsProtocol>)instanceMediationSettingsForClass:(Class)aClass;
+- (id<MPMediationSettingsProtocol> _Nullable)instanceMediationSettingsForClass:(Class)aClass;
 - (void)adShouldRewardUserForAdapter:(id<MPAdAdapter>)adapter reward:(MPReward *)reward;
 
 @end

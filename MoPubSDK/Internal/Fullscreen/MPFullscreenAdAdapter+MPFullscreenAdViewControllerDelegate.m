@@ -38,6 +38,10 @@
     // `fullscreenAdWillDisappear:` so this is the earliest termination spot.
     [self stopViewabilitySession];
 
+    [self.delegate fullscreenAdAdapterAdWillDismiss:self];
+}
+
+- (void)fullscreenAdDidDismiss:(id<MPFullscreenAdViewController>)fullscreenAdViewController {
     // Deallocate the `viewController` as we don't need it anymore. If we don't deallocate the
     // `viewController` after dismissal, then the ad content might continue to run, which could lead
     // to bugs such as continuing to play the sound of a video since the app may hold onto the
@@ -45,11 +49,7 @@
     self.viewController = nil;
     self.hasAdAvailable = NO;
 
-    [self.delegate fullscreenAdAdapterAdWillDismiss:self];
-}
-
-- (void)fullscreenAdDidDismiss:(id<MPFullscreenAdViewController>)fullscreenAdViewController {
-    // no op
+    [self.delegate fullscreenAdAdapterAdDidDismiss:self];
 }
 
 @end

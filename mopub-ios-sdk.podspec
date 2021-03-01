@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
   spec.name             = 'mopub-ios-sdk'
   spec.module_name      = 'MoPub'
-  spec.version          = '5.14.1'
+  spec.version          = '5.15.0'
   spec.license          = { :type => 'New BSD', :file => 'LICENSE' }
   spec.homepage         = 'https://github.com/mopub/mopub-ios-sdk'
   spec.authors          = { 'MoPub' => 'support@mopub.com' }
@@ -14,9 +14,10 @@ Pod::Spec.new do |spec|
                             To learn more or sign up for an account, go to http://www.mopub.com. \n
                           DESC
   spec.social_media_url = 'http://twitter.com/mopub'
-  spec.source           = { :git => 'https://github.com/mopub/mopub-ios-sdk.git', :tag => '5.14.1' }
+  spec.source           = { :git => 'https://github.com/mopub/mopub-ios-sdk.git', :tag => '5.15.0' }
   spec.requires_arc     = true
   spec.ios.deployment_target = '10.0'
+  spec.swift_version    = '5.0'
   spec.frameworks       = [
                             'AVFoundation',
                             'AVKit',
@@ -47,15 +48,15 @@ Pod::Spec.new do |spec|
   end
 
   spec.subspec 'Core' do |core|
-    core.source_files         = 'MoPubSDK/**/*.{h,m}'
+    core.source_files         = 'MoPubSDK/**/*.{swift,h,m}'
     core.resource_bundles     = {'MoPubResources' => ['MoPubSDK/Resources/**/*', 'MoPubSDK/**/*.{nib,xib,js}']}
-    core.exclude_files        = ['MoPubSDK/NativeAds', 'MoPubSDK/NativeVideo']
+    core.exclude_files        = ['MoPubSDK/NativeAds']
     core.vendored_libraries   = ['MoPubSDK/Internal/Viewability/OMSDK/*.{a}']
   end
 
   spec.subspec 'NativeAds' do |native|
     native.dependency             'mopub-ios-sdk/Core'
-    native.source_files         = ['MoPubSDK/NativeAds/**/*.{h,m}', 'MoPubSDK/NativeVideo/**/*.{h,m}']
+    native.source_files         = ['MoPubSDK/NativeAds/**/*.{swift,h,m}']
   end
 end
 

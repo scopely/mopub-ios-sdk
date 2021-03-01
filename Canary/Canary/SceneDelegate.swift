@@ -11,7 +11,6 @@ import UIKit
 import AppTrackingTransparency
 
 private let kAppId = "112358"
-private let kAdUnitId = "0ac59b0996d947309c33f59d6676399f"
 
 class SceneDelegate: UIResponder {
     /**
@@ -43,15 +42,11 @@ class SceneDelegate: UIResponder {
          */
         let containerViewController: ContainerViewController
         
-        #if INTERNAL
-        let internalState = InternalState()
-        #endif
+        
         
         init(containerViewController: ContainerViewController) {
             self.containerViewController = containerViewController
-            #if INTERNAL
-            internalState.initialize(with: containerViewController)
-            #endif
+            
         }
     }
     
@@ -101,6 +96,13 @@ class SceneDelegate: UIResponder {
         // Make one-off calls here
         if (SceneDelegate.didHandleAppInit == false) {
             SceneDelegate.didHandleAppInit = true
+            
+            // Register app conversion.
+            // This is for SKAdNetwork advertising campaigns that use this app
+            // as the target installed app.
+            if #available(iOS 11.3, *) {
+                SKAdNetwork.registerAppForAdNetworkAttribution()
+            }
             
             // MoPub SDK initialization
             checkAndInitializeSdk(containerViewController: containerViewController)
@@ -216,53 +218,18 @@ private extension SceneDelegate {
      - Parameter userDefaults: the target `UserDefaults` instance
      */
     func checkAndInitializeSdk(containerViewController: ContainerViewController, userDefaults: UserDefaults = .standard) {
-        // First, prompt for ID for SDK initialization
-        self.promptForAdUnitIDForSDKInitialization(fromViewController: containerViewController) { [unowned self] in
-            // Next, initialize the SDK
-            self.initializeMoPubSdk(adUnitIdForConsent: userDefaults.cachedAdUnitId, containerViewController: containerViewController)
-            
-            // Prompt for authorization status after prompting for ID so Canary isn't trying to present two prompts at the same time
+        // Retrieve the ad unit used to initialize the SDK.
+        let adUnitIdForConsent: String = userDefaults.cachedAdUnitId ?? Constants.defaultAdUnitId
+        
+        // Next, initialize the SDK
+        initializeMoPubSdk(adUnitIdForConsent: adUnitIdForConsent, containerViewController: containerViewController, mopub: MoPub.sharedInstance()) {
+            // Prompt for authorization status after running the `initializeMoPubSDK` method (which
+            // also shows the GDPR prompt, if available) so Canary isn't trying to present two
+            // view controllers simultaneously
             self.promptForTrackingAuthorizationStatus(fromViewController: containerViewController)
         }
     }
-    
-    private func promptForAdUnitIDForSDKInitialization(fromViewController viewController: UIViewController, userDefaults: UserDefaults = .standard, completion: (() -> Void)? = nil) {
-        guard userDefaults.cachedAdUnitId.isEmpty else {
-            // has a cached ad unit ID
-            completion?()
-            return
-        }
-        
-        #if DEBUG
-        // Need to prompt for an ad unit.
-        let prompt = UIAlertController(title: "MoPub SDK initialization",
-                                       message: "Enter an ad unit ID to use for consent:",
-                                       preferredStyle: .alert)
-        var adUnitIdTextField: UITextField?
-        prompt.addTextField { textField in
-            textField.placeholder = "Ad Unit ID"
-            adUnitIdTextField = textField       // Capture the text field so we can later read the value
-        }
-        prompt.addAction(UIAlertAction(title: "Use default ID", style: .destructive) { _ in
-            userDefaults.cachedAdUnitId = kAdUnitId;
-            completion?()
-        })
-        prompt.addAction(UIAlertAction(title: "Use inputted ID", style: .default) { _ in
-            let adUnitID = adUnitIdTextField?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "";
-            userDefaults.cachedAdUnitId = adUnitID;
-            completion?()
-        })
-        
-        DispatchQueue.main.async {
-            viewController.present(prompt, animated: true, completion: nil)
-        }
-        #else
-        // Production should only use the default ad unit ID. Cache it and don't prompt.
-        userDefaults.cachedAdUnitId = kAdUnitId
-        completion?()
-        #endif
-    }
-    
+
     private func promptForTrackingAuthorizationStatus(fromViewController viewController: UIViewController, completion: (() -> Void)? = nil) {
         // If tracking authorization status is equal to `.notDetermined`, prompt
         // to see if Canary should ask for authorization permission.
@@ -284,7 +251,6 @@ private extension SceneDelegate {
             return
         }
         
-        #if INTERNAL
         let alertController = UIAlertController(title: "Do you want to be prompted to set IDFA permissions now?", message: "IDFA consent", preferredStyle: .alert)
         
         alertController.addAction(UIAlertAction(title: "Yes, prompt now.", style: .default, handler: { _ in
@@ -313,10 +279,6 @@ private extension SceneDelegate {
         DispatchQueue.main.async {
             viewController.present(alertController, animated: true, completion: nil)
         }
-        #else
-        // Production shouldn't prompt; just call completion.
-        completion?()
-        #endif
     }
 
     /**
@@ -327,7 +289,8 @@ private extension SceneDelegate {
      */
     func initializeMoPubSdk(adUnitIdForConsent: String,
                             containerViewController: ContainerViewController,
-                            mopub: MoPub = .sharedInstance()) {
+                            mopub: MoPub = .sharedInstance(),
+                            completion: (() -> Void)? = nil) {
         // MoPub SDK initialization
         let sdkConfig = MPMoPubConfiguration(adUnitIdForAppInitialization: adUnitIdForConsent)
         sdkConfig.globalMediationSettings = []
@@ -342,7 +305,9 @@ private extension SceneDelegate {
             // Request user consent to collect personally identifiable information
             // used for targeted ads
             if let tabBarController = containerViewController.mainTabBarController {
-                SceneDelegate.displayConsentDialog(from: tabBarController)
+                SceneDelegate.displayConsentDialog(from: tabBarController, mopub: mopub) {
+                    completion?()
+                }
             }
         }
     }
@@ -358,9 +323,11 @@ private extension SceneDelegate {
      - Parameter mopub: the target `MoPub` instance
      */
     static func displayConsentDialog(from presentingViewController: UIViewController,
-                                     mopub: MoPub = .sharedInstance()) {
+                                     mopub: MoPub = .sharedInstance(),
+                                     completion: (() -> Void)? = nil) {
         // Verify that we need to acquire consent.
         guard mopub.shouldShowConsentDialog else {
+            completion?()
             return
         }
         
@@ -369,10 +336,13 @@ private extension SceneDelegate {
         mopub.loadConsentDialog { (error: Error?) in
             guard error == nil else {
                 print("Consent dialog failed to load: \(String(describing: error?.localizedDescription))")
+                completion?()
                 return
             }
             
-            mopub.showConsentDialog(from: presentingViewController, completion: nil)
+            mopub.showConsentDialog(from: presentingViewController, didShow: nil) {
+                completion?()
+            }
         }
     }
 }

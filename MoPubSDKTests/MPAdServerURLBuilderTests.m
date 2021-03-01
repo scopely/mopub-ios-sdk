@@ -7,9 +7,9 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <MoPub/MoPub-Swift.h>
 #import "MPAdServerKeys.h"
 #import "MPAdServerURLBuilder+Testing.h"
-#import "MPAPIEndpoints.h"
 #import "MPConsentManager.h"
 #import "MPEngineInfo.h"
 #import "MPIdentityProvider+Testing.h"
@@ -598,8 +598,8 @@ static NSString * const kLastChangedMsStorageKey                 = @"com.mopub.m
     NSArray<NSString *> *referenceSupportedNetworks = @[@"foo", @"bar"];
     skAdNetworkUrl = [MPAdServerURLBuilder skAdNetworkSynchronizationURLWithSkAdNetworkIds:referenceSupportedNetworks];
     XCTAssertNotNil(skAdNetworkUrl);
-    XCTAssert([skAdNetworkUrl.host isEqualToString:MPAPIEndpoints.callbackBaseHostname]);
-    XCTAssert([skAdNetworkUrl.path isEqualToString:MOPUB_CALLBACK_API_PATH_SKADNETWORK_SYNC]);
+    XCTAssert([skAdNetworkUrl.host isEqualToString:@"cb.mopub.com"]);
+    XCTAssert([skAdNetworkUrl.path isEqualToString:@"/supported_ad_partners"]);
 
     NSArray<NSString *> * supportedNetworks = (NSArray *)skAdNetworkUrl.postData[kSKAdNetworkSupportedNetworksKey];
     for (NSString *network in supportedNetworks) {

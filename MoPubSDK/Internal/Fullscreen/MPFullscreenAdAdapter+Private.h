@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The original URLs come from the value of "x-rewarded-video-completion-url" in ad response.
  */
-- (NSArray<NSURL *> *)rewardedVideoCompletionUrlsByAppendingClientParams;
+- (NSArray<NSURL *> * _Nullable)rewardedVideoCompletionUrlsByAppendingClientParams;
 
 /**
  Tracks an impression when called the first time. Any subsequent calls will do nothing.

@@ -150,7 +150,7 @@ static const NSUInteger kExcessiveCustomDataLength = 8196;
     [self.timeoutTimer invalidate];
 }
 
-- (NSArray<NSURL *> *)rewardedVideoCompletionUrlsByAppendingClientParams {
+- (NSArray<NSURL *> * _Nullable)rewardedVideoCompletionUrlsByAppendingClientParams {
     if (self.configuration.rewardedVideoCompletionUrls.count == 0) {
         return nil;
     }
@@ -216,6 +216,7 @@ static const NSUInteger kExcessiveCustomDataLength = 8196;
         case MPFullscreenAdEventDidDisappear:
         case MPFullscreenAdEventWillLeaveApplication:
         case MPFullscreenAdEventWillDismiss:
+        case MPFullscreenAdEventDidDismiss:
             [self.adapterDelegate adAdapter:self handleFullscreenAdEvent:event];
             break;
     }

@@ -6,7 +6,11 @@
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
-#import "MPAPIEndpoints.h"
+#if __has_include(<MoPub/MoPub-Swift.h>)
+    #import <MoPub/MoPub-Swift.h>
+#else
+    #import "MoPub-Swift.h"
+#endif
 #import "MPLogging.h"
 #import "MPURL.h"
 #import "MPURLRequest.h"

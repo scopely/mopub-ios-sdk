@@ -18,10 +18,10 @@
 @class MPWebView;
 
 /**
- * The `MRController` class is used to load and interact with MRAID ads.
- * It contains two MRAID ad views and uses a separate `MRBridge` to
- * communicate to each view. `MRController` handles view-related MRAID
- * native calls such as expand(), resize(), close(), and open().
+ The `MRController` class is used to load and interact with MRAID ads.
+ It contains two MRAID ad views and uses a separate `MRBridge` to
+ communicate to each view. `MRController` handles view-related MRAID
+ native calls such as expand(), resize(), close(), and open().
  */
 @interface MRController : NSObject
 @property (nonatomic, readonly) MPAdContainerView *mraidAdView;
@@ -64,10 +64,10 @@
 @end
 
 /**
- * The `MRControllerDelegate` will relay specific events such as ad loading to
- * the object that implements the delegate. It also requires information
- * such as adUnitId, adConfiguation, and location in order to use its
- * ad alert manager.
+ The `MRControllerDelegate` will relay specific events such as ad loading to
+ the object that implements the delegate. It also requires information
+ such as adUnitId, adConfiguation, and location in order to use its
+ ad alert manager.
  **/
 @protocol MRControllerDelegate <NSObject>
 

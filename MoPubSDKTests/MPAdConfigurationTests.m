@@ -161,7 +161,7 @@ extern NSString * const kNativeImpressionMinVisiblePixelsMetadataKey;
 //    "events": ["start", "firstQuartile", "midpoint", "thirdQuartile", "complete"]
 //   }"
 - (void)testVASTVideoTrackers {
-    MPAdConfiguration *config = [MPAdConfigurationFactory defaultNativeVideoConfigurationWithVideoTrackers];
+    MPAdConfiguration *config = [MPAdConfigurationFactory defaultVASTConfigurationWithVideoTrackers];
     XCTAssertNotNil(config.vastVideoTrackers);
     XCTAssertEqual(config.vastVideoTrackers.count, 5);
     XCTAssertEqual(((NSArray *)config.vastVideoTrackers[MPVideoEventStart]).count, 2);

@@ -8,13 +8,6 @@
 
 import UIKit
 
-fileprivate enum Constants {
-    /**
-     Time in seconds to render notification animations.
-     */
-    static let notificationAnimationDuration: TimeInterval = 0.5
-}
-
 class MainTabBarController: UITabBarController {
     /**
      Button used for displaying status notifications.

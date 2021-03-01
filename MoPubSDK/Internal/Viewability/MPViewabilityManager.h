@@ -13,7 +13,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Notification that is fired when at least one viewability vendor is disabled.
+ Notification that is fired when at least one viewability vendor is disabled.
  */
 extern NSString *const kDisableViewabilityTrackerNotification;
 

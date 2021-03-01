@@ -285,9 +285,9 @@
     return dict;
 }
 
-+ (NSMutableDictionary *)defaultNativeVideoHeadersWithTrackers
++ (NSMutableDictionary *)defaultVASTHeadersWithTrackers
 {
-    NSMutableDictionary *dict = [[self defaultNativeAdHeaders] mutableCopy];
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
     dict[kVASTVideoTrackersMetadataKey] = @"{\"urls\": [\"http://mopub.com/%%VIDEO_EVENT%%/foo\", \"http://mopub.com/%%VIDEO_EVENT%%/bar\"],\"events\": [\"start\", \"firstQuartile\", \"midpoint\", \"thirdQuartile\", \"complete\"]}";
     return dict;
 }
@@ -327,9 +327,9 @@
     return adConfiguration;
 }
 
-+ (MPAdConfiguration *)defaultNativeVideoConfigurationWithVideoTrackers
++ (MPAdConfiguration *)defaultVASTConfigurationWithVideoTrackers
 {
-    MPAdConfiguration *adConfiguration = [[MPAdConfiguration alloc] initWithMetadata:[self defaultNativeVideoHeadersWithTrackers] data:nil isFullscreenAd:YES];
+    MPAdConfiguration *adConfiguration = [[MPAdConfiguration alloc] initWithMetadata:[self defaultVASTHeadersWithTrackers] data:nil isFullscreenAd:YES];
     return adConfiguration;
 }
 

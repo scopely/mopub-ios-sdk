@@ -9,8 +9,8 @@
 #import "MPFullscreenAdAdapter.h"
 
 /**
- * This adapter subclass exists to separate MoPub-only functionality from base
- * @c MPFullscreenAdAdapter functionality.
+ This adapter subclass exists to separate MoPub-only functionality from base
+ @c MPFullscreenAdAdapter functionality.
  */
 
 NS_ASSUME_NONNULL_BEGIN

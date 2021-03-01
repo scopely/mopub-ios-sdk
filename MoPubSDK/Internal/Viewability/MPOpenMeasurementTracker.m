@@ -56,13 +56,13 @@ NSString * const kOMIDCustomReferenceId = @"";
         if (!manager.isInitialized || !manager.isEnabled) {
             return nil;
         }
-        
+
         // Initial state
         _isTracking = NO;
         _hasTrackedAdLoadEvent = NO;
         _hasTrackedImpressionEvent = NO;
         _videoPlayerView = nil;         // This field does not apply to web content
-        
+
         // Capture the reference to the view that will be tracked and its
         // friendly obstructions.
         // Do not immediately add `obstructions` to `self.friendlyObstructions` because
@@ -71,7 +71,7 @@ NSString * const kOMIDCustomReferenceId = @"";
         _creativeViewToTrack = containerView;
         _friendlyObstructionsToAddOnSessionCreation = obstructions;
         _friendlyObstructions = nil;
-        
+
         // Defer creating the OM SDK session in order to prevent issues with starting the session later.
         // We must wait until the WebView finishes loading OM SDK JavaScript before creating the `OMIDAdSession`.
         // Creating the session sooner than that may result in an inability to signal events (impression, etc.)
@@ -83,7 +83,7 @@ NSString * const kOMIDCustomReferenceId = @"";
         _omidMediaEvents = nil;
         _omidVASTProperties = nil;      // This field does not apply to web content
         _omidNotExecutedTrackers = nil; // This field does not apply to web content
-        
+
         // First, create a context with a reference to the partner object you created in the setup step and the ad’s WebView.
         NSError *error = nil;
         _omidContext = [[OMIDMopubAdSessionContext alloc] initWithPartner:MPViewabilityManager.sharedManager.omidPartner
@@ -95,7 +95,7 @@ NSString * const kOMIDCustomReferenceId = @"";
             MPLogEvent([MPLogEvent error:error message:@"Failed to initialize Viewability tracker"]);
             return nil;
         }
-        
+
         // Then designate which layer is responsible for signaling the impression event.
         // For WebView display ads this is generally the native layer.
         _omidSessionConfiguration = [[OMIDMopubAdSessionConfiguration alloc] initWithCreativeType:OMIDCreativeTypeHtmlDisplay
@@ -109,7 +109,7 @@ NSString * const kOMIDCustomReferenceId = @"";
             return nil;
         }
     }
-    
+
     return self;
 }
 
@@ -121,13 +121,13 @@ NSString * const kOMIDCustomReferenceId = @"";
         if (!manager.isInitialized || !manager.isEnabled) {
             return nil;
         }
-        
+
         // Initial state
         _isTracking = NO;
         _hasTrackedAdLoadEvent = NO;
         _hasTrackedImpressionEvent = NO;
         _videoPlayerView = videoPlayerContainerView.videoPlayerView;
-        
+
         // Capture the reference to the view that will be tracked and its
         // friendly obstructions.
         // Do not immediately add `obstructions` to `self.friendlyObstructions` because
@@ -136,13 +136,13 @@ NSString * const kOMIDCustomReferenceId = @"";
         _creativeViewToTrack = videoPlayerContainerView;
         _friendlyObstructionsToAddOnSessionCreation = videoPlayerContainerView.friendlyObstructions;
         _friendlyObstructions = nil;
-        
+
         // Defer creating the OM SDK session in order to prevent issues with starting the session later.
         _omidSession = nil;
         _omidAdEvents = nil;
         _omidMediaEvents = nil;
         _omidNotExecutedTrackers = videoConfig.viewabilityContext.omidNotExecutedTrackers;
-        
+
         // Generate the VAST properties used for tracking purposes
         if (videoConfig.isRewardExpected) {
             // Locked experience
@@ -153,7 +153,7 @@ NSString * const kOMIDCustomReferenceId = @"";
             CGFloat skipOffset = [videoConfig.skipOffset timeIntervalForVideoWithDuration:videoPlayerContainerView.videoPlayerView.videoDuration];
             _omidVASTProperties = [[OMIDMopubVASTProperties alloc] initWithSkipOffset:skipOffset autoPlay:YES position:OMIDPositionStandalone];
         }
-        
+
         // First, create a context with a reference to the partner object you created in the setup step,
         // the OMID JS, and the measurement resources.
         NSError *error = nil;
@@ -168,9 +168,8 @@ NSString * const kOMIDCustomReferenceId = @"";
             MPLogEvent([MPLogEvent error:error message:@"Failed to initialize Viewability tracker"]);
             return nil;
         }
-        
+
         // Then designate which layer is responsible for signaling the impression event.
-        // For Native video this will generally be the native video player.
         _omidSessionConfiguration = [[OMIDMopubAdSessionConfiguration alloc] initWithCreativeType:OMIDCreativeTypeVideo
                                                                                    impressionType:OMIDImpressionTypeBeginToRender
                                                                                   impressionOwner:OMIDNativeOwner
@@ -182,7 +181,7 @@ NSString * const kOMIDCustomReferenceId = @"";
             return nil;
         }
     }
-    
+
     return self;
 }
 
@@ -195,13 +194,13 @@ NSString * const kOMIDCustomReferenceId = @"";
         if (!manager.isInitialized || !manager.isEnabled) {
             return nil;
         }
-        
+
         // Initial state
         _isTracking = NO;
         _hasTrackedAdLoadEvent = NO;
         _hasTrackedImpressionEvent = NO;
         _videoPlayerView = nil;         // This field does not apply to native content
-        
+
         // Capture the reference to the view that will be tracked and its
         // friendly obstructions.
         // Do not immediately add `obstructions` to `self.friendlyObstructions` because
@@ -210,14 +209,14 @@ NSString * const kOMIDCustomReferenceId = @"";
         _creativeViewToTrack = view;
         _friendlyObstructionsToAddOnSessionCreation = obstructions;
         _friendlyObstructions = nil;
-        
+
         // Defer creating the OM SDK session in order to prevent issues with starting the session later.
         _omidSession = nil;
         _omidAdEvents = nil;
         _omidMediaEvents = nil;
         _omidNotExecutedTrackers = context.omidNotExecutedTrackers;
         _omidVASTProperties = nil;      // This field does not apply to native content
-        
+
         // First, create a context with a reference to the partner object you created in the setup step,
         // the OMID JS, and the measurement resources.
         NSError *error = nil;
@@ -232,9 +231,8 @@ NSString * const kOMIDCustomReferenceId = @"";
             MPLogEvent([MPLogEvent error:error message:@"Failed to initialize Viewability tracker"]);
             return nil;
         }
-        
+
         // Then designate which layer is responsible for signaling the impression event.
-        // For Native video this will generally be the native video player.
         _omidSessionConfiguration = [[OMIDMopubAdSessionConfiguration alloc] initWithCreativeType:OMIDCreativeTypeNativeDisplay
                                                                                    impressionType:OMIDImpressionTypeBeginToRender
                                                                                   impressionOwner:OMIDNativeOwner
@@ -246,19 +244,19 @@ NSString * const kOMIDCustomReferenceId = @"";
             return nil;
         }
     }
-    
+
     return self;
 }
 
 - (void)dealloc {
     [self stopTracking];
-    
+
     // Capture that a Viewability session was valid.
     // We are using the session configuration instead of the session
     // itself since `omidSessionConfiguration` is created at initialization
     // time, whereas `omidSession` is created at `startTracking` time.
     BOOL validViewabilitySession = (_omidSessionConfiguration != nil);
-    
+
     // Explicit `nil` in case the Open Measurement SDK decides to hang on
     // to references longer than expected.
     _creativeViewToTrack = nil;
@@ -271,7 +269,7 @@ NSString * const kOMIDCustomReferenceId = @"";
     _omidSession = nil;
     _omidVASTProperties = nil;
     _videoPlayerView = nil;
-    
+
     // Log the deallocation of the Viewability tracker only if
     // the Viewability tracking session was valid. This is to
     // filter out this log message when initialization of this
@@ -298,10 +296,10 @@ NSString * const kOMIDCustomReferenceId = @"";
     if (error != nil) {
         MPLogEvent([MPLogEvent error:error message:@"Failed to initialize OM SDK session"]);
     }
-    
+
     // Set the view on which to track viewability. For a WebView ad, this will be the WebView itself.
     self.omidSession.mainAdView = self.creativeViewToTrack;
-    
+
     // If there are any native elements which you would consider to be part of the ad,
     // such as a close button, some logo text, or another decoration, you should register them as friendly
     // obstructions to prevent them from counting towards coverage of the ad.
@@ -309,13 +307,13 @@ NSString * const kOMIDCustomReferenceId = @"";
     // be automatically treated as part of the ad)
     [self addFriendlyObstructions:self.friendlyObstructionsToAddOnSessionCreation];
     self.friendlyObstructionsToAddOnSessionCreation = nil;
-    
+
     // Create the object responsible for notifying OM SDK of ad life cycle events.
     self.omidAdEvents = [[OMIDMopubAdEvents alloc] initWithAdSession:self.omidSession error:&error];
     if (error != nil) {
         MPLogEvent([MPLogEvent error:error message:@"Failed to initialize OM SDK ad events"]);
     }
-    
+
     // Create the object responsible for notifying OM SDK of media events.
     self.omidMediaEvents = [[OMIDMopubMediaEvents alloc] initWithAdSession:self.omidSession error:&error];
     if (error != nil) {
@@ -342,26 +340,26 @@ NSString * const kOMIDCustomReferenceId = @"";
     if (obstructions.count == 0) {
         return;
     }
-    
+
     // No session to add to.
     if (self.omidSession == nil) {
         return;
     }
-    
+
     // Sort the obstructions by name so that adding the obstructions will be deterministic
     // for unit testing and UI testing.
     NSArray<UIView<MPViewabilityObstruction> *> *sortedObstructions = [obstructions sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"viewabilityObstructionName" ascending:YES]]];
-    
+
     [sortedObstructions enumerateObjectsUsingBlock:^(UIView<MPViewabilityObstruction> * _Nonnull obstructionView, NSUInteger idx, BOOL * _Nonnull stop) {
         // Do not add an obstruction that already exists
         if ([self.friendlyObstructions containsObject:obstructionView]) {
             return;
         }
-        
+
         // Extract relevant information
         OMIDFriendlyObstructionType type = [self omidObstructionType:obstructionView.viewabilityObstructionType];
         NSString *reason = obstructionView.viewabilityObstructionName;
-        
+
         // Add the obstruction
         NSError *obstructionError = nil;
         [self.omidSession addFriendlyObstruction:obstructionView purpose:type detailedReason:reason error:&obstructionError];
@@ -374,7 +372,7 @@ NSString * const kOMIDCustomReferenceId = @"";
                 self.friendlyObstructions = [NSMutableSet set];
             }
             [self.friendlyObstructions addObject:obstructionView];
-            
+
             MPLogEvent([MPLogEvent viewabilityTracker:self addedFriendlyObstruction:obstructionView]);
         }
     }];
@@ -386,44 +384,44 @@ NSString * const kOMIDCustomReferenceId = @"";
         if (self.isTracking) {
             return;
         }
-        
+
         // Viewability is not initialize or disabled
         MPViewabilityManager *manager = MPViewabilityManager.sharedManager;
         if (!manager.isInitialized || !manager.isEnabled) {
             return;
         }
-        
+
         // Disallow reusing the tracker
         if (self.omidSession != nil) {
             MPLogWarn(@"Attempted to start a previously tracked Viewability session!");
             return;
         }
-        
+
         // Create the Open Measurement session and tracking objects before starting
         // the tracking session. This has been defered as late as possible to give
         // the Open Measurement javascript that was injected into the creative HTML
         // time to finish loading in the web view.
         [self createOmidSession];
-        
+
         // Register notification handler
         [NSNotificationCenter.defaultCenter addObserver:self
                                                selector:@selector(onViewabilityDisabledNotification:)
                                                    name:kDisableViewabilityTrackerNotification
                                                  object:nil];
-        
+
         // Start the tracking session
         [self.omidSession start];
-        
+
         // Dispatch out all of the optional resource error trackers now.
         if (self.omidNotExecutedTrackers.count > 0) {
             [MPAnalyticsTracker.sharedTracker sendTrackingRequestForURLs:self.omidNotExecutedTrackers];
         }
-        
+
         // Set internal state
         self.isTracking = YES;
-        
+
         MPLogEvent([MPLogEvent viewabilityTrackerSessionStarted:self]);
-        
+
     } // End synchronized(self)
 }
 
@@ -433,23 +431,23 @@ NSString * const kOMIDCustomReferenceId = @"";
         if (!self.isTracking) {
             return;
         }
-        
+
         self.isTracking = NO;
-        
+
         // Remove notification observing
         [NSNotificationCenter.defaultCenter removeObserver:self];
-        
+
         // Note that ending an OMID ad session sends a message to the verification scripts running inside the webview
         // supplied by the integration. So that the verification scripts have enough time to handle the `sessionFinish` event,
         // the integration must maintain a strong reference to the webview for at least 1.0 seconds after ending the session.
         [self.omidSession finish];
-        
+
         // DO NOT set `omidSession` to `nil` since it needs to be given time to dispatch out any messages
         // to the webview, and `omidSession` is used to determine if the session has already been created
         // and should not be restarted.
-        
+
         MPLogEvent([MPLogEvent viewabilityTrackerSessionStopped:self]);
-        
+
     } // End synchronized(self)
 }
 
@@ -459,11 +457,11 @@ NSString * const kOMIDCustomReferenceId = @"";
         if (!self.isTracking) {
             return;
         }
-        
+
         if (self.hasTrackedAdLoadEvent) {
             return;
         }
-        
+
         // Signal to OM SDK that the ad has loaded.
         NSError *error = nil;
         if (self.omidVASTProperties != nil) {
@@ -472,13 +470,13 @@ NSString * const kOMIDCustomReferenceId = @"";
         else {
             [self.omidAdEvents loadedWithError:&error];
         }
-        
+
         if (error != nil) {
             MPLogEvent([MPLogEvent error:error message:@"Failed to signal ad load event to OM SDK"]);
         }
-        
+
         self.hasTrackedAdLoadEvent = YES;
-        
+
         MPLogEvent([MPLogEvent viewabilityTrackerTrackedAdLoaded:self]);
     } // End synchronized(self)
 }
@@ -489,21 +487,21 @@ NSString * const kOMIDCustomReferenceId = @"";
         if (!self.isTracking) {
             return;
         }
-        
+
         // Already tracked impression
         if (self.hasTrackedImpressionEvent) {
             return;
         }
-        
+
         // Signal to OM SDK that an ad impression has occurred.
         NSError *error = nil;
         [self.omidAdEvents impressionOccurredWithError:&error];
         if (error != nil) {
             MPLogEvent([MPLogEvent error:error message:@"Failed to signal ad impression event to OM SDK"]);
         }
-        
+
         self.hasTrackedImpressionEvent = YES;
-        
+
         MPLogEvent([MPLogEvent viewabilityTrackerTrackedImpression:self]);
     } // End synchronized(self)
 }
@@ -514,12 +512,12 @@ NSString * const kOMIDCustomReferenceId = @"";
         if (!self.isTracking) {
             return;
         }
-        
+
         // Tracker not initialized for media events. Disregard this tracking event.
         if (self.omidMediaEvents == nil) {
             return;
         }
-        
+
         // Video playback started
         if ([event isEqualToString:MPVideoEventStart]) {
             NSTimeInterval duration = self.videoPlayerView.videoDuration;
@@ -589,7 +587,7 @@ NSString * const kOMIDCustomReferenceId = @"";
             // not executed.
             return;
         }
-        
+
         MPLogEvent([MPLogEvent viewabilityTracker:self trackedVideoEvent:event]);
     } // End synchronized(self)
 }
@@ -600,12 +598,12 @@ NSString * const kOMIDCustomReferenceId = @"";
         if (!self.isTracking) {
             return;
         }
-        
+
         // If the view changes at a subsequent time due to a fullscreen expansion or for a similar reason,
         // you should always update the `mainAdView` reference to whatever is appropriate at that time.
         self.creativeViewToTrack = view;
         self.omidSession.mainAdView = self.creativeViewToTrack;
-        
+
         MPLogEvent([MPLogEvent viewabilityTrackerUpdatedTrackingView:self]);
     } // End synchronized(self)
 }

@@ -53,6 +53,6 @@
                                                               additionalMetadata:(NSDictionary *)additionalMetadata;
 + (MPAdConfiguration *)defaultRewardedVideoConfigurationWithReward;
 + (MPAdConfiguration *)defaultRewardedVideoConfigurationServerToServer;
-+ (MPAdConfiguration *)defaultNativeVideoConfigurationWithVideoTrackers;
++ (MPAdConfiguration *)defaultVASTConfigurationWithVideoTrackers;
 
 @end

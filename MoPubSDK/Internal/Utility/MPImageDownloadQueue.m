@@ -6,6 +6,11 @@
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
+#if __has_include(<MoPub/MoPub-Swift.h>)
+    #import <MoPub/MoPub-Swift.h>
+#else
+    #import "MoPub-Swift.h"
+#endif
 #import "MPImageDownloadQueue.h"
 #import "MPNativeAdError.h"
 #import "MPLogging.h"
@@ -57,7 +62,7 @@
             @autoreleasepool {
                 if ([[MPNativeCache sharedCache] cachedDataExistsForKey:imageURL.absoluteString] && useCachedImage) {
                     NSData *imageData = [[MPNativeCache sharedCache] retrieveDataForKey:imageURL.absoluteString];
-                    UIImage *image = [UIImage imageWithData:imageData];
+                    UIImage *image = [MPImageCreator imageWith:imageData];
                     result[imageURL] = image;
                 } else if (![[MPNativeCache sharedCache] cachedDataExistsForKey:imageURL.absoluteString] || !useCachedImage) {
                     MPLogDebug(@"Downloading %@", imageURL);
@@ -78,7 +83,7 @@
 
                     BOOL validImageDownloaded = data != nil;
                     if (validImageDownloaded) {
-                        UIImage *downloadedImage = [UIImage imageWithData:data];
+                        UIImage *downloadedImage = [MPImageCreator imageWith:data];
                         if (downloadedImage != nil) {
                             [[MPNativeCache sharedCache] storeData:data forKey:imageURL.absoluteString];
                             result[imageURL] = downloadedImage;

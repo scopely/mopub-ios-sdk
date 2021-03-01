@@ -281,7 +281,7 @@
 
 @implementation MPRewardedVideoAdManager (MPAdAdapterDelegate)
 
-- (id<MPMediationSettingsProtocol>)instanceMediationSettingsForClass:(Class)aClass
+- (id<MPMediationSettingsProtocol> _Nullable)instanceMediationSettingsForClass:(Class)aClass
 {
     for (id<MPMediationSettingsProtocol> settings in self.mediationSettings) {
         if ([settings isKindOfClass:aClass]) {
@@ -372,8 +372,6 @@
             [self.delegate rewardedVideoWillDisappearForAdManager:self];
             break;
         case MPFullscreenAdEventDidDisappear:
-            self.ready = NO;     // This state reset was put back here to accommodate adapters using the wrong event upon dismissal
-            self.playedAd = YES; // This state reset was put back here to accommodate adapters using the wrong event upon dismissal
             MPLogAdEvent(MPLogEvent.adDidDisappear, self.adUnitId);
             [self.delegate rewardedVideoDidDisappearForAdManager:self];
             break;
@@ -385,7 +383,9 @@
             MPLogAdEvent(MPLogEvent.adWillLeaveApplication, self.adUnitId);
             [self.delegate rewardedVideoWillLeaveApplicationForAdManager:self];
             break;
-        case MPFullscreenAdEventWillDismiss: {
+        case MPFullscreenAdEventWillDismiss:
+            break;
+        case MPFullscreenAdEventDidDismiss: {
             // End the Viewability session and schedule the previously onscreen adapter for
             // deallocation if it exists since it is going offscreen. This only applies to
             // webview-based content.
@@ -395,6 +395,7 @@
             }
 
             // Successful playback of the rewarded video; reset the internal played state.
+            self.adapter = nil;     // `nil` to trigger the scheduled deallocation since we are handing over ownership of the reference
             self.ready = NO;
             self.playedAd = YES;
             self.loading = NO;

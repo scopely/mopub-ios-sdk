@@ -422,7 +422,7 @@ static char kAdPlacerKey;
     }
 }
 
-- (id)mp_dequeueReusableCellWithReuseIdentifier:(NSString *)identifier forIndexPath:(NSIndexPath *)indexPath
+- (id)mp_dequeueReusableCellWithReuseIdentifier:(NSString *)identifier forIndexPath:(NSIndexPath * _Nonnull)indexPath
 {
     MPCollectionViewAdPlacer *adPlacer = [self mp_adPlacer];
     NSIndexPath *adjustedIndexPath = indexPath;
@@ -562,7 +562,7 @@ static char kAdPlacerKey;
     return adjustedIndexPaths;
 }
 
-- (void)mp_scrollToItemAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UICollectionViewScrollPosition)scrollPosition animated:(BOOL)animated
+- (void)mp_scrollToItemAtIndexPath:(NSIndexPath * _Nonnull)indexPath atScrollPosition:(UICollectionViewScrollPosition)scrollPosition animated:(BOOL)animated
 {
     MPCollectionViewAdPlacer *adPlacer = [self mp_adPlacer];
     NSIndexPath *adjustedIndexPath = indexPath;

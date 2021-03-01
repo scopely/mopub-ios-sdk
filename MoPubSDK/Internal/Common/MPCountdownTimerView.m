@@ -61,7 +61,7 @@ static NSString * const kAnimationKey = @"Timer";
                                                                   clockwise:false];
         _backgroundRingLayer = ({
             CAShapeLayer * layer = [CAShapeLayer new];
-            layer.fillColor = UIColor.clearColor.CGColor;
+            layer.fillColor = UIColor.blackColor.CGColor;
             layer.lineWidth = kRingWidth;
             layer.path = [circularPath CGPath];
             layer.strokeColor = [UIColor.whiteColor colorWithAlphaComponent:0.5].CGColor;
@@ -70,7 +70,7 @@ static NSString * const kAnimationKey = @"Timer";
 
         _animatingRingLayer = ({
             CAShapeLayer * layer = [CAShapeLayer new];
-            layer.fillColor = UIColor.clearColor.CGColor;
+            layer.fillColor = UIColor.blackColor.CGColor;
             layer.lineWidth = kRingWidth;
             layer.path = [circularPath CGPath];
             layer.strokeColor = UIColor.whiteColor.CGColor;

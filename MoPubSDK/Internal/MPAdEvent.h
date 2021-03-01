@@ -96,5 +96,10 @@ typedef NS_ENUM(NSUInteger, MPFullscreenAdEvent) {
     /**
      The fullscreen ad will be dismissed by the user.
      */
-    MPFullscreenAdEventWillDismiss
+    MPFullscreenAdEventWillDismiss,
+
+    /**
+     The fullscreen ad has finished dismissing.
+     */
+    MPFullscreenAdEventDidDismiss
 };

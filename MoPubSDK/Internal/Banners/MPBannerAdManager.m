@@ -133,9 +133,7 @@
 
 - (void)applicationWillEnterForeground
 {
-    if (self.automaticallyRefreshesContents && self.hasRequestedAtLeastOneAd) {
-        [self loadAdWithURL:nil];
-    }
+    [self resumeRefreshTimer];
 }
 
 - (void)applicationDidEnterBackground
@@ -254,6 +252,11 @@
     // Start the stopwatch for the adapter load.
     [self.loadStopwatch start];
 
+    // Reset the requesting adapter back to nil, so that if we call
+    // didFailToLoadAdWithError with a nil adapter in the next few lines,
+    // it will continue the client side waterfall.
+    self.requestingAdapter = nil;
+
     if (configuration.adapterClass == nil) {
         [self adapter:nil didFailToLoadAdWithError:nil];
         return;
@@ -275,7 +278,7 @@
 
     self.requestingAdapter.adUnitId = self.adUnitId;
     self.requestingAdapter.adapterDelegate = self;
-    
+
     [self.delegate bannerWillStartAttemptForAdManager:self];
     [self.requestingAdapter getAdWithConfiguration:configuration targeting:self.targeting];
 }
@@ -400,7 +403,7 @@
     [self.delegate bannerDidFailAttemptForAdManager:self error:error];
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
     [self.communicator sendAfterLoadUrlWithConfiguration:self.requestingConfiguration adapterLoadDuration:duration adapterLoadResult:result];
-    
+
     if (self.requestingAdapter == adapter) {
         // There are more ad configurations to try.
         if (self.remainingConfigurations.count > 0) {

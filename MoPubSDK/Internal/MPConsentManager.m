@@ -7,7 +7,11 @@
 //
 
 #import <AdSupport/AdSupport.h>
-#import "MPAPIEndpoints.h"
+#if __has_include(<MoPub/MoPub-Swift.h>)
+    #import <MoPub/MoPub-Swift.h>
+#else
+    #import "MoPub-Swift.h"
+#endif
 #import "MPAdServerURLBuilder.h"
 #import "MPAdServerKeys.h"
 #import "MPConsentChangedNotification.h"
@@ -1005,7 +1009,8 @@ static NSString * const kDeprecatedIfaPrefixToRemove = @"ifa:";
 - (void)clearAdUnitIdUsedForConsent {
     [NSUserDefaults.standardUserDefaults setObject:nil forKey:kAdUnitIdUsedForConsentStorageKey];
     // Using ivar here to get around warning about nullability
-    _adUnitIdUsedForConsent = nil;
+    // Intentional cast to suppress the static analyzer.
+    _adUnitIdUsedForConsent = (id _Nonnull)nil;
 }
 
 @end
@@ -1267,7 +1272,7 @@ static NSString * const kDeprecatedIfaPrefixToRemove = @"ifa:";
 }
 
 /**
- * App conversion request will only be fired when MoPub obtains consent.
+ App conversion request will only be fired when MoPub obtains consent.
  */
 - (void)updateAppConversionTracking {
     if ([MPConsentManager sharedManager].canCollectPersonalInfo) {
