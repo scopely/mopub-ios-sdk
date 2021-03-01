@@ -199,7 +199,7 @@ NSString * const kVASTClickabilityExperimentKey = @"vast-click-enabled";
     self.creationTimestamp = [NSDate date];
 
     self.creativeId = [metadata objectForKey:kCreativeIdMetadataKey];
-    
+
     self.lineItemId = [metadata objectForKey:kAdLineItemIdKey];
 
     self.metadataAdType = [metadata objectForKey:kAdTypeMetadataKey];
