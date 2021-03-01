@@ -58,7 +58,7 @@
  @param view The ad view sending the message.
  @param error The error that occurred during the load.
  */
-- (void)bannerDidFailAttemptForAd:(MPAdView *)view error:(NSError*)error;
+- (void)bannerDidFailAttemptForAd:(MPAdView *)view error:(NSError*)error withImpressionData:(MPImpressionData *)impressionData;
 
 /** @name Detecting When a Banner Ad is Loaded */
 

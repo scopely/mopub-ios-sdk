@@ -274,8 +274,8 @@
 
 - (void)bannerDidFailAttemptForAdManager:(MPBannerAdManager *)manager error:(NSError *)error
 {
-    if ([self.delegate respondsToSelector:@selector(bannerDidFailAttemptForAd:error:)]) {
-        [self.delegate bannerDidFailAttemptForAd:self error:error];
+    if ([self.delegate respondsToSelector:@selector(bannerDidFailAttemptForAd:error:withImpressionData:)]) {
+        [self.delegate bannerDidFailAttemptForAd:self error:error withImpressionData:[manager impressionData]];
     }
 }
 

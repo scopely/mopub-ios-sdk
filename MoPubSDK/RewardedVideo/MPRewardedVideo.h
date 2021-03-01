@@ -268,7 +268,7 @@
  @param adUnitID The ad unit ID of the ad associated with the event.
  @param error The error that occurred during the load.
  */
-- (void)rewardedVideoDidFailAttemptForAdUnitID:(NSString *)adUnitID error:(NSError *)error;
+- (void)rewardedVideoDidFailAttemptForAdUnitID:(NSString *)adUnitID error:(NSError*)error withImpressionData:(MPImpressionData *)impressionData;
 
 /**
  This method is called after an ad loads successfully.
