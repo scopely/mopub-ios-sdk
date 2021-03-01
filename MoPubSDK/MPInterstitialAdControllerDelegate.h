@@ -48,7 +48,7 @@
  @param interstitial The interstitial ad object sending the message.
  @param error The error that occurred during the load.
  */
-- (void)interstitialDidFailAttemptToLoadAd:(MPInterstitialAdController *)interstitial error:(NSError*)error;
+- (void)interstitialDidFailAttemptToLoadAd:(MPInterstitialAdController *)interstitial error:(NSError*)error withImpressionData:(MPImpressionData *)impressionData;
 
 /**
  Sent when an interstitial ad object successfully loads an ad.
@@ -62,7 +62,7 @@
 
  @param interstitial The interstitial ad object sending the message.
  */
-- (void)interstitialDidFailAttemptToLoadAd:(MPInterstitialAdController *)interstitial error:(NSError*)error withImpressionData:(MPImpressionData *)impressionData;
+- (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial;
 
 /**
  Sent when an interstitial ad object fails to load an ad.
