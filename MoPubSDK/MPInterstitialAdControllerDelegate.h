@@ -26,31 +26,6 @@
 /** @name Detecting When an Interstitial Ad is Loaded */
 
 /**
- * This method is called before an ad attempts to load.
- *
- * @param interstitial The interstitial ad object sending the message.
- * @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
- * @param lineItemId The id of line item the ad belongs to.
- */
-- (void)interstitialWillStartAttemptToLoadAd:(MPInterstitialAdController *)interstitial customEventClass:(NSString*)customEventClass withLineItemId:(NSString*)lineItemId;
-
-/**
- * This method is called after an ad attempt succeeds to load.
- *
- * @param interstitial The interstitial ad object sending the message.
- * @param creativeId The id of the creative loaded.
- */
-- (void)interstitialDidSucceedAttemptToLoadAd:(MPInterstitialAdController *)interstitial withCreativeId:(NSString*)creativeId withImpressionData:(MPImpressionData *)impressionData;
-
-/**
- * This method is called after an ad attempt fails to load.
- *
- * @param interstitial The interstitial ad object sending the message.
- * @param error The error that occurred during the load.
- */
-- (void)interstitialDidFailAttemptToLoadAd:(MPInterstitialAdController *)interstitial error:(NSError*)error withImpressionData:(MPImpressionData *)impressionData;
-
-/**
  This method is called before an ad attempts to load.
 
  @param interstitial The interstitial ad object sending the message.
@@ -65,7 +40,7 @@
  @param interstitial The interstitial ad object sending the message.
  @param creativeId The id of the creative loaded.
  */
-- (void)interstitialDidSucceedAttemptToLoadAd:(MPInterstitialAdController *)interstitial withCreativeId:(NSString*)creativeId withPublisherRevenue:(NSNumber*)publisherRevenue;
+- (void)interstitialDidSucceedAttemptToLoadAd:(MPInterstitialAdController *)interstitial withCreativeId:(NSString*)creativeId withImpressionData:(MPImpressionData *)impressionData;
 
 /**
  This method is called after an ad attempt fails to load.
@@ -87,7 +62,7 @@
 
  @param interstitial The interstitial ad object sending the message.
  */
-- (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial;
+- (void)interstitialDidFailAttemptToLoadAd:(MPInterstitialAdController *)interstitial error:(NSError*)error withImpressionData:(MPImpressionData *)impressionData;
 
 /**
  Sent when an interstitial ad object fails to load an ad.

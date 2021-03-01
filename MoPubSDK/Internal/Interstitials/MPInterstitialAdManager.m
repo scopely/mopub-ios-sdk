@@ -203,8 +203,6 @@
 
     [self.delegate managerWillStartInterstitialAttempt:self];
 
-    [self.delegate managerWillStartInterstitialAttempt:self];
-
     NSObject *object = [configuration.adapterClass new];
     if ([object isKindOfClass:MPFullscreenAdAdapter.class]) {
         MPFullscreenAdAdapter *adapter = (MPFullscreenAdAdapter *)object;
@@ -237,8 +235,6 @@
             self.remainingConfigurations = nil;
             self.ready = YES;
             self.loading = NO;
-
-            [self.delegate managerDidSucceedInterstitialAttempt:self];
 
             [self.delegate managerDidSucceedInterstitialAttempt:self];
 
