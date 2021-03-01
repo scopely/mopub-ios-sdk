@@ -25,7 +25,7 @@
 @property (nonatomic, copy) NSString *customerId;
 @property (nonatomic, readonly) NSString *dspCreativeId;
 @property (nonatomic, readonly) NSString *lineItemId;
-@property (nonatomic, readonly) NSNumber *publisherRevenue;
+@property (nonatomic, readonly) MPImpressionData *impressionData;
 @property (nonatomic, strong) MPAdTargeting *targeting;
 
 /**

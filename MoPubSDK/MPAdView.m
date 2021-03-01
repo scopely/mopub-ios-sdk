@@ -267,8 +267,8 @@
 
 - (void)bannerDidSucceedAttemptForAdManager:(MPBannerAdManager *)manager
 {
-    if ([self.delegate respondsToSelector:@selector(bannerDidSucceedAttemptForAd:withCreativeId:withPublisherRevenue:)]) {
-        [self.delegate bannerDidSucceedAttemptForAd:self withCreativeId:[manager dspCreativeId] withPublisherRevenue:[manager publisherRevenue]];
+    if ([self.delegate respondsToSelector:@selector(bannerDidSucceedAttemptForAd:withCreativeId:withImpressionData:)]) {
+        [self.delegate bannerDidSucceedAttemptForAd:self withCreativeId:[manager dspCreativeId] withImpressionData:[manager impressionData]];
     }
 }
 

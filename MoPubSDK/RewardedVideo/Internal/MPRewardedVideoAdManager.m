@@ -89,12 +89,11 @@
     return self.configuration.lineItemId;
 }
 
-- (NSNumber*)publisherRevenue {
-    if (self.configuration == nil ||
-        self.configuration.impressionData == nil){
+- (MPImpressionData *)impressionData {
+    if (self.configuration == nil){
         return nil;
     }
-    return self.configuration.impressionData.publisherRevenue;
+    return self.configuration.impressionData;
 }
 
 - (BOOL)hasAdAvailable
