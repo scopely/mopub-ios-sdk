@@ -202,8 +202,6 @@ NSString * const kVASTClickabilityExperimentKey = @"vast-click-enabled";
     
     self.lineItemId = [metadata objectForKey:kAdLineItemIdKey];
 
-    self.lineItemId = [metadata objectForKey:kAdLineItemIdKey];
-
     self.metadataAdType = [metadata objectForKey:kAdTypeMetadataKey];
 
     self.nativeImpressionMinVisiblePixels = [[self adAmountFromMetadata:metadata key:kNativeImpressionMinVisiblePixelsMetadataKey] floatValue];
