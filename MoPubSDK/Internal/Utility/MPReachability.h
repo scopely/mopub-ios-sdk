@@ -20,17 +20,17 @@ extern NSString *kMPReachabilityChangedNotification;
 @interface MPReachability : NSObject
 
 /*!
- * Use to check the reachability of a given host name.
+ Use to check the reachability of a given host name.
  */
 + (instancetype)reachabilityWithHostName:(NSString *)hostName;
 
 /*!
- * Use to check the reachability of a given IP address.
+ Use to check the reachability of a given IP address.
  */
 + (instancetype)reachabilityWithAddress:(const struct sockaddr *)hostAddress;
 
 /*!
- * Checks whether the default route is available. Should be used by applications that do not connect to a particular host.
+ Checks whether the default route is available. Should be used by applications that do not connect to a particular host.
  */
 + (instancetype)reachabilityForInternetConnection;
 
@@ -40,7 +40,7 @@ extern NSString *kMPReachabilityChangedNotification;
 //+ (instancetype)reachabilityForLocalWiFi;
 
 /*!
- * Start listening for reachability notifications on the current run loop.
+ Start listening for reachability notifications on the current run loop.
  */
 - (BOOL)startNotifier;
 - (void)stopNotifier;
@@ -48,7 +48,7 @@ extern NSString *kMPReachabilityChangedNotification;
 - (MPNetworkStatus)currentReachabilityStatus;
 
 /*!
- * WWAN may be available, but not active until a connection has been established. WiFi may require a connection for VPN on Demand.
+ WWAN may be available, but not active until a connection has been established. WiFi may require a connection for VPN on Demand.
  */
 - (BOOL)connectionRequired;
 

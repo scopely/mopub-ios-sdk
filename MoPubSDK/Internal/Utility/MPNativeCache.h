@@ -13,7 +13,7 @@
 + (instancetype)sharedCache;
 
 /*
- * Do NOT call any of the following methods on the main thread, potentially lengthy wait for disk IO
+ Do NOT call any of the following methods on the main thread, potentially lengthy wait for disk IO
  */
 - (BOOL)cachedDataExistsForKey:(NSString *)key;
 - (NSData *)retrieveDataForKey:(NSString *)key;

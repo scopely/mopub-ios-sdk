@@ -308,18 +308,19 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 {
     self.isLoadingDestination = NO;
 
-    // In `presentStoreKitControllerWithProductParameters:fallbackURL:` we specify that the
-    // `modalPresentationStyle` for `SKStoreProductViewController` should be `UIModalPresentationFullScreen`.
-    // However for notch-based devices, iOS will automatically decide to change the style to
-    // `UIModalPresentationOverFullScreen` which results in a paged modal over modal effect.
-    // As a consequence, dismissing `SKStoreProductViewController` using this style automatically
-    // removes `SKStoreProductViewController` and no futher action is needed.
-    UIModalPresentationStyle style = viewController.modalPresentationStyle;
-    if (style == UIModalPresentationOverFullScreen) {
+    // In iOS 13.0 and later, SKStoreProductViewController is automatically dismissed when the
+    // user clicks "Cancel", so we do not need to manually dismiss it.
+    // However, in iOS 13.0 and 13.1, there's a bug in @c SKStoreProductViewController that
+    // leaves around an invisible view controller giving the appearance of a softlock upon
+    // dismissal. Given that, for iOS 13.0 and 13.1, *a* view controller must be dismissed
+    // before the ad can be interacted with.
+    // Therefore, for iOS 13.2 and later, when this method is called, assume the
+    // @c SKStoreProductViewController has been dismissed. For iOS 13.1 and earlier, manually
+    // dismiss it.
+    if (@available(iOS 13.2, *)) {
         [self.delegate displayAgentDidDismissModal];
     }
-    // Fall back to our expected `UIModalPresentationFullScreen` behavior where we will need to
-    // explicitly dismiss `SKStoreProductViewController` before notifying the delegate.
+    // Manually dismiss the presented view controller on iOS 13.1 and earlier.
     else {
         [self hideModalAndNotifyDelegate];
     }

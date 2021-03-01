@@ -42,10 +42,6 @@ NSError *MPNativeAdNSErrorForVASTParsingFailure() {
     return [NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorVASTParsingFailed userInfo:@{NSLocalizedDescriptionKey : @"Failed to parse VAST tag"}];
 }
 
-NSError *MPNativeAdNSErrorForVideoConfigInvalid() {
-    return [NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorVideoConfigInvalid userInfo:@{NSLocalizedDescriptionKey : @"Native Video Config Values in Adserver response are invalid"}];
-}
-
 NSError *MPNativeAdNSErrorForContentDisplayErrorMissingRootController() {
     return [NSError errorWithDomain:MoPubNativeAdsSDKDomain code:MPNativeAdErrorContentDisplayError userInfo:@{NSLocalizedDescriptionKey : @"Cannot display content without a root view controller"}];
 }

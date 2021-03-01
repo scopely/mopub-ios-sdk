@@ -10,7 +10,10 @@
 
 #import <StoreKit/StoreKit.h>
 
-#define NULLABLE_STRING_TO_NULLABLE_NSNUMBER(str) str == nil ? nil : @([str integerValue])
+// Intentionally casting to suppress the static analyzer.
+// Since we validate that all values are non-nil in `isClickthroughDataValid`,
+// we'll never return an object with nil values from init.
+#define NULLABLE_STRING_TO_NULLABLE_NSNUMBER(str) str == nil ? (id _Nonnull)nil : (id _Nonnull)@([str integerValue])
 
 static NSString *const kAdServerVersionKey                       = @"version";
 static NSString *const kAdServerNetworkKey                       = @"network";

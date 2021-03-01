@@ -19,9 +19,9 @@
 @property (class, nonatomic, strong) MPEngineInfo * engineInformation;
 
 /**
- * Returns an NSURL object given an endpoint and a dictionary of query parameters/values
+ Returns an NSURL object given NSURLComponents and a dictionary of query parameters/values
  */
-+ (MPURL *)URLWithEndpointPath:(NSString *)endpointPath postData:(NSDictionary *)parameters;
++ (MPURL *)URLWithComponents:(NSURLComponents *)components postData:(NSDictionary *)parameters;
 
 @end
 

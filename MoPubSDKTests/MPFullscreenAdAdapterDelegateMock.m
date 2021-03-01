@@ -120,6 +120,11 @@
     [self safelyFulfillAdEventExpectation];
 }
 
+- (void)fullscreenAdAdapterAdDidDismiss:(nonnull MPFullscreenAdAdapter *)adapter {
+    [self.selectorCounter incrementCountForSelector:@selector(fullscreenAdAdapterAdDidDismiss:)];
+    [self safelyFulfillAdEventExpectation];
+}
+
 - (void)trackClickForAdapter:(MPFullscreenAdAdapter *)adapter {
     [self.selectorCounter incrementCountForSelector:@selector(trackClickForAdapter:)];
 }

@@ -15,7 +15,7 @@ static const NSTimeInterval kTestDispatchTime = 0.5; // seconds
 static const NSTimeInterval kExpectationWaitTime = 1.0; // seconds
 
 /**
- * This test make use of `MPTimer.associatedTitle` to identifier the timers in each test.
+ This test make use of `MPTimer.associatedTitle` to identifier the timers in each test.
  */
 @interface MPTimerTests : XCTestCase
 
@@ -107,49 +107,6 @@ static const NSTimeInterval kExpectationWaitTime = 1.0; // seconds
     [self waitForExpectations:@[expectation] timeout:kExpectationWaitTime];
 }
 
-// Test pausing and resuming the timer at different timings (before & after firing & invalidating).
-- (void)testPauseAndResume {
-    // Create an expectation waiting for the expected number of expectation triggers to fire.
-    __weak XCTestExpectation *expectation = [self expectationWithDescription:@"Wait for timer to fire"];
-    expectation.expectedFulfillmentCount = 1;
-
-    // Test timer
-    MPTimer *timer = [self generateTestTimerWithBlock:^(MPTimer * _Nonnull timer) {
-        [expectation fulfill];
-    }];
-
-    XCTAssertFalse(timer.isCountdownActive);
-    XCTAssertTrue(timer.isValid);
-    [timer pause];
-    XCTAssertFalse(timer.isCountdownActive);
-    XCTAssertTrue(timer.isValid);
-    [timer scheduleNow];
-    XCTAssertTrue(timer.isCountdownActive);
-    XCTAssertTrue(timer.isValid);
-
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kTestDispatchTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        XCTAssertTrue(timer.isCountdownActive);
-        XCTAssertTrue(timer.isValid);
-        [timer pause];
-        XCTAssertFalse(timer.isCountdownActive);
-        XCTAssertTrue(timer.isValid);
-        [timer resume];
-        XCTAssertTrue(timer.isCountdownActive);
-        XCTAssertTrue(timer.isValid);
-        [timer invalidate];
-        XCTAssertFalse(timer.isCountdownActive);
-        XCTAssertFalse(timer.isValid);
-        [timer pause];
-        XCTAssertFalse(timer.isCountdownActive);
-        XCTAssertFalse(timer.isValid);
-        [timer resume];
-        XCTAssertFalse(timer.isCountdownActive);
-        XCTAssertFalse(timer.isValid);
-    });
-
-    [self waitForExpectations:@[expectation] timeout:kExpectationWaitTime];
-}
-
 // Test whether the timer repeats firing as expected.
 - (void)testRepeatingTimer {
     // Create an expectation waiting for the expected number of expectation triggers to fire.
@@ -209,6 +166,86 @@ static const NSTimeInterval kExpectationWaitTime = 1.0; // seconds
 
     [self waitForExpectations:@[expectation] timeout:kExpectationWaitTime];
 }
+
+#pragma mark - Pause and Resume
+
+// Test pausing and resuming the timer at different timings (before & after firing & invalidating).
+- (void)testPauseAndResume {
+    // Create an expectation waiting for the expected number of expectation triggers to fire.
+    __weak XCTestExpectation *expectation = [self expectationWithDescription:@"Wait for timer to fire"];
+    expectation.expectedFulfillmentCount = 1;
+
+    // Test timer
+    MPTimer *timer = [self generateTestTimerWithBlock:^(MPTimer * _Nonnull timer) {
+        [expectation fulfill];
+    }];
+
+    XCTAssertFalse(timer.isCountdownActive);
+    XCTAssertTrue(timer.isValid);
+    [timer pause];
+    XCTAssertFalse(timer.isCountdownActive);
+    XCTAssertTrue(timer.isValid);
+    [timer scheduleNow];
+    XCTAssertTrue(timer.isCountdownActive);
+    XCTAssertTrue(timer.isValid);
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kTestDispatchTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        XCTAssertTrue(timer.isCountdownActive);
+        XCTAssertTrue(timer.isValid);
+        [timer pause];
+        XCTAssertFalse(timer.isCountdownActive);
+        XCTAssertTrue(timer.isValid);
+        [timer resume];
+        XCTAssertTrue(timer.isCountdownActive);
+        XCTAssertTrue(timer.isValid);
+        [timer invalidate];
+        XCTAssertFalse(timer.isCountdownActive);
+        XCTAssertFalse(timer.isValid);
+        [timer pause];
+        XCTAssertFalse(timer.isCountdownActive);
+        XCTAssertFalse(timer.isValid);
+        [timer resume];
+        XCTAssertFalse(timer.isCountdownActive);
+        XCTAssertFalse(timer.isValid);
+    });
+
+    [self waitForExpectations:@[expectation] timeout:kExpectationWaitTime];
+}
+
+// Tests that resuming the timer after a pause will continue with the
+// time remaining rather than starting a new timer.
+- (void)testResumeAfterPause {
+    // Create an expectation waiting for the expected number of expectation triggers to fire.
+    __weak XCTestExpectation *expectation = [self expectationWithDescription:@"Wait for timer to fire"];
+
+    // Test timer
+    NSTimeInterval timeInterval = 20;
+    NSTimeInterval halfInterval = timeInterval / 2;
+    MPTimer *timer = [MPTimer timerWithTimeInterval:timeInterval repeats:NO block:^(MPTimer * _Nonnull timer) {
+        [expectation fulfill];
+    }];
+
+    // After 10 seconds have elapsed, pause the timer.
+    dispatch_after(halfInterval, dispatch_get_main_queue(), ^{
+        [timer pause];
+
+        // After 10 seconds of being paused, resume the timer,
+        // which should have 10 seconds remaining.
+        dispatch_after(halfInterval, dispatch_get_main_queue(), ^{
+            [timer resume];
+        });
+    });
+
+    // Wait for timer duration + pause time + some tolerance.
+    // In the event that the old behavior where the timer starts
+    // fresh on resume, that time will exceed the wait time by
+    // `halfInterval`.
+    NSTimeInterval tolerance = 5;
+    NSTimeInterval expectedTotalTimeInterval = timeInterval + halfInterval + tolerance;
+    [self waitForExpectations:@[expectation] timeout:expectedTotalTimeInterval];
+}
+
+#pragma mark - Thread Safety
 
 // Test thread safety of `MPTimer`. `MPTimer` wasn't thread safe in the past, and `scheduleNow` might
 // crash if the internal `NSTimer` is set to `nil` by `invalidate` before `scheduleNow` completes.

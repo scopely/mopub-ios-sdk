@@ -6,6 +6,11 @@
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
+#if __has_include(<MoPub/MoPub-Swift.h>)
+    #import <MoPub/MoPub-Swift.h>
+#else
+    #import "MoPub-Swift.h"
+#endif
 #import "MPImageLoader.h"
 #import "MPLogging.h"
 #import "MPNativeCache.h"
@@ -48,7 +53,7 @@
         }
 
         NSData *cachedImageData = [[MPNativeCache sharedCache] retrieveDataForKey:imageURL.absoluteString];
-        UIImage *image = [UIImage imageWithData:cachedImageData];
+        UIImage *image = [MPImageCreator imageWith:cachedImageData];
 
         if (image) {
             // By default, the image data isn't decompressed until set on a UIImageView, on the main thread. This

@@ -1,3 +1,18 @@
+## Version 5.15.0 (November 18, 2020)
+- **Features**
+  - The MoPub iOS SDK now includes Swift 5.
+  - Updated countdown animation background color to black for better visibility.
+  - Enforce HTTPS for base URLs.
+  - Removed native video support.
+  - Add support for Snap Audience Network.
+
+- **Bug Fixes**
+  - Fixed bug where app foregrounding was requesting a new banner ad instead of resuming the refresh timer.
+  - Fixed bug with animated GIFs in VAST end cards.
+  - Fixed bug with scheduled deallocation of HTML Viewability trackers.
+  - Fixed `SKStoreProductViewController` causing freezes on iOS 13.0 and 13.1 devices.
+  - Fixed bug where attempting to instantiate a mediation adapter that does not exist at runtime will not fire the failure callback.
+
 ## Version 5.14.1 (October 5, 2020)
 - **Bug Fixes**
   - Fixed a bug where delegate methods `interstitialWillDisappear:`, `interstitialDidDisappear:`, `rewardedVideoAdWillDisappearForAdUnitID:`, and `rewardedVideoAdDidDisappearForAdUnitID:` did not fire.

@@ -601,7 +601,7 @@ static char kAdPlacerKey;
     [self reloadData];
 }
 
-- (CGRect)mp_rectForRowAtIndexPath:(NSIndexPath *)indexPath
+- (CGRect)mp_rectForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath
 {
     MPTableViewAdPlacer *adPlacer = [self mp_adPlacer];
     NSIndexPath *adjustedIndexPath = indexPath;
@@ -867,7 +867,7 @@ static char kAdPlacerKey;
     }
 }
 
-- (void)mp_deselectRowAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated
+- (void)mp_deselectRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath animated:(BOOL)animated
 {
     MPTableViewAdPlacer *adPlacer = [self mp_adPlacer];
     NSIndexPath *adjustedIndexPath = indexPath;
@@ -881,7 +881,7 @@ static char kAdPlacerKey;
     }
 }
 
-- (id)mp_dequeueReusableCellWithIdentifier:(NSString *)identifier forIndexPath:(NSIndexPath *)indexPath
+- (id)mp_dequeueReusableCellWithIdentifier:(NSString *)identifier forIndexPath:(NSIndexPath * _Nonnull)indexPath
 {
     MPTableViewAdPlacer *adPlacer = [self mp_adPlacer];
     NSIndexPath *adjustedIndexPath = indexPath;

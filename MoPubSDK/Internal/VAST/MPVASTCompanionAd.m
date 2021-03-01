@@ -102,7 +102,7 @@
     return CGRectMake(0, 0, MAX(1, self.width), MAX(1, self.height));
 }
 
-- (MPVASTResource *)resourceToDisplay {
+- (MPVASTResource * _Nullable)resourceToDisplay {
     // format score = 1, display priority = A
     for (MPVASTResource *resource in self.staticResources) {
         if (resource.content.length > 0) {
@@ -142,7 +142,7 @@
     return nil;
 }
 
-+ (MPVASTCompanionAd *)bestCompanionAdForCandidates:(NSArray<MPVASTCompanionAd *> *)candidates
++ (MPVASTCompanionAd * _Nullable)bestCompanionAdForCandidates:(NSArray<MPVASTCompanionAd *> *)candidates
                                       containerSize:(CGSize)containerSize {
     if (candidates.count == 0 || containerSize.width <= 0 || containerSize.height <= 0) {
         return nil;

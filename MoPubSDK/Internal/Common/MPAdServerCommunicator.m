@@ -8,10 +8,14 @@
 
 #import "MPAdServerCommunicator.h"
 
+#if __has_include(<MoPub/MoPub-Swift.h>)
+    #import <MoPub/MoPub-Swift.h>
+#else
+    #import "MoPub-Swift.h"
+#endif
 #import "MoPub.h"
 #import "MPAdConfiguration.h"
 #import "MPAdServerKeys.h"
-#import "MPAPIEndpoints.h"
 #import "MPConsentManager.h"
 #import "MPCoreInstanceProvider.h"
 #import "MPError.h"

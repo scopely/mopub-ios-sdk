@@ -16,7 +16,6 @@ typedef NS_ENUM(NSInteger, MPNativeAdErrorCode) {
     MPNativeAdErrorImageDownloadFailed = -1003,
     MPNativeAdErrorAdUnitWarmingUp = -1004,
     MPNativeAdErrorVASTParsingFailed = -1005,
-    MPNativeAdErrorVideoConfigInvalid = -1006,
     MPNativeAdErrorContentDisplayError = -1100,
     MPNativeAdErrorRenderError = -1200
 };
@@ -32,5 +31,4 @@ NSError *MPNativeAdNSErrorForImageDownloadFailure(void);
 NSError *MPNativeAdNSErrorForContentDisplayErrorMissingRootController(void);
 NSError *MPNativeAdNSErrorForContentDisplayErrorInvalidURL(void);
 NSError *MPNativeAdNSErrorForVASTParsingFailure(void);
-NSError *MPNativeAdNSErrorForVideoConfigInvalid(void);
 NSError *MPNativeAdNSErrorForRenderValueTypeError(void);

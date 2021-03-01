@@ -7,11 +7,11 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <MoPub/MoPub-Swift.h>
 #import "MPAdConfiguration.h"
 #import "MPAdConfigurationFactory.h"
 #import "MPAdServerKeys.h"
 #import "MPAdTargeting.h"
-#import "MPAPIEndpoints.h"
 #import "MPFullscreenAdAdapterMock.h"
 #import "MPProxy.h"
 #import "MPRewardedVideoAdManager+Testing.h"

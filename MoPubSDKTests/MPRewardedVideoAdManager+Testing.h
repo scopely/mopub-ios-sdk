@@ -17,8 +17,8 @@
 @property (nonatomic, strong) MPFullscreenAdAdapter *adapter;
 
 /**
- * Pretends to load the class with a rewarded ad and sets the configuration.
- * @param config Testing configuration to set.
+ Pretends to load the class with a rewarded ad and sets the configuration.
+ @param config Testing configuration to set.
  */
 - (void)loadWithConfiguration:(MPAdConfiguration *)config;
 

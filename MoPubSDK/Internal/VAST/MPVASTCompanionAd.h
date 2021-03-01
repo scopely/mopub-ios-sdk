@@ -98,12 +98,12 @@ NS_ASSUME_NONNULL_BEGIN
 
  Note: The @c type of the returned @c MPVASTResource is determined and assigned.
  */
-- (MPVASTResource *)resourceToDisplay;
+- (MPVASTResource * _Nullable)resourceToDisplay;
 
 /**
  Return best @c MPVASTCompanionAd that should be displayed.
  */
-+ (MPVASTCompanionAd *)bestCompanionAdForCandidates:(NSArray<MPVASTCompanionAd *> *)candidates
++ (MPVASTCompanionAd * _Nullable)bestCompanionAdForCandidates:(NSArray<MPVASTCompanionAd *> *)candidates
                                       containerSize:(CGSize)containerSize;
 
 @end

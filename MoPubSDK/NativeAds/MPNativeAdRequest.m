@@ -20,8 +20,7 @@
 #import "MPNativeCustomEventDelegate.h"
 #import "MPNativeCustomEvent.h"
 #import "MPNativeView.h"
-#import "MOPUBNativeVideoAdConfigValues.h"
-#import "MOPUBNativeVideoCustomEvent.h"
+#import "MPNativeAdConfigValues.h"
 #import "NSJSONSerialization+MPAdditions.h"
 #import "MPAdServerCommunicator.h"
 #import "MPNativeAdRenderer.h"
@@ -155,25 +154,15 @@ static NSString * const kNativeAdErrorDomain = @"com.mopub.NativeAd";
      [self startTimeoutTimer];
 
     // For MoPub native ads, set the classData to be the adResponseData
-    if ((configuration.adapterClass == [MPMoPubNativeCustomEvent class]) || (configuration.adapterClass == [MOPUBNativeVideoCustomEvent class])) {
+    if ((configuration.adapterClass == [MPMoPubNativeCustomEvent class])) {
         NSError *error;
         NSMutableDictionary *classData = [NSJSONSerialization mp_JSONObjectWithData:configuration.adResponseData
                                                                             options:0
                                                                    clearNullObjects:YES
                                                                               error:&error];
-        if (configuration.adapterClass == [MOPUBNativeVideoCustomEvent class]) {
-            classData[kNativeAdConfigKey] = [[MOPUBNativeVideoAdConfigValues alloc] initWithPlayVisiblePercent:configuration.nativeVideoPlayVisiblePercent
-                                                                                           pauseVisiblePercent:configuration.nativeVideoPauseVisiblePercent
-                                                                                    impressionMinVisiblePixels:configuration.nativeImpressionMinVisiblePixels
-                                                                                   impressionMinVisiblePercent:configuration.nativeImpressionMinVisiblePercent
-                                                                                   impressionMinVisibleSeconds:configuration.nativeImpressionMinVisibleTimeInterval
-                                                                                              maxBufferingTime:configuration.nativeVideoMaxBufferingTime
-                                                                                                      trackers:configuration.vastVideoTrackers];
-        } else if (configuration.adapterClass == [MPMoPubNativeCustomEvent class]) {
-            classData[kNativeAdConfigKey] = [[MPNativeAdConfigValues alloc] initWithImpressionMinVisiblePixels:configuration.nativeImpressionMinVisiblePixels
-                                                                                   impressionMinVisiblePercent:configuration.nativeImpressionMinVisiblePercent
-                                                                                   impressionMinVisibleSeconds:configuration.nativeImpressionMinVisibleTimeInterval];
-        }
+        classData[kNativeAdConfigKey] = [[MPNativeAdConfigValues alloc] initWithImpressionMinVisiblePixels:configuration.nativeImpressionMinVisiblePixels
+                                                                               impressionMinVisiblePercent:configuration.nativeImpressionMinVisiblePercent
+                                                                               impressionMinVisibleSeconds:configuration.nativeImpressionMinVisibleTimeInterval];
 
         // Additional information to be passed to the MoPub native custom events
         // for the purposes of logging.
@@ -246,8 +235,6 @@ static NSString * const kNativeAdErrorDomain = @"com.mopub.NativeAd";
     adObject.adUnitID = self.adUnitId;
 
     // Create the Viewability tracker if it's a Marketplace native ad.
-    // Note that only native display ads are supported since native video
-    // ads are deprecated and slated for removal.
     Class customEventClass = self.adConfiguration.adapterClass;
     if (customEventClass == [MPMoPubNativeCustomEvent class]) {
         // If Viewability has been disabled or not initialized, `self.tracker` will be `nil`.

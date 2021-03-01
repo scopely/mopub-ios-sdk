@@ -101,4 +101,8 @@
     [self handleAdEvent:MPFullscreenAdEventWillDismiss];
 }
 
+- (void)fullscreenAdAdapterAdDidDismiss:(MPFullscreenAdAdapter *)adapter {
+    [self handleAdEvent: MPFullscreenAdEventDidDismiss];
+}
+
 @end

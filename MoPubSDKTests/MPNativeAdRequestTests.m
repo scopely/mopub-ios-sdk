@@ -7,9 +7,9 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <MoPub/MoPub-Swift.h>
 #import "MPAdConfigurationFactory.h"
 #import "MPAdServerKeys.h"
-#import "MPAPIEndpoints.h"
 #import "MPConstants.h"
 #import "MPError.h"
 #import "MPNativeAdRequest.h"

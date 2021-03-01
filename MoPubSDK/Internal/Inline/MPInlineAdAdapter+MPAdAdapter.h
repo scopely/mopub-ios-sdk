@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MPInlineAdAdapter (MPAdAdapter) <MPAdAdapter>
 
-@property (nonatomic, readonly) id<MPAdAdapterInlineEventDelegate> inlineAdAdapterDelegate;
+@property (nonatomic, nullable, readonly) id<MPAdAdapterInlineEventDelegate> inlineAdAdapterDelegate;
 
 @end
 

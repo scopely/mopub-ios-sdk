@@ -12,10 +12,10 @@
 @interface MPInlineAdAdapter (Internal) <MPInlineAdAdapterWebSessionDelegate>
 
 /**
- * Track impressions for trackers that are included in the creative's markup.
- * Extended class implements this method if necessary.
- * Currently, only HTML and MRAID banners use trackers included in markup.
- * Mediated networks track impressions via their own means.
+ Track impressions for trackers that are included in the creative's markup.
+ Extended class implements this method if necessary.
+ Currently, only HTML and MRAID banners use trackers included in markup.
+ Mediated networks track impressions via their own means.
  */
 - (void)trackImpressionsIncludedInMarkup;
 

@@ -7,8 +7,8 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <MoPub/MoPub-Swift.h>
 #import "MPAdServerKeys.h"
-#import "MPAPIEndpoints.h"
 #import "MPInterstitialAdController.h"
 #import "MPInterstitialAdController+Testing.h"
 #import "MPInterstitialAdManager+Testing.h"

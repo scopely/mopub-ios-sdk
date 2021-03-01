@@ -7,10 +7,13 @@
 //
 
 #import "MRController.h"
-
+#if __has_include(<MoPub/MoPub-Swift.h>)
+    #import <MoPub/MoPub-Swift.h>
+#else
+    #import "MoPub-Swift.h"
+#endif
 #import "MoPub.h"
 #import "MPAdDestinationDisplayAgent.h"
-#import "MPAPIEndPoints.h"
 #import "MRBridge.h"
 #import "MRCommand.h"
 #import "MPCoreInstanceProvider.h"
