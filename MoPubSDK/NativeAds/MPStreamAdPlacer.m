@@ -571,13 +571,25 @@ static const NSUInteger kIndexPathItemIndex = 1;
 
     if ([renderer respondsToSelector:@selector(viewSizeHandler)] && renderer.viewSizeHandler) {
         adSize = [renderer viewSizeHandler](maxWidth);
-        if (adSize.height == MPNativeViewDynamicDimension) {
+        if (adSize.height == MPNativeViewFrameBasedDynamicDimension) {
             UIView *adView = [ad retrieveAdViewForSizeCalculationWithError:nil];
             if (adView) {
                 CGSize hydratedAdViewSize = [adView sizeThatFits:CGSizeMake(adSize.width, CGFLOAT_MAX)];
                 return hydratedAdViewSize;
             }
+        } else if (adSize.height == MPNativeViewAutoLayoutBasedDynamicDimension) {
+            UIView *adView = [ad retrieveAdViewForSizeCalculationWithError:nil];
+            if (adView) {
+                // Before requesting systemLayoutSizeFittingSize, we must update the view's frame and perform a layout pass so that the child views that rely on the width of this view (i.e. PreferredWidthLabel) provide the proper system layout size.
+                adView.frame = CGRectMake(0, 0, adSize.width, UILayoutFittingExpandedSize.height);
+                [adView setNeedsLayout];
+                [adView layoutIfNeeded];
+
+                CGSize hydratedAdViewSize = [adView systemLayoutSizeFittingSize:CGSizeMake(adSize.width, UILayoutFittingCompressedSize.height) withHorizontalFittingPriority:UILayoutPriorityRequired verticalFittingPriority:UILayoutPriorityFittingSizeLevel];
+                return hydratedAdViewSize;
+            }
         }
+
         return adSize;
     }
 

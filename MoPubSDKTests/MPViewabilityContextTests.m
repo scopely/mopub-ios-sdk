@@ -6,6 +6,7 @@
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
+#import <OMSDK_Mopub/OMIDVerificationScriptResource.h>
 #import <XCTest/XCTest.h>
 #import "MPVASTResponse.h"
 #import "MPViewabilityContext.h"

@@ -13,6 +13,8 @@
 @dynamic isLoadingDestination;
 @dynamic storeKitController;
 @dynamic safariController;
+@dynamic analyticsTracker;
+@dynamic displayAgentType;
 
 static void (^sPresentStoreKitControllerWithProductParametersBlock)(NSDictionary *) = nil;
 

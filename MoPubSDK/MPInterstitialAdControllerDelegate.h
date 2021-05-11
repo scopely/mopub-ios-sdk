@@ -55,7 +55,7 @@
 
  @param interstitial The interstitial ad object sending the message.
  */
-- (void)interstitialWillAppear:(MPInterstitialAdController *)interstitial;
+- (void)interstitialWillAppear:(MPInterstitialAdController *)interstitial DEPRECATED_MSG_ATTRIBUTE("interstitialWillAppear: is deprecated. Use interstitialWillPresent: instead.");
 
 /**
  Sent after an interstitial ad object has been presented on the screen.
@@ -65,7 +65,26 @@
 
  @param interstitial The interstitial ad object sending the message.
  */
-- (void)interstitialDidAppear:(MPInterstitialAdController *)interstitial;
+- (void)interstitialDidAppear:(MPInterstitialAdController *)interstitial DEPRECATED_MSG_ATTRIBUTE("interstitialDidAppear: is deprecated. Use interstitialDidPresent: instead.");
+
+/** @name Detecting When an Interstitial Ad is Presented */
+
+/**
+ Sent immediately before an interstitial ad object is presented on the screen.
+
+ @param interstitial The interstitial ad object sending the message.
+ */
+- (void)interstitialWillPresent:(MPInterstitialAdController *)interstitial;
+
+/**
+ Sent after an interstitial ad object has been presented on the screen.
+
+ Your implementation of this method should pause any application activity that requires user
+ interaction.
+
+ @param interstitial The interstitial ad object sending the message.
+ */
+- (void)interstitialDidPresent:(MPInterstitialAdController *)interstitial;
 
 /** @name Detecting When an Interstitial Ad is Dismissed */
 

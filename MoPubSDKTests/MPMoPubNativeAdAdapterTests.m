@@ -7,9 +7,19 @@
 //
 
 #import <XCTest/XCTest.h>
+
+// For non-module targets, UIKit must be explicitly imported
+// since MoPubSDK-Swift.h will not import it.
+#if __has_include(<MoPubSDK/MoPubSDK-Swift.h>)
+    #import <UIKit/UIKit.h>
+    #import <MoPubSDK/MoPubSDK-Swift.h>
+#else
+    #import <UIKit/UIKit.h>
+    #import "MoPubSDK-Swift.h"
+#endif
+
 #import "MPMoPubNativeAdAdapter+Testing.h"
 #import "MPAdConfigurationFactory.h"
-#import "MPAdImpressionTimer+Testing.h"
 #import "MPGlobal.h"
 #import "MPMockAdDestinationDisplayAgent.h"
 #import "MPNativeAdConstants.h"
@@ -103,7 +113,7 @@
     MPMoPubNativeAdAdapter *adapter = [[MPMoPubNativeAdAdapter alloc] initWithAdProperties:[NSMutableDictionary dictionaryWithDictionary:properties]];
 
     XCTAssertEqual(adapter.impressionTimer.pixelsRequiredForViewVisibility, configValues.impressionMinVisiblePixels);
-    XCTAssertEqual(adapter.impressionTimer.requiredSecondsForImpression, configValues.impressionMinVisibleSeconds);
+    XCTAssertEqual(adapter.impressionTimer.impressionTime, configValues.impressionMinVisibleSeconds);
     XCTAssertFalse(configValues.isImpressionMinVisiblePercentValid);
     XCTAssertTrue(configValues.isImpressionMinVisiblePixelsValid);
     XCTAssertTrue(configValues.isImpressionMinVisibleSecondsValid);
@@ -119,7 +129,7 @@
     MPMoPubNativeAdAdapter *adapter = [[MPMoPubNativeAdAdapter alloc] initWithAdProperties:[NSMutableDictionary dictionaryWithDictionary:properties]];
 
     XCTAssertEqual(adapter.impressionTimer.pixelsRequiredForViewVisibility, configValues.impressionMinVisiblePixels);
-    XCTAssertEqual(adapter.impressionTimer.requiredSecondsForImpression, configValues.impressionMinVisibleSeconds);
+    XCTAssertEqual(adapter.impressionTimer.impressionTime, configValues.impressionMinVisibleSeconds);
     XCTAssertNotEqual(adapter.impressionTimer.percentageRequiredForViewVisibility, configValues.impressionMinVisiblePercent);
     XCTAssertTrue(configValues.isImpressionMinVisiblePercentValid);
     XCTAssertTrue(configValues.isImpressionMinVisiblePixelsValid);
@@ -135,7 +145,7 @@
                                   };
     MPMoPubNativeAdAdapter *adapter = [[MPMoPubNativeAdAdapter alloc] initWithAdProperties:[NSMutableDictionary dictionaryWithDictionary:properties]];
 
-    XCTAssertEqual(adapter.impressionTimer.requiredSecondsForImpression, configValues.impressionMinVisibleSeconds);
+    XCTAssertEqual(adapter.impressionTimer.impressionTime, configValues.impressionMinVisibleSeconds);
     XCTAssertEqual(adapter.impressionTimer.percentageRequiredForViewVisibility, configValues.impressionMinVisiblePercent);
     XCTAssertTrue(configValues.isImpressionMinVisiblePercentValid);
     XCTAssertFalse(configValues.isImpressionMinVisiblePixelsValid);
@@ -151,9 +161,9 @@
                                   };
     MPMoPubNativeAdAdapter *adapter = [[MPMoPubNativeAdAdapter alloc] initWithAdProperties:[NSMutableDictionary dictionaryWithDictionary:properties]];
 
-    XCTAssertNotEqual(adapter.impressionTimer.requiredSecondsForImpression, configValues.impressionMinVisibleSeconds);
+    XCTAssertNotEqual(adapter.impressionTimer.impressionTime, configValues.impressionMinVisibleSeconds);
     XCTAssertNotEqual(adapter.impressionTimer.percentageRequiredForViewVisibility, (configValues.impressionMinVisiblePercent / 100.0));
-    XCTAssertEqual(adapter.impressionTimer.requiredSecondsForImpression, 1.0);
+    XCTAssertEqual(adapter.impressionTimer.impressionTime, 1.0);
     XCTAssertEqual(adapter.impressionTimer.percentageRequiredForViewVisibility, 0.5);
     XCTAssertFalse(configValues.isImpressionMinVisiblePercentValid);
     XCTAssertFalse(configValues.isImpressionMinVisiblePixelsValid);
@@ -181,8 +191,8 @@
     MPMoPubNativeAdAdapter *adapter = [[MPMoPubNativeAdAdapter alloc] initWithAdProperties:[NSMutableDictionary dictionaryWithDictionary:properties]];
 
     XCTAssertEqual(adapter.impressionTimer.pixelsRequiredForViewVisibility, configValues.impressionMinVisiblePixels);
-    XCTAssertNotEqual(adapter.impressionTimer.requiredSecondsForImpression, configValues.impressionMinVisibleSeconds);
-    XCTAssertEqual(adapter.impressionTimer.requiredSecondsForImpression, 1.0); // check for default
+    XCTAssertNotEqual(adapter.impressionTimer.impressionTime, configValues.impressionMinVisibleSeconds);
+    XCTAssertEqual(adapter.impressionTimer.impressionTime, 1.0); // check for default
     XCTAssertFalse(configValues.isImpressionMinVisiblePercentValid);
     XCTAssertTrue(configValues.isImpressionMinVisiblePixelsValid);
     XCTAssertFalse(configValues.isImpressionMinVisibleSecondsValid);
@@ -197,10 +207,10 @@
                                   };
     MPMoPubNativeAdAdapter *adapter = [[MPMoPubNativeAdAdapter alloc] initWithAdProperties:[NSMutableDictionary dictionaryWithDictionary:properties]];
 
-    XCTAssertNotEqual(adapter.impressionTimer.requiredSecondsForImpression, configValues.impressionMinVisibleSeconds);
+    XCTAssertNotEqual(adapter.impressionTimer.impressionTime, configValues.impressionMinVisibleSeconds);
     CGFloat percentage = configValues.impressionMinVisiblePercent;
     XCTAssertEqual(adapter.impressionTimer.percentageRequiredForViewVisibility, percentage);
-    XCTAssertEqual(adapter.impressionTimer.requiredSecondsForImpression, 1.0);
+    XCTAssertEqual(adapter.impressionTimer.impressionTime, 1.0);
     CGFloat expected = 0.1;
     XCTAssertEqual(adapter.impressionTimer.percentageRequiredForViewVisibility, expected);
     XCTAssertTrue(configValues.isImpressionMinVisiblePercentValid);
@@ -217,9 +227,9 @@
                                   };
     MPMoPubNativeAdAdapter *adapter = [[MPMoPubNativeAdAdapter alloc] initWithAdProperties:[NSMutableDictionary dictionaryWithDictionary:properties]];
 
-    XCTAssertEqual(adapter.impressionTimer.requiredSecondsForImpression, configValues.impressionMinVisibleSeconds);
+    XCTAssertEqual(adapter.impressionTimer.impressionTime, configValues.impressionMinVisibleSeconds);
     XCTAssertNotEqual(adapter.impressionTimer.percentageRequiredForViewVisibility, (configValues.impressionMinVisiblePercent / 100.0));
-    XCTAssertEqual(adapter.impressionTimer.requiredSecondsForImpression, 30.0);
+    XCTAssertEqual(adapter.impressionTimer.impressionTime, 30.0);
     XCTAssertEqual(adapter.impressionTimer.percentageRequiredForViewVisibility, 0.5);
     XCTAssertFalse(configValues.isImpressionMinVisiblePercentValid);
     XCTAssertFalse(configValues.isImpressionMinVisiblePixelsValid);

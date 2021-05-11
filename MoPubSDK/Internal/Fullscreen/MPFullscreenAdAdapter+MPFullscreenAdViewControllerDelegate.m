@@ -33,6 +33,14 @@
     [self.delegate fullscreenAdAdapterAdDidDisappear:self];
 }
 
+- (void)fullscreenAdWillPresent:(id<MPFullscreenAdViewController>)fullscreenAdViewController {
+    [self.delegate fullscreenAdAdapterAdWillPresent:self];
+}
+
+- (void)fullscreenAdDidPresent:(id<MPFullscreenAdViewController>)fullscreenAdViewController {
+    [self.delegate fullscreenAdAdapterAdDidPresent:self];
+}
+
 - (void)fullscreenAdWillDismiss:(id<MPFullscreenAdViewController>)fullscreenAdViewController {
     // Stop the Viewability tracker here. `fullscreenAdWillDismiss:` is invoked before
     // `fullscreenAdWillDisappear:` so this is the earliest termination spot.

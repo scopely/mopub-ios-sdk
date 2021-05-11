@@ -104,13 +104,13 @@
     return [[MPLogEvent alloc] initWithMessage:message];
 }
 
-+ (instancetype)adWillAppear {
-    static NSString * const message = @"Ad will appear";
++ (instancetype)adWillPresent {
+    static NSString * const message = @"Ad will present";
     return [[MPLogEvent alloc] initWithMessage:message];
 }
 
-+ (instancetype)adDidAppear {
-    static NSString * const message = @"Ad did appear";
++ (instancetype)adDidPresent {
+    static NSString * const message = @"Ad did present";
     return [[MPLogEvent alloc] initWithMessage:message];
 }
 

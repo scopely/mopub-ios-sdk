@@ -16,6 +16,14 @@
 
 @implementation MPFullscreenAdViewControllerDelegateMock (Appearance)
 
+- (void)fullscreenAdWillPresent:(id<MPFullscreenAdViewController>)fullscreenAdViewController {
+    // no op
+}
+
+- (void)fullscreenAdDidPresent:(id<MPFullscreenAdViewController>)fullscreenAdViewController {
+    // no op
+}
+
 - (void)fullscreenAdDidAppear:(id<MPFullscreenAdViewController>)fullscreenAdViewController {
     // no op
 }

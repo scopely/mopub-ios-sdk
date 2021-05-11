@@ -50,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) BOOL hasTrackedImpression;
 @property (nonatomic, assign) BOOL hasTrackedClick;
+@property (nonatomic, assign) BOOL hasEndedImpression;
 @property (nonatomic, assign) BOOL isUserRewarded;
 
 @property (nonatomic, strong) MPFullscreenAdViewController * _Nullable viewController; // set to nil after dismissal

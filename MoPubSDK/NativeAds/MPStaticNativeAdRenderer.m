@@ -31,7 +31,8 @@
   currently passed back in `-tableView:shouldIndentWhileEditingRowAtIndexPath:` directly so it can
   be any abitrary value.
  */
-const CGFloat MPNativeViewDynamicDimension = -1.0;
+const CGFloat MPNativeViewFrameBasedDynamicDimension = -1.0;
+const CGFloat MPNativeViewAutoLayoutBasedDynamicDimension = -99.0;
 
 @interface MPStaticNativeAdRenderer () <MPNativeAdRendererImageHandlerDelegate>
 

@@ -55,6 +55,15 @@
     [self safelyFulfillAdEventExpectation];
 }
 
+- (void)fullscreenAdAdapterAdWillPresent:(MPFullscreenAdAdapter *)adapter {
+    [self.selectorCounter incrementCountForSelector:@selector(fullscreenAdAdapterAdWillPresent:)];
+    [self safelyFulfillAdEventExpectation];
+}
+
+- (void)fullscreenAdAdapterAdDidPresent:(MPFullscreenAdAdapter *)adapter {
+    [self.selectorCounter incrementCountForSelector:@selector(fullscreenAdAdapterAdDidPresent:)];
+    [self safelyFulfillAdEventExpectation];
+}
 
 - (void)fullscreenAdAdapterAdDidAppear:(MPFullscreenAdAdapter *)adapter {
     [self.selectorCounter incrementCountForSelector:@selector(fullscreenAdAdapterAdDidAppear:)];

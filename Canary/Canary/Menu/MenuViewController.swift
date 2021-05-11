@@ -18,6 +18,8 @@ class MenuViewController: UIViewController {
     
     fileprivate let dataSource: MenuDataSource = MenuDataSource()
     
+    fileprivate var notificationToken: NSObjectProtocol?
+    
     // MARK: - View Life Cycle
     
     override func viewDidLoad() {
@@ -32,6 +34,16 @@ class MenuViewController: UIViewController {
         
         // Populate the SDK version label
         sdkVersionLabel.text = "SDK version \(MoPub.sharedInstance().version())"
+        
+        // Reload table view when rotating device
+        notificationToken = NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: OperationQueue.main) { [weak self] (notification) in
+            self?.tableView.reloadData()
+        }
+    }
+    
+    deinit {
+        guard let notificationToken = notificationToken else { return }
+        NotificationCenter.default.removeObserver(notificationToken)
     }
     
     // MARK: - Data Source

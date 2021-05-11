@@ -35,7 +35,7 @@ static MPRewardedAds *gSharedInstance = nil;
     if (self = [super init]) {
         _rewardedAdManagers = [[NSMutableDictionary alloc] init];
         _rewardedAdConnections = [NSMutableArray new];
-        
+
         // Keys (ad unit ID) are strong, values (delegates) are weak.
         _delegateTable = [NSMapTable strongToWeakObjectsMapTable];
     }
@@ -48,7 +48,7 @@ static MPRewardedAds *gSharedInstance = nil;
     if (adUnitId == nil) {
         return;
     }
-    
+
     [[[self class] sharedInstance].delegateTable setObject:delegate forKey:adUnitId];
 }
 
@@ -57,9 +57,9 @@ static MPRewardedAds *gSharedInstance = nil;
     if (delegate == nil) {
         return;
     }
-    
+
     NSMapTable * mapTable = [[self class] sharedInstance].delegateTable;
-    
+
     // Find all keys that contain the delegate
     NSMutableArray<NSString *> * keys = [NSMutableArray array];
     for (NSString * key in mapTable) {
@@ -67,7 +67,7 @@ static MPRewardedAds *gSharedInstance = nil;
             [keys addObject:key];
         }
     }
-    
+
     // Remove all of the found keys
     for (NSString * key in keys) {
         [mapTable removeObjectForKey:key];
@@ -79,7 +79,7 @@ static MPRewardedAds *gSharedInstance = nil;
     if (adUnitId == nil) {
         return;
     }
-    
+
     [[[self class] sharedInstance].delegateTable removeObjectForKey:adUnitId];
 }
 
@@ -117,13 +117,13 @@ static MPRewardedAds *gSharedInstance = nil;
     }
 
     adManager.mediationSettings = mediationSettings;
-    
+
     // Ad targeting options
     MPAdTargeting * targeting = [MPAdTargeting targetingWithCreativeSafeSize:MPApplicationFrame(YES).size];
     targeting.keywords = keywords;
     targeting.localExtras = localExtras;
     targeting.userDataKeywords = userDataKeywords;
-    
+
     [adManager loadRewardedAdWithCustomerId:customerId targeting:targeting];
 }
 
@@ -139,7 +139,7 @@ static MPRewardedAds *gSharedInstance = nil;
 {
     MPRewardedAds *sharedInstance = [[self class] sharedInstance];
     MPRewardedAdManager *adManager = sharedInstance.rewardedAdManagers[adUnitID];
-    
+
     if (adManager.availableRewards == nil) {
         return nil;
     }
@@ -156,7 +156,7 @@ static MPRewardedAds *gSharedInstance = nil;
 {
     MPRewardedAds *sharedInstance = [[self class] sharedInstance];
     MPRewardedAdManager *adManager = sharedInstance.rewardedAdManagers[adUnitID];
-    
+
     return adManager.selectedReward;
 }
 
@@ -238,7 +238,7 @@ static MPRewardedAds *gSharedInstance = nil;
     }
 }
 
-- (void)rewardedAdWillAppearForAdManager:(MPRewardedAdManager *)manager
+- (void)rewardedAdWillPresentForAdManager:(MPRewardedAdManager *)manager
 {
     id<MPRewardedAdsDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
     if ([delegate respondsToSelector:@selector(rewardedAdWillPresentForAdUnitID:)]) {
@@ -246,7 +246,7 @@ static MPRewardedAds *gSharedInstance = nil;
     }
 }
 
-- (void)rewardedAdDidAppearForAdManager:(MPRewardedAdManager *)manager
+- (void)rewardedAdDidPresentForAdManager:(MPRewardedAdManager *)manager
 {
     id<MPRewardedAdsDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
     if ([delegate respondsToSelector:@selector(rewardedAdDidPresentForAdUnitID:)]) {
@@ -273,10 +273,10 @@ static MPRewardedAds *gSharedInstance = nil;
     // that their ads may not be available anymore since another ad unit might have "played" their ad. We go through and notify all ad managers
     // that are of the type of ad that is playing now.
     Class adapterClass = manager.adapterClass;
-    
+
     for (id key in self.rewardedAdManagers) {
         MPRewardedAdManager *adManager = self.rewardedAdManagers[key];
-        
+
         if (adManager != manager && adManager.adapterClass == adapterClass) {
             [adManager handleAdPlayedForAdapterNetwork];
         }
@@ -296,7 +296,7 @@ static MPRewardedAds *gSharedInstance = nil;
     [MoPub sendImpressionNotificationFromAd:nil
                                    adUnitID:manager.adUnitId
                              impressionData:impressionData];
-    
+
     id<MPRewardedAdsDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
     if ([delegate respondsToSelector:@selector(didTrackImpressionWithAdUnitID:impressionData:)]) {
         [delegate didTrackImpressionWithAdUnitID:manager.adUnitId impressionData:impressionData];

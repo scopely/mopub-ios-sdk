@@ -7,34 +7,37 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		109259CB36A535E2923E0FB9 /* Pods_Canary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 267AA063AEA5003F034A70C5 /* Pods_Canary.framework */; };
 		2A1F52F7221628A000933277 /* ManualEntryInterfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1F52F322160A0300933277 /* ManualEntryInterfaceViewController.swift */; };
 		2A1F52F8221628AA00933277 /* UIAlertController+Picker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1F52F52216230300933277 /* UIAlertController+Picker.swift */; };
 		2A35FAAC21B5DA6200DC8805 /* QRCodeCameraInterfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A35FAAA21B5DA6200DC8805 /* QRCodeCameraInterfaceViewController.swift */; };
 		2A49E2002298766C0049B61B /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		2A49E20222987B530049B61B /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		2A4D35E3211D074800BE9377 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		2C63BD043C704C5D6AB0C2E1 /* Pods_Canary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92FE9399ED0CA6F685D3D022 /* Pods_Canary.framework */; };
 		301B35122565E0BF00A30150 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		304823BA25A554A3004095B9 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		305A5C9E23C664B700A7A31B /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		306BA54C25252201000AC5C8 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		308F286023FF11BB008B5049 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3099E02025CCB686007209D6 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3099E02125CCB686007209D6 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3099E02225CCB686007209D6 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		30CA81CD23DF687F0023ABEE /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		63367AC425AF85BD005A3247 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		63367AC925AF91AE005A3247 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		63367ACE25AFB179005A3247 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		637B1DB62587F17900656457 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		637B1E32258BE8F800656457 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		637B1E41258D43E800656457 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		637B1E52258D490500656457 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		637B1E5D258D4AE700656457 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		637B1E62258D4AFA00656457 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		637DEF5A2579982C00CB88D0 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		637DEF5F257AF27D00CB88D0 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		638373FA259163B000A11CBA /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		63840D7B25A8FDC600485586 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		63FD4CBE258023980035CF3E /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		63FD4CE0258056D20035CF3E /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		8A1B421C7667F9AD02F79B16 /* Pods_CanaryUnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 258970CE5776BA717BF6182F /* Pods_CanaryUnitTests.framework */; };
+		76343D6353C759A66959911D /* Pods_CanaryUnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38EA7DFCD97A6BB6A39D9637 /* Pods_CanaryUnitTests.framework */; };
+		7D43A87E25C9DC8300C6DCFF /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		7D43A88325C9DCB700C6DCFF /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		B2564EE320AB5039000B9F7A /* SampleAds.plist in Resources */ = {isa = PBXBuildFile; fileRef = BCF7095E1FBCCF50009A3981 /* SampleAds.plist */; };
 		B275DB2E200FD64000F053F8 /* SavedAdsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B275DB2C200FD64000F053F8 /* SavedAdsDataSource.swift */; };
 		B2D3EEB6200DAF94009FEBC9 /* SavedAdsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D3EEB4200DAF94009FEBC9 /* SavedAdsManager.swift */; };
@@ -225,18 +228,18 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		087F3B84AFA354044BA48804 /* Pods-Internal Application.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Internal Application.debug.xcconfig"; path = "Target Support Files/Pods-Internal Application/Pods-Internal Application.debug.xcconfig"; sourceTree = "<group>"; };
-		19CF984E91C148C573F5603A /* Pods-Internal Application.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Internal Application.release.xcconfig"; path = "Target Support Files/Pods-Internal Application/Pods-Internal Application.release.xcconfig"; sourceTree = "<group>"; };
-		258970CE5776BA717BF6182F /* Pods_CanaryUnitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CanaryUnitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		267AA063AEA5003F034A70C5 /* Pods_Canary.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Canary.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		279C8126407F5FC34D366FA0 /* Pods-CanaryUnitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CanaryUnitTests.release.xcconfig"; path = "Target Support Files/Pods-CanaryUnitTests/Pods-CanaryUnitTests.release.xcconfig"; sourceTree = "<group>"; };
 		2A1F52F322160A0300933277 /* ManualEntryInterfaceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualEntryInterfaceViewController.swift; sourceTree = "<group>"; };
 		2A1F52F52216230300933277 /* UIAlertController+Picker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Picker.swift"; sourceTree = "<group>"; };
 		2A35FAA821B5DA1C00DC8805 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		2A35FAAA21B5DA6200DC8805 /* QRCodeCameraInterfaceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeCameraInterfaceViewController.swift; sourceTree = "<group>"; };
-		32CD35E1A59FE582FAD25F7C /* Pods-Canary.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Canary.release.xcconfig"; path = "Target Support Files/Pods-Canary/Pods-Canary.release.xcconfig"; sourceTree = "<group>"; };
-		3AE968B0B58083546C8F1A5D /* Pods-Canary.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Canary.debug.xcconfig"; path = "Target Support Files/Pods-Canary/Pods-Canary.debug.xcconfig"; sourceTree = "<group>"; };
-		5AD644B8959A94CCA53F4253 /* Pods-CanaryUnitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CanaryUnitTests.release.xcconfig"; path = "Target Support Files/Pods-CanaryUnitTests/Pods-CanaryUnitTests.release.xcconfig"; sourceTree = "<group>"; };
-		61E7ED6F4152C03BABFAD5B8 /* Pods-CanaryUnitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CanaryUnitTests.debug.xcconfig"; path = "Target Support Files/Pods-CanaryUnitTests/Pods-CanaryUnitTests.debug.xcconfig"; sourceTree = "<group>"; };
-		92FE9399ED0CA6F685D3D022 /* Pods_Canary.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Canary.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		30B1462725AEAA660051CA28 /* SmokeCanaryUITests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = SmokeCanaryUITests.xctestplan; sourceTree = "<group>"; };
+		30B1462B25AEAB080051CA28 /* FullCanaryAutomationTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = FullCanaryAutomationTests.xctestplan; sourceTree = "<group>"; };
+		38EA7DFCD97A6BB6A39D9637 /* Pods_CanaryUnitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CanaryUnitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B8CA636189A4B9AA35FCC06 /* Pods-Canary.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Canary.debug.xcconfig"; path = "Target Support Files/Pods-Canary/Pods-Canary.debug.xcconfig"; sourceTree = "<group>"; };
+		7677867DB4C8EA5C3D76D217 /* Pods-Canary.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Canary.release.xcconfig"; path = "Target Support Files/Pods-Canary/Pods-Canary.release.xcconfig"; sourceTree = "<group>"; };
+		8EA9D7842E6AD33AC68D526B /* Pods-CanaryUnitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CanaryUnitTests.debug.xcconfig"; path = "Target Support Files/Pods-CanaryUnitTests/Pods-CanaryUnitTests.debug.xcconfig"; sourceTree = "<group>"; };
 		B275DB2C200FD64000F053F8 /* SavedAdsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedAdsDataSource.swift; sourceTree = "<group>"; };
 		B2D3EEB4200DAF94009FEBC9 /* SavedAdsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedAdsManager.swift; sourceTree = "<group>"; };
 		BC003AFC20DC42FE00CD1FEB /* LogingLevelMenuDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogingLevelMenuDataSource.swift; sourceTree = "<group>"; };
@@ -353,7 +356,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C63BD043C704C5D6AB0C2E1 /* Pods_Canary.framework in Frameworks */,
+				109259CB36A535E2923E0FB9 /* Pods_Canary.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -368,24 +371,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8A1B421C7667F9AD02F79B16 /* Pods_CanaryUnitTests.framework in Frameworks */,
+				76343D6353C759A66959911D /* Pods_CanaryUnitTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0579E20B6B7F9CB8F99A5FA4 /* Pods */ = {
+		30B1462625AEAA4F0051CA28 /* TestPlans */ = {
 			isa = PBXGroup;
 			children = (
-				61E7ED6F4152C03BABFAD5B8 /* Pods-CanaryUnitTests.debug.xcconfig */,
-				5AD644B8959A94CCA53F4253 /* Pods-CanaryUnitTests.release.xcconfig */,
-				087F3B84AFA354044BA48804 /* Pods-Internal Application.debug.xcconfig */,
-				19CF984E91C148C573F5603A /* Pods-Internal Application.release.xcconfig */,
-				3AE968B0B58083546C8F1A5D /* Pods-Canary.debug.xcconfig */,
-				32CD35E1A59FE582FAD25F7C /* Pods-Canary.release.xcconfig */,
+				30B1462725AEAA660051CA28 /* SmokeCanaryUITests.xctestplan */,
+				30B1462B25AEAB080051CA28 /* FullCanaryAutomationTests.xctestplan */,
 			);
-			path = Pods;
+			path = TestPlans;
 			sourceTree = "<group>";
 		};
 		B275DB2B200FD5F500F053F8 /* SavedAds */ = {
@@ -421,12 +420,13 @@
 		BC33E02A1FBB627B0060ECBE = {
 			isa = PBXGroup;
 			children = (
+				30B1462625AEAA4F0051CA28 /* TestPlans */,
 				BC33E0351FBB627B0060ECBE /* Canary */,
 				EC728C77233563BA0020AEBD /* CanaryScreenshots */,
 				EC469C1122613063006CABAA /* CanaryUnitTests */,
 				BC33E0341FBB627B0060ECBE /* Products */,
 				BD565F79D171D27FE1BAD7EB /* Frameworks */,
-				0579E20B6B7F9CB8F99A5FA4 /* Pods */,
+				CCBF76C6C81E71D15CCD6B5A /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -591,10 +591,22 @@
 			children = (
 				2A35FAA821B5DA1C00DC8805 /* AVFoundation.framework */,
 				BCE738601FBB707500093CCD /* CoalMine.framework */,
-				258970CE5776BA717BF6182F /* Pods_CanaryUnitTests.framework */,
-				92FE9399ED0CA6F685D3D022 /* Pods_Canary.framework */,
+				267AA063AEA5003F034A70C5 /* Pods_Canary.framework */,
+				38EA7DFCD97A6BB6A39D9637 /* Pods_CanaryUnitTests.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CCBF76C6C81E71D15CCD6B5A /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				5B8CA636189A4B9AA35FCC06 /* Pods-Canary.debug.xcconfig */,
+				7677867DB4C8EA5C3D76D217 /* Pods-Canary.release.xcconfig */,
+				8EA9D7842E6AD33AC68D526B /* Pods-CanaryUnitTests.debug.xcconfig */,
+				279C8126407F5FC34D366FA0 /* Pods-CanaryUnitTests.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		EC0BF26D2279EBD5003DB141 /* Renderer */ = {
@@ -688,12 +700,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BC33E0541FBB63260060ECBE /* Build configuration list for PBXNativeTarget "Canary" */;
 			buildPhases = (
-				1BF3FDBC75F794C6FA1E6888 /* [CP] Check Pods Manifest.lock */,
+				22E33EBF6B5B92F9387B8392 /* [CP] Check Pods Manifest.lock */,
 				BC33E04B1FBB63260060ECBE /* Sources */,
 				BC33E04F1FBB63260060ECBE /* Frameworks */,
 				BC33E0501FBB63260060ECBE /* Resources */,
 				BC4A99D5200EBCDD00E3EB07 /* Embed Frameworks */,
-				E0CD20FC63258235E1B98BE8 /* [CP] Embed Pods Frameworks */,
+				F79396997278F0B4B4386F38 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -726,7 +738,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = EC469C1922613063006CABAA /* Build configuration list for PBXNativeTarget "CanaryUnitTests" */;
 			buildPhases = (
-				28BE51754CFDF1A76D414FF5 /* [CP] Check Pods Manifest.lock */,
+				B24EB2686F73540CDF20E3E6 /* [CP] Check Pods Manifest.lock */,
 				EC469C0C22613063006CABAA /* Sources */,
 				EC469C0D22613063006CABAA /* Frameworks */,
 				EC469C0E22613063006CABAA /* Resources */,
@@ -855,7 +867,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1BF3FDBC75F794C6FA1E6888 /* [CP] Check Pods Manifest.lock */ = {
+		22E33EBF6B5B92F9387B8392 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -877,7 +889,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		28BE51754CFDF1A76D414FF5 /* [CP] Check Pods Manifest.lock */ = {
+		B24EB2686F73540CDF20E3E6 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -899,7 +911,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E0CD20FC63258235E1B98BE8 /* [CP] Embed Pods Frameworks */ = {
+		F79396997278F0B4B4386F38 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -908,11 +920,13 @@
 				"${PODS_ROOT}/Target Support Files/Pods-Canary/Pods-Canary-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/LoremIpsum/LoremIpsum.framework",
 				"${BUILT_PRODUCTS_DIR}/mopub-ios-sdk/MoPubSDK.framework",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OMSDK_Mopub/OMSDK_Mopub.framework/OMSDK_Mopub",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/LoremIpsum.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MoPubSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OMSDK_Mopub.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1038,6 +1052,7 @@
 				EC728C73233561B10020AEBD /* BuildFile in Sources */,
 				EC728C70233561B10020AEBD /* BuildFile in Sources */,
 				EC728C72233561B10020AEBD /* BuildFile in Sources */,
+				3099E02125CCB686007209D6 /* BuildFile in Sources */,
 				63367AC925AF91AE005A3247 /* BuildFile in Sources */,
 				BC61B62324EEE5D20053AD64 /* BuildFile in Sources */,
 				EC478D352335363D000B3397 /* CallbackFunctionNames.swift in Sources */,
@@ -1046,6 +1061,7 @@
 				637B1E32258BE8F800656457 /* BuildFile in Sources */,
 				EC85D08C23C00BB300D5E72F /* BuildFile in Sources */,
 				EC728C6F233561B10020AEBD /* BuildFile in Sources */,
+				7D43A88325C9DCB700C6DCFF /* BuildFile in Sources */,
 				EC728C6C233561B10020AEBD /* BuildFile in Sources */,
 				BC163E05251554CA006CD07F /* BuildFile in Sources */,
 				63367ACE25AFB179005A3247 /* BuildFile in Sources */,
@@ -1053,11 +1069,11 @@
 				305A5C9E23C664B700A7A31B /* BuildFile in Sources */,
 				63840D7B25A8FDC600485586 /* BuildFile in Sources */,
 				BC2814EF250A935200325BE8 /* BuildFile in Sources */,
+				3099E02225CCB686007209D6 /* BuildFile in Sources */,
 				EC728C67233561B10020AEBD /* BuildFile in Sources */,
 				BCC6648924F5A62300B4A090 /* BuildFile in Sources */,
 				306BA54C25252201000AC5C8 /* BuildFile in Sources */,
 				EC728C66233561B10020AEBD /* BuildFile in Sources */,
-				637B1E41258D43E800656457 /* BuildFile in Sources */,
 				BC0E204524F6B5DC00F72055 /* BuildFile in Sources */,
 				EC728C65233561B10020AEBD /* BuildFile in Sources */,
 				637B1DB62587F17900656457 /* BuildFile in Sources */,
@@ -1065,10 +1081,10 @@
 				63367AC425AF85BD005A3247 /* BuildFile in Sources */,
 				63FD4CBE258023980035CF3E /* BuildFile in Sources */,
 				63FD4CE0258056D20035CF3E /* BuildFile in Sources */,
-				637B1E62258D4AFA00656457 /* BuildFile in Sources */,
 				EC728C75233561B10020AEBD /* BuildFile in Sources */,
 				30CA81CD23DF687F0023ABEE /* BuildFile in Sources */,
 				637DEF5F257AF27D00CB88D0 /* BuildFile in Sources */,
+				7D43A87E25C9DC8300C6DCFF /* BuildFile in Sources */,
 				EC728C6E233561B10020AEBD /* BuildFile in Sources */,
 				637B1E5D258D4AE700656457 /* BuildFile in Sources */,
 				BCE6DDC724F463820094BEA6 /* BuildFile in Sources */,
@@ -1077,13 +1093,14 @@
 				EC728C74233561B10020AEBD /* BuildFile in Sources */,
 				308F286023FF11BB008B5049 /* BuildFile in Sources */,
 				BCE6DDC224F43C9C0094BEA6 /* BuildFile in Sources */,
-				637B1E52258D490500656457 /* BuildFile in Sources */,
 				EC728C64233561B10020AEBD /* BuildFile in Sources */,
 				EC728C68233561B10020AEBD /* BuildFile in Sources */,
+				3099E02025CCB686007209D6 /* BuildFile in Sources */,
 				EC728C71233561B10020AEBD /* BuildFile in Sources */,
 				BCE6DDC524F461AD0094BEA6 /* BuildFile in Sources */,
 				637DEF5A2579982C00CB88D0 /* BuildFile in Sources */,
 				EC728C6D233561B10020AEBD /* BuildFile in Sources */,
+				304823BA25A554A3004095B9 /* BuildFile in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1143,12 +1160,12 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202103161233;
+				CURRENT_PROJECT_VERSION = 202104261348;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				INFOPLIST_FILE = "CanaryScreenshots/Snapshots-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MARKETING_VERSION = 5.16.2;
+				MARKETING_VERSION = 5.17.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "";
@@ -1165,12 +1182,12 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202103161233;
+				CURRENT_PROJECT_VERSION = 202104261348;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				INFOPLIST_FILE = "CanaryScreenshots/Snapshots-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MARKETING_VERSION = 5.16.2;
+				MARKETING_VERSION = 5.17.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mopub.CanaryScreenshots;
@@ -1296,15 +1313,15 @@
 		};
 		BC33E0551FBB63260060ECBE /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AE968B0B58083546C8F1A5D /* Pods-Canary.debug.xcconfig */;
+			baseConfigurationReference = 5B8CA636189A4B9AA35FCC06 /* Pods-Canary.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202103161233;
+				CURRENT_PROJECT_VERSION = 202104261348;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				INFOPLIST_FILE = Canary/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 5.16.2;
+				MARKETING_VERSION = 5.17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mopub.Canary;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1314,15 +1331,15 @@
 		};
 		BC33E0561FBB63260060ECBE /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 32CD35E1A59FE582FAD25F7C /* Pods-Canary.release.xcconfig */;
+			baseConfigurationReference = 7677867DB4C8EA5C3D76D217 /* Pods-Canary.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202103161233;
+				CURRENT_PROJECT_VERSION = 202104261348;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				INFOPLIST_FILE = Canary/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 5.16.2;
+				MARKETING_VERSION = 5.17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mopub.Canary;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1335,12 +1352,12 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202103161233;
+				CURRENT_PROJECT_VERSION = 202104261348;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				INFOPLIST_FILE = "CanaryUITests/UITests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MARKETING_VERSION = 5.16.2;
+				MARKETING_VERSION = 5.17.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.twitter.CanaryUITests;
@@ -1356,12 +1373,12 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202103161233;
+				CURRENT_PROJECT_VERSION = 202104261348;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				INFOPLIST_FILE = "CanaryUITests/UITests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MARKETING_VERSION = 5.16.2;
+				MARKETING_VERSION = 5.17.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.twitter.CanaryUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1373,16 +1390,16 @@
 		};
 		EC469C1722613063006CABAA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 61E7ED6F4152C03BABFAD5B8 /* Pods-CanaryUnitTests.debug.xcconfig */;
+			baseConfigurationReference = 8EA9D7842E6AD33AC68D526B /* Pods-CanaryUnitTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202103161233;
+				CURRENT_PROJECT_VERSION = 202104261348;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				INFOPLIST_FILE = CanaryUnitTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MARKETING_VERSION = 5.16.2;
+				MARKETING_VERSION = 5.17.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "";
@@ -1397,16 +1414,16 @@
 		};
 		EC469C1822613063006CABAA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5AD644B8959A94CCA53F4253 /* Pods-CanaryUnitTests.release.xcconfig */;
+			baseConfigurationReference = 279C8126407F5FC34D366FA0 /* Pods-CanaryUnitTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202103161233;
+				CURRENT_PROJECT_VERSION = 202104261348;
 				DEVELOPMENT_TEAM = 4S7XS533V3;
 				INFOPLIST_FILE = CanaryUnitTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MARKETING_VERSION = 5.16.2;
+				MARKETING_VERSION = 5.17.0;
 				MTL_FAST_MATH = YES;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mopub.Canary.UnitTests;

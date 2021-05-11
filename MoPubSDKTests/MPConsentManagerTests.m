@@ -6,14 +6,15 @@
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
+#import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <XCTest/XCTest.h>
 
+#import "MoPubSDKTests-Swift.h"
 #import "MPAdServerKeys.h"
 #import "MPAdServerURLBuilder.h"
 #import "MPConsentManager.h"
 #import "MPConsentManager+Testing.h"
 #import "MPConsentError.h"
-#import "MPIdentityProvider+Testing.h"
 #import "MPURL.h"
 
 @interface MPConsentManagerTests : XCTestCase
@@ -32,7 +33,12 @@
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
 
-    [MPIdentityProvider resetTrackingAuthorizationStatusToDefault];
+    if (@available(iOS 14.0, *)) {
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusNotDetermined;
+    }
+
+    // Reset mock IDFA
+    MPAdvertisingTrackingAuthorization.mockAdvertisingIdentifier = nil;
 }
 
 #pragma mark - Consent States
@@ -603,7 +609,7 @@
 
     // Set tracking authorization to denied
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusDenied];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusDenied;
     }
 
     // Do not track
@@ -617,7 +623,7 @@
 
     // Set tracking authorization to authorized
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusAuthorized];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusAuthorized;
     }
 
     // Transition to allow tracking
@@ -655,7 +661,7 @@
 
     // Set tracking authorization to denied
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusDenied];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusDenied;
     }
 
     // Do not track
@@ -669,7 +675,7 @@
 
     // Set tracking authorization to authorized
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusAuthorized];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusAuthorized;
     }
 
     // Transition to allow tracking
@@ -700,7 +706,7 @@
 
     // Set tracking authorization to denied
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusDenied];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusDenied;
     }
 
     // Do not track
@@ -714,7 +720,7 @@
 
     // Set tracking authorization to authorized
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusAuthorized];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusAuthorized;
     }
 
     // Transition to allow tracking
@@ -751,7 +757,7 @@
 
     // Set tracking authorization to restricted
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusRestricted];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusRestricted;
     }
 
     // Do not track
@@ -765,7 +771,7 @@
 
     // Set tracking authorization to authorized
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusAuthorized];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusAuthorized;
     }
 
     // Transition to allow tracking
@@ -803,7 +809,7 @@
 
     // Set tracking authorization to restricted
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusRestricted];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusRestricted;
     }
 
     // Do not track
@@ -817,7 +823,7 @@
 
     // Set tracking authorization to authorized
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusAuthorized];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusAuthorized;
     }
 
     // Transition to allow tracking
@@ -848,7 +854,7 @@
 
     // Set tracking authorization to restricted
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusRestricted];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusRestricted;
     }
 
     // Do not track
@@ -862,7 +868,7 @@
 
     // Set tracking authorization to authorized
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusAuthorized];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusAuthorized;
     }
 
     // Transition to allow tracking
@@ -899,7 +905,7 @@
 
     // Set tracking authorization to denied
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusNotDetermined];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusNotDetermined;
     }
 
     // Do not track
@@ -913,7 +919,7 @@
 
     // Set tracking authorization to authorized
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusAuthorized];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusAuthorized;
     }
 
     // Transition to allow tracking
@@ -954,7 +960,7 @@
 
     // Set tracking authorization to denied
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusNotDetermined];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusNotDetermined;
     }
 
     // Do not track
@@ -968,7 +974,7 @@
 
     // Set tracking authorization to authorized
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusAuthorized];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusAuthorized;
     }
 
     // Transition to allow tracking
@@ -999,7 +1005,7 @@
 
     // Set tracking authorization to denied
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusNotDetermined];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusNotDetermined;
     }
 
     // Do not track
@@ -1013,7 +1019,7 @@
 
     // Set tracking authorization to authorized
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusAuthorized];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusAuthorized;
     }
 
     // Transition to allow tracking
@@ -1706,11 +1712,11 @@
 - (void)testStoreIfa {
     // Set tracking authorization to authorized so ifa is accessible
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusAuthorized];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusAuthorized;
     }
 
     // Preconditions
-    MPConsentManager.sharedManager.rawIfa = @"fake_ifa_for_consent";
+    MPAdvertisingTrackingAuthorization.mockAdvertisingIdentifier = @"fake_ifa_for_consent";
 
     [MPConsentManager.sharedManager storeIfa];
 
@@ -1736,11 +1742,11 @@
 - (void)testIfaOldStatusNotConsentedNewStatusConsented {
     // Set tracking authorization to authorized so ifa is accessible
     if (@available(iOS 14.0, *)) {
-        [MPIdentityProvider setTrackingAuthorizationStatus:ATTrackingManagerAuthorizationStatusAuthorized];
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusAuthorized;
     }
 
     // Preconditions
-    MPConsentManager.sharedManager.rawIfa = @"fake_ifa_for_consent";
+    MPAdvertisingTrackingAuthorization.mockAdvertisingIdentifier = @"fake_ifa_for_consent";
 
     [MPConsentManager.sharedManager setCurrentStatus:MPConsentStatusUnknown reason:@"Unit test: Unknown" statusWasReacquired:NO shouldBroadcast:YES];
     [MPConsentManager.sharedManager setCurrentStatus:MPConsentStatusConsented reason:@"Unit test: Consented" statusWasReacquired:NO shouldBroadcast:YES];
@@ -2033,14 +2039,6 @@
     XCTAssert([manager.adUnitIdUsedForConsent isEqualToString:adunitID]);
     // Check to make sure it is now cached
     XCTAssert([adunitID isEqualToString:[NSUserDefaults.standardUserDefaults stringForKey:kAdUnitIdUsedForConsentStorageKey]]);
-
-
-    /*
-     Clear the adunit ID and make sure it's totally cleared
-     */
-    [manager clearAdUnitIdUsedForConsent];
-    XCTAssertNil(manager.adUnitIdUsedForConsent);
-    XCTAssertNil([NSUserDefaults.standardUserDefaults stringForKey:kAdUnitIdUsedForConsentStorageKey]);
 }
 
 #pragma mark - IFA Upgrading

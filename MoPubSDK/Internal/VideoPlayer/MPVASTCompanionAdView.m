@@ -12,11 +12,21 @@
 #import "MRController.h"
 #import "UIView+MPAdditions.h"
 
+// For non-module targets, UIKit must be explicitly imported
+// since MoPubSDK-Swift.h will not import it.
+#if __has_include(<MoPubSDK/MoPubSDK-Swift.h>)
+    #import <UIKit/UIKit.h>
+    #import <MoPubSDK/MoPubSDK-Swift.h>
+#else
+    #import <UIKit/UIKit.h>
+    #import "MoPubSDK-Swift.h"
+#endif
+
 @interface MPVASTCompanionAdView ()
 
 @property (nonatomic, strong) MPVASTCompanionAd *ad;
 @property (nonatomic, strong) MRController *mraidController;
-@property (nonatomic, strong) UIImageView *imageView;
+@property (nonatomic, strong) MPImageCreativeView *imageView;
 @property (nonatomic, strong) MPImageLoader *imageLoader;
 @property (nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer; // exclusively for image resource
 @property (nonatomic, assign, readwrite) BOOL isWebContent;
@@ -84,8 +94,7 @@
     [self addGestureRecognizer:self.tapGestureRecognizer];
 
     // create and layout the image view
-    self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    self.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.imageView = [[MPImageCreativeView alloc] init];
     [self addSubview:self.imageView];
     self.imageView.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
@@ -108,7 +117,7 @@
 
     self.mraidController = [[MRController alloc] initWithAdViewFrame:self.ad.safeAdViewBounds
                                                supportedOrientations:MPInterstitialOrientationTypeAll // companion ad does not inherit `x-orientation` from the main ad
-                                                     adPlacementType:MRAdViewPlacementTypeInline
+                                                     adPlacementType:MRAdViewPlacementTypeInterstitial
                                                             delegate:self];
     self.mraidController.delegate = self;
     [self.mraidController disableClickthroughWebBrowser]; // let the companion ad view delegate handle click-through instead of the `MRController`

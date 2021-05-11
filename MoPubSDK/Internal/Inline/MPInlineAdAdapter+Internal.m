@@ -18,6 +18,16 @@
     // no-op.
 }
 
+- (void)endImpression {
+    // Only end the impression once
+    if (self.hasEndedImpression) {
+        return;
+    }
+    self.hasEndedImpression = YES;
+
+    [self.analyticsTracker trackEndImpressionForConfiguration:self.configuration];
+}
+
 #pragma mark - MPInlineAdAdapterWebSessionDelegate
 
 - (void)inlineAd:(MPInlineAdAdapter *)inlineAdAdapter webSessionWillStartInView:(MPAdContainerView *)containerView {

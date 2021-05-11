@@ -100,6 +100,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)fullscreenAdAdapterDidExpire:(MPFullscreenAdAdapter *)adapter;
 
 /**
+ Call this method when an ad is about to present.
+
+ @param adapter You should pass @c self to allow the MoPub SDK to associate this event with the correct
+ instance of your adapter.
+
+ @warning **Important**: Your adapter subclass **must** call this method when it is about to present
+ the fullscreen ad. Failure to do so will disrupt the mediation waterfall and cause future ad requests
+ to stall.
+ */
+- (void)fullscreenAdAdapterAdWillPresent:(MPFullscreenAdAdapter *)adapter;
+
+/**
+ Call this method when an ad has finished presenting.
+
+ @param adapter You should pass @c self to allow the MoPub SDK to associate this event with the correct
+ instance of your adapter.
+
+ @warning **Important**: Your adapter subclass **must** call this method when it is finished presenting
+ the fullscreen ad. Failure to do so will disrupt the mediation waterfall and cause future ad requests
+ to stall.
+
+ **Note**: if it is not possible to know when the fullscreen ad *finished* presenting, you should call
+ this immediately after calling @c fullscreenAdAdapterAdWillPresent:.
+ */
+- (void)fullscreenAdAdapterAdDidPresent:(MPFullscreenAdAdapter *)adapter;
+
+/**
  Call this method when an ad is about to appear.
 
  @param adapter You should pass @c self to allow the MoPub SDK to associate this event with the correct
@@ -183,6 +210,9 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param adapter You should pass @c self to allow the MoPub SDK to associate this event with the correct
  instance of your adapter.
+
+ @warning **Important**: Your adapter subclass **must** call this method when it is about to dismiss the
+ fullscreen ad. Failure to do so will disrupt the mediation waterfall and cause future ad requests to stall.
  */
 - (void)fullscreenAdAdapterAdWillDismiss:(MPFullscreenAdAdapter *)adapter;
 
@@ -193,6 +223,12 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param adapter You should pass @c self to allow the MoPub SDK to associate this event with the correct
  instance of your adapter.
+
+ @warning **Important**: Your adapter subclass **must** call this method when it is finished with dismissing
+ the fullscreen ad. Failure to do so will disrupt the mediation waterfall and cause future ad requests to stall.
+
+ **Note**: if it is not possible to know when the fullscreen ad *finished* dismissing, you should call
+ this immediately after calling @c fullscreenAdAdapterAdWillDismiss:.
  */
 - (void)fullscreenAdAdapterAdDidDismiss:(MPFullscreenAdAdapter *)adapter;
 

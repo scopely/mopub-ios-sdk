@@ -12,7 +12,6 @@
 #import "MPAdapterConfiguration.h"
 #import "MPAdAdapterError.h"
 #import "MPAdConversionTracker.h"
-#import "MPAdImpressionTimer.h"
 #import "MPAdTargeting.h"
 #import "MPAdView.h"
 #import "MPAdViewDelegate.h"
@@ -55,6 +54,9 @@
 // These are internal headers exposed for Swift bridging and will be
 // removed once those systems have been converted to Swift.
 #import "MPAdServerURLBuilder.h"
+#import "MPAnalyticsTracker.h"
+#import "MPConsentDialogViewController.h"
+#import "MPConsentManager.h"
 #import "MPHTTPNetworkSession.h"
 #import "MPURL.h"
 #import "MPURLRequest.h"

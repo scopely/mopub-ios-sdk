@@ -63,7 +63,8 @@ public class ConsentSyncSerialNetworkSession: NSObject {
     // MARK: - Public functions
     
     
-    /// Attempts to start a task with the provided `MPURLRequest` instance. Based on comparison results derived from the `URLRequestComparable` comparator, the request may not execute, and subsequently the `responseHandler` and `errorHandler` will not be invoked.
+    /// Attempts to start a task with the provided `MPURLRequest` instance.
+    /// In cases where the request is deemed a duplicated, the `errorHandler` will be invoked.
     /// - Parameter request: Request to send.
     /// - Parameter responseHandler: Optional response handler that will be invoked on the main thread.
     /// - Parameter errorHandler: Optional error handler that will be invoked on the main thread.
@@ -108,7 +109,16 @@ public class ConsentSyncSerialNetworkSession: NSObject {
         // If the pending request is a duplicate of the last completed request, we won't execute the task. Discard it by removing the pending task.
         if let lastCompletedTask = lastCompletedTask, comparator.isRequest(pendingTask.request, duplicateOf: lastCompletedTask.request) {
             MPLogging.logEvent(with: "Pending request \(pendingTask.request.url?.absoluteString ?? "") is a duplicate of last completed request \(lastCompletedTask.request.url?.absoluteString ?? ""). Will discard.", from: ConsentSyncSerialNetworkSession.self)
+            // Capture a local reference for use in the `DispatchQueue.main` call
+            // This allows us to immediately clear the stored `pendingTask` state.
+            let errorHandler = self.pendingTask?.errorHandler
             self.pendingTask = nil
+            
+            // Invoke the error handler on the main thread.
+            DispatchQueue.main.async {
+                let error = NSError(code: MOPUBErrorDuplicateURLRequest)
+                errorHandler?(error)
+            }
         }
         // If the pending request waiting to be executed is not a duplicate of the last completed request, let's execute it.
         else if !comparator.isRequest(pendingTask.request, duplicateOf: lastCompletedTask?.request) {

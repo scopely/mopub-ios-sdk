@@ -50,7 +50,7 @@ static NSTimeInterval const kTestTimeout = 3;
     viewController.webAdDelegate = self.delegateMock;
 
     XCTAssertNil(viewController.mraidController);
-    [viewController loadConfigurationForMRAIDAd:[MPAdConfiguration new]];
+    [viewController loadConfigurationForMRAIDAd:[[MPAdConfiguration alloc] initWithMetadata:@{} data:nil isFullscreenAd:YES]];
     XCTAssertNotNil(viewController.mraidController);
 
     // Force type
@@ -106,7 +106,7 @@ static NSTimeInterval const kTestTimeout = 3;
     viewController.webAdDelegate = self.delegateMock;
 
     XCTAssertNil(viewController.mraidController);
-    [viewController loadConfigurationForMRAIDAd:[MPAdConfiguration new]];
+    [viewController loadConfigurationForMRAIDAd:[[MPAdConfiguration alloc] initWithMetadata:@{} data:nil isFullscreenAd:YES]];
     XCTAssertNotNil(viewController.mraidController);
 
     // Force type

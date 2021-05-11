@@ -19,7 +19,7 @@ class ConsentSyncSerialNetworkSessionTests: XCTestCase {
     
     struct Constants {
         /// 2 second test timeout.
-        static let timeout: TimeInterval = 2.0
+        static let timeout: TimeInterval = 5.0
     }
 
     // MARK: - Test Setup
@@ -116,10 +116,7 @@ class ConsentSyncSerialNetworkSessionTests: XCTestCase {
         
         // Create the expectations for the asyncronous responses
         let expectation1 = XCTestExpectation(description: "First request completed")
-        
-        // Expectation is inverted because we expect it to not be called
         let expectation2 = XCTestExpectation(description: "Second request completed")
-        expectation2.isInverted = true
         
         // Requests to be attempted (note: only the URL hosts are used by the `MockURLRequestComparator` for determining equality)
         let request1 = MPURLRequest(url: URL(string: "https://twitter.com/?id=1")!)
@@ -133,9 +130,14 @@ class ConsentSyncSerialNetworkSessionTests: XCTestCase {
         
         // Attempt to perform the second request
         session.attemptTask(with: request2) { (data, response) in
+            // No op
+        } errorHandler: { error in
+            // Expect a non-nil error.
+            XCTAssertNotNil(error)
+            
             // Fulfill the expectation
             expectation2.fulfill()
-        } errorHandler: { _ in }
+        }
         
         // Wait for asynchronous responses
         wait(for: [expectation1, expectation2], timeout: Constants.timeout, enforceOrder: true)
@@ -157,7 +159,9 @@ class MockHTTPNetworkSession: MPHTTPNetworkSession {
         requestsStarted.append(request)
         
         // Invoke the response handler
-        responseHandler?(Data(), HTTPURLResponse())
+        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(2)) {
+            responseHandler?(Data(), HTTPURLResponse())
+        }
         
         // Return unused URLSessionTask
         return URLSession.shared.dataTask(with: request)

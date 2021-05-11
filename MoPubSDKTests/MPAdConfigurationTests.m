@@ -7,6 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <StoreKit/StoreKit.h>
 #import "MPAdConfiguration.h"
 #import "MPAdConfigurationFactory.h"
 #import "MPReward.h"
@@ -15,6 +16,16 @@
 #import "MPVASTTracking.h"
 #import "MPViewabilityManager+Testing.h"
 #import "MPAdServerKeys.h"
+
+// For non-module targets, UIKit must be explicitly imported
+// since MoPubSDK-Swift.h will not import it.
+#if __has_include(<MoPubSDK/MoPubSDK-Swift.h>)
+    #import <UIKit/UIKit.h>
+    #import <MoPubSDK/MoPubSDK-Swift.h>
+#else
+    #import <UIKit/UIKit.h>
+    #import "MoPubSDK-Swift.h"
+#endif
 
 extern NSString * const kNativeImpressionVisibleMsMetadataKey;
 extern NSString * const kNativeImpressionMinVisiblePercentMetadataKey;
@@ -1135,7 +1146,7 @@ extern NSString * const kNativeImpressionMinVisiblePixelsMetadataKey;
 
     MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:metadata data:nil isFullscreenAd:YES];
 
-    XCTAssertNil(config.skAdNetworkClickthroughData);
+    XCTAssertNil(config.skAdNetworkData);
 }
 
 - (void)testNoSKAdNetworkDataGeneratedWhenEmptyIsSent {
@@ -1145,7 +1156,7 @@ extern NSString * const kNativeImpressionMinVisiblePixelsMetadataKey;
 
     MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:metadata data:nil isFullscreenAd:YES];
 
-    XCTAssertNil(config.skAdNetworkClickthroughData);
+    XCTAssertNil(config.skAdNetworkData);
 }
 
 - (void)testNoSKAdNetworkDataGeneratedWhenIncompleteDataIsSent {
@@ -1157,10 +1168,10 @@ extern NSString * const kNativeImpressionMinVisiblePixelsMetadataKey;
 
     MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:metadata data:nil isFullscreenAd:YES];
 
-    XCTAssertNil(config.skAdNetworkClickthroughData);
+    XCTAssertNil(config.skAdNetworkData);
 }
 
-- (void)testSKAdNetworkDataGeneratesCorrectlyWhenDataIsSent {
+- (void)testSKAdNetworkClickthroughDataGeneratesCorrectlyWhenDataIsSent {
     NSString * version = @"2.0";
     NSString * network = @"cDkw7geQsH.skadnetwork";
     NSString * campaign = @"45";
@@ -1172,31 +1183,107 @@ extern NSString * const kNativeImpressionMinVisiblePixelsMetadataKey;
 
     NSDictionary * metadata = @{
         @"skadn": @{
-                @"version": version,
-                @"network": network,
-                @"campaign": campaign,
-                @"itunesitem": itunesitem,
-                @"nonce": nonce,
-                @"sourceapp": sourceapp,
-                @"timestamp": timestamp,
-                @"signature": signature,
+                @"click": @{
+                        @"version": version,
+                        @"network": network,
+                        @"campaign": campaign,
+                        @"itunesitem": itunesitem,
+                        @"nonce": nonce,
+                        @"sourceapp": sourceapp,
+                        @"timestamp": timestamp,
+                        @"signature": signature,
+                }
         }
     };
 
     MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:metadata data:nil isFullscreenAd:YES];
-    MPSKAdNetworkClickthroughData * data = config.skAdNetworkClickthroughData;
+    MPSKAdNetworkData * data = config.skAdNetworkData;
 
     XCTAssertNotNil(data);
 
-    // Validate data was copied into properties correctly
-    XCTAssert([data.version isEqualToString:version]);
-    XCTAssert([data.networkIdentifier isEqualToString:network]);
-    XCTAssertEqual(data.campaignIdentifier.integerValue, campaign.integerValue);
-    XCTAssertEqual(data.destinationAppStoreIdentifier.integerValue, itunesitem.integerValue);
-    XCTAssert([data.nonce.UUIDString.lowercaseString isEqualToString:nonce.lowercaseString]);
-    XCTAssert([data.sourceAppStoreIdentifier integerValue] == [sourceapp integerValue]);
-    XCTAssertEqual(data.timestamp.integerValue, timestamp.integerValue);
-    XCTAssert([data.signature isEqualToString:signature]);
+    if (@available(iOS 14.0, *)) {
+        // Validate data was copied into properties correctly
+        XCTAssert([data.clickDataDictionary[SKStoreProductParameterAdNetworkVersion] isEqualToString:version]);
+        XCTAssert([data.clickDataDictionary[SKStoreProductParameterAdNetworkIdentifier] isEqualToString:network]);
+        XCTAssertEqual([data.clickDataDictionary[SKStoreProductParameterAdNetworkCampaignIdentifier] integerValue], campaign.integerValue);
+        XCTAssertEqual([data.clickDataDictionary[SKStoreProductParameterITunesItemIdentifier] integerValue], itunesitem.integerValue);
+        XCTAssert([((NSUUID *)data.clickDataDictionary[SKStoreProductParameterAdNetworkNonce]).UUIDString.lowercaseString isEqualToString:nonce.lowercaseString]);
+        XCTAssert([data.clickDataDictionary[SKStoreProductParameterAdNetworkSourceAppStoreIdentifier] integerValue] == [sourceapp integerValue]);
+        XCTAssertEqual([data.clickDataDictionary[SKStoreProductParameterAdNetworkTimestamp] longLongValue], timestamp.longLongValue);
+        XCTAssert([data.clickDataDictionary[SKStoreProductParameterAdNetworkAttributionSignature] isEqualToString:signature]);
+    }
+}
+
+- (void)testSKAdNetworkViewthroughDataGeneratesCorrectlyWhenDataIsSent {
+    NSString * version = @"2.2";
+    NSString * network = @"cDkw7geQsH.skadnetwork";
+    NSString * campaign = @"45";
+    NSString * itunesitem = @"880047117";
+    NSString * nonce = @"473b1a16-b4ef-43ad-9591-fcf3aefa82a7";
+    NSString * sourceapp = @"123456789";
+    NSString * timestamp = @"1594406341";
+    NSString * signature = @"hi i'm a signature";
+    NSString * fidelity = @"1";
+
+    NSDictionary * metadata = @{
+        @"skadn": @{
+                @"click": @{
+                        @"version": version,
+                        @"network": network,
+                        @"campaign": campaign,
+                        @"itunesitem": itunesitem,
+                        @"nonce": nonce,
+                        @"sourceapp": sourceapp,
+                        @"timestamp": timestamp,
+                        @"signature": signature,
+                        @"fidelity": fidelity,
+                },
+                @"view": @{
+                         @"signature": signature,
+                         @"version": version,
+                         @"network": network,
+                         @"campaign": campaign,
+                         @"itunesitem": itunesitem,
+                         @"nonce": nonce,
+                         @"sourceapp": sourceapp,
+                         @"timestamp": timestamp,
+                },
+        }
+    };
+
+    MPAdConfiguration * config = [[MPAdConfiguration alloc] initWithMetadata:metadata data:nil isFullscreenAd:YES];
+    MPSKAdNetworkData * data = config.skAdNetworkData;
+
+    XCTAssertNotNil(data);
+
+    if (@available(iOS 14.0, *)) {
+        // Validate data was copied into properties correctly
+        XCTAssert([data.clickDataDictionary[SKStoreProductParameterAdNetworkVersion] isEqualToString:version]);
+        XCTAssert([data.clickDataDictionary[SKStoreProductParameterAdNetworkIdentifier] isEqualToString:network]);
+        XCTAssertEqual([data.clickDataDictionary[SKStoreProductParameterAdNetworkCampaignIdentifier] integerValue], campaign.integerValue);
+        XCTAssertEqual([data.clickDataDictionary[SKStoreProductParameterITunesItemIdentifier] integerValue], itunesitem.integerValue);
+        XCTAssert([((NSUUID *)data.clickDataDictionary[SKStoreProductParameterAdNetworkNonce]).UUIDString.lowercaseString isEqualToString:nonce.lowercaseString]);
+        XCTAssert([data.clickDataDictionary[SKStoreProductParameterAdNetworkSourceAppStoreIdentifier] integerValue] == [sourceapp integerValue]);
+        XCTAssertEqual([data.clickDataDictionary[SKStoreProductParameterAdNetworkTimestamp] longLongValue], timestamp.longLongValue);
+        XCTAssert([data.clickDataDictionary[SKStoreProductParameterAdNetworkAttributionSignature] isEqualToString:signature]);
+        XCTAssert([data.clickDataDictionary[@"fidelity-type"] integerValue] == [fidelity integerValue]);
+    }
+
+    if (@available(iOS 14.5, *)) {
+        // Validate data was copied into impressionData properties correctly
+        SKAdImpression * impressionData = data.impressionData;
+
+        XCTAssertNotNil(impressionData);
+
+        XCTAssert([impressionData.version isEqualToString:version]);
+        XCTAssert([impressionData.adNetworkIdentifier isEqualToString:network]);
+        XCTAssertEqual([impressionData.adCampaignIdentifier integerValue], campaign.integerValue);
+        XCTAssertEqual([impressionData.advertisedAppStoreItemIdentifier integerValue], itunesitem.integerValue);
+        XCTAssert([impressionData.adImpressionIdentifier isEqualToString:nonce]);
+        XCTAssert([impressionData.sourceAppStoreItemIdentifier integerValue] == [sourceapp integerValue]);
+        XCTAssertEqual([impressionData.timestamp longLongValue], timestamp.longLongValue);
+        XCTAssert([impressionData.signature isEqualToString:signature]);
+    }
 }
 
 @end

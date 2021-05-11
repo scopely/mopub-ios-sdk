@@ -20,11 +20,16 @@
 #import "MPInterstitialAdManagerDelegate.h"
 #import "MPLogging.h"
 #import "MPError.h"
-#import "MPStopwatch.h"
 #import "MPViewabilityManager.h"
 #import "NSMutableArray+MPAdditions.h"
 #import "NSDate+MPAdditions.h"
 #import "NSError+MPAdditions.h"
+
+#if __has_include(<MoPubSDK/MoPubSDK-Swift.h>)
+    #import <MoPubSDK/MoPubSDK-Swift.h>
+#else
+    #import "MoPubSDK-Swift.h"
+#endif
 
 @interface MPInterstitialAdManager ()
 
@@ -225,13 +230,17 @@
             MPLogAdEvent([MPLogEvent adExpiredWithTimeInterval:MPConstants.adsExpirationInterval], self.delegate.interstitialAdController.adUnitId);
             [self.delegate managerDidExpireInterstitial:self];
             break;
-        case MPFullscreenAdEventWillAppear:
-            MPLogAdEvent(MPLogEvent.adWillAppear, self.delegate.interstitialAdController.adUnitId);
+        case MPFullscreenAdEventWillPresent:
+            MPLogAdEvent(MPLogEvent.adWillPresent, self.delegate.interstitialAdController.adUnitId);
             [self.delegate managerWillPresentInterstitial:self];
             break;
-        case MPFullscreenAdEventDidAppear:
-            MPLogAdEvent(MPLogEvent.adDidAppear, self.delegate.interstitialAdController.adUnitId);
+        case MPFullscreenAdEventDidPresent:
+            MPLogAdEvent(MPLogEvent.adDidPresent, self.delegate.interstitialAdController.adUnitId);
             [self.delegate managerDidPresentInterstitial:self];
+            break;
+        case MPFullscreenAdEventWillAppear:
+            break;
+        case MPFullscreenAdEventDidAppear:
             break;
         case MPFullscreenAdEventWillDisappear:
             break;

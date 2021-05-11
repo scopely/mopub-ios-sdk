@@ -10,4 +10,17 @@ import UIKit
 
 final class BasicMenuTableViewCell: UITableViewCell, TableViewCellRegisterable {
     @IBOutlet weak var title: UILabel!
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        // Clean up accessoryType
+        accessoryType = .none
+        
+        // Clean up accessibilityIdentifier
+        accessibilityIdentifier = nil
+        
+        // Clean up accessibilityValue
+        accessibilityValue = nil
+    }
 }

@@ -43,6 +43,7 @@ typedef enum {
     MOPUBErrorNoHTMLUrlToLoad,
     MOPUBErrorInlineNoViewGivenWhenAdLoaded,
     MOPUBErrorViewabilityNoViewToTrack,
+    MOPUBErrorDuplicateURLRequest,
 } MOPUBErrorCode;
 
 @interface NSError (MoPub)

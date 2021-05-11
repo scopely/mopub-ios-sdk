@@ -213,20 +213,23 @@ extension SceneDelegate: UIWindowSceneDelegate {
 
 private extension SceneDelegate {
     /**
-     Check if the Canary app has a cached ad unit ID for consent. If not, the app will present an alert dialog allowing custom ad unit ID entry.
+     Attempts to display the tracking authorization prompt. At completion, will check if the Canary app has a cached ad unit ID for consent. If not, the app will present an alert dialog allowing custom ad unit ID entry.
      - Parameter containerViewController: the main container view controller
      - Parameter userDefaults: the target `UserDefaults` instance
      */
     func checkAndInitializeSdk(containerViewController: ContainerViewController, userDefaults: UserDefaults = .standard) {
-        // Retrieve the ad unit used to initialize the SDK.
-        let adUnitIdForConsent: String = userDefaults.cachedAdUnitId ?? Constants.defaultAdUnitId
-        
-        // Next, initialize the SDK
-        initializeMoPubSdk(adUnitIdForConsent: adUnitIdForConsent, containerViewController: containerViewController, mopub: MoPub.sharedInstance()) {
-            // Prompt for authorization status after running the `initializeMoPubSDK` method (which
-            // also shows the GDPR prompt, if available) so Canary isn't trying to present two
-            // view controllers simultaneously
-            self.promptForTrackingAuthorizationStatus(fromViewController: containerViewController)
+        // Prompt for authorization status, then run the `initializeMoPubSDK` method (which
+        // also shows the GDPR prompt, if available) at completion so Canary isn't trying to present two
+        // view controllers simultaneously
+        promptForTrackingAuthorizationStatus(fromViewController: containerViewController) { [weak self] in
+            // Obtain strong reference to self, otherwise don't bother.
+            guard let self = self else { return }
+            
+            // Retrieve the ad unit used to initialize the SDK.
+            let adUnitIdForConsent: String = userDefaults.cachedAdUnitId ?? Constants.defaultAdUnitId
+            
+            // Next, initialize the SDK
+            self.initializeMoPubSdk(adUnitIdForConsent: adUnitIdForConsent, containerViewController: containerViewController, mopub: MoPub.sharedInstance())
         }
     }
 

@@ -151,7 +151,7 @@ class ContainerViewController: UIViewController {
         }
     }
     
-    @objc func swipeMenuOpen(_ sender: UISwipeGestureRecognizer) {
+    @objc func swipeMenuOpen(_ sender: Any) {
         // Do nothing if the menu is already open or in the process of opening.
         guard (menuContainerWidthConstraint.constant + menuContainerLeadingEdgeConstraint.constant) == 0 else {
             return

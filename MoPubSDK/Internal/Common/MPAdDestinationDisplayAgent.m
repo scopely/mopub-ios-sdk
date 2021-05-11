@@ -18,6 +18,16 @@
 #import "SKStoreProductViewController+MPAdditions.h"
 #import <SafariServices/SafariServices.h>
 
+// For non-module targets, UIKit must be explicitly imported
+// since MoPubSDK-Swift.h will not import it.
+#if __has_include(<MoPubSDK/MoPubSDK-Swift.h>)
+    #import <UIKit/UIKit.h>
+    #import <MoPubSDK/MoPubSDK-Swift.h>
+#else
+    #import <UIKit/UIKit.h>
+    #import "MoPubSDK-Swift.h"
+#endif
+
 static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +41,8 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 @property (nonatomic) MOPUBDisplayAgentType displayAgentType;
 @property (nonatomic, strong) SKStoreProductViewController *storeKitController;
 @property (nonatomic, strong) SFSafariViewController *safariController;
-@property (nonatomic, strong) MPSKAdNetworkClickthroughData *clickthroughData;
+@property (nonatomic, strong) MPSKAdNetworkData *skAdNetworkData;
+@property (nonatomic, strong) id<MPAnalyticsTracker> analyticsTracker;
 
 @property (nonatomic, strong) MPActivityViewControllerHelper *activityViewControllerHelper;
 
@@ -50,6 +61,7 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
     agent.overlayView = [[MPProgressOverlayView alloc] initWithDelegate:agent];
     agent.activityViewControllerHelper = [[MPActivityViewControllerHelper alloc] initWithDelegate:agent];
     agent.displayAgentType = MOPUBExperimentProvider.sharedInstance.displayAgentType;
+    agent.analyticsTracker = [MPAnalyticsTracker sharedTracker];
     return agent;
 }
 
@@ -85,7 +97,7 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
     }
 }
 
-- (void)displayDestinationForURL:(NSURL *)URL skAdNetworkClickthroughData:(MPSKAdNetworkClickthroughData *)clickthroughData
+- (void)displayDestinationForURL:(NSURL *)URL skAdNetworkData:(MPSKAdNetworkData *)skAdNetworkData
 {
     if (self.isLoadingDestination) return;
     self.isLoadingDestination = YES;
@@ -96,8 +108,18 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
     [self.resolver cancel];
     [self.enhancedDeeplinkFallbackResolver cancel];
 
-    // Save clickthrough data (or nil) for later
-    self.clickthroughData = clickthroughData;
+    // Save SKAdNetwork data (or nil) for later
+    self.skAdNetworkData = skAdNetworkData;
+
+    // If SKAdNetwork data says to intercept all clicks, intercept here
+    if (self.skAdNetworkData.clickMethod == MPSKAdNetworkDataClickMethodInterceptAllClicks) {
+        // Fire destination URL as a click tracker
+        [self.analyticsTracker sendTrackingRequestForURLs:@[URL]];
+
+        // Display SKStoreProductViewController with SKAdNetwork click data
+        [self presentStoreKitControllerWithProductParameters:self.skAdNetworkData.clickDataDictionary];
+        return;
+    }
 
     // For other clickthroughs, follow the URL and suggested action
     __weak __typeof__(self) weakSelf = self;
@@ -232,6 +254,10 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 }
 
 - (void)showAdBrowserController {
+    // Fire click display tracker
+    [MPClickDisplayTracker trackClickDisplayWithSkAdNetworkData:self.skAdNetworkData displayType:MPClickDisplayTrackerDisplayTypeSafariViewController];
+
+    // Display Safari View Controller
     [self hideOverlay];
     [[self.delegate viewControllerForPresentingModalView] presentViewController:self.safariController
                                                                        animated:MP_ANIMATED
@@ -245,16 +271,23 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
         return;
     }
 
-    // SKAdNetwork:
-    // If clickthrough data was sent as part of the ad response, use that rather than
-    // the clickthrough data generated from the URL.
-    NSDictionary *productParameters = self.clickthroughData != nil ? self.clickthroughData.dictionaryForStoreProductViewController : parameters;
+    NSDictionary *productParameters = parameters;
+
+    // If SKAdNetwork data indicates to intercept App Store clicks, intercept here.
+    if (self.skAdNetworkData.clickMethod == MPSKAdNetworkDataClickMethodInterceptAppStoreClicks) {
+        // Use clickthrough data from the SKAdNetwork data if available.
+        productParameters = self.skAdNetworkData != nil ? self.skAdNetworkData.clickDataDictionary : parameters;
+    }
 
     [self presentStoreKitControllerWithProductParameters:productParameters];
 }
 
 - (void)openURLInApplication:(NSURL *)URL
 {
+    // Fire click display tracker
+    [MPClickDisplayTracker trackClickDisplayWithSkAdNetworkData:self.skAdNetworkData displayType:MPClickDisplayTrackerDisplayTypeNativeSafari];
+
+    // Display URL natively
     [self hideOverlay];
 
     [MoPub openURL:URL options:@{} completion:^(BOOL didOpenURLSuccessfully) {
@@ -280,6 +313,10 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 
 - (void)failedToResolveURLWithError:(NSError *)error
 {
+    // Fire click display tracker
+    [MPClickDisplayTracker trackClickDisplayWithSkAdNetworkData:self.skAdNetworkData displayType:MPClickDisplayTrackerDisplayTypeError];
+
+    // Finish failing resolution
     [self hideOverlay];
     [self completeDestinationLoading];
 }
@@ -292,6 +329,10 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
 
 - (void)presentStoreKitControllerWithProductParameters:(NSDictionary *)parameters
 {
+    // Fire click display tracker
+    [MPClickDisplayTracker trackClickDisplayWithSkAdNetworkData:self.skAdNetworkData displayType:MPClickDisplayTrackerDisplayTypeStoreProductViewController];
+
+    // Display store product
     self.storeKitController = [[SKStoreProductViewController alloc] init];
     self.storeKitController.modalPresentationStyle = UIModalPresentationFullScreen;
     self.storeKitController.delegate = self;
@@ -378,25 +419,14 @@ static NSString * const kDisplayAgentErrorDomain = @"com.mopub.displayagent";
     [self.delegate displayAgentDidDismissModal];
 }
 
-#pragma mark - Experiment with 3 display agent types: 0 -> keep existing, 1 -> use native safari, 2 -> use SafariViewController
-
 - (void)showStoreKitWithAction:(MPURLActionInfo *)actionInfo
 {
-    switch (self.displayAgentType) {
-        case MOPUBDisplayAgentTypeInApp:
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        case MOPUBDisplayAgentTypeSafariViewController: // It doesn't make sense to open store kit in SafariViewController so storeKitController is used here.
-#pragma clang diagnostic pop
-            [self showStoreKitProductWithParameters:actionInfo.iTunesStoreParameters
-                                        fallbackURL:actionInfo.iTunesStoreFallbackURL];
-            break;
-        case MOPUBDisplayAgentTypeNativeSafari:
-            [self openURLInApplication:actionInfo.iTunesStoreFallbackURL];
-            break;
-        default:
-            break;
-    }
+    // When opening an App Store (or other store kit) link, @c SKStoreProductViewController
+    // should be used regardless of the @c displayAgentType.
+    // This ensures that SKAdNetwork clicks are attributed correctly even if
+    // @c MOPUBDisplayAgentTypeNativeSafari is set.
+    [self showStoreKitProductWithParameters:actionInfo.iTunesStoreParameters
+                                fallbackURL:actionInfo.iTunesStoreFallbackURL];
 }
 
 @end

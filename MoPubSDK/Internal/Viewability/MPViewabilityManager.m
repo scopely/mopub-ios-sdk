@@ -6,14 +6,15 @@
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
+#import <OMSDK_Mopub/OMIDPartner.h>
+#import <OMSDK_Mopub/OMIDScriptInjector.h>
+#import <OMSDK_Mopub/OMIDSDK.h>
 #import "MPAdServerURLBuilder.h"
 #import "MPConstants.h"
 #import "MPGlobal.h"
 #import "MPHTTPNetworkSession.h"
 #import "MPLogging.h"
 #import "MPViewabilityManager.h"
-#import "OMIDSDK.h"
-#import "OMIDScriptInjector.h"
 
 // `NSUserDefaults` entry to the cached Open Measurement Javascript Library.
 static NSString * const kCachedOMJSLibraryKey = @"com.mopub.mopub-ios-sdk.viewability.omidjs";

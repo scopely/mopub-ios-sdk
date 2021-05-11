@@ -27,7 +27,6 @@
 #import "MPMoPubNativeCustomEvent.h"
 #import "MPNativeAdRendererConfiguration.h"
 #import "NSMutableArray+MPAdditions.h"
-#import "MPStopwatch.h"
 #import "MPError.h"
 #import "NSDate+MPAdditions.h"
 #import "NSError+MPAdditions.h"

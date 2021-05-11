@@ -25,8 +25,4 @@ extern NSString * _Nonnull const kAdUnitIdUsedForConsentStorageKey;
 // Reset consent manager state for testing
 - (void)setUpConsentManagerForTesting;
 
-#pragma mark - Overridden Private Properties
-
-@property (nonatomic, copy, readwrite, nullable) NSString *rawIfa;
-
 @end

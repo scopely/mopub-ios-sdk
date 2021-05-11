@@ -6,13 +6,15 @@
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
-#import <XCTest/XCTest.h>
+#import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <MoPubSDK/MoPubSDK-Swift.h>
+#import <XCTest/XCTest.h>
+
+#import "MoPubSDKTests-Swift.h"
 #import "MPAdServerKeys.h"
 #import "MPAdServerURLBuilder+Testing.h"
 #import "MPConsentManager.h"
 #import "MPEngineInfo.h"
-#import "MPIdentityProvider+Testing.h"
 #import "MPMediationManager.h"
 #import "MPMediationManager+Testing.h"
 #import "MPURL.h"
@@ -67,7 +69,9 @@ static NSString * const kLastChangedMsStorageKey                 = @"com.mopub.m
 - (void)tearDown {
     [super tearDown];
 
-    [MPIdentityProvider resetTrackingAuthorizationStatusToDefault];
+    if (@available(iOS 14.0, *)) {
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusNotDetermined;
+    }
 }
 
 #pragma mark - Viewability
@@ -84,7 +88,7 @@ static NSString * const kLastChangedMsStorageKey                 = @"com.mopub.m
     XCTAssertTrue([viewabilityValue isEqualToString:@"4"]);
 
     NSString * viewabilityVersion = [url stringForPOSTDataKey:kViewabilityVersionKey];
-    XCTAssertTrue([viewabilityVersion isEqualToString:@"1.3.4-Mopub"]);
+    XCTAssertTrue([viewabilityVersion isEqualToString:@"1.3.16-Mopub"]);
 }
 
 - (void)testViewabilityDisabled {
@@ -407,7 +411,7 @@ static NSString * const kLastChangedMsStorageKey                 = @"com.mopub.m
     XCTAssertNotNil(url);
     XCTAssertNotNil([url stringForPOSTDataKey:kMoPubIDKey]);
     XCTAssertNotEqual([url stringForPOSTDataKey:kMoPubIDKey], @"");
-    XCTAssertTrue([[url stringForPOSTDataKey:kMoPubIDKey] isEqualToString:MPIdentityProvider.mopubId]);
+    XCTAssertTrue([[url stringForPOSTDataKey:kMoPubIDKey] isEqualToString:MPDeviceInformation.mopubIdentifier]);
 }
 
 #pragma mark - Engine Information
@@ -638,21 +642,21 @@ static NSString * const kLastChangedMsStorageKey                 = @"com.mopub.m
     if (@available(iOS 14.0, *)) {
         MPURL *adRequestURL;
 
-        MPIdentityProvider.trackingAuthorizationStatus = ATTrackingManagerAuthorizationStatusNotDetermined;
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusNotDetermined;
         adRequestURL = [MPAdServerURLBuilder URLWithAdUnitID:@"asfdjkl" targeting:nil];
-        XCTAssert([kAppTrackingTransparencyDescriptionNotDetermined isEqualToString:(NSString *)adRequestURL.postData[kTrackingAuthorizationStatusKey]]);
+        XCTAssert([@"not_determined" isEqualToString:(NSString *)adRequestURL.postData[kTrackingAuthorizationStatusKey]]);
 
-        MPIdentityProvider.trackingAuthorizationStatus = ATTrackingManagerAuthorizationStatusAuthorized;
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusAuthorized;
         adRequestURL = [MPAdServerURLBuilder URLWithAdUnitID:@"asfdjkl" targeting:nil];
-        XCTAssert([kAppTrackingTransparencyDescriptionAuthorized isEqualToString:(NSString *)adRequestURL.postData[kTrackingAuthorizationStatusKey]]);
+        XCTAssert([@"authorized" isEqualToString:(NSString *)adRequestURL.postData[kTrackingAuthorizationStatusKey]]);
 
-        MPIdentityProvider.trackingAuthorizationStatus = ATTrackingManagerAuthorizationStatusDenied;
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusDenied;
         adRequestURL = [MPAdServerURLBuilder URLWithAdUnitID:@"asfdjkl" targeting:nil];
-        XCTAssert([kAppTrackingTransparencyDescriptionDenied isEqualToString:(NSString *)adRequestURL.postData[kTrackingAuthorizationStatusKey]]);
+        XCTAssert([@"denied" isEqualToString:(NSString *)adRequestURL.postData[kTrackingAuthorizationStatusKey]]);
 
-        MPIdentityProvider.trackingAuthorizationStatus = ATTrackingManagerAuthorizationStatusRestricted;
+        MPAdvertisingTrackingAuthorization.mockStatus = ATTrackingManagerAuthorizationStatusRestricted;
         adRequestURL = [MPAdServerURLBuilder URLWithAdUnitID:@"asfdjkl" targeting:nil];
-        XCTAssert([kAppTrackingTransparencyDescriptionRestricted isEqualToString:(NSString *)adRequestURL.postData[kTrackingAuthorizationStatusKey]]);
+        XCTAssert([@"restricted" isEqualToString:(NSString *)adRequestURL.postData[kTrackingAuthorizationStatusKey]]);
     }
 }
 

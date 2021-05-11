@@ -59,25 +59,10 @@ static NSString * const kLastATTAuthorizationStatusStorageKey    = @"com.mopub.m
     [defaults setObject:nil forKey:kShouldReacquireConsentStorageKey];
     [defaults setObject:nil forKey:kForceGDPRAppliesStorageKey];
     [defaults setObject:nil forKey:kLastATTAuthorizationStatusStorageKey];
-
-    // Clear out overridden properties
-    sRawIfa = nil;
 }
 
 - (void)setIsGDPRApplicable:(MPBool)isGDPRApplicable {
     [[NSUserDefaults standardUserDefaults] setInteger:isGDPRApplicable forKey:kGDPRAppliesStorageKey];
-}
-
-#pragma mark - Overridden Private Properties
-
-static NSString *sRawIfa = nil;
-
-- (NSString *)rawIfa {
-    return sRawIfa;
-}
-
-- (void)setRawIfa:(NSString *)rawIfa {
-    sRawIfa = rawIfa;
 }
 
 @end

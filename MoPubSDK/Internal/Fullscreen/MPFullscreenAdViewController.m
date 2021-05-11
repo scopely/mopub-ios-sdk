@@ -315,6 +315,8 @@
             [self willPresentFullscreenMRAIDWebAd];
             break;
     }
+
+    [self.appearanceDelegate fullscreenAdWillPresent:self];
 }
 
 /**
@@ -338,6 +340,8 @@
             [self didPresentFullscreenMRAIDWebAd];
             break;
     }
+
+    [self.appearanceDelegate fullscreenAdDidPresent:self];
 }
 
 /**

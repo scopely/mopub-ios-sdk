@@ -19,6 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Note: Appear and Disappear events might happen multiple times if a view controller such as a web
  browser view controller is presented on top, and disappearing is not the same as dismissing.
+
+ Note: Presentation and dismissal events should only occur once per fullscreen ad life cycle, and correspond with
+ the view controller's presentation and dismissal.
  */
 @protocol MPFullscreenAdViewControllerAppearanceDelegate <NSObject>
 
@@ -26,6 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)fullscreenAdDidAppear:(id<MPFullscreenAdViewController>)fullscreenAdViewController;
 - (void)fullscreenAdWillDisappear:(id<MPFullscreenAdViewController>)fullscreenAdViewController;
 - (void)fullscreenAdDidDisappear:(id<MPFullscreenAdViewController>)fullscreenAdViewController;
+
+- (void)fullscreenAdWillPresent:(id<MPFullscreenAdViewController>)fullscreenAdViewController;
+- (void)fullscreenAdDidPresent:(id<MPFullscreenAdViewController>)fullscreenAdViewController;
 - (void)fullscreenAdWillDismiss:(id<MPFullscreenAdViewController>)fullscreenAdViewController;
 - (void)fullscreenAdDidDismiss:(id<MPFullscreenAdViewController>)fullscreenAdViewController;
 

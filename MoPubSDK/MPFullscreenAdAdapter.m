@@ -61,6 +61,9 @@ static const NSUInteger kExcessiveCustomDataLength = 8196;
     // may have a system that holds extra references to the adapter. Let's tell the adapter
     // that we no longer need it.
     [self handleDidInvalidateAd];
+
+    // End the impression if needed.
+    [self endImpression];
 }
 
 - (instancetype)init {
@@ -221,13 +224,18 @@ static const NSUInteger kExcessiveCustomDataLength = 8196;
             }
             [self.adapterDelegate adAdapter:self handleFullscreenAdEvent:event];
             break;
+        case MPFullscreenAdEventDidDismiss:
+            [self endImpression];
+            [self.adapterDelegate adAdapter:self handleFullscreenAdEvent:event];
+            break;
         // intentionally fall through for default delegate callback
+        case MPFullscreenAdEventWillPresent:
+        case MPFullscreenAdEventDidPresent:
         case MPFullscreenAdEventWillAppear:
         case MPFullscreenAdEventWillDisappear:
         case MPFullscreenAdEventDidDisappear:
         case MPFullscreenAdEventWillLeaveApplication:
         case MPFullscreenAdEventWillDismiss:
-        case MPFullscreenAdEventDidDismiss:
             [self.adapterDelegate adAdapter:self handleFullscreenAdEvent:event];
             break;
     }
@@ -256,6 +264,16 @@ static const NSUInteger kExcessiveCustomDataLength = 8196;
 
     // Notify listeners
     [self.adapterDelegate adDidReceiveImpressionEventForAdapter:self];
+}
+
+- (void)endImpression {
+    // Only end the impression once
+    if (self.hasEndedImpression) {
+        return;
+    }
+    self.hasEndedImpression = YES;
+
+    [self.analyticsTracker trackEndImpressionForConfiguration:self.configuration];
 }
 
 #pragma mark - Viewability
@@ -330,7 +348,8 @@ static const NSUInteger kExcessiveCustomDataLength = 8196;
 }
 
 - (BOOL)isRewardExpected {
-    return (self.configuration.rewardedDuration > 0);
+    // The ad configuration keeps a value determining if this ad is rewarded. Return that value here.
+    return self.configuration.isRewarded;
 }
 
 - (void)requestAdWithAdapterInfo:(NSDictionary *)info adMarkup:(NSString *)adMarkup {

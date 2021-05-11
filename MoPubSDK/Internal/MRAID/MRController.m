@@ -27,7 +27,6 @@
 #import "MPHTTPNetworkSession.h"
 #import "MPLogging.h"
 #import "MRProperty.h"
-#import "MPSKAdNetworkClickthroughData.h"
 #import "MPURLRequest.h"
 #import "NSHTTPURLResponse+MPAdditions.h"
 #import "NSURL+MPAdditions.h"
@@ -95,7 +94,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
 @property (nonatomic, assign) BOOL allowCustomClose;
 
 // Hold onto SKAdNetwork clickthrough data
-@property (nonatomic, strong) MPSKAdNetworkClickthroughData *skAdNetworkClickthroughData;
+@property (nonatomic, strong) MPSKAdNetworkData *skAdNetworkData;
 
 @end
 
@@ -171,7 +170,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
     self.adRequiresPrecaching = configuration.precacheRequired;
     self.isAdVastVideoPlayer = configuration.isVastVideoPlayer;
 
-    self.skAdNetworkClickthroughData = configuration.skAdNetworkClickthroughData;
+    self.skAdNetworkData = configuration.skAdNetworkData;
 
     // Rewarded ads always allowed to use custom close since it utilizes JS
     // and MRAID to render the locked countdown experience and then show the close button.
@@ -805,7 +804,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
 - (void)bridge:(MRBridge *)bridge handleDisplayForDestinationURL:(NSURL *)URL
 {
     if ([self hasUserInteractedWithWebViewForBridge:bridge]) {
-        [self.destinationDisplayAgent displayDestinationForURL:URL skAdNetworkClickthroughData:self.skAdNetworkClickthroughData];
+        [self.destinationDisplayAgent displayDestinationForURL:URL skAdNetworkData:self.skAdNetworkData];
 
         if ([self.delegate respondsToSelector:@selector(mraidAdDidReceiveClickthrough:)]) {
             [self.delegate mraidAdDidReceiveClickthrough:URL];
@@ -1276,7 +1275,7 @@ static NSString *const kMRAIDCommandResize = @"resize";
 
 - (void)checkViewability
 {
-    BOOL viewable = MPViewIsVisible([self activeView]) &&
+    BOOL viewable = [self activeView].isVisible &&
         ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive);
     [self updateViewabilityWithBool:viewable];
 }

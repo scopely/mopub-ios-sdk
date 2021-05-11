@@ -26,11 +26,11 @@
     // no op
 }
 
-- (void)rewardedAdWillAppearForAdManager:(MPRewardedAdManager *)manager {
+- (void)rewardedAdWillPresentForAdManager:(MPRewardedAdManager *)manager {
     // no op
 }
 
-- (void)rewardedAdDidAppearForAdManager:(MPRewardedAdManager *)manager {
+- (void)rewardedAdDidPresentForAdManager:(MPRewardedAdManager *)manager {
     // no op
 }
 

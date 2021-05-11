@@ -9,12 +9,12 @@
 #import "MPBannerAdManager.h"
 #import "MPAdServerURLBuilder.h"
 #import "MPAdTargeting.h"
-#import "MPCoreInstanceProvider.h"
 #import "MPBannerAdManagerDelegate.h"
-#import "MPError.h"
 #import "MPConstants.h"
+#import "MPCoreInstanceProvider.h"
+#import "MPError.h"
+#import "MPInlineAdAdapter+Internal.h"
 #import "MPLogging.h"
-#import "MPStopwatch.h"
 #import "MPViewabilityManager.h"
 #import "NSMutableArray+MPAdditions.h"
 #import "NSDate+MPAdditions.h"
@@ -346,6 +346,9 @@
 - (void)presentRequestingAdapter
 {
     if (!self.adActionInProgress && self.requestingAdapterIsReadyToBePresented) {
+        // End the impression for the onscreen adapter early so SKAdImpression sessions do not overlap
+        [self.onscreenAdapter endImpression];
+
         // End the Viewability session and schedule the onscreen adapter for
         // deallocation if it exists since it is going offscreen.
         if (self.onscreenAdapter != nil) {

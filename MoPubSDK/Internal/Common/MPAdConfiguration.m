@@ -226,7 +226,7 @@ NSString * const kVASTClickabilityExperimentKey = @"vast-click-enabled";
 
     self.impressionData = [self impressionDataFromMetadata:metadata];
 
-    self.skAdNetworkClickthroughData = [self skAdNetworkClickthroughDataFromMetadata:metadata];
+    self.skAdNetworkData = [self skAdNetworkDataFromMetadata:metadata];
 
     self.enableEarlyClickthroughForNonRewardedVideo = [metadata mp_boolForKey:kVASTClickabilityExperimentKey defaultValue:NO];
 
@@ -389,11 +389,6 @@ NSString * const kVASTClickabilityExperimentKey = @"vast-click-enabled";
     else {
         return MPAdContentTypeUndefined;
     }
-}
-
-- (BOOL)hasValidRewardFromMoPubSDK
-{
-    return self.availableRewards.firstObject.isCurrencyTypeSpecified;
 }
 
 - (NSString *)adResponseHTMLString
@@ -735,15 +730,15 @@ NSString * const kVASTClickabilityExperimentKey = @"vast-click-enabled";
     return impressionData;
 }
 
-- (MPSKAdNetworkClickthroughData *)skAdNetworkClickthroughDataFromMetadata:(NSDictionary *)metadata {
-    NSDictionary *adNetworkClickthroughDictionary = metadata[kSKAdNetworkClickMetadataKey];
-    if (adNetworkClickthroughDictionary.count == 0) {
+- (MPSKAdNetworkData *)skAdNetworkDataFromMetadata:(NSDictionary *)metadata {
+    NSDictionary *skAdNetworkResponseDictionary = metadata[kSKAdNetworkClickMetadataKey];
+    if (skAdNetworkResponseDictionary.count == 0) {
         return nil;
     }
 
-    MPSKAdNetworkClickthroughData *adNetworkClickthroughData = [[MPSKAdNetworkClickthroughData alloc] initWithDictionary:adNetworkClickthroughDictionary];
+    MPSKAdNetworkData *skAdNetworkData = [[MPSKAdNetworkData alloc] initWithServerResponse:skAdNetworkResponseDictionary];
 
-    return adNetworkClickthroughData;
+    return skAdNetworkData;
 }
 
 @end

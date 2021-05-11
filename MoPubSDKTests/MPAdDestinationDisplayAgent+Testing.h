@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL isLoadingDestination;
 @property (nonatomic, strong) SKStoreProductViewController *storeKitController;
 @property (nonatomic, strong) SFSafariViewController *safariController;
+@property (nonatomic, strong) id<MPAnalyticsTracker> analyticsTracker;
+@property (nonatomic, assign) MOPUBDisplayAgentType displayAgentType;
 
 @property (nonatomic, copy, class, nullable) void (^presentStoreKitControllerWithProductParametersBlock)(NSDictionary *);
 @property (nonatomic, copy, class, nullable) void (^showAdBrowserControllerBlock)(void);

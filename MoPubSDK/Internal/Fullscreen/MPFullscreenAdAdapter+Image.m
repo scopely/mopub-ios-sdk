@@ -113,7 +113,7 @@
 
     // Navigate to clickthrough destination
     [self.adDestinationDisplayAgent displayDestinationForURL:creativeData.clickthroughURL
-                                 skAdNetworkClickthroughData:configuration.skAdNetworkClickthroughData];
+                                             skAdNetworkData:configuration.skAdNetworkData];
 }
 
 @end

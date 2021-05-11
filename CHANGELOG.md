@@ -1,3 +1,17 @@
+## Version 5.17.0 (May 11, 2021)
+- **Features**
+  - Added support for SKAdNetwork 2.2 including view through attribution.
+  - Added support for iOS Simulators on Apple Silicon Macs.
+  - Bumped minimum Xcode version to Xcode 12.5.
+  - Renamed the fullscreen `willAppear` and `didAppear` callbacks to `willPresent` and `didPresent`.
+  - Updated OMSDK to 1.3.16.
+
+- **Bug Fixes**
+  - Fixed an issue that prevented `SKStoreProductViewController` from being used for App Store and iTunes URLs in some cases.
+  - Fixed an issue that could prevent consent synchronization callbacks from being invoked.
+  - Fixed an issue that caused an end card image to center rather than fit when too big.
+  - Fixed an issue that could cause an ad with an invalid reward to not be treated as a rewarded ad.
+
 ## Version 5.16.2 (March 18, 2021)
 - **Bug Fixes**
   - Address issue with `radioAccessTechnologyString` on XCode > 12.1

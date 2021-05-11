@@ -22,13 +22,13 @@
 + (id<MPAdDestinationDisplayAgent>)agentWithDelegate:(id<MPAdDestinationDisplayAgentDelegate>)delegate;
 + (BOOL)shouldDisplayContentInApp;
 /**
- Displays destination URL or clickthrough data in-app. When @c clickthroughData is present, the URL is
- fired and forgotten as a tracker. When @c clickthroughData is @c nil, the URL is the destination URL.
+ Displays destination URL or clickthrough data in-app. When @c skAdNetworkData is present, the URL is
+ fired and forgotten as a tracker. When @c skAdNetworkData is @c nil, the URL is the destination URL.
 
- @param URL destination clickthrough URL, or click tracker if @c clickthroughData is non-nil
- @param clickthroughData (nullable) the App Store destination metadata for an SKAdNetwork-enabled ad
+ @param URL destination clickthrough URL, or click tracker if @c skAdNetworkData is non-nil
+ @param skAdNetworkData (nullable) the App Store destination metadata for an SKAdNetwork-enabled ad
  */
-- (void)displayDestinationForURL:(NSURL *)URL skAdNetworkClickthroughData:(MPSKAdNetworkClickthroughData *)clickthroughData;
+- (void)displayDestinationForURL:(NSURL *)URL skAdNetworkData:(MPSKAdNetworkData *)skAdNetworkData;
 - (void)cancel;
 
 @end

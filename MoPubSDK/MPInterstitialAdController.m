@@ -139,15 +139,31 @@
 
 - (void)managerWillPresentInterstitial:(MPInterstitialAdManager *)manager
 {
+    if ([self.delegate respondsToSelector:@selector(interstitialWillPresent:)]) {
+        [self.delegate interstitialWillPresent:self];
+    }
+
+    // Deprecated API slated for removal.
     if ([self.delegate respondsToSelector:@selector(interstitialWillAppear:)]) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         [self.delegate interstitialWillAppear:self];
     }
+#pragma GCC diagnostic pop
 }
 
 - (void)managerDidPresentInterstitial:(MPInterstitialAdManager *)manager
 {
+    if ([self.delegate respondsToSelector:@selector(interstitialDidPresent:)]) {
+        [self.delegate interstitialDidPresent:self];
+    }
+
+    // Deprecated API slated for removal.
     if ([self.delegate respondsToSelector:@selector(interstitialDidAppear:)]) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         [self.delegate interstitialDidAppear:self];
+#pragma GCC diagnostic pop
     }
 }
 

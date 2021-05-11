@@ -9,6 +9,7 @@
 #import "MPNativeAd+Internal.h"
 #import "MoPub+Utility.h"
 #import "MPAdConfiguration.h"
+#import "MPAnalyticsTracker.h"
 #import "MPCoreInstanceProvider.h"
 #import "MPNativeAdError.h"
 #import "MPLogging.h"
@@ -97,6 +98,8 @@
     if (self.tracker != nil) {
         [self.tracker stopTracking];
     }
+
+    [MPAnalyticsTracker.sharedTracker trackEndImpressionForConfiguration:self.configuration];
 }
 
 #pragma mark - Public
@@ -118,7 +121,13 @@
 
     if (adView) {
         if (!self.hasAttachedToView) {
-            [self willAttachToView:self.associatedView withAdContentViews:adView.subviews];
+            // If the view provides specific clickableViews, use those instead of all subviews.
+            NSArray <UIView *> *adContentViews = adView.subviews;
+            if ([adView respondsToSelector:@selector(clickableViews)]) {
+                adContentViews = [(UIView <MPNativeAdRendering> *)adView clickableViews];
+            }
+
+            [self willAttachToView:self.associatedView withAdContentViews:adContentViews];
             self.hasAttachedToView = YES;
         }
 
@@ -146,6 +155,9 @@
     MPLogDebug(@"Tracking an impression for %@.", self.adIdentifier);
     self.hasTrackedImpression = YES;
     [self trackMetricsForURLs:self.impressionTrackerURLs];
+
+    // Begin SKAdImpression session, if needed
+    [MPAnalyticsTracker.sharedTracker trackSKAdNetworkStartImpressionForConfiguration:self.configuration];
 
     [MoPub sendImpressionDelegateAndNotificationFromAd:self
                                               adUnitID:self.adUnitID

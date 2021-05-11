@@ -39,14 +39,36 @@
     } else {
         self.lastTrackedUrls = [self.lastTrackedUrls arrayByAddingObjectsFromArray:URLs];
     }
+
+    // Do not call super on @c sendTrackingRequestForURLs: to prevent sending any HTTP requests
 }
 
 - (void)trackClickForConfiguration:(MPAdConfiguration *)configuration {
     [self.selectorCounter incrementCountForSelector:@selector(trackClickForConfiguration:)];
+
+    // Call super to make sure related methods are called
+    [super trackClickForConfiguration:configuration];
 }
 
 - (void)trackImpressionForConfiguration:(MPAdConfiguration *)configuration {
     [self.selectorCounter incrementCountForSelector:@selector(trackImpressionForConfiguration:)];
+
+    // Call super to make sure related methods are called
+    [super trackImpressionForConfiguration:configuration];
+}
+
+- (void)trackEndImpressionForConfiguration:(MPAdConfiguration *)configuration {
+    [self.selectorCounter incrementCountForSelector:@selector(trackEndImpressionForConfiguration:)];
+
+    // Call super to make sure related methods are called
+    [super trackEndImpressionForConfiguration:configuration];
+}
+
+- (void)trackSKAdNetworkStartImpressionForConfiguration:(MPAdConfiguration *)configuration {
+    [self.selectorCounter incrementCountForSelector:@selector(trackSKAdNetworkStartImpressionForConfiguration:)];
+
+    // Call super to make sure related methods are called
+    [super trackSKAdNetworkStartImpressionForConfiguration:configuration];
 }
 
 #pragma mark - MPSelectorCountable

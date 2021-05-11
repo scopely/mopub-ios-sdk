@@ -55,7 +55,7 @@ typealias AdActionHandler = ((Any) -> Swift.Void)
 /**
  Delegate for presenting the data source's ad.
  */
-protocol AdDataSourcePresentationDelegate: class {
+protocol AdDataSourcePresentationDelegate: AnyObject {
     /**
      View controller used to present models (either the ad itself or any click through destination).
      */
@@ -70,7 +70,7 @@ protocol AdDataSourcePresentationDelegate: class {
 /**
  Protocol to specifying an ad's rendering on screen.
  */
-protocol AdDataSource: class {
+protocol AdDataSource: AnyObject {
     /**
      Delegate used for presenting the data source's ad. This must be specified as `weak`.
      */

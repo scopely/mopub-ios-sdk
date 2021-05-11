@@ -117,4 +117,15 @@
  */
 + (UINib *)nibForAd;
 
+/**
+ Return the array of @c UIView instances that may be clickable. If not implemented, the view's
+ subviews will be used by default.
+
+ In some cases, especially in view subclasses that have a complex view hierarchy, it may be
+ desirable to specify a subset of views that are considered clickable. Supply these views here.
+
+ @return an array of @c UIView instances.
+ */
+- (NSArray <UIView *> *)clickableViews;
+
 @end

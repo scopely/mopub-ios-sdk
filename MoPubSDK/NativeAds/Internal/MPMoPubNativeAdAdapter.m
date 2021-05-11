@@ -7,7 +7,17 @@
 //
 
 #import "MPAdDestinationDisplayAgent.h"
-#import "MPAdImpressionTimer.h"
+
+// For non-module targets, UIKit must be explicitly imported
+// since MoPubSDK-Swift.h will not import it.
+#if __has_include(<MoPubSDK/MoPubSDK-Swift.h>)
+    #import <UIKit/UIKit.h>
+    #import <MoPubSDK/MoPubSDK-Swift.h>
+#else
+    #import <UIKit/UIKit.h>
+    #import "MoPubSDK-Swift.h"
+#endif
+
 #import "MPCoreInstanceProvider.h"
 #import "MPGlobal.h"
 #import "MPMemoryCache.h"
@@ -19,7 +29,7 @@
 static const NSTimeInterval kMoPubRequiredSecondsForImpression = 1.0;
 static const CGFloat kMoPubRequiredViewVisibilityPercentage = 0.5;
 
-@interface MPMoPubNativeAdAdapter () <MPAdDestinationDisplayAgentDelegate, MPAdImpressionTimerDelegate>
+@interface MPMoPubNativeAdAdapter () <MPAdDestinationDisplayAgentDelegate>
 
 @property (nonatomic, strong) MPAdImpressionTimer *impressionTimer;
 @property (nonatomic, strong) id<MPAdDestinationDisplayAgent> destinationDisplayAgent;
@@ -84,15 +94,24 @@ static const CGFloat kMoPubRequiredViewVisibilityPercentage = 0.5;
         // and set up the timer.
         MPNativeAdConfigValues *config = properties[kNativeAdConfigKey];
         NSTimeInterval requiredSecondsForImpression = config.isImpressionMinVisibleSecondsValid ? config.impressionMinVisibleSeconds : kMoPubRequiredSecondsForImpression;
+
+        __weak __typeof__(self) weakSelf = self;
+
+        void (^completion)(UIView *) = ^(UIView * _Nonnull view) {
+            __typeof__(self) strongSelf = weakSelf;
+            [strongSelf.delegate nativeAdWillLogImpression:weakSelf];
+        };
+
         if (config.isImpressionMinVisiblePixelsValid) {
-            _impressionTimer = [[MPAdImpressionTimer alloc] initWithRequiredSecondsForImpression:requiredSecondsForImpression
-                                                                          requiredViewVisibilityPixels:config.impressionMinVisiblePixels];
+            _impressionTimer = [[MPAdImpressionTimer alloc] initWithImpressionTime:requiredSecondsForImpression
+                                                      requiredViewVisibilityPixels:config.impressionMinVisiblePixels
+                                                                        completion:completion];
         } else {
             CGFloat requiredViewVisibilityPercentage = config.isImpressionMinVisiblePercentValid ? config.impressionMinVisiblePercent : kMoPubRequiredViewVisibilityPercentage;
-            _impressionTimer = [[MPAdImpressionTimer alloc] initWithRequiredSecondsForImpression:requiredSecondsForImpression
-                                                                      requiredViewVisibilityPercentage:requiredViewVisibilityPercentage];
+            _impressionTimer = [[MPAdImpressionTimer alloc] initWithImpressionTime:requiredSecondsForImpression
+                                                  requiredViewVisibilityPercentage:requiredViewVisibilityPercentage
+                                                                        completion:completion];
         }
-        _impressionTimer.delegate = self;
 
         [properties removeObjectsForKeys:@[kClickTrackerURLKey, kDefaultActionURLKey, kNativeAdConfigKey]];
         _properties = properties;
@@ -144,7 +163,7 @@ static const CGFloat kMoPubRequiredViewVisibilityPercentage = 0.5;
 
 - (void)willAttachToView:(UIView *)view
 {
-    [self.impressionTimer startTrackingView:view];
+    [self.impressionTimer startTrackingWithView:view];
 }
 
 - (void)displayContentForURL:(NSURL *)URL rootViewController:(UIViewController *)controller
@@ -157,7 +176,7 @@ static const CGFloat kMoPubRequiredViewVisibilityPercentage = 0.5;
         return;
     }
 
-    [self.destinationDisplayAgent displayDestinationForURL:URL skAdNetworkClickthroughData:self.adConfiguration.skAdNetworkClickthroughData];
+    [self.destinationDisplayAgent displayDestinationForURL:URL skAdNetworkData:self.adConfiguration.skAdNetworkData];
 }
 
 #pragma mark - Privacy Icon
@@ -176,15 +195,8 @@ static const CGFloat kMoPubRequiredViewVisibilityPercentage = 0.5;
         (url != nil ? [NSURL URLWithString:url] : nil);
     });
 
-    // Since this is the privacy icon, send @c nil for skAdNetworkClickthroughData
-    [self.destinationDisplayAgent displayDestinationForURL:(overridePrivacyClickUrl != nil ? overridePrivacyClickUrl : defaultPrivacyClickUrl) skAdNetworkClickthroughData:nil];
-}
-
-#pragma mark - <MPAdImpressionTimerDelegate>
-
-- (void)adViewWillLogImpression:(UIView *)adView
-{
-    [self.delegate nativeAdWillLogImpression:self];
+    // Since this is the privacy icon, send @c nil for skAdNetworkData
+    [self.destinationDisplayAgent displayDestinationForURL:(overridePrivacyClickUrl != nil ? overridePrivacyClickUrl : defaultPrivacyClickUrl) skAdNetworkData:nil];
 }
 
 #pragma mark - <MPAdDestinationDisplayAgentDelegate>

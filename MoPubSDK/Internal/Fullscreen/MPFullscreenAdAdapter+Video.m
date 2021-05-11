@@ -191,7 +191,7 @@ videoDidReachProgressTime:(NSTimeInterval)videoProgress
     didTriggerEvent:(MPVideoEvent)event
       videoProgress:(NSTimeInterval)videoProgress {
     if ([event isEqualToString:MPVideoEventClick]) {
-        [self.adDestinationDisplayAgent displayDestinationForURL:self.videoConfig.clickThroughURL skAdNetworkClickthroughData:self.configuration.skAdNetworkClickthroughData];
+        [self.adDestinationDisplayAgent displayDestinationForURL:self.videoConfig.clickThroughURL skAdNetworkData:self.configuration.skAdNetworkData];
 
         // need to take care of both VAST level and ad level click tracking
         [self.vastTracking handleVideoEvent:MPVideoEventClick videoTimeOffset:videoProgress];
@@ -242,11 +242,11 @@ didShowIndustryIconView:(MPVASTIndustryIconView *)iconView {
 - (void)videoPlayer:(id<MPVideoPlayer>)videoPlayerView
 didClickIndustryIconView:(MPVASTIndustryIconView *)iconView
 overridingClickThroughURL:(NSURL * _Nullable)url {
-    // Since this is the privacy icon, send @c nil for skAdNetworkClickthroughData
+    // Since this is the privacy icon, send @c nil for skAdNetworkData
     if (url.absoluteString.length > 0) {
-        [self.adDestinationDisplayAgent displayDestinationForURL:url skAdNetworkClickthroughData:nil];
+        [self.adDestinationDisplayAgent displayDestinationForURL:url skAdNetworkData:nil];
     } else {
-        [self.adDestinationDisplayAgent displayDestinationForURL:iconView.icon.clickThroughURL skAdNetworkClickthroughData:nil];
+        [self.adDestinationDisplayAgent displayDestinationForURL:iconView.icon.clickThroughURL skAdNetworkData:nil];
     }
 
     [self.viewController disableAppLifeCycleEventObservationForAutoPlayPause];
@@ -290,7 +290,7 @@ overridingClickThroughURL:(NSURL * _Nullable)url {
     }
 
     // Begin navigating to the clickthrough destination.
-    [self.adDestinationDisplayAgent displayDestinationForURL:clickthroughDestinationUrl skAdNetworkClickthroughData:self.configuration.skAdNetworkClickthroughData];
+    [self.adDestinationDisplayAgent displayDestinationForURL:clickthroughDestinationUrl skAdNetworkData:self.configuration.skAdNetworkData];
 
     [self.viewController disableAppLifeCycleEventObservationForAutoPlayPause];
 

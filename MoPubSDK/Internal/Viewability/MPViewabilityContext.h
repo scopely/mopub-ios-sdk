@@ -9,7 +9,10 @@
 #import <Foundation/Foundation.h>
 #import <WebKit/WebKit.h>
 #import "MPVASTAdVerifications.h"
-#import "OMIDVerificationScriptResource.h"
+
+// Forward declaration of OM SDK types for allow Swift compiler
+// since OM SDK is non-modular.
+@class OMIDMopubVerificationScriptResource;
 
 NS_ASSUME_NONNULL_BEGIN
 

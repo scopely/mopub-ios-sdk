@@ -7,24 +7,23 @@
 //
 
 #import <Foundation/Foundation.h>
-
 #import "MPInlineAdAdapter.h"
 #import "MPInlineAdAdapter+MPInlineAdAdapterDelegate.h"
 
 #import "MPAdAdapterDelegate.h"
 #import "MPAdConfiguration.h"
 #import "MPAdContainerView.h"
-#import "MPAdImpressionTimer.h"
 #import "MPAnalyticsTracker.h"
 #import "MPViewabilityTracker.h"
 
 // Forward declarations of Swift objects required since it is not
 // possible to import MoPub-Swift.h from header files.
 @class MPResumableTimer;
+@class MPAdImpressionTimer;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MPInlineAdAdapter () <MPAdImpressionTimerDelegate>
+@interface MPInlineAdAdapter ()
 
 @property (nonatomic, weak, readwrite) id<MPInlineAdAdapterDelegate> delegate; // default is `self`
 
@@ -34,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) BOOL hasTrackedImpression;
 @property (nonatomic, assign) BOOL hasTrackedClick;
+@property (nonatomic, assign) BOOL hasEndedImpression;
 
 @property (nonatomic, copy) NSString *adUnitId;
 @property (nonatomic, weak) id<MPAdAdapterBaseDelegate> adapterDelegate;

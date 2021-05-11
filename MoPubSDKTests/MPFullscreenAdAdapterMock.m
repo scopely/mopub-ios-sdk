@@ -18,8 +18,10 @@
 }
 
 - (void)presentAdFromViewController:(UIViewController *)viewController {
+    [self.adapterDelegate adAdapter:self handleFullscreenAdEvent:MPFullscreenAdEventWillPresent];
     [self.adapterDelegate adAdapter:self handleFullscreenAdEvent:MPFullscreenAdEventWillAppear];
     [self.adapterDelegate adAdapter:self handleFullscreenAdEvent:MPFullscreenAdEventDidAppear];
+    [self.adapterDelegate adAdapter:self handleFullscreenAdEvent:MPFullscreenAdEventDidPresent];
 
     if (self.configuration.rewardedVideoCompletionUrls == nil) {
         [self.adapterDelegate adShouldRewardUserForAdapter:self reward:self.configuration.selectedReward];

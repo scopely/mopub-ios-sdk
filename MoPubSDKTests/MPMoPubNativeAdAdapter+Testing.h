@@ -8,7 +8,8 @@
 
 #import "MPMoPubNativeAdAdapter.h"
 #import "MPAdDestinationDisplayAgent.h"
-#import "MPAdImpressionTimer.h"
+
+@class MPAdImpressionTimer;
 
 @interface MPMoPubNativeAdAdapter (Testing)
 

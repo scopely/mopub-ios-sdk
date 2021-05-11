@@ -74,6 +74,16 @@ typedef NS_ENUM(NSUInteger, MPFullscreenAdEvent) {
     MPFullscreenAdEventWillLeaveApplication,
 
     /**
+     The fullscreen ad will be presented to the user.
+     */
+    MPFullscreenAdEventWillPresent,
+
+    /**
+     The fullscreen ad has finished presenting to the user.
+     */
+    MPFullscreenAdEventDidPresent,
+
+    /**
      An ad is about to appear.
      */
     MPFullscreenAdEventWillAppear,

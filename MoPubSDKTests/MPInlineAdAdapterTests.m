@@ -11,6 +11,7 @@
 #import "MPAdConfiguration.h"
 #import "MPAdConfigurationFactory.h"
 #import "MPInlineAdAdapter+MPAdAdapter.h"
+#import "MPInlineAdAdapter+Internal.h"
 #import "MPInlineAdAdapter+Private.h"
 #import "MPInlineAdAdapter+Testing.h"
 #import "MPInlineAdAdapterMock.h"
@@ -70,7 +71,7 @@ static const NSTimeInterval kTestTimeout   = 2; // seconds
 
 // When an AD is not in the imp tracking experiment, banner impressions are fired from JS directly. SDK doesn't fire impression.
 - (void)testImpFiredWhenAutoTrackingEnabledForHtmlAndExperimentDisabled {
-    MPAdConfiguration *config = [MPAdConfiguration new];
+    MPAdConfiguration *config = [[MPAdConfiguration alloc] initWithMetadata:@{} data:nil isFullscreenAd:NO];
     self.adapter.configuration = config;
     self.adapter.hasTrackedImpression = NO;
 
@@ -82,7 +83,7 @@ static const NSTimeInterval kTestTimeout   = 2; // seconds
 - (void)testClickTracking {
     MPMockAnalyticsTracker *trackerMock = [MPMockAnalyticsTracker new];
     MPInlineAdAdapterMock *adapter = [MPInlineAdAdapterMock new];
-    adapter.configuration = [MPAdConfiguration new];
+    adapter.configuration = [[MPAdConfiguration alloc] initWithMetadata:@{} data:nil isFullscreenAd:NO];
     adapter.analyticsTracker = trackerMock;
 
     // Test with `enableAutomaticImpressionAndClickTracking = YES`
@@ -404,6 +405,47 @@ static const NSTimeInterval kTestTimeout   = 2; // seconds
     id<MPViewabilityTracker> tracker = [adapter viewabilityTrackerForWebContentInView:view];
 
     XCTAssertNil(tracker);
+}
+
+#pragma mark Viewthrough Attribution
+
+- (void)testSKAdImpressionCallbacksTracked {
+    MPMockAnalyticsTracker *trackerMock = [MPMockAnalyticsTracker new];
+    MPInlineAdAdapterMock *adapter = [MPInlineAdAdapterMock new];
+    adapter.configuration = [[MPAdConfiguration alloc] initWithMetadata:@{} data:nil isFullscreenAd:NO];
+    adapter.analyticsTracker = trackerMock;
+
+    // Disable automatic click and impression tracking
+    adapter.enableAutomaticImpressionAndClickTracking = NO;
+
+    // Check no impression has been tracked
+    XCTAssertEqual(0, [trackerMock countOfSelectorCalls:@selector(trackImpressionForConfiguration:)]);
+    XCTAssertEqual(0, [trackerMock countOfSelectorCalls:@selector(trackSKAdNetworkStartImpressionForConfiguration:)]);
+
+    // Manually track the impression
+    [adapter inlineAdAdapterDidTrackImpression:adapter];
+
+    // Check it got tracked and SKAdImpression VTA was started
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackImpressionForConfiguration:)]);
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackSKAdNetworkStartImpressionForConfiguration:)]);
+
+    // Check the impression hasn't ended yet
+    XCTAssertEqual(0, [trackerMock countOfSelectorCalls:@selector(trackEndImpressionForConfiguration:)]);
+
+    // Check that VTA ends when @c endImpression is called
+    [adapter endImpression];
+
+    // Check the impression ended
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackEndImpressionForConfiguration:)]);
+
+    // Reset end impression state
+    adapter.hasEndedImpression = NO;
+
+    // Deallocate adapter
+    adapter = nil;
+
+    // Check the impression ended on dealloc
+    XCTAssertEqual(2, [trackerMock countOfSelectorCalls:@selector(trackEndImpressionForConfiguration:)]);
 }
 
 @end

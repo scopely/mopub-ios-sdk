@@ -12,6 +12,16 @@
 #import "MPAdDestinationDisplayAgentDelegateHandler.h"
 #import "MPMockAnalyticsTracker.h"
 
+// For non-module targets, UIKit must be explicitly imported
+// since MoPubSDK-Swift.h will not import it.
+#if __has_include(<MoPubSDK/MoPubSDK-Swift.h>)
+    #import <UIKit/UIKit.h>
+    #import <MoPubSDK/MoPubSDK-Swift.h>
+#else
+    #import <UIKit/UIKit.h>
+    #import "MoPubSDK-Swift.h"
+#endif
+
 static NSTimeInterval const kTestTimeout = 10.0;
 
 @interface MPAdDestinationDisplayAgentTests : XCTestCase
@@ -47,7 +57,7 @@ static NSTimeInterval const kTestTimeout = 10.0;
 
     NSURL *clickthroughURL = [NSURL URLWithString:@"https://mopub.com"];
 
-    [self.displayAgent displayDestinationForURL:clickthroughURL skAdNetworkClickthroughData:nil];
+    [self.displayAgent displayDestinationForURL:clickthroughURL skAdNetworkData:nil];
 
     // Since the URL is resolving, nothing will be ready at this point
     XCTAssertTrue(self.displayAgent.isLoadingDestination);
@@ -76,7 +86,7 @@ static NSTimeInterval const kTestTimeout = 10.0;
 
     NSURL *clickthroughURL = [NSURL URLWithString:@"https://apps.apple.com/us/app/mopub-canary/id1446093432"];
 
-    [self.displayAgent displayDestinationForURL:clickthroughURL skAdNetworkClickthroughData:nil];
+    [self.displayAgent displayDestinationForURL:clickthroughURL skAdNetworkData:nil];
 
     // Since the URL is resolving, nothing will be ready at this point
     XCTAssertTrue(self.displayAgent.isLoadingDestination);
@@ -98,7 +108,7 @@ static NSTimeInterval const kTestTimeout = 10.0;
 
 #pragma mark - SKAdNetwork
 
-- (void)testDisplayAgentShowsStoreProductViewControllerWithClickthroughDataAndAppStoreURL {
+- (void)testDisplayAgentShowsStoreProductViewControllerWithSkAdNetworkDataAndAppStoreURL {
     __block NSDictionary *storeKitDictionary = nil;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"Wait for presentation attempt"];
@@ -117,20 +127,23 @@ static NSTimeInterval const kTestTimeout = 10.0;
     NSString *timestamp = @"1594406341";
     NSString *signature = @"hi i'm a signature";
 
-    MPSKAdNetworkClickthroughData * clickthroughData = [[MPSKAdNetworkClickthroughData alloc] initWithDictionary:@{
-        @"version": version,
-        @"network": network,
-        @"campaign": campaign,
-        @"itunesitem": itunesitem,
-        @"nonce": nonce,
-        @"sourceapp": sourceapp,
-        @"timestamp": timestamp,
-        @"signature": signature,
+    MPSKAdNetworkData * skAdNetworkData = [[MPSKAdNetworkData alloc] initWithServerResponse:@{
+        @"click": @{
+                @"version": version,
+                @"network": network,
+                @"campaign": campaign,
+                @"itunesitem": itunesitem,
+                @"nonce": nonce,
+                @"sourceapp": sourceapp,
+                @"timestamp": timestamp,
+                @"signature": signature,
+        },
+        @"clickmethod": @"0"
     }];
 
     NSURL *clickthroughURL = [NSURL URLWithString:@"https://apps.apple.com/us/app/mopub-canary/id1446093432"];
 
-    [self.displayAgent displayDestinationForURL:clickthroughURL skAdNetworkClickthroughData:clickthroughData];
+    [self.displayAgent displayDestinationForURL:clickthroughURL skAdNetworkData:skAdNetworkData];
 
     // Since the URL is resolving, nothing will be ready at this point
     XCTAssertTrue(self.displayAgent.isLoadingDestination);
@@ -146,10 +159,70 @@ static NSTimeInterval const kTestTimeout = 10.0;
 
     // Store kit controller will be nil because the method that creates it was swizzled; instead check the dictionary
     XCTAssertNotNil(storeKitDictionary);
-    XCTAssertTrue([clickthroughData.dictionaryForStoreProductViewController isEqual:storeKitDictionary]);
+    XCTAssertTrue([skAdNetworkData.clickDataDictionary isEqual:storeKitDictionary]);
 }
 
-- (void)testDisplayAgentSafariViewControllerWithClickthroughDataAndNoAppStoreURL {
+- (void)testDisplayAgentShowsStoreProductViewControllerWithSkAdNetworkDataAndAppStoreURLWhenNativeSafariIsEnabled {
+    // Enable NativeSafari
+    self.displayAgent.displayAgentType = MOPUBDisplayAgentTypeNativeSafari;
+
+    __block NSDictionary *storeKitDictionary = nil;
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Wait for presentation attempt"];
+    MPAdDestinationDisplayAgent.presentStoreKitControllerWithProductParametersBlock = ^(NSDictionary *dictionary){
+        [expectation fulfill];
+
+        storeKitDictionary = dictionary;
+    };
+
+    NSString *version = @"2.0";
+    NSString *network = @"cDkw7geQsH.skadnetwork";
+    NSString *campaign = @"45";
+    NSString *itunesitem = @"880047117";
+    NSString *nonce = @"473b1a16-b4ef-43ad-9591-fcf3aefa82a7";
+    NSString *sourceapp = @"123456789";
+    NSString *timestamp = @"1594406341";
+    NSString *signature = @"hi i'm a signature";
+
+    MPSKAdNetworkData * skAdNetworkData = [[MPSKAdNetworkData alloc] initWithServerResponse:@{
+        @"click": @{
+                @"version": version,
+                @"network": network,
+                @"campaign": campaign,
+                @"itunesitem": itunesitem,
+                @"nonce": nonce,
+                @"sourceapp": sourceapp,
+                @"timestamp": timestamp,
+                @"signature": signature,
+        },
+        @"clickmethod": @"0"
+    }];
+
+    NSURL *clickthroughURL = [NSURL URLWithString:@"https://apps.apple.com/us/app/mopub-canary/id1446093432"];
+
+    [self.displayAgent displayDestinationForURL:clickthroughURL skAdNetworkData:skAdNetworkData];
+
+    // Since the URL is resolving, nothing will be ready at this point
+    XCTAssertTrue(self.displayAgent.isLoadingDestination);
+    XCTAssertNil(self.displayAgent.storeKitController);
+    XCTAssertNil(self.displayAgent.safariController);
+    XCTAssertNil(storeKitDictionary);
+
+    [self waitForExpectations:@[expectation] timeout:kTestTimeout];
+
+    // When the expectation fulfills, safari should be nil
+    XCTAssertTrue(self.displayAgent.isLoadingDestination);
+    XCTAssertNil(self.displayAgent.safariController);
+
+    // Store kit controller will be nil because the method that creates it was swizzled; instead check the dictionary
+    XCTAssertNotNil(storeKitDictionary);
+    XCTAssertTrue([skAdNetworkData.clickDataDictionary isEqual:storeKitDictionary]);
+
+    // Disable NativeSafari
+    self.displayAgent.displayAgentType = MOPUBDisplayAgentTypeInApp;
+}
+
+- (void)testDisplayAgentShowsSafariViewControllerWithSkAdNetworkDataAndNoAppStoreURL {
     __block BOOL didShowSafari = NO;
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"Wait for presentation attempt"];
@@ -168,20 +241,23 @@ static NSTimeInterval const kTestTimeout = 10.0;
     NSString *timestamp = @"1594406341";
     NSString *signature = @"hi i'm a signature";
 
-    MPSKAdNetworkClickthroughData * clickthroughData = [[MPSKAdNetworkClickthroughData alloc] initWithDictionary:@{
-        @"version": version,
-        @"network": network,
-        @"campaign": campaign,
-        @"itunesitem": itunesitem,
-        @"nonce": nonce,
-        @"sourceapp": sourceapp,
-        @"timestamp": timestamp,
-        @"signature": signature,
+    MPSKAdNetworkData * skAdNetworkData = [[MPSKAdNetworkData alloc] initWithServerResponse:@{
+        @"click": @{
+                @"version": version,
+                @"network": network,
+                @"campaign": campaign,
+                @"itunesitem": itunesitem,
+                @"nonce": nonce,
+                @"sourceapp": sourceapp,
+                @"timestamp": timestamp,
+                @"signature": signature,
+        },
+        @"clickmethod": @"0"
     }];
 
     NSURL *clickthroughURL = [NSURL URLWithString:@"https://mopub.com"];
 
-    [self.displayAgent displayDestinationForURL:clickthroughURL skAdNetworkClickthroughData:clickthroughData];
+    [self.displayAgent displayDestinationForURL:clickthroughURL skAdNetworkData:skAdNetworkData];
 
     // Since the URL is resolving, nothing will be ready at this point
     XCTAssertTrue(self.displayAgent.isLoadingDestination);
@@ -196,6 +272,119 @@ static NSTimeInterval const kTestTimeout = 10.0;
     XCTAssertNil(self.displayAgent.storeKitController);
     XCTAssertNotNil(self.displayAgent.safariController);
     XCTAssertTrue(didShowSafari);
+}
+
+- (void)testDisplayAgentShowsStoreProductViewControllerWithSkAdNetworkDataAndNoAppStoreURLAndClickMethodOne {
+    MPMockAnalyticsTracker *mockAnalyticsTracker = [[MPMockAnalyticsTracker alloc] init];
+    self.displayAgent.analyticsTracker = mockAnalyticsTracker;
+
+    __block NSDictionary *storeKitDictionary = nil;
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Wait for presentation attempt"];
+    MPAdDestinationDisplayAgent.presentStoreKitControllerWithProductParametersBlock = ^(NSDictionary *dictionary){
+        [expectation fulfill];
+
+        storeKitDictionary = dictionary;
+    };
+
+    NSString *version = @"2.0";
+    NSString *network = @"cDkw7geQsH.skadnetwork";
+    NSString *campaign = @"45";
+    NSString *itunesitem = @"880047117";
+    NSString *nonce = @"473b1a16-b4ef-43ad-9591-fcf3aefa82a7";
+    NSString *sourceapp = @"123456789";
+    NSString *timestamp = @"1594406341";
+    NSString *signature = @"hi i'm a signature";
+
+    MPSKAdNetworkData * skAdNetworkData = [[MPSKAdNetworkData alloc] initWithServerResponse:@{
+        @"click": @{
+                @"version": version,
+                @"network": network,
+                @"campaign": campaign,
+                @"itunesitem": itunesitem,
+                @"nonce": nonce,
+                @"sourceapp": sourceapp,
+                @"timestamp": timestamp,
+                @"signature": signature,
+        },
+        @"clickmethod": @"1"
+    }];
+
+    NSURL *clickthroughURL = [NSURL URLWithString:@"https://mopub.com"];
+
+    [self.displayAgent displayDestinationForURL:clickthroughURL skAdNetworkData:skAdNetworkData];
+
+    // Since the URL is resolving, nothing will be ready at this point
+    XCTAssertTrue(self.displayAgent.isLoadingDestination);
+    XCTAssertNil(self.displayAgent.storeKitController);
+    XCTAssertNil(self.displayAgent.safariController);
+
+    [self waitForExpectations:@[expectation] timeout:kTestTimeout];
+
+    // When the expectation fulfills, safari should be nil
+    XCTAssertTrue(self.displayAgent.isLoadingDestination);
+    XCTAssertNil(self.displayAgent.safariController);
+
+    // Store kit controller will be nil because the method that creates it was swizzled; instead check the dictionary
+    XCTAssertNotNil(storeKitDictionary);
+    XCTAssertTrue([skAdNetworkData.clickDataDictionary isEqual:storeKitDictionary]);
+
+    // Verify clickthrough URL was fired as tracker
+    XCTAssert([mockAnalyticsTracker.lastTrackedUrls.lastObject isEqual:clickthroughURL]);
+}
+
+- (void)testDisplayAgentShowsStoreProductViewControllerWithSkAdNetworkDataAndAppStoreURLAndClickMethodOne {
+    MPMockAnalyticsTracker *mockAnalyticsTracker = [[MPMockAnalyticsTracker alloc] init];
+    self.displayAgent.analyticsTracker = mockAnalyticsTracker;
+
+    __block NSDictionary *storeKitDictionary = nil;
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Wait for presentation attempt"];
+    MPAdDestinationDisplayAgent.presentStoreKitControllerWithProductParametersBlock = ^(NSDictionary *dictionary){
+        [expectation fulfill];
+
+        storeKitDictionary = dictionary;
+    };
+
+    NSString *version = @"2.0";
+    NSString *network = @"cDkw7geQsH.skadnetwork";
+    NSString *campaign = @"45";
+    NSString *itunesitem = @"880047117";
+    NSString *nonce = @"473b1a16-b4ef-43ad-9591-fcf3aefa82a7";
+    NSString *sourceapp = @"123456789";
+    NSString *timestamp = @"1594406341";
+    NSString *signature = @"hi i'm a signature";
+
+    MPSKAdNetworkData * skAdNetworkData = [[MPSKAdNetworkData alloc] initWithServerResponse:@{
+        @"click": @{
+                @"version": version,
+                @"network": network,
+                @"campaign": campaign,
+                @"itunesitem": itunesitem,
+                @"nonce": nonce,
+                @"sourceapp": sourceapp,
+                @"timestamp": timestamp,
+                @"signature": signature,
+        },
+        @"clickmethod": @"1"
+    }];
+
+    NSURL *clickthroughURL = [NSURL URLWithString:@"https://apps.apple.com/us/app/mopub-canary/id1446093432"];
+
+    [self.displayAgent displayDestinationForURL:clickthroughURL skAdNetworkData:skAdNetworkData];
+
+    [self waitForExpectations:@[expectation] timeout:kTestTimeout];
+
+    // When the expectation fulfills, safari should be nil
+    XCTAssertTrue(self.displayAgent.isLoadingDestination);
+    XCTAssertNil(self.displayAgent.safariController);
+
+    // Store kit controller will be nil because the method that creates it was swizzled; instead check the dictionary
+    XCTAssertNotNil(storeKitDictionary);
+    XCTAssertTrue([skAdNetworkData.clickDataDictionary isEqual:storeKitDictionary]);
+
+    // Verify clickthrough URL was fired as tracker
+    XCTAssert([mockAnalyticsTracker.lastTrackedUrls.lastObject isEqual:clickthroughURL]);
 }
 
 @end

@@ -7,6 +7,7 @@
 //
 
 #import <AdSupport/AdSupport.h>
+#import <AppTrackingTransparency/AppTrackingTransparency.h>
 // For non-module targets, UIKit must be explicitly imported
 // since MoPubSDK-Swift.h will not import it.
 #if __has_include(<MoPubSDK/MoPubSDK-Swift.h>)
@@ -25,7 +26,6 @@
 #import "MPConstants.h"
 #import "MPError.h"
 #import "MPHTTPNetworkSession.h"
-#import "MPIdentityProvider.h"
 #import "MPLogging.h"
 #import "MPURLRequest.h"
 #import "NSString+MPConsentStatus.h"
@@ -60,9 +60,6 @@ static NSTimeInterval const kDefaultRefreshInterval = 300; //seconds
 
 // String replacement macros
 static NSString * const kMacroReplaceLanguageCode = @"%%LANGUAGE%%";
-
-// All zero UUID
-static NSString * const kAllZeroUUID = @"00000000-0000-0000-0000-000000000000";
 
 // Deprecated constants used to upgrade the cached IFA for consent by removing
 // the ifa: prefix.
@@ -566,7 +563,7 @@ static NSString * const kDeprecatedIfaPrefixToRemove = @"ifa:";
     // out of the "do not track" state.
     // In the case that raw (MoPub) GDPR applicability is unknown, we should perform a sync
     // to determine the final state.
-    if (!MPIdentityProvider.advertisingTrackingEnabled && self.ifaForConsent == nil && self.rawIsGDPRApplicable != MPBoolUnknown) {
+    if (!MPAdvertisingTrackingAuthorization.isAllowed && self.ifaForConsent == nil && self.rawIsGDPRApplicable != MPBoolUnknown) {
         MPLogEvent([MPLogEvent consentSyncCompletedWithMessage:@"Currently in a do not track state, consent synchronization will complete immediately"]);
         [self stopUpdateTimer];
         completion(nil);
@@ -703,7 +700,7 @@ static NSString * const kDeprecatedIfaPrefixToRemove = @"ifa:";
     BOOL didTransition = NO;
 
     // Transitioned from an "allowed to track" to "do not track" state.
-    BOOL trackingAllowed = [MPIdentityProvider advertisingTrackingEnabled];
+    BOOL trackingAllowed = MPAdvertisingTrackingAuthorization.isAllowed;
     MPConsentStatus status = self.currentStatus;
     if (status != MPConsentStatusDoNotTrack && !trackingAllowed) {
         didTransition = [self setCurrentStatus:MPConsentStatusDoNotTrack reason:kConsentedChangedReasonDoNotTrackEnabled statusWasReacquired:NO shouldBroadcast:YES];
@@ -737,7 +734,7 @@ static NSString * const kDeprecatedIfaPrefixToRemove = @"ifa:";
     // Do this on every DNT check because while the DNT status may not have changed,
     // the ATT status likely has, and that should be captured.
     if (@available(iOS 14.0, *)) {
-        [NSUserDefaults.standardUserDefaults setInteger:MPIdentityProvider.trackingAuthorizationStatus
+        [NSUserDefaults.standardUserDefaults setInteger:MPAdvertisingTrackingAuthorization.statusValue
                                                  forKey:kLastATTAuthorizationStatusStorageKey];
     }
 
@@ -801,7 +798,7 @@ static NSString * const kDeprecatedIfaPrefixToRemove = @"ifa:";
 
     // Disallow setting consent status if we are currently in a "do not track" state
     // and will not transition out of it.
-    BOOL trackingEnabledOnDevice = MPIdentityProvider.advertisingTrackingEnabled;
+    BOOL trackingEnabledOnDevice = MPAdvertisingTrackingAuthorization.isAllowed;
     if (oldStatus == MPConsentStatusDoNotTrack && !trackingEnabledOnDevice) {
         MPLogInfo(@"Attempted to set consent status while in a do not track state");
         return NO;
@@ -1234,18 +1231,6 @@ static NSString * const kDeprecatedIfaPrefixToRemove = @"ifa:";
 
 @implementation MPConsentManager (PersonalDataHandler)
 
-- (NSString *)rawIfa {
-    // Note that per: https://developer.apple.com/documentation/adsupport/asidentifiermanager/1614151-advertisingidentifier
-    // The advertising identifier has a value of 00000000-0000-0000-0000-000000000000 until authorization is granted or when using the Simulator.
-    NSString *identifier = ASIdentifierManager.sharedManager.advertisingIdentifier.UUIDString;
-    if ([identifier isEqualToString:kAllZeroUUID]) {
-        return nil;
-    }
-
-    // Uppercase the UUID to preserve uniformity of UUIDs with previous iterations of the SDK.
-    return identifier.uppercaseString;
-}
-
 - (void)handlePersonalDataOnStateChangeTo:(MPConsentStatus)newStatus fromOldStatus:(MPConsentStatus)oldStatus {
     [self updateAppConversionTracking];
 
@@ -1263,7 +1248,7 @@ static NSString * const kDeprecatedIfaPrefixToRemove = @"ifa:";
 }
 
 - (void)storeIfa {
-    NSString *identifier = self.rawIfa;
+    NSString *identifier = MPAdvertisingTrackingAuthorization.advertisingIdentifier;
     if (identifier == nil) {
         return;
     }
@@ -1278,7 +1263,7 @@ static NSString * const kDeprecatedIfaPrefixToRemove = @"ifa:";
  */
 - (void)checkForIfaChange {
     NSString *oldIfa = self.ifaForConsent;
-    NSString *newIfa = self.rawIfa;
+    NSString *newIfa = MPAdvertisingTrackingAuthorization.advertisingIdentifier;
     // IFA reset
     if (self.currentStatus == MPConsentStatusConsented && ![oldIfa isEqualToString:newIfa] && newIfa != nil) {
         [NSUserDefaults.standardUserDefaults removeObjectForKey:kLastSynchronizedConsentStatusStorageKey];

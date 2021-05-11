@@ -36,8 +36,8 @@ class InterstitialAdDataSource: NSObject, AdDataSource {
         var titleStrings: [AdEvent: String] = [:]
         titleStrings[.didLoad]            = CallbackFunctionNames.interstitialDidLoadAd
         titleStrings[.didFailToLoad]      = CallbackFunctionNames.interstitialDidFailToLoadAd
-        titleStrings[.willPresent]        = CallbackFunctionNames.interstitialWillAppear
-        titleStrings[.didPresent]         = CallbackFunctionNames.interstitialDidAppear
+        titleStrings[.willPresent]        = CallbackFunctionNames.interstitialWillPresent
+        titleStrings[.didPresent]         = CallbackFunctionNames.interstitialDidPresent
         titleStrings[.willDismiss]        = CallbackFunctionNames.interstitialWillDismiss
         titleStrings[.didDismiss]         = CallbackFunctionNames.interstitialDidDismiss
         titleStrings[.didExpire]          = CallbackFunctionNames.interstitialDidExpire
@@ -171,13 +171,13 @@ extension InterstitialAdDataSource: MPInterstitialAdControllerDelegate {
         }
     }
     
-    func interstitialWillAppear(_ interstitial: MPInterstitialAdController!) {
+    func interstitialWillPresent(_ interstitial: MPInterstitialAdController!) {
         setStatus(for: .willPresent) { [weak self] in
             self?.delegate?.adPresentationTableView.reloadData()
         }
     }
     
-    func interstitialDidAppear(_ interstitial: MPInterstitialAdController!) {
+    func interstitialDidPresent(_ interstitial: MPInterstitialAdController!) {
         setStatus(for: .didPresent) { [weak self] in
             self?.delegate?.adPresentationTableView.reloadData()
         }

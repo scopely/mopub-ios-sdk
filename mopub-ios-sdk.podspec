@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
   spec.name             = 'mopub-ios-sdk'
   spec.module_name      = 'MoPubSDK'
-  spec.version          = '5.16.2'
+  spec.version          = '5.17.0'
   spec.license          = { :type => 'New BSD', :file => 'LICENSE' }
   spec.homepage         = 'https://github.com/mopub/mopub-ios-sdk'
   spec.authors          = { 'MoPub' => 'support@mopub.com' }
@@ -14,7 +14,7 @@ Pod::Spec.new do |spec|
                             To learn more or sign up for an account, go to http://www.mopub.com. \n
                           DESC
   spec.social_media_url = 'http://twitter.com/mopub'
-  spec.source           = { :git => 'https://github.com/mopub/mopub-ios-sdk.git', :tag => '5.16.2' }
+  spec.source           = { :git => 'https://github.com/mopub/mopub-ios-sdk.git', :tag => '5.17.0' }
   spec.requires_arc     = true
   spec.ios.deployment_target = '10.0'
   spec.swift_version    = '5.0'
@@ -39,8 +39,9 @@ Pod::Spec.new do |spec|
                           ]
   spec.default_subspecs = 'MoPubSDK'
 
-  spec.pod_target_xcconfig  = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64 arm64e armv7 armv7s', 'EXCLUDED_ARCHS[sdk=iphoneos*]' => 'i386 x86_64' }
-  spec.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64 arm64e armv7 armv7s', 'EXCLUDED_ARCHS[sdk=iphoneos*]' => 'i386 x86_64' }
+  spec.xcconfig = {
+    'OTHER_LDFLAGS' => '-framework OMSDK_Mopub'
+  }
 
   spec.subspec 'MoPubSDK' do |sdk|
     sdk.dependency              'mopub-ios-sdk/Core'
@@ -51,7 +52,7 @@ Pod::Spec.new do |spec|
     core.source_files         = 'MoPubSDK/**/*.{swift,h,m}'
     core.resource_bundles     = {'MoPubResources' => ['MoPubSDK/Resources/**/*', 'MoPubSDK/**/*.{nib,xib,js}']}
     core.exclude_files        = ['MoPubSDK/NativeAds']
-    core.vendored_libraries   = ['MoPubSDK/Internal/Viewability/OMSDK/*.{a}']
+    core.vendored_frameworks  = 'Frameworks/*.xcframework'
   end
 
   spec.subspec 'NativeAds' do |native|

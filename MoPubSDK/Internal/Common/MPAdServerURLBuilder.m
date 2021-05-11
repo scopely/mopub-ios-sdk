@@ -26,7 +26,6 @@
 #import "MPCoreInstanceProvider+MRAID.h"
 #import "MPError.h"
 #import "MPGlobal.h"
-#import "MPIdentityProvider.h"
 #import "MPLogging.h"
 #import "MPMediationManager.h"
 #import "MPRateLimitManager.h"
@@ -141,9 +140,9 @@ static NSString* _engineVersion = nil;
     queryParameters[kCurrentConsentStatusKey] = [NSString stringFromConsentStatus:manager.currentStatus];
 
     // REQUIRED: DNT, Tracking Authorization Status, Bundle
-    queryParameters[kDoNotTrackIdKey] = [MPIdentityProvider advertisingTrackingEnabled] ? nil : @"1";
+    queryParameters[kDoNotTrackIdKey] = MPAdvertisingTrackingAuthorization.isAllowed ? nil : @"1";
 
-    queryParameters[kTrackingAuthorizationStatusKey] = MPIdentityProvider.trackingAuthorizationStatusDescription;
+    queryParameters[kTrackingAuthorizationStatusKey] = MPAdvertisingTrackingAuthorization.statusDescription;
 
     queryParameters[kBundleKey] = [[NSBundle mainBundle] bundleIdentifier];
 
@@ -198,15 +197,15 @@ static NSString* _engineVersion = nil;
 }
 
 + (NSString *)ifv {
-    return MPIdentityProvider.ifv;
+    return MPDeviceInformation.ifv;
 }
 
 + (NSString *)ifa {
-    return MPIdentityProvider.ifa;
+    return MPDeviceInformation.ifa;
 }
 
 + (NSString *)mopubId {
-    return MPIdentityProvider.mopubId;
+    return MPDeviceInformation.mopubIdentifier;
 }
 
 @end

@@ -22,7 +22,6 @@
 #import "MPLogging.h"
 #import "MPMediationManager.h"
 #import "MPRewardedAds.h"
-#import "MPIdentityProvider.h"
 #import "MPWebView.h"
 #import "MOPUBExperimentProvider.h"
 #import "MPAdConversionTracker.h"
@@ -31,7 +30,6 @@
 #import "MPSessionTracker.h"
 #import "MPViewabilityManager.h"
 
-static NSString * const kPublisherEnteredAdUnitIdStorageKey = @"com.mopub.mopub-ios-sdk.initialization.publisher.entered.ad.unit.id";
 
 @interface MoPub ()
 
@@ -137,12 +135,7 @@ static NSString * const kPublisherEnteredAdUnitIdStorageKey = @"com.mopub.mopub-
         // Configure the consent manager and synchronize regardless of the result
         // of `checkForDoNotTrackAndTransition`.
         dispatch_group_enter(initializationGroup);
-        // If the publisher has changed their adunit ID for app initialization, clear our adunit ID caches
-        NSString * cachedPublisherEnteredAdUnitID = [NSUserDefaults.standardUserDefaults stringForKey:kPublisherEnteredAdUnitIdStorageKey];
-        if (![configuration.adUnitIdForAppInitialization isEqualToString:cachedPublisherEnteredAdUnitID]) {
-            [MPConsentManager.sharedManager clearAdUnitIdUsedForConsent];
-            [NSUserDefaults.standardUserDefaults setObject:configuration.adUnitIdForAppInitialization forKey:kPublisherEnteredAdUnitIdStorageKey];
-        }
+
         MPConsentManager.sharedManager.adUnitIdUsedForConsent = configuration.adUnitIdForAppInitialization;
         MPConsentManager.sharedManager.allowLegitimateInterest = configuration.allowLegitimateInterest;
         // Process personal data if a user is in GDPR region.

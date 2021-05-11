@@ -8,7 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import "MPScheduledDeallocationAdAdapter.h"
-#import "OMIDPartner.h"
+
+// Forward declaration of OM SDK types for allow Swift compiler
+// since OM SDK is non-modular.
+@class OMIDMopubPartner;
 
 NS_ASSUME_NONNULL_BEGIN
 

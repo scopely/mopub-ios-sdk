@@ -1,0 +1,51 @@
+{
+  "configurations" : [
+    {
+      "id" : "FB62A2B7-1643-4D35-B899-BF1C95DB5037",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Canary.xcodeproj",
+      "identifier" : "CE237F1D216BF2C800A8134A",
+      "name" : "CanaryUITests"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "skippedTests" : [
+        "OMBaseTestCase",
+        "OpenMeasurementFullscreenDisplayTests",
+        "OpenMeasurementInlineDisplayTests",
+        "OpenMeasurementNativeTests",
+        "OpenMeasurementVASTSkipTests",
+        "OpenMeasurementVASTTests",
+        "ReleaseMoPubBanners",
+        "ReleaseMoPubFullscreen",
+        "ReleaseMoPubMediumRectangle",
+        "RewardedAdsClickabilityTests\/testStaticImageCannotBeClickedBeforeRewardDuration()",
+        "RewardedAdsClickabilityTests\/testStaticImageClickability()",
+        "RewardedAdsEndCardTests\/testMRAIDEndCard()",
+        "RewardedAdsEndCardTests\/testPlayableMRAIDEndCard()",
+        "RewardedAdsPausabilityTests\/testStaticImageHomeButtonPausesTimer()",
+        "RewardedAdsSkippabilityTests\/testStaticImage()",
+        "RewardedAdsTrackerTests\/testStaticImage()",
+        "RewardedRichMediaTests",
+        "RewardedVideoTests",
+        "ViewabilityTests"
+      ],
+      "target" : {
+        "containerPath" : "container:Canary.xcodeproj",
+        "identifier" : "CE237F1D216BF2C800A8134A",
+        "name" : "CanaryUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

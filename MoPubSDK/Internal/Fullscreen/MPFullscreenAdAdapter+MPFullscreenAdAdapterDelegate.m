@@ -62,39 +62,40 @@
     [self handleAdEvent:MPFullscreenAdEventDidAppear];
 }
 
-
 - (void)fullscreenAdAdapterAdDidDisappear:(MPFullscreenAdAdapter *)adapter {
     [self handleAdEvent:MPFullscreenAdEventDidDisappear];
 }
-
 
 - (void)fullscreenAdAdapterAdWillAppear:(MPFullscreenAdAdapter *)adapter {
     [self handleAdEvent:MPFullscreenAdEventWillAppear];
 }
 
-
 - (void)fullscreenAdAdapterAdWillDisappear:(MPFullscreenAdAdapter *)adapter {
     [self handleAdEvent:MPFullscreenAdEventWillDisappear];
 }
-
 
 - (void)fullscreenAdAdapterDidExpire:(MPFullscreenAdAdapter *)adapter {
     [self handleAdEvent:MPFullscreenAdEventDidExpire];
 }
 
-
 - (void)fullscreenAdAdapterDidLoadAd:(MPFullscreenAdAdapter *)adapter {
     [self handleAdEvent:MPFullscreenAdEventDidLoad];
 }
-
 
 - (void)fullscreenAdAdapterDidReceiveTap:(MPFullscreenAdAdapter *)adapter {
     [self handleAdEvent:MPFullscreenAdEventDidReceiveTap];
 }
 
-
 - (void)fullscreenAdAdapterWillLeaveApplication:(MPFullscreenAdAdapter *)adapter {
     [self handleAdEvent:MPFullscreenAdEventWillLeaveApplication];
+}
+
+- (void)fullscreenAdAdapterAdWillPresent:(nonnull MPFullscreenAdAdapter *)adapter {
+    [self handleAdEvent:MPFullscreenAdEventWillPresent];
+}
+
+- (void)fullscreenAdAdapterAdDidPresent:(nonnull MPFullscreenAdAdapter *)adapter {
+    [self handleAdEvent:MPFullscreenAdEventDidPresent];
 }
 
 - (void)fullscreenAdAdapterAdWillDismiss:(MPFullscreenAdAdapter *)adapter {

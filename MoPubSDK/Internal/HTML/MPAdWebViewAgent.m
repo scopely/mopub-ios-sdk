@@ -202,7 +202,7 @@
     [self.delegate adWebViewAgentDidReceiveTap:self];
 
     // Direct the URL to the destination handler.
-    [self.clickthroughDestination displayDestinationForURL:url skAdNetworkClickthroughData:self.configuration.skAdNetworkClickthroughData];
+    [self.clickthroughDestination displayDestinationForURL:url skAdNetworkData:self.configuration.skAdNetworkData];
 }
 
 #pragma mark - MPAdDestinationDisplayAgentDelegate

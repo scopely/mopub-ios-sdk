@@ -1,0 +1,34 @@
+{
+  "configurations" : [
+    {
+      "id" : "5949D256-8674-473D-A28F-851FAA0FAD16",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "skippedTests" : [
+        "RewardedAdsClickabilityTests\/testStaticImageCannotBeClickedBeforeRewardDuration()",
+        "RewardedAdsClickabilityTests\/testStaticImageClickability()",
+        "RewardedAdsEndCardTests\/testMRAIDEndCard()",
+        "RewardedAdsEndCardTests\/testPlayableMRAIDEndCard()",
+        "RewardedAdsPausabilityTests\/testStaticImageHomeButtonPausesTimer()",
+        "RewardedAdsSkippabilityTests\/testStaticImage()",
+        "RewardedAdsTrackerTests\/testStaticImage()"
+      ],
+      "target" : {
+        "containerPath" : "container:Canary.xcodeproj",
+        "identifier" : "CE237F1D216BF2C800A8134A",
+        "name" : "CanaryUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

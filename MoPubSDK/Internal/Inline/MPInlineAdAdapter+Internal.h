@@ -19,4 +19,11 @@
  */
 - (void)trackImpressionsIncludedInMarkup;
 
+/**
+ Method to let the @c MPInlineAdAdapter instance know to end the impression
+ early. Used when a new adapter is being loaded so SKAdImpression sessions
+ do not overlap.
+ */
+- (void)endImpression;
+
 @end

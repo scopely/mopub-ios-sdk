@@ -44,12 +44,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) MPVASTCompanionAdView *companionAdView;
 
 /**
- Autolayout constraints for the companion ad.
- @see @c updateConstraints
- */
-@property (nonatomic, strong) NSArray<NSLayoutConstraint *> *companionAdViewEdgeConstraints;
-
-/**
  Blur effect that is applied to the last frame of the video when there is no companion ad to show at the end
  of the video.
  @note: This is a friendly obstruction and conforms to @c MPViewabilityObstruction

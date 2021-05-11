@@ -18,7 +18,7 @@ class AdUnitTableViewController: UIViewController {
     // Outlets from `Main.storyboard`
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet var addButton: UIBarButtonItem?
-    
+    @IBOutlet weak var drawerButton: UIBarButtonItem!
     // Table data source.
     internal var dataSource: AdUnitDataSource? = nil
     
@@ -74,7 +74,10 @@ class AdUnitTableViewController: UIViewController {
     }
     
     // MARK: - IBActions
-    
+    @IBAction func drawerButtonAction(_ sender: Any) {
+        containerViewController?.swipeMenuOpen(sender)
+    }
+
     @IBAction func addButtonAction(_ sender: Any) {
         let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: QRCodeCameraInterfaceViewController.defaultMediaType)
         let showCameraButton = cameraAuthorizationStatus == .authorized || cameraAuthorizationStatus == .notDetermined ? true : false

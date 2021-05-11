@@ -28,7 +28,13 @@ extension UIView {
             fittingSize = CGSize(width: view.bounds.width, height: 0)
         }
         
+        // Before requesting systemLayoutSizeFitting, we must update the view's frame and perform a layout pass so that the child views that rely on the width of this view (i.e. PreferredWidthLabel) provide the proper system layout size.
+        frame = view.frame
+        setNeedsLayout()
+        layoutIfNeeded()
+        
         let size = systemLayoutSizeFitting(fittingSize, withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel)
+        
         return size
     }
 }

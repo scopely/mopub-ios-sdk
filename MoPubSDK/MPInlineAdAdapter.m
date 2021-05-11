@@ -45,6 +45,8 @@ static NSTimeInterval const kDefaultRequiredSecondsInViewForImpression = 0.0;
     }
 
     [self.timeoutTimer invalidate];
+
+    [self endImpression];
 }
 
 - (instancetype)init {
@@ -120,20 +122,19 @@ static NSTimeInterval const kDefaultRequiredSecondsInViewForImpression = 0.0;
     NSTimeInterval minimumSecondsForImpression = self.configuration.impressionMinVisibleTimeInSec >= 0 ? self.configuration.impressionMinVisibleTimeInSec : kDefaultRequiredSecondsInViewForImpression;
     CGFloat minimumPixelsForImpression = self.configuration.impressionMinVisiblePixels >= 0 ? self.configuration.impressionMinVisiblePixels : kDefaultRequiredPixelsInViewForImpression;
 
-    self.impressionTimer = [[MPAdImpressionTimer alloc] initWithRequiredSecondsForImpression:minimumSecondsForImpression
-                                                                requiredViewVisibilityPixels:minimumPixelsForImpression];
-    self.impressionTimer.delegate = self;
-    [self.impressionTimer startTrackingView:self.adView];
-}
+    __weak __typeof__(self) weakSelf = self;
+    self.impressionTimer = [[MPAdImpressionTimer alloc] initWithImpressionTime:minimumSecondsForImpression
+                                                                requiredViewVisibilityPixels:minimumPixelsForImpression
+                                                                    completion:^(UIView * _Nonnull view) {
+        __typeof__(self) strongSelf = weakSelf;
 
-#pragma mark - MPAdImpressionTimerDelegate
+        // Track impression for all impression trackers known by the SDK
+        [strongSelf trackImpression];
+        // Track impression for all impression trackers included in the markup
+        [strongSelf trackImpressionsIncludedInMarkup];
+    }];
 
-- (void)adViewWillLogImpression:(UIView *)adView
-{
-    // Track impression for all impression trackers known by the SDK
-    [self trackImpression];
-    // Track impression for all impression trackers included in the markup
-    [self trackImpressionsIncludedInMarkup];
+    [self.impressionTimer startTrackingWithView:self.adView];
 }
 
 #pragma mark - Viewability

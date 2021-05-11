@@ -30,8 +30,8 @@ enum CallbackFunctionNames {
     // MARK: - MPInterstitialAdControllerDelegate
     static let interstitialDidLoadAd = "interstitialDidLoadAd:"
     static let interstitialDidFailToLoadAd = "interstitialDidFailToLoadAd:"
-    static let interstitialWillAppear = "interstitialWillAppear:"
-    static let interstitialDidAppear = "interstitialDidAppear:"
+    static let interstitialWillPresent = "interstitialWillPresent:"
+    static let interstitialDidPresent = "interstitialDidPresent:"
     static let interstitialWillDismiss = "interstitialWillDismiss:"
     static let interstitialDidDismiss = "interstitialDidDismiss:"
     static let interstitialDidExpire = "interstitialDidExpire:"

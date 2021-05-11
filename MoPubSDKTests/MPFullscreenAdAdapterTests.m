@@ -368,7 +368,7 @@ static const NSTimeInterval kSimulatedVideoDuration = 31.0;
 - (void)testClickTracking {
     MPMockAnalyticsTracker *trackerMock = [MPMockAnalyticsTracker new];
     MPFullscreenAdAdapterMock *adapter = [MPFullscreenAdAdapterMock new];
-    adapter.configuration = [MPAdConfiguration new];
+    adapter.configuration = [[MPAdConfiguration alloc] initWithMetadata:@{} data:nil isFullscreenAd:YES];
     adapter.analyticsTracker = trackerMock;
 
     // Test with `enableAutomaticImpressionAndClickTracking = YES`
@@ -416,7 +416,7 @@ static const NSTimeInterval kSimulatedVideoDuration = 31.0;
 - (void)testImpressionTracking {
     MPMockAnalyticsTracker *trackerMock = [MPMockAnalyticsTracker new];
     MPFullscreenAdAdapterMock *adapter = [MPFullscreenAdAdapterMock new];
-    adapter.configuration = [MPAdConfiguration new];
+    adapter.configuration = [[MPAdConfiguration alloc] initWithMetadata:@{} data:nil isFullscreenAd:YES];
     adapter.analyticsTracker = trackerMock;
 
     // Test with `enableAutomaticImpressionAndClickTracking = YES`
@@ -1952,6 +1952,92 @@ static const NSTimeInterval kSimulatedVideoDuration = 31.0;
 
     // Check that the image view is clickable
     XCTAssertTrue(imageCreativeView.isClickable);
+}
+
+#pragma mark Viewthrough Attribution
+
+- (void)testVtaTrackersFiredWithAutomaticImpressionTracking {
+    MPMockAnalyticsTracker *trackerMock = [MPMockAnalyticsTracker new];
+    MPFullscreenAdAdapterMock *adapter = [MPFullscreenAdAdapterMock new];
+    adapter.configuration = [[MPAdConfiguration alloc] initWithMetadata:@{} data:nil isFullscreenAd:YES];
+    adapter.analyticsTracker = trackerMock;
+
+    // Test with `enableAutomaticImpressionAndClickTracking = YES`
+    adapter.enableAutomaticImpressionAndClickTracking = YES;
+
+    // Test no impression has been tracked yet
+    XCTAssertEqual(0, [trackerMock countOfSelectorCalls:@selector(trackImpressionForConfiguration:)]);
+    XCTAssertEqual(0, [trackerMock countOfSelectorCalls:@selector(trackSKAdNetworkStartImpressionForConfiguration:)]);
+
+    // Test impression was tracked, and SKAdImpression was started upon adDidAppear event
+    [adapter fullscreenAdAdapterAdDidAppear:adapter];
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackImpressionForConfiguration:)]);
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackSKAdNetworkStartImpressionForConfiguration:)]);
+
+    // Test another appearance doesn't cause double tracking
+    [adapter fullscreenAdAdapterAdDidAppear:adapter];
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackImpressionForConfiguration:)]);
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackSKAdNetworkStartImpressionForConfiguration:)]);
+
+    // Test impression hasn't ended yet
+    XCTAssertEqual(0, [trackerMock countOfSelectorCalls:@selector(trackEndImpressionForConfiguration:)]);
+
+    // Test impression ends when dismissed
+    [adapter fullscreenAdAdapterAdDidDismiss:adapter];
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackEndImpressionForConfiguration:)]);
+
+    // Test impression end doesn't fire twice on multiple dismissals
+    [adapter fullscreenAdAdapterAdDidDismiss:adapter];
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackEndImpressionForConfiguration:)]);
+
+    // Reset impression end state
+    adapter.hasEndedImpression = NO;
+
+    // Test impression ends on dealloc
+    adapter = nil;
+    XCTAssertEqual(2, [trackerMock countOfSelectorCalls:@selector(trackEndImpressionForConfiguration:)]);
+}
+
+- (void)testVtaTrackersFiredWithManualImpressionTracking {
+    MPMockAnalyticsTracker *trackerMock = [MPMockAnalyticsTracker new];
+    MPFullscreenAdAdapterMock *adapter = [MPFullscreenAdAdapterMock new];
+    adapter.configuration = [[MPAdConfiguration alloc] initWithMetadata:@{} data:nil isFullscreenAd:YES];
+    adapter.analyticsTracker = trackerMock;
+
+    // Test with `enableAutomaticImpressionAndClickTracking = NO`
+    adapter.enableAutomaticImpressionAndClickTracking = NO;
+
+    // Test no impression has been tracked yet
+    XCTAssertEqual(0, [trackerMock countOfSelectorCalls:@selector(trackImpressionForConfiguration:)]);
+    XCTAssertEqual(0, [trackerMock countOfSelectorCalls:@selector(trackSKAdNetworkStartImpressionForConfiguration:)]);
+
+    // Test impression was tracked, and SKAdImpression was started upon adDidAppear event
+    [adapter fullscreenAdAdapterDidTrackImpression:adapter];
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackImpressionForConfiguration:)]);
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackSKAdNetworkStartImpressionForConfiguration:)]);
+
+    // Test another appearance doesn't cause double tracking
+    [adapter fullscreenAdAdapterDidTrackImpression:adapter];
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackImpressionForConfiguration:)]);
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackSKAdNetworkStartImpressionForConfiguration:)]);
+
+    // Test impression hasn't ended yet
+    XCTAssertEqual(0, [trackerMock countOfSelectorCalls:@selector(trackEndImpressionForConfiguration:)]);
+
+    // Test impression ends when dismissed
+    [adapter fullscreenAdAdapterAdDidDismiss:adapter];
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackEndImpressionForConfiguration:)]);
+
+    // Test impression end doesn't fire twice on multiple dismissals
+    [adapter fullscreenAdAdapterAdDidDismiss:adapter];
+    XCTAssertEqual(1, [trackerMock countOfSelectorCalls:@selector(trackEndImpressionForConfiguration:)]);
+
+    // Reset impression end state
+    adapter.hasEndedImpression = NO;
+
+    // Test impression ends on dealloc
+    adapter = nil;
+    XCTAssertEqual(2, [trackerMock countOfSelectorCalls:@selector(trackEndImpressionForConfiguration:)]);
 }
 
 @end

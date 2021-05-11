@@ -88,6 +88,16 @@ public class ImageCreativeView: UIImageView {
         // If the image is smaller than the container, center it. Otherwise, aspect fit it.
         contentMode = imageIsSmallerThanContainer ? .center : .scaleAspectFit
     }
+    
+    /// Override `image` property to observe when the image is set to inform the view that
+    /// it must layout again with a new image. This ensures the `contentMode` is always set
+    /// correctly.
+    public override var image: UIImage? {
+        didSet {
+            // When a new value is set to `image`, inform the view that it needs to be laid out.
+            setNeedsLayout()
+        }
+    }
 }
 
 

@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MPMockAnalyticsTracker : NSObject <MPAnalyticsTracker, MPSelectorCountable>
+@interface MPMockAnalyticsTracker : MPAnalyticsTracker <MPSelectorCountable>
 @property (nonatomic, strong, readonly) NSArray<NSURL *> *lastTrackedUrls;
 
 - (void)reset;

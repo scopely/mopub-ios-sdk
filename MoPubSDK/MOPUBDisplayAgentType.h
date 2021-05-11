@@ -14,7 +14,8 @@ typedef NS_ENUM(NSInteger, MOPUBDisplayAgentType) {
     MOPUBDisplayAgentTypeInApp = 0,
 
     /**
-     Use the iOS Native Safari browser app for display agent.
+     Use the iOS Native Safari browser app to display web content, and @c SKStoreProductViewController
+     to display App Store links.
      */
     MOPUBDisplayAgentTypeNativeSafari,
 

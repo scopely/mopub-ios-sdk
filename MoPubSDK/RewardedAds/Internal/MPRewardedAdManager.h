@@ -84,8 +84,8 @@
 - (void)rewardedAdDidFailToLoadForAdManager:(MPRewardedAdManager *)manager error:(NSError *)error;
 - (void)rewardedAdDidExpireForAdManager:(MPRewardedAdManager *)manager;
 - (void)rewardedAdDidFailToShowForAdManager:(MPRewardedAdManager *)manager error:(NSError *)error;
-- (void)rewardedAdWillAppearForAdManager:(MPRewardedAdManager *)manager;
-- (void)rewardedAdDidAppearForAdManager:(MPRewardedAdManager *)manager;
+- (void)rewardedAdWillPresentForAdManager:(MPRewardedAdManager *)manager;
+- (void)rewardedAdDidPresentForAdManager:(MPRewardedAdManager *)manager;
 - (void)rewardedAdWillDismissForAdManager:(MPRewardedAdManager *)manager;
 - (void)rewardedAdDidDismissForAdManager:(MPRewardedAdManager *)manager;
 - (void)rewardedAdDidReceiveTapEventForAdManager:(MPRewardedAdManager *)manager;

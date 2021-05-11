@@ -86,8 +86,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)adWillPresentModal;
 + (instancetype)adDidDismissModal;
 + (instancetype)adTapped;
-+ (instancetype)adWillAppear;
-+ (instancetype)adDidAppear;
++ (instancetype)adWillPresent;
++ (instancetype)adDidPresent;
 + (instancetype)adWillDismiss;
 + (instancetype)adDidDismiss;
 + (instancetype)adShouldRewardUserWithReward:(MPReward *)reward;
