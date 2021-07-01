@@ -117,6 +117,28 @@
     return self.delegate;
 }
 
+- (void)managerWillStartInterstitialAttempt:(MPInterstitialAdManager *)manager
+{
+    if ([self.delegate respondsToSelector:@selector(interstitialWillStartAttemptToLoadAd:customEventClass:withLineItemId:)]) {
+        NSString *customEventClass = NSStringFromClass([manager customEventClass]);
+        [self.delegate interstitialWillStartAttemptToLoadAd:self customEventClass:customEventClass withLineItemId:[manager lineItemId]];
+    }
+}
+
+- (void)managerDidSucceedInterstitialAttempt:(MPInterstitialAdManager *)manager
+{
+    if ([self.delegate respondsToSelector:@selector(interstitialDidSucceedAttemptToLoadAd:withCreativeId:withImpressionData:)]) {
+        [self.delegate interstitialDidSucceedAttemptToLoadAd:self withCreativeId:[manager dspCreativeId] withImpressionData:[manager impressionData]];
+    }
+}
+
+- (void)manager:(MPInterstitialAdManager *)manager didFailInterstitialAttemptWithError:(NSError*)error
+{
+    if ([self.delegate respondsToSelector:@selector(interstitialDidFailAttemptToLoadAd:error:withImpressionData:)]) {
+        [self.delegate interstitialDidFailAttemptToLoadAd:self error:error withImpressionData:[manager impressionData]];
+    }
+}
+
 - (void)managerDidLoadInterstitial:(MPInterstitialAdManager *)manager
 {
     if ([self.delegate respondsToSelector:@selector(interstitialDidLoadAd:)]) {

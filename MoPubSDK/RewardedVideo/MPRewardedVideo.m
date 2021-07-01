@@ -248,6 +248,35 @@ static NSMapTable <NSString *, id<MPRewardedVideoDelegate>> *sRewardedVideoDeleg
 - (void)rewardedAdDidLoadForAdUnitID:(NSString *)adUnitID {
     id<MPRewardedVideoDelegate> delegate = [self delegateForAdUnitId:adUnitID];
 
+
+- (void)rewardedVideoWillStartAttemptForAdManager:(MPRewardedVideoAdManager *)manager
+{
+    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
+    if ([delegate respondsToSelector:@selector(rewardedVideoWillStartAttemptForAdUnitID:customEventClass:withLineItemId:)]) {
+        NSString *customEventClass = NSStringFromClass([manager adapterClass]);
+        [delegate rewardedVideoWillStartAttemptForAdUnitID:manager.adUnitId customEventClass:customEventClass withLineItemId:[manager lineItemId]];
+    }
+}
+
+- (void)rewardedVideoDidSucceedAttemptForAdManager:(MPRewardedVideoAdManager *)manager
+{
+    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
+    if ([delegate respondsToSelector:@selector(rewardedVideoDidSucceedAttemptForAdUnitID:withCreativeId:withImpressionData:)]) {
+        [delegate rewardedVideoDidSucceedAttemptForAdUnitID:manager.adUnitId withCreativeId:[manager dspCreativeId] withImpressionData:[manager impressionData]];
+    }
+}
+
+- (void)rewardedVideoDidFailAttemptForAdManager:(MPRewardedVideoAdManager *)manager error:(NSError *)error
+{
+    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
+    if ([delegate respondsToSelector:@selector(rewardedVideoDidFailAttemptForAdUnitID:error:withImpressionData:)]) {
+        [delegate rewardedVideoDidFailAttemptForAdUnitID:manager.adUnitId error:error withImpressionData:[manager impressionData]];
+    }
+}
+
+- (void)rewardedVideoDidLoadForAdManager:(MPRewardedVideoAdManager *)manager
+{
+    id<MPRewardedVideoDelegate> delegate = [self.delegateTable objectForKey:manager.adUnitId];
     if ([delegate respondsToSelector:@selector(rewardedVideoAdDidLoadForAdUnitID:)]) {
         [delegate rewardedVideoAdDidLoadForAdUnitID:adUnitID];
     }
@@ -339,6 +368,13 @@ static NSMapTable <NSString *, id<MPRewardedVideoDelegate>> *sRewardedVideoDeleg
     if ([delegate respondsToSelector:@selector(didTrackImpressionWithAdUnitID:impressionData:)]) {
         [delegate didTrackImpressionWithAdUnitID:adUnitID impressionData:impressionData];
     }
+}
+
++ (NSString*) creativeIdForAdUnitID:(NSString *)adUnitID {
+    MPRewardedVideo *sharedInstance = [[self class] sharedInstance];
+    MPRewardedVideoAdManager *adManager = sharedInstance.rewardedVideoAdManagers[adUnitID];
+
+    return [adManager getCreativeId];
 }
 
 @end

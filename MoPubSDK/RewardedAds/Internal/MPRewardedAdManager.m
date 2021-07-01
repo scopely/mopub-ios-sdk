@@ -85,6 +85,22 @@
     return self.configuration.adapterClass;
 }
 
+- (NSString*)dspCreativeId
+{
+    return self.configuration.dspCreativeId;
+}
+
+- (NSString*)lineItemId {
+    return self.configuration.lineItemId;
+}
+
+(MPImpressionData *)impressionData {
+    if (self.configuration == nil){
+        return nil;
+    }
+    return self.configuration.impressionData;
+}
+
 - (BOOL)hasAdAvailable
 {
     //An Ad is not ready or has expired.
@@ -224,6 +240,7 @@
         MPFullscreenAdAdapter *adapter = (MPFullscreenAdAdapter *)object;
         self.adapter = adapter;
         adapter.adapterDelegate = self;
+        [self.delegate rewardedVideoWillStartAttemptForAdManager:self];
         [adapter getAdWithConfiguration:configuration targeting:self.targeting];
     }
     else { // unrecognized ad adapter
@@ -284,6 +301,7 @@
     // Record the end of the adapter load and send off the fire and forget after-load-url tracker
     // with the appropriate error code result.
     NSTimeInterval duration = [self.loadStopwatch stop];
+    [self.delegate rewardedVideoDidFailAttemptForAdManager:self error:error];
     MPAfterLoadResult result = (error.isAdRequestTimedOutError ? MPAfterLoadResultTimeout : (adapter == nil ? MPAfterLoadResultMissingAdapter : MPAfterLoadResultError));
     [self.communicator sendAfterLoadUrlWithConfiguration:self.configuration adapterLoadDuration:duration adapterLoadResult:result];
 
@@ -326,6 +344,7 @@
 - (void)adAdapter:(id<MPAdAdapter>)adapter handleFullscreenAdEvent:(MPFullscreenAdEvent)fullscreenAdEvent {
     switch (fullscreenAdEvent) {
         case MPFullscreenAdEventDidLoad:
+            [self.delegate rewardedVideoDidSucceedAttemptForAdManager:self];
             self.remainingConfigurations = nil;
             self.ready = YES;
             self.loading = NO;
@@ -402,6 +421,11 @@
 - (void)adShouldRewardUserForAdapter:(id<MPAdAdapter>)adapter reward:(MPReward *)reward {
     MPLogAdEvent([MPLogEvent adShouldRewardUserWithReward:reward], self.adUnitId);
     [self.delegate rewardedAdShouldRewardUserForAdManager:self reward:reward];
+}
+
+- (NSString *) getCreativeId
+{
+    return self.configuration.dspCreativeId;
 }
 
 @end

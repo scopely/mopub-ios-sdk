@@ -18,6 +18,11 @@
 - (MPInterstitialAdController *)interstitialAdController;
 - (NSString *)adUnitId;
 - (id)interstitialDelegate;
+
+- (void)managerWillStartInterstitialAttempt:(MPInterstitialAdManager *)manager;
+- (void)managerDidSucceedInterstitialAttempt:(MPInterstitialAdManager *)manager;
+- (void)manager:(MPInterstitialAdManager *)manager didFailInterstitialAttemptWithError:(NSError*)error;
+
 - (void)managerDidLoadInterstitial:(MPInterstitialAdManager *)manager;
 - (void)manager:(MPInterstitialAdManager *)manager
 didFailToLoadInterstitialWithError:(NSError *)error;
