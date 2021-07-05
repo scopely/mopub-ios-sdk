@@ -223,38 +223,12 @@ DEPRECATED_MSG_ATTRIBUTE("MPRewardedVideo is deprecated. Please use MPRewardedAd
  */
 + (void)presentRewardedVideoAdForAdUnitID:(NSString *)adUnitID fromViewController:(UIViewController *)viewController withReward:(MPRewardedVideoReward *)reward customData:(NSString *)customData DEPRECATED_MSG_ATTRIBUTE("MPRewardedVideo.presentRewardedVideoAdForAdUnitID:fromViewController:withReward:customData: is deprecated and will be removed in a future version. Use MPRewardedAds.presentRewardedAdForAdUnitID:fromViewController:withReward:customData: instead.");
 
-+ (NSString*) creativeIdForAdUnitID:(NSString *)adUnitID;
 
 @end
 
 @protocol MPRewardedVideoDelegate <NSObject>
 
 @optional
-
-/**
- This method is called before an ad attempts to load.
-
- @param adUnitID The ad unit ID of the ad associated with the event.
- @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
- @param lineItemId The id of line item the ad belongs to.
- */
-- (void)rewardedVideoWillStartAttemptForAdUnitID:(NSString *)adUnitID customEventClass:(NSString*)customEventClass withLineItemId:(NSString*)lineItemId;
-
-/**
- This method is called after an ad attempt succeeds to load.
-
- @param adUnitID The ad unit ID of the ad associated with the event.
- @param creativeId The id of the creative loaded.
- */
-- (void)rewardedVideoDidSucceedAttemptForAdUnitID:(NSString *)adUnitID withCreativeId:(NSString*)creativeId withImpressionData:(MPImpressionData *)impressionData;
-
-/**
- This method is called after an ad attempt fails to load.
-
- @param adUnitID The ad unit ID of the ad associated with the event.
- @param error The error that occurred during the load.
- */
-- (void)rewardedVideoDidFailAttemptForAdUnitID:(NSString *)adUnitID error:(NSError*)error withImpressionData:(MPImpressionData *)impressionData;
 
 /**
  This method is called after an ad loads successfully.

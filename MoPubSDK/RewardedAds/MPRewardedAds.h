@@ -163,11 +163,38 @@
  */
 + (void)presentRewardedAdForAdUnitID:(NSString *)adUnitID fromViewController:(UIViewController *)viewController withReward:(MPReward *)reward customData:(NSString *)customData;
 
++ (NSString*) creativeIdForAdUnitID:(NSString *)adUnitID;
+
 @end
 
 @protocol MPRewardedAdsDelegate <NSObject>
 
 @optional
+
+/**
+ This method is called before an ad attempts to load.
+
+ @param adUnitID The ad unit ID of the ad associated with the event.
+ @param customEventClass The MPCustomEvent class name to identify the AdNetwork.
+ @param lineItemId The id of line item the ad belongs to.
+ */
+- (void)rewardedVideoWillStartAttemptForAdUnitID:(NSString *)adUnitID customEventClass:(NSString*)customEventClass withLineItemId:(NSString*)lineItemId;
+
+/**
+ This method is called after an ad attempt succeeds to load.
+
+ @param adUnitID The ad unit ID of the ad associated with the event.
+ @param creativeId The id of the creative loaded.
+ */
+- (void)rewardedVideoDidSucceedAttemptForAdUnitID:(NSString *)adUnitID withCreativeId:(NSString*)creativeId withImpressionData:(MPImpressionData *)impressionData;
+
+/**
+ This method is called after an ad attempt fails to load.
+
+ @param adUnitID The ad unit ID of the ad associated with the event.
+ @param error The error that occurred during the load.
+ */
+- (void)rewardedVideoDidFailAttemptForAdUnitID:(NSString *)adUnitID error:(NSError*)error withImpressionData:(MPImpressionData *)impressionData;
 
 /**
  This method is called after an ad loads successfully.

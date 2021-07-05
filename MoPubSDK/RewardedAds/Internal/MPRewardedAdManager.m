@@ -94,7 +94,7 @@
     return self.configuration.lineItemId;
 }
 
-(MPImpressionData *)impressionData {
+- (MPImpressionData *)impressionData {
     if (self.configuration == nil){
         return nil;
     }
